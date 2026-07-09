@@ -1,14 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function LoginForm() {
-  const router = useRouter();
+export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -19,21 +16,21 @@ export function LoginForm() {
     setMessage(null);
     setIsSubmitting(true);
 
+    const redirectTo = `${window.location.origin}/auth/confirm?next=/auth/update-password`;
     const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
       email,
-      password,
-    });
+      { redirectTo },
+    );
 
-    if (signInError) {
-      setError("Invalid email or password.");
-      setIsSubmitting(false);
+    setIsSubmitting(false);
+
+    if (resetError) {
+      setError("Could not send the reset email. Check the email address and try again.");
       return;
     }
 
-    setMessage("Signed in. Opening hub...");
-    router.replace("/hub");
-    router.refresh();
+    setMessage("Reset email sent. Check your inbox for the password reset link.");
   }
 
   return (
@@ -50,21 +47,6 @@ export function LoginForm() {
           onChange={(event) => setEmail(event.target.value)}
           className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/35"
           placeholder="name@example.com"
-        />
-      </label>
-
-      <label className="grid gap-1.5 text-sm font-medium" htmlFor="password">
-        Password
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/35"
-          placeholder="Password"
         />
       </label>
 
@@ -85,14 +67,14 @@ export function LoginForm() {
         disabled={isSubmitting}
         className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60"
       >
-        {isSubmitting ? "Signing in" : "Sign in"}
+        {isSubmitting ? "Sending reset link" : "Send reset link"}
       </button>
 
       <Link
-        href="/auth/forgot-password"
+        href="/login"
         className="text-center text-sm text-muted-foreground hover:text-foreground"
       >
-        Forgot password?
+        Back to login
       </Link>
     </form>
   );

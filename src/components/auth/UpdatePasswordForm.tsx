@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function LoginForm() {
+export function UpdatePasswordForm() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -17,54 +16,69 @@ export function LoginForm() {
     event.preventDefault();
     setError(null);
     setMessage(null);
-    setIsSubmitting(true);
 
+    if (password.length < 8) {
+      setError("Use at least 8 characters.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setIsSubmitting(true);
     const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
+    const { error: updateError } = await supabase.auth.updateUser({
       password,
     });
 
-    if (signInError) {
-      setError("Invalid email or password.");
+    if (updateError) {
+      setError("Could not update the password. Open the latest reset link and try again.");
       setIsSubmitting(false);
       return;
     }
 
-    setMessage("Signed in. Opening hub...");
-    router.replace("/hub");
+    setMessage("Password updated. Redirecting to login...");
+    await supabase.auth.signOut();
+    router.replace("/login");
     router.refresh();
   }
 
   return (
     <form className="mt-5 grid gap-4" onSubmit={handleSubmit}>
-      <label className="grid gap-1.5 text-sm font-medium" htmlFor="email">
-        Email
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/35"
-          placeholder="name@example.com"
-        />
-      </label>
-
       <label className="grid gap-1.5 text-sm font-medium" htmlFor="password">
-        Password
+        New password
         <input
           id="password"
           name="password"
           type="password"
-          autoComplete="current-password"
+          autoComplete="new-password"
           required
+          minLength={8}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/35"
-          placeholder="Password"
+          placeholder="New password"
+        />
+      </label>
+
+      <label
+        className="grid gap-1.5 text-sm font-medium"
+        htmlFor="confirm-password"
+      >
+        Confirm password
+        <input
+          id="confirm-password"
+          name="confirm-password"
+          type="password"
+          autoComplete="new-password"
+          required
+          minLength={8}
+          value={confirmPassword}
+          onChange={(event) => setConfirmPassword(event.target.value)}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/35"
+          placeholder="Confirm password"
         />
       </label>
 
@@ -85,15 +99,8 @@ export function LoginForm() {
         disabled={isSubmitting}
         className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60"
       >
-        {isSubmitting ? "Signing in" : "Sign in"}
+        {isSubmitting ? "Updating password" : "Update password"}
       </button>
-
-      <Link
-        href="/auth/forgot-password"
-        className="text-center text-sm text-muted-foreground hover:text-foreground"
-      >
-        Forgot password?
-      </Link>
     </form>
   );
 }
