@@ -40,3 +40,17 @@ rtk pip list            rtk pnpm install        rtk npm run <script>
 - For debugging, use raw command without rtk prefix
 - `rtk proxy <cmd>` runs command without filtering but tracks usage
 <!-- /headroom:rtk-instructions -->
+
+## Pins Hub Project Rules
+
+- Use Next.js App Router, TypeScript, Tailwind CSS, and Supabase.
+- Do not add Prisma or expose service-role credentials in application code.
+- Keep external API credentials server-only. Never use `NEXT_PUBLIC_` for tokens, Monday API keys, or other secrets.
+- Preserve existing Supabase Auth, SSR cookie handling, migrations, and Pins Hub access control unless the user explicitly approves a change.
+- Place feature work under `src/features/<feature-name>/` with `components/`, `data/`, `lib/`, and `types.ts` as needed.
+- Keep business logic, API clients, data mapping, and KPI calculations out of page files and presentational UI components.
+- Prefer server components for initial data loading where practical; keep client components for forms and interactive controls.
+- Reuse shared components from `src/components/ui`, `src/components/layout`, and feature component folders instead of repeating JSX and Tailwind classes.
+- Every data surface must handle loading, empty, and error states with existing shared state components where practical.
+- Keep UI compact, dark, and operational. Do not add descriptions, subtitles, helper paragraphs, decorative badges, hero sections, or marketing copy unless explicitly requested.
+- Before handing off code changes, run `npm run lint`, `npx tsc --noEmit`, and `npm run build`.
