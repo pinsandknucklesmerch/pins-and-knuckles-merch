@@ -1,29 +1,26 @@
+import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { connection } from "next/server";
+
+import { createClient } from "@/lib/supabase/server";
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-center px-6">
-      <section className="w-full max-w-md rounded-lg border border-border bg-card p-5">
-        <p className="text-xs font-medium text-muted-foreground">Pins Hub</p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-normal">
-          Operations rebuild
-        </h1>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Initial Next.js and Supabase structure is ready for staged feature work.
-        </p>
-        <div className="mt-5 flex gap-3 text-sm">
-          <a
-            href="/hub"
-            className="rounded-md bg-primary px-3 py-2 font-medium text-primary-foreground"
-          >
-            Open hub
-          </a>
-          <a
-            href="/login"
-            className="rounded-md border border-border px-3 py-2 font-medium text-foreground"
-          >
-            Login
-          </a>
-        </div>
-      </section>
-    </main>
+    <Suspense fallback={null}>
+      <HomeRedirect />
+    </Suspense>
   );
+}
+
+async function HomeRedirect() {
+  await connection();
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  redirect(user ? "/hub" : "/login");
+
+  return null;
 }

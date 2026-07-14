@@ -4,7 +4,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function UpdatePasswordForm() {
+type UpdatePasswordFormProps = {
+  mode?: "invite" | "recovery";
+};
+
+export function UpdatePasswordForm({
+  mode = "recovery",
+}: UpdatePasswordFormProps) {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -34,8 +40,19 @@ export function UpdatePasswordForm() {
     });
 
     if (updateError) {
-      setError("Could not update the password. Open the latest reset link and try again.");
+      setError(
+        mode === "invite"
+          ? "Could not set the password. Open the latest invite link and try again."
+          : "Could not update the password. Open the latest reset link and try again.",
+      );
       setIsSubmitting(false);
+      return;
+    }
+
+    if (mode === "invite") {
+      setMessage("Password set. Opening hub...");
+      router.replace("/hub");
+      router.refresh();
       return;
     }
 

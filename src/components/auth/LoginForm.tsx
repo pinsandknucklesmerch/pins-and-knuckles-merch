@@ -37,7 +37,7 @@ export function LoginForm() {
   }
 
   return (
-    <form className="mt-5 grid gap-4" onSubmit={handleSubmit}>
+    <form className="mt-5 grid gap-4" method="post" onSubmit={handleSubmit}>
       <label className="grid gap-1.5 text-sm font-medium" htmlFor="email">
         Email
         <input
@@ -57,7 +57,6 @@ export function LoginForm() {
         Password
         <input
           id="password"
-          name="password"
           type="password"
           autoComplete="current-password"
           required

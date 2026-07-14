@@ -19,10 +19,16 @@ const navItems = [
 ];
 
 type SidebarNavProps = {
+  accessLevel: "admin" | "write" | "read";
+  organisationRole: "owner" | "admin" | "manager" | "staff" | "viewer" | null;
   userEmail: string | null;
 };
 
-export function SidebarNav({ userEmail }: SidebarNavProps) {
+export function SidebarNav({
+  accessLevel,
+  organisationRole,
+  userEmail,
+}: SidebarNavProps) {
   return (
     <aside className="hidden w-60 shrink-0 border-r border-border bg-card/55 px-3 py-4 md:flex md:flex-col">
       <div>
@@ -50,6 +56,14 @@ export function SidebarNav({ userEmail }: SidebarNavProps) {
         <p className="truncate px-2 text-xs text-muted-foreground">
           {userEmail ?? "Signed in"}
         </p>
+        <div className="mt-2 grid grid-cols-2 gap-2 px-2 text-xs">
+          <span className="rounded-md bg-secondary px-2 py-1 text-center text-foreground">
+            {accessLevel}
+          </span>
+          <span className="rounded-md bg-secondary px-2 py-1 text-center text-foreground">
+            {organisationRole ?? "member"}
+          </span>
+        </div>
         <LogoutButton />
       </div>
     </aside>
