@@ -1,4 +1,5 @@
 import {
+  ChartNoAxesColumnIncreasing,
   Calculator,
   FileText,
   Gauge,
@@ -11,6 +12,11 @@ import { LogoutButton } from "@/components/auth/LogoutButton";
 
 const navItems = [
   { href: "/hub", label: "Dashboard", icon: Gauge },
+  {
+    href: "/hub/sales-dashboard",
+    label: "Sales Dashboard",
+    icon: ChartNoAxesColumnIncreasing,
+  },
   { href: "/hub", label: "Calculators", icon: Calculator },
   { href: "/hub", label: "Garments", icon: Shirt },
   { href: "/hub", label: "Invoices", icon: FileText },

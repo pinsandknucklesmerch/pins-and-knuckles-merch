@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { Panel } from "@/components/ui/Panel";
+import Link from "next/link";
 
 export default function HubPage() {
   return (
@@ -15,10 +16,15 @@ export default function HubPage() {
         />
         <div className="grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
           <Panel title="Workspace">
-            <EmptyState
-              title="No modules connected"
-              description="Feature areas are scaffolded and ready for staged build-out."
-            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Link
+                className="rounded-md border border-border bg-background px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+                href="/hub/sales-dashboard"
+              >
+                Sales Dashboard
+              </Link>
+              <EmptyState title="No modules connected" />
+            </div>
           </Panel>
           <Panel title="Status">
             <dl className="grid gap-3 text-sm">
