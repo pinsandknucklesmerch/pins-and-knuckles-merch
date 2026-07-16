@@ -5,6 +5,7 @@ type ActionButtonProps = {
   children: React.ReactNode;
   className?: string;
   href?: string;
+  onClick?: () => void;
   type?: "button" | "submit";
 };
 
@@ -12,6 +13,7 @@ export function ActionButton({
   children,
   className,
   href,
+  onClick,
   type = "button",
 }: ActionButtonProps) {
   const classes = cn(
@@ -28,7 +30,7 @@ export function ActionButton({
   }
 
   return (
-    <button type={type} className={classes}>
+    <button type={type} className={classes} onClick={onClick}>
       {children}
     </button>
   );

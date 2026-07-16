@@ -201,3 +201,10 @@ export async function loadCalculatorReferenceData(
     deliveryRates: (deliveryResponse.data ?? []).map(mapDeliveryRate),
   };
 }
+
+export async function loadEuCalculatorReferenceData(
+  supabase: CalculatorSupabaseClient,
+  profileCode: Extract<CalculatorProfileCode, "EU_STANDARD" | "EU_US_CLIENTS">,
+) {
+  return loadCalculatorReferenceData(supabase, profileCode);
+}
