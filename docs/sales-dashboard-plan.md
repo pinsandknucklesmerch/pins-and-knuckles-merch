@@ -71,7 +71,7 @@ Required column IDs should be collected before implementation:
 - Lead status: current lead pipeline status.
 - Conversion status: value that identifies won/converted leads.
 - Converted date: date used for date-range conversion reporting.
-- Lead source: source category such as website, referral, repeat customer, social, event, or manual.
+- Lead source: source category such as website, repeat customer, social, event, or manual.
 
 ## Server-Side Monday Query Flow
 

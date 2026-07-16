@@ -403,17 +403,7 @@ No `/hub/calculators/eu/trade` route exists.
 
 ### Local Branch Search
 
-Visible local branches checked:
-
-- `main`
-- `backup/pre-db-rework`
-- `feature/commercial-invoice-save-load`
-- `feature/component-updates`
-- `feature/hub-cleanup-remove-referrals`
-- `feature/remove-referrals-redo`
-- `feature/sales-dashboard-readonly`
-- `rescue/current-untracked`
-- `staging`
+Visible local branches were checked during the legacy audit.
 
 `git grep` across those visible local branches found UK Trade implementations and documentation, but no working EU Trade route/profile implementation. Matches were UK Trade paths such as `src/app/hub/calculators/uk/trade/*` and documentation references to `/hub/calculators/uk/trade`.
 

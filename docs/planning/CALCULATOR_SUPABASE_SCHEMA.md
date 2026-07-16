@@ -1,12 +1,12 @@
-# Calculator Supabase Schema Plan
+# Calculator Supabase Schema Reference
 
 Source of truth:
 
-- `docs/ai-context/REBUILD_PROJECT_CONTEXT.md`
+- `docs/ai-context/PROJECT_CONTEXT.md`
 - `docs/planning/CALCULATOR_MIGRATION_ANALYSIS.md`
 - `docs/planning/LEGACY_CALCULATOR_BEHAVIOUR_CONFIRMATION.md`
 
-This is a schema plan only. Do not create migrations from this document until the table names, RLS policy shape, and seed/import process are reviewed.
+This document began as the calculator schema plan. The schema and seed data have since been implemented in `supabase/migrations/20260715120000_calculator_schema.sql` and `supabase/migrations/20260715130000_calculator_seed.sql`; treat the migrations and generated types as implementation truth.
 
 ## Confirmed Migration Decisions
 
@@ -51,7 +51,7 @@ This is a schema plan only. Do not create migrations from this document until th
 - Keep EU and UK Trade pricing separated by profile, region, currency, and dedicated tier tables.
 - Do not delete historical pricing rows. Retire rows with validity windows and `is_active`.
 - Store currency values as `numeric(12,4)` so cents/pence and per-unit fractions are exact enough for pricing.
-- Use generated Supabase types once configured; map DB rows into calculator domain DTOs before calculating.
+- Use generated Supabase types in repositories; map DB rows into calculator domain DTOs before calculating.
 
 ## Shared Conventions
 
@@ -859,21 +859,25 @@ and (valid_to is null or valid_to >= quote_date)
 
 If quote persistence is added later, saved quotes should store the pricing effective date and/or price row ids used.
 
-## Proposed Migration Order
+## Implemented Migration State
 
-1. Create shared pricing enums/checks and timestamp trigger helper if not already available.
-2. Create `garments`.
-3. Create `calculator_profiles`.
-4. Create `calculator_garment_markups`.
-5. Create EU pricing tables: `eu_print_price_tiers`, `eu_embroidery_pricing`.
-6. Create UK Trade pricing tables: `uk_trade_print_price_tiers`, `uk_trade_embroidery_pricing`.
-7. Create `calculator_fees`.
-8. Create `delivery_rates`.
-9. Add RLS policies and admin write policies.
-10. Generate Supabase database types.
-11. Build read-only repositories and pure calculator fixtures before UI work.
+Implemented in `20260715120000_calculator_schema.sql`:
 
-## Seed/Import Order
+1. Shared pricing checks and timestamp trigger helpers.
+2. `garments`.
+3. `calculator_profiles`.
+4. `calculator_garment_markups`.
+5. `calculator_pricing_sets` and `calculator_profile_price_sets`.
+6. EU pricing tables: `eu_print_price_tiers`, `eu_embroidery_pricing`.
+7. UK Trade pricing tables: `uk_trade_print_price_tiers`, `uk_trade_embroidery_pricing`.
+8. `calculator_fees`.
+9. `delivery_rates`.
+10. RLS read/admin-write policies.
+11. Generated Supabase database types in `src/types/database.types.ts`.
+
+## Implemented Seed State
+
+Implemented in `20260715130000_calculator_seed.sql`:
 
 1. Seed global `calculator_profiles`: `EU_STANDARD`, `EU_US_CLIENTS`, `UK_TRADE`.
 2. Seed `garments` with current EUR and GBP fields; keep `extra_size_cost` as metadata only.
@@ -885,21 +889,17 @@ If quote persistence is added later, saved quotes should store the pricing effec
 8. Seed `uk_trade_embroidery_pricing`.
 9. Seed UK setup fees.
 10. Seed EU `delivery_rates`.
-11. Run fixture parity tests against imported rows.
+11. Seed calculator profile pricing-set mappings.
 
-## Unresolved Decisions
+## Deferred Future Decisions
 
-- Whether `organisation_id` should remain nullable global-only for calculators or become required when multi-organisation pricing is needed.
-- Whether pricing-set mapping should be stored in a dedicated join table now or kept in TypeScript until admin switching is needed.
-- Whether UK Trade embroidery quantities above `2500` should continue using the `2500` tier or become invalid; source docs indicate current floor-tier behaviour, but this should be fixture-tested.
-- Whether UK Trade values should remain ex-VAT in every surface; current confirmed behaviour has no VAT in totals/copy.
-- Whether delivery rates should be shared between EU Standard and EU US Clients through one delivery set or duplicated per profile.
-- Whether to add quote persistence in the same calculator phase or defer it until calculators are stable.
-- Whether future EU Trade should get a dormant profile row now. Recommendation: do not seed active EU Trade until rules exist.
+- When multi-organisation pricing is needed, review and remove the current global-only `organisation_id is null` checks with explicit fallback/override rules.
+- Quote persistence remains deferred until calculator flows are stable.
+- Do not seed an active EU Trade profile until rules exist.
 
 ## Risks of Over-Normalising the Schema
 
-Note: the current confirmed decisions at the top of this document supersede any older unresolved notes above about organisation overrides, price-set mapping, shared delivery sets, UK embroidery quantities above `2500`, and active EU Trade profiles.
+Note: the current confirmed decisions at the top of this document supersede older planning notes about organisation overrides, shared delivery sets, UK embroidery quantities above `2500`, and active EU Trade profiles.
 
 - Separating every position, method, price set, and fee into many generic tables can slow the rebuild and make imports fragile.
 - A generic decoration pricing model may accidentally allow UK prices to leak into EU calculators.

@@ -1,11 +1,7 @@
 import {
   ChartNoAxesColumnIncreasing,
   Calculator,
-  FileText,
   Gauge,
-  Library,
-  ReceiptText,
-  Shirt,
 } from "lucide-react";
 import Link from "next/link";
 import { LogoutButton } from "@/components/auth/LogoutButton";
@@ -17,11 +13,7 @@ const navItems = [
     label: "Sales Dashboard",
     icon: ChartNoAxesColumnIncreasing,
   },
-  { href: "/hub", label: "Calculators", icon: Calculator },
-  { href: "/hub", label: "Garments", icon: Shirt },
-  { href: "/hub", label: "Invoices", icon: FileText },
-  { href: "/hub", label: "PK Tax", icon: ReceiptText },
-  { href: "/hub", label: "Reference", icon: Library },
+  { href: "/hub/calculators", label: "Calculators", icon: Calculator },
 ];
 
 type SidebarNavProps = {
