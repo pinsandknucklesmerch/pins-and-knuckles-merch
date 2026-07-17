@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
 
 function isPublicPath(pathname: string) {
-  return pathname.startsWith("/login") || pathname.startsWith("/auth");
+  return pathname === "/" || pathname.startsWith("/login") || pathname.startsWith("/auth");
 }
 
 function hasSupabaseAuthCookie(request: NextRequest) {
