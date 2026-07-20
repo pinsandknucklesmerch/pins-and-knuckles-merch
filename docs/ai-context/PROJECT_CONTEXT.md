@@ -95,6 +95,14 @@ Generated database types are present at `src/types/database.types.ts`.
 | `/hub/calculators` | Protected calculator region menu |
 | `/hub/calculators/eu` | Protected EU calculator menu |
 | `/hub/calculators/eu/standard` | Protected initial EU Standard calculator |
+| `/hub/pk-tax` | Protected calculation-only PK Tax allocation calculator |
+
+## PK Tax
+
+- Inputs: EPCC, Johan, Bux, Hardus, Shannon, Justin, and Snuggle.
+- Legacy source-of-truth: the legacy Pins Hub PK Tax implementation; Seth is removed from inputs, calculations, recipients, exports, labels, types, and tests.
+- Calculation-only: no persistence, saved reports, history, API route, localStorage, or sessionStorage.
+- Export behavior: clipboard text summary matching the legacy export behavior; the legacy implementation does not use a filename.
 
 There is no active `/test` route.
 
@@ -107,9 +115,15 @@ There is no active `/test` route.
 
 ## Sales Dashboard Status
 
-- Implemented under `src/features/sales-dashboard`.
-- Uses fixture data only.
-- Includes date range filtering, KPI summary, salesperson table, and lead source table.
+- Rebuilt from the legacy reference/validated dashboard plan under `src/features/sales-dashboard`.
+- Uses fixture data only; no persistence or Monday.com/Netsuite integration yet.
+- Monthly Profit target is `£155,000`; Quotes Done target is `300`; Orders Processed has no confirmed target.
+- Includes date range filtering, KPI cards with prior-year comparisons and progress meters, salesperson performance, and lead source breakdowns.
+- Historical fixture source: normalized `Monthly Compare.xlsx` workbook data in `src/features/sales-dashboard/data/workbookFixture.ts`; default selection is October 2025.
+- The committed source workbook is `docs/Monthly Compare.xlsx`; its `JULY per sales rep ` sheet name has a trailing space that is normalized when imported.
+- The workbook has no unambiguous Orders Processed or lead-source field, so those surfaces show `—`/empty state rather than inferred values.
+- Workbook blanks, including November/December summary values and late-year average-profit cells, remain `null`; no missing month is treated as zero.
+- Per-sales-rep sheets have no year column and are presented as 2024-aligned historical salesperson data; `CAT` is normalized to `Catherine`.
 - Future work is replacing fixtures with server-side source mapping once source IDs and column IDs are confirmed.
 
 ## Calculator Status
