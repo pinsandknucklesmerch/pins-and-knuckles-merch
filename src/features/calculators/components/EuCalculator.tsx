@@ -3,7 +3,7 @@
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ActionButton } from "@/components/ui/ActionButton";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { createDefaultEuCalculatorItem } from "../domain/euCalculatorDefaults.ts";
 import { calculateEuStandardPrice } from "../domain/euPricingEngine.ts";
 import type {
   CalculatorReferenceData,
@@ -11,8 +11,9 @@ import type {
   EuCalculatorItemInput,
   EuCalculatorTotals,
 } from "../domain/types.ts";
-import { CalculatorTotals } from "./CalculatorTotals";
 import { EuItemCard } from "./EuItemCard";
+import { EuCalculatorResults } from "./EuCalculatorResults";
+import type { EuQuoteLine } from "../domain/euQuoteFormatter.ts";
 
 type EuCalculatorProps = {
   referenceData: CalculatorReferenceData;
@@ -22,19 +23,8 @@ type ItemCalculation = {
   itemId: string;
   errors: CalculatorValidationError[];
   totals: EuCalculatorTotals | null;
+  result: EuQuoteLine["result"] | null;
 };
-
-function createDefaultItem(index: number): EuCalculatorItemInput {
-  return {
-    id: `item-${index}`,
-    garmentId: null,
-    quantity: 50,
-    printPositions: [{ position: "FRONT", colourCount: 1 }],
-    embroideryItems: [],
-    pkMarkupEnabled: false,
-    pkMarkupPerUnit: 0,
-  };
-}
 
 function emptyTotals(vatRate: number): EuCalculatorTotals {
   return {
@@ -66,7 +56,7 @@ function addTotals(
 export function EuCalculator({ referenceData }: EuCalculatorProps) {
   const [nextItemIndex, setNextItemIndex] = useState(2);
   const [items, setItems] = useState<EuCalculatorItemInput[]>([
-    createDefaultItem(1),
+    createDefaultEuCalculatorItem(1),
   ]);
 
   const calculations = useMemo<ItemCalculation[]>(() => {
@@ -79,11 +69,14 @@ export function EuCalculator({ referenceData }: EuCalculatorProps) {
         referenceData,
       );
 
-      return {
-        itemId: item.id,
-        errors: result.errors,
-        totals: result.ok ? result.totals : null,
-      };
+      return result.ok
+        ? {
+            itemId: item.id,
+            errors: result.errors,
+            totals: result.totals,
+            result: result.items[0] ?? null,
+          }
+        : { itemId: item.id, errors: result.errors, totals: null, result: null };
     });
   }, [items, referenceData]);
 
@@ -97,6 +90,16 @@ export function EuCalculator({ referenceData }: EuCalculatorProps) {
     (calculation) => calculation.totals,
   ).length;
 
+  const validQuoteLines: EuQuoteLine[] = calculations.flatMap((calculation) => {
+    if (!calculation.result) return [];
+    const input = items.find((item) => item.id === calculation.itemId);
+    const garment = referenceData.garments.find(
+      (candidate) => candidate.id === calculation.result?.garmentId,
+    );
+    if (!input || !garment) return [];
+    return [{ input, result: calculation.result, garment }];
+  });
+
   function updateItem(updatedItem: EuCalculatorItemInput) {
     setItems((currentItems) =>
       currentItems.map((item) =>
@@ -106,7 +109,7 @@ export function EuCalculator({ referenceData }: EuCalculatorProps) {
   }
 
   function addItem() {
-    setItems((currentItems) => [...currentItems, createDefaultItem(nextItemIndex)]);
+    setItems((currentItems) => [...currentItems, createDefaultEuCalculatorItem(nextItemIndex)]);
     setNextItemIndex((currentIndex) => currentIndex + 1);
   }
 
@@ -119,8 +122,8 @@ export function EuCalculator({ referenceData }: EuCalculatorProps) {
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-      <div className="grid gap-4">
+    <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid min-w-0 gap-4">
         <div className="flex items-center justify-between gap-3">
           <div className="text-sm text-muted-foreground">
             {validItemCount} valid / {items.length} total
@@ -150,9 +153,12 @@ export function EuCalculator({ referenceData }: EuCalculatorProps) {
         </div>
       </div>
 
-      <div className="grid content-start gap-4">
-        <CalculatorTotals totals={totals} />
-        {validItemCount === 0 ? <EmptyState title="No valid items" /> : null}
+      <div className="grid min-w-0 content-start gap-4">
+        <EuCalculatorResults items={validQuoteLines} totals={totals} showBreakdown={false} showEmptyState={false} />
+      </div>
+
+      <div className="col-span-full min-w-0">
+        <EuCalculatorResults items={validQuoteLines} totals={totals} showSummary={false} />
       </div>
     </div>
   );

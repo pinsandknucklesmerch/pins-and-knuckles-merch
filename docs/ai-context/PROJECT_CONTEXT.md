@@ -84,7 +84,7 @@ Generated database types are present at `src/types/database.types.ts`.
 
 | Route | Status |
 | --- | --- |
-| `/` | Redirects to `/hub` |
+| `/` | Implemented branded landing page; shows sign-in options when signed out and an `Open Pins Hub` action when authenticated |
 | `/login` | Implemented |
 | `/auth/forgot-password` | Implemented |
 | `/auth/confirm` | Implemented route handler |
@@ -97,6 +97,13 @@ Generated database types are present at `src/types/database.types.ts`.
 | `/hub/calculators/eu/standard` | Protected initial EU Standard calculator |
 
 There is no active `/test` route.
+
+## Current Landing UI
+
+- `src/app/page.tsx` is the public entry screen and performs a server-side Supabase auth check.
+- The landing screen uses the reusable `src/components/backgrounds/Galaxy.tsx` background and Pins & Knuckles assets under `public/branding/`.
+- Email sign-in links to `/login`; Microsoft and Google buttons are present as disabled placeholders until those providers are configured.
+- Authenticated users see a direct link to `/hub`.
 
 ## Sales Dashboard Status
 

@@ -5,6 +5,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import Image from "next/image";
+
 
 const navItems = [
   { href: "/hub", label: "Dashboard", icon: Gauge },
@@ -30,12 +32,18 @@ export function SidebarNav({
   return (
     <aside className="hidden w-60 shrink-0 border-r border-border bg-card/55 px-3 py-4 md:flex md:flex-col">
       <div>
-        <Link href="/hub" className="mb-4 flex items-center gap-2 px-2">
-          <span className="flex size-8 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
-            PK
-          </span>
-          <span className="text-sm font-semibold">Pins Hub</span>
-        </Link>
+
+          <Link href="/hub" className="mb-5 flex items-center px-2">
+        <Image
+          src="/branding/P&K_LOGO.png"
+          alt="Pins & Knuckles"
+          width={180}
+          height={48}
+          priority
+          className="h-auto w-40"
+        />
+      </Link>
+
         <nav className="space-y-1">
           {navItems.map((item) => (
             <Link

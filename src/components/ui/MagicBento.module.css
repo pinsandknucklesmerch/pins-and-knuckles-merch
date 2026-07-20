@@ -1,0 +1,208 @@
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.magicBentoCard {
+  --glow-x: 50%;
+  --glow-y: 50%;
+  --glow-intensity: 0;
+  --glow-radius: 300px;
+  --glow-color: 222, 59, 67;
+
+  position: relative;
+  display: flex;
+  min-height: 172px;
+  width: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  background: hsl(var(--card));
+  padding: 1rem;
+  color: hsl(var(--foreground));
+  text-align: left;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  isolation: isolate;
+}
+
+.magicBentoCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--glow-color), 0.55);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+}
+
+.magicBentoCard:focus-visible {
+  outline: 2px solid rgb(var(--glow-color));
+  outline-offset: 3px;
+}
+
+.magicBentoCard::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(
+    var(--glow-radius) circle at var(--glow-x) var(--glow-y),
+    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.8)) 0%,
+    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.4)) 30%,
+    transparent 60%
+  );
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.borderGlow::after {
+  z-index: 1;
+  padding: 1px;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 1;
+}
+
+.borderGlow:hover {
+  box-shadow: 0 4px 20px rgba(var(--glow-color), 0.18);
+}
+
+.particleContainer {
+  position: relative;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  z-index: 2;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(var(--glow-color), 1);
+  box-shadow: 0 0 6px rgba(var(--glow-color), 0.6);
+  pointer-events: none;
+}
+
+.particle::before {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: rgba(var(--glow-color), 0.2);
+  content: "";
+}
+
+.cardHeader,
+.cardContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+}
+
+.cardHeader {
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cardContent {
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cardIcon {
+  display: inline-flex;
+  color: rgb(var(--glow-color));
+}
+
+.cardLabel,
+.cardStatus,
+.cardValue {
+  font-size: 0.6875rem;
+  line-height: 1rem;
+}
+
+.cardLabel,
+.cardStatus {
+  color: hsl(var(--muted-foreground));
+}
+
+.cardStatus {
+  text-align: right;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+}
+
+.cardValue {
+  color: hsl(var(--muted-foreground));
+}
+
+.textAutoHide .cardLabel,
+.textAutoHide .cardTitle,
+.textAutoHide .cardStatus,
+.textAutoHide .cardValue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.staticBorder::after {
+  background: rgba(var(--glow-color), 0.2);
+  opacity: 1;
+}
+
+.spotlight {
+  position: fixed;
+  z-index: 20;
+  width: 800px;
+  height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(var(--glow-color), 0.15) 0%,
+    rgba(var(--glow-color), 0.08) 15%,
+    rgba(var(--glow-color), 0.04) 25%,
+    rgba(var(--glow-color), 0.02) 40%,
+    transparent 70%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
+
+.section {
+  position: relative;
+  user-select: none;
+}
+
+@media (max-width: 599px) {
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .magicBentoCard {
+    min-height: 148px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .magicBentoCard {
+    transition: none;
+  }
+}

@@ -143,6 +143,7 @@ export type EuEmbroiderySelection = {
 
 export type EuCalculatorItemInput = {
   id: string;
+  itemLabel?: string;
   garmentId: string | null;
   quantity: number;
   printPositions: EuPrintSelection[];
