@@ -1,0 +1,38 @@
+.panel {
+  --bento-accent: hsl(var(--primary));
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid hsl(var(--border) / 0.9);
+  border-radius: 0.75rem;
+  background: hsl(var(--card) / 0.78);
+  color: hsl(var(--card-foreground));
+  backdrop-filter: blur(12px);
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.panel::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(circle at 12% 0%, hsl(var(--bento-accent) / 0.09), transparent 42%);
+  content: "";
+  pointer-events: none;
+}
+
+.interactive { cursor: pointer; }
+.interactive:hover {
+  transform: translateY(-2px);
+  border-color: hsl(var(--bento-accent) / 0.65);
+  box-shadow: 0 6px 8px hsl(var(--bento-accent) / 0.12);
+}
+.interactive:focus-visible { outline: 2px solid hsl(var(--bento-accent)); outline-offset: 3px; }
+.accent { --bento-accent: hsl(var(--accent)); }
+.neutral { --bento-accent: hsl(var(--foreground)); }
+.glow { border-color: hsl(var(--bento-accent) / 0.48); box-shadow: 0 0 8px hsl(var(--bento-accent) / 0.12); }
+
+@media (prefers-reduced-motion: reduce) {
+  .panel { transition: none; }
+  .interactive:hover { transform: none; }
+}

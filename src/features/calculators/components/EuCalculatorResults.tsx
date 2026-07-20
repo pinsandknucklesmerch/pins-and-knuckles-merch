@@ -55,7 +55,7 @@ function ItemHeading({ line, index }: { line: EuQuoteLine; index: number }) {
 function ProductionBreakdown({ line, index }: { line: EuQuoteLine; index: number }) {
   const { result } = line;
   return (
-    <div className="min-w-0 rounded-md border border-border/70 bg-background/50 p-3">
+    <div className="min-w-0 rounded-md border border-border/70 bg-background/55 p-3 backdrop-blur-sm">
       <ItemHeading line={line} index={index} />
       <dl className="text-xs">
         <DetailRow label="Garment base price / unit" value={money(unitValue(result.baseCost, result.quantity))} />
@@ -76,7 +76,7 @@ function ProductionBreakdown({ line, index }: { line: EuQuoteLine; index: number
 function PinsBreakdown({ line, index }: { line: EuQuoteLine; index: number }) {
   const { input, result } = line;
   return (
-    <div className="min-w-0 rounded-md border border-border/70 bg-background/50 p-3">
+    <div className="min-w-0 rounded-md border border-border/70 bg-background/55 p-3 backdrop-blur-sm">
       <ItemHeading line={line} index={index} />
       <dl className="text-xs">
         <DetailRow label="Garment base price / unit" value={money(unitValue(result.baseCost, result.quantity))} />
@@ -136,7 +136,7 @@ export function EuCalculatorResults({
         <button
           type="button"
           onClick={copyQuote}
-          className="rounded-lg border border-accent/60 bg-accent/10 p-4 text-left transition-colors hover:bg-accent/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="rounded-lg border border-accent/60 bg-accent/10 p-4 text-left backdrop-blur-sm transition-colors hover:bg-accent/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label="Copy Pins Price quote"
         >
           <div className="flex items-center justify-between gap-3">
@@ -150,7 +150,7 @@ export function EuCalculatorResults({
         </button>
       </div> : null}
 
-      {showBreakdown ? <details className="group min-w-0 rounded-lg border border-border bg-card">
+      {showBreakdown ? <details className="group min-w-0 rounded-lg border border-border/90 bg-card/75 backdrop-blur-sm">
         <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
           <span className="flex items-center justify-between gap-3">Breakdown <span className="text-muted-foreground transition-transform group-open:rotate-180">⌄</span></span>
         </summary>

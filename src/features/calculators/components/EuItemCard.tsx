@@ -87,7 +87,7 @@ export function EuItemCard({
           onChange={(embroideryItems) => onChange({ ...item, embroideryItems })}
         />
 
-        <div className="grid gap-2 rounded-md border border-border bg-background p-3 sm:grid-cols-[1fr_140px]">
+        <div className="grid gap-2 rounded-md border border-border/70 bg-background/55 p-3 backdrop-blur-sm sm:grid-cols-[1fr_140px]">
           <label className="flex items-center gap-2 text-sm text-foreground">
             <input
               type="checkbox"

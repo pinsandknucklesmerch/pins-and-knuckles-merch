@@ -2,6 +2,7 @@ import {
   ChartNoAxesColumnIncreasing,
   Calculator,
   Gauge,
+  Landmark,
 } from "lucide-react";
 import Link from "next/link";
 import { LogoutButton } from "@/components/auth/LogoutButton";
@@ -16,6 +17,7 @@ const navItems = [
     icon: ChartNoAxesColumnIncreasing,
   },
   { href: "/hub/calculators", label: "Calculators", icon: Calculator },
+  { href: "/hub/pk-tax", label: "PK Tax", icon: Landmark },
 ];
 
 type SidebarNavProps = {
@@ -30,10 +32,10 @@ export function SidebarNav({
   userEmail,
 }: SidebarNavProps) {
   return (
-    <aside className="hidden w-60 shrink-0 border-r border-border bg-card/55 px-3 py-4 md:flex md:flex-col">
+    <aside className="hidden w-60 shrink-0 border-r border-border/80 bg-card/65 px-3 py-4 backdrop-blur-md md:flex md:flex-col">
       <div>
 
-          <Link href="/hub" className="mb-5 flex items-center px-2">
+          <Link href="/hub" className="mb-5 flex items-center rounded-md px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
         <Image
           src="/branding/P&K_LOGO.png"
           alt="Pins & Knuckles"
@@ -49,7 +51,7 @@ export function SidebarNav({
             <Link
               key={item.label}
               href={item.href}
-              className="flex h-9 items-center gap-2 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="flex h-9 items-center gap-2 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <item.icon className="size-4" aria-hidden="true" />
               {item.label}
@@ -58,7 +60,7 @@ export function SidebarNav({
         </nav>
       </div>
 
-      <div className="mt-auto border-t border-border pt-3">
+      <div className="mt-auto border-t border-border/80 pt-3">
         <p className="truncate px-2 text-xs text-muted-foreground">
           {userEmail ?? "Signed in"}
         </p>
