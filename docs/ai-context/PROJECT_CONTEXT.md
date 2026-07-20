@@ -116,15 +116,18 @@ There is no active `/test` route.
 ## Sales Dashboard Status
 
 - Rebuilt from the legacy reference/validated dashboard plan under `src/features/sales-dashboard`.
-- Uses fixture data only; no persistence or Monday.com/Netsuite integration yet.
-- Monthly Profit target is `£155,000`; Quotes Done target is `300`; Orders Processed has no confirmed target.
-- Includes date range filtering, KPI cards with prior-year comparisons and progress meters, salesperson performance, and lead source breakdowns.
+- Supports company and team-member monthly views with persistent Supabase KPI and target tables after the Phase 1 migration is applied.
+- Pins Hub admins can manually enter company and team-member monthly KPIs; other access levels are read-only.
+- Targets are Monthly Profit `£155,000`, Quotes Done `300`, Orders Processed `200`, and Conversion Rate `65%`.
+- Conversion Rate is `converted / sales inbox enquiries * 100` and returns zero when enquiries are zero.
+- Includes year/month and company/team-member filtering, prior-year comparisons, target progress, a sortable member table, and selected-member detail.
 - Historical fixture source: normalized `Monthly Compare.xlsx` workbook data in `src/features/sales-dashboard/data/workbookFixture.ts`; default selection is October 2025.
 - The committed source workbook is `docs/Monthly Compare.xlsx`; its `JULY per sales rep ` sheet name has a trailing space that is normalized when imported.
 - The workbook has no unambiguous Orders Processed or lead-source field, so those surfaces show `—`/empty state rather than inferred values.
 - Workbook blanks, including November/December summary values and late-year average-profit cells, remain `null`; no missing month is treated as zero.
 - Per-sales-rep sheets have no year column and are presented as 2024-aligned historical salesperson data; `CAT` is normalized to `Catherine`.
-- Future work is replacing fixtures with server-side source mapping once source IDs and column IDs are confirmed.
+- Supabase values take priority; historical workbook rows fill only missing months or team members and remain marked `historical_fixture` internally.
+- Monday.com sourcing and EPCC profit-email ingestion remain deferred.
 
 ## Calculator Status
 

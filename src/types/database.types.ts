@@ -707,6 +707,185 @@ export type Database = {
         }
         Relationships: []
       }
+      sales_kpi_member_months: {
+        Row: {
+          converted: number | null
+          created_at: string
+          data_source: string
+          id: string
+          month: number
+          orders_processed: number | null
+          organisation_id: string | null
+          profit: number | null
+          quotes_done: number | null
+          sales_inbox_enquiries: number | null
+          team_member_key: string
+          team_member_name: string
+          updated_at: string
+          updated_by: string | null
+          year: number
+        }
+        Insert: {
+          converted?: number | null
+          created_at?: string
+          data_source?: string
+          id?: string
+          month: number
+          orders_processed?: number | null
+          organisation_id?: string | null
+          profit?: number | null
+          quotes_done?: number | null
+          sales_inbox_enquiries?: number | null
+          team_member_key: string
+          team_member_name: string
+          updated_at?: string
+          updated_by?: string | null
+          year: number
+        }
+        Update: {
+          converted?: number | null
+          created_at?: string
+          data_source?: string
+          id?: string
+          month?: number
+          orders_processed?: number | null
+          organisation_id?: string | null
+          profit?: number | null
+          quotes_done?: number | null
+          sales_inbox_enquiries?: number | null
+          team_member_key?: string
+          team_member_name?: string
+          updated_at?: string
+          updated_by?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_kpi_member_months_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_kpi_member_months_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_kpi_months: {
+        Row: {
+          converted: number | null
+          created_at: string
+          data_source: string
+          id: string
+          month: number
+          monthly_profit: number | null
+          notes: string | null
+          orders_processed: number | null
+          organisation_id: string | null
+          quotes_done: number | null
+          sales_inbox_enquiries: number | null
+          updated_at: string
+          updated_by: string | null
+          year: number
+        }
+        Insert: {
+          converted?: number | null
+          created_at?: string
+          data_source?: string
+          id?: string
+          month: number
+          monthly_profit?: number | null
+          notes?: string | null
+          orders_processed?: number | null
+          organisation_id?: string | null
+          quotes_done?: number | null
+          sales_inbox_enquiries?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          year: number
+        }
+        Update: {
+          converted?: number | null
+          created_at?: string
+          data_source?: string
+          id?: string
+          month?: number
+          monthly_profit?: number | null
+          notes?: string | null
+          orders_processed?: number | null
+          organisation_id?: string | null
+          quotes_done?: number | null
+          sales_inbox_enquiries?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_kpi_months_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_kpi_months_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_kpi_targets: {
+        Row: {
+          created_at: string
+          effective_from: string
+          effective_to: string | null
+          id: string
+          is_active: boolean
+          metric_code: string
+          organisation_id: string | null
+          target_value: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          effective_from: string
+          effective_to?: string | null
+          id?: string
+          is_active?: boolean
+          metric_code: string
+          organisation_id?: string | null
+          target_value: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          effective_from?: string
+          effective_to?: string | null
+          id?: string
+          is_active?: boolean
+          metric_code?: string
+          organisation_id?: string | null
+          target_value?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_kpi_targets_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       uk_trade_embroidery_pricing: {
         Row: {
           created_at: string

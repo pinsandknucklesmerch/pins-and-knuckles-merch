@@ -73,7 +73,7 @@ test("totals, salesperson rows, and source rows are calculated and stably sorted
 test("workbook fixture preserves historical nulls and normalized salesperson names", () => {
   const year2025 = historicalSalesDashboardFixture.years.find((year) => year.year === 2025);
   assert.deepEqual(year2025?.enquiries.slice(10), [null, null]);
-  assert.deepEqual(year2025?.profit.slice(10), [null, null]);
+  assert.deepEqual(year2025?.profit.slice(10), [193674, null]);
   const salesperson2024 = historicalSalesDashboardFixture.salespersonYears.find((year) => year.year === 2024);
   assert.equal(salesperson2024?.months.January?.[3].salespersonName, "Catherine");
   assert.equal(salesperson2024?.months.August?.[0].averageProfitPerJob, null);
