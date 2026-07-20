@@ -146,6 +146,16 @@ Deferred:
 
 - EU Trade. No active profile should be added until rules are explicitly confirmed.
 
+## Commercial Invoice Generator
+
+- Route: `/hub/commercial-invoices`.
+- Legacy source of truth: `pins-hub-app/src/app/hub/commercial-invoices` in the legacy Pins Hub repository.
+- Fields: invoice reference, invoice date, ship date, tracking, box count, weight, GBP/EUR currency, print location, duties payer, sender and receiver contact/address/tax identifiers, and product line details.
+- Totals: line cost multiplied by whole-number quantity, total quantity, subtotal, and final invoice total. The legacy tool has no freight, tax, other-charge, or line-weight calculation.
+- Export: editable XLSX and landscape A4 PDF using `commercial-invoice-<reference-or-date>` filenames.
+- No save, load, history, browser storage, API, or database persistence.
+- Reset restores a new dated invoice; leaving and returning to the route also creates a fresh invoice.
+
 ## EU Calculator Structure
 
 - Routes:

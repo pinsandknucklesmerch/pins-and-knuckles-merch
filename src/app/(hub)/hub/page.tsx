@@ -3,26 +3,15 @@ import { AppShell } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LoadingState } from "@/components/ui/LoadingState";
 import MagicBento, { type MagicBentoItem } from "@/components/ui/MagicBento";
-import { BarChart3, Calculator } from "lucide-react";
+import { hubFeatureNavigation } from "@/config/hubNavigation";
 
-const items: MagicBentoItem[] = [
-  {
-    id: "sales-dashboard",
-    title: "Sales Dashboard",
-    href: "/hub/sales-dashboard",
-    label: "Operations",
-    icon: <BarChart3 size={20} strokeWidth={1.8} />,
-    status: "Ready",
-  },
-  {
-    id: "calculators",
-    title: "Calculators",
-    href: "/hub/calculators",
-    label: "Pricing",
-    icon: <Calculator size={20} strokeWidth={1.8} />,
-    status: "Ready",
-  },
-];
+const items: MagicBentoItem[] = hubFeatureNavigation.map((item) => ({
+  id: item.href,
+  title: item.label,
+  href: item.href,
+  icon: <item.icon size={20} strokeWidth={1.8} />,
+  status: "Ready",
+}));
 
 export default function HubPage() {
   return (

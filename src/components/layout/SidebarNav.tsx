@@ -1,23 +1,12 @@
-import {
-  ChartNoAxesColumnIncreasing,
-  Calculator,
-  Gauge,
-  Landmark,
-} from "lucide-react";
+import { Gauge } from "lucide-react";
 import Link from "next/link";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import Image from "next/image";
-
+import { hubFeatureNavigation } from "@/config/hubNavigation";
 
 const navItems = [
   { href: "/hub", label: "Dashboard", icon: Gauge },
-  {
-    href: "/hub/sales-dashboard",
-    label: "Sales Dashboard",
-    icon: ChartNoAxesColumnIncreasing,
-  },
-  { href: "/hub/calculators", label: "Calculators", icon: Calculator },
-  { href: "/hub/pk-tax", label: "PK Tax", icon: Landmark },
+  ...hubFeatureNavigation,
 ];
 
 type SidebarNavProps = {

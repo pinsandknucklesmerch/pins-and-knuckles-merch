@@ -70,3 +70,43 @@
     @apply text-inherit;
   }
 }
+
+@page {
+  size: A4 landscape;
+  margin: 10mm;
+}
+
+@media print {
+  body {
+    background: white !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #commercial-invoice-preview,
+  #commercial-invoice-preview * {
+    visibility: visible;
+  }
+
+  #commercial-invoice-preview {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    padding: 0;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr,
+  section {
+    break-inside: avoid;
+  }
+}

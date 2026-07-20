@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { connection } from "next/server";
 
-import Galaxy from "@/components/backgrounds/Galaxy";
+import { GalaxyPageBackground } from "@/components/backgrounds/GalaxyPageBackground";
 import { Panel } from "@/components/ui/Panel";
 import { createClient } from "@/lib/supabase/server";
 
@@ -64,26 +64,8 @@ function LoginPanel({ isAuthenticated }: { isAuthenticated: boolean }) {
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-foreground">
-      <div className="absolute inset-0 z-0">
-        <Galaxy
-          mouseRepulsion
-          mouseInteraction
-          density={1}
-          glowIntensity={0.3}
-          saturation={0}
-          hueShift={140}
-          twinkleIntensity={0.3}
-          rotationSpeed={0.1}
-          repulsionStrength={2}
-          autoCenterRepulsion={0}
-          starSpeed={0.5}
-          speed={1}
-          transparent
-        />
-      </div>
-
-      <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-10">
+    <GalaxyPageBackground>
+      <div className="flex min-h-screen items-center justify-center px-6 py-10">
         <section className="grid w-full max-w-sm gap-5">
           <div className="grid justify-items-center gap-3 text-center">
             <Image
@@ -102,6 +84,6 @@ export default function Home() {
           </Suspense>
         </section>
       </div>
-    </main>
+    </GalaxyPageBackground>
   );
 }
