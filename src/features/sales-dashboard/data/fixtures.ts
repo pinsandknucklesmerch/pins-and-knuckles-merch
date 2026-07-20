@@ -1,4 +1,21 @@
-import type { SalesLead } from "../types";
+import type { SalesDashboardFixture, SalesLead } from "../types";
+import { historicalSalesDashboardFixture } from "./workbookFixture.ts";
+
+export const salesDashboardFixture: SalesDashboardFixture = {
+  periods: [
+    {
+      month: "2025-October",
+      monthlyProfit: 364_197,
+      previousYearMonthlyProfit: 252_641,
+      quotesDone: 323,
+      previousYearQuotesDone: 303,
+      ordersProcessed: null,
+      previousYearOrdersProcessed: null,
+    },
+  ],
+  leads: [],
+  historical: historicalSalesDashboardFixture,
+};
 
 export const salesLeadFixtures: SalesLead[] = [
   {
