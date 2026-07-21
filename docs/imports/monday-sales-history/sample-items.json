@@ -1,0 +1,5 @@
+{
+  "status": "not-run",
+  "items": [],
+  "note": "The report command creates sample-items-<board-id>.json after read-only inspection."
+}

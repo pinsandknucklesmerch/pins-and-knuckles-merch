@@ -1,0 +1,19 @@
+{
+  "$schema": "review template; unresolved values are intentional",
+  "timezone": "UNRESOLVED",
+  "boards": {
+    "salesInbox": { "boardId": "UNRESOLVED", "groupIncludeIds": [], "groupExcludeIds": [], "subitems": "UNRESOLVED" },
+    "quotes": { "boardId": "UNRESOLVED", "groupIncludeIds": [], "groupExcludeIds": [], "subitems": "UNRESOLVED" },
+    "orders": { "boardId": "UNRESOLVED", "groupIncludeIds": [], "groupExcludeIds": [], "subitems": "UNRESOLVED" }
+  },
+  "metrics": {
+    "salesInboxEnquiries": { "dateColumnId": "UNRESOLVED", "monthAttribution": "UNRESOLVED", "oneItemPerEnquiry": "UNRESOLVED", "duplicateRule": "UNRESOLVED" },
+    "converted": { "statusColumnId": "UNRESOLVED", "acceptedStatusLabels": [], "dateColumnId": "UNRESOLVED", "monthAttribution": "UNRESOLVED", "currentStatusHistoricalSafe": "UNRESOLVED" },
+    "quotesDone": { "statusColumnId": "UNRESOLVED", "acceptedStatusLabels": [], "excludedStatusLabels": [], "dateColumnId": "UNRESOLVED", "monthAttribution": "UNRESOLVED", "oneItemPerQuote": "UNRESOLVED" },
+    "ordersProcessed": { "statusColumnId": "UNRESOLVED", "acceptedStatusLabels": [], "excludedStatusLabels": [], "dateColumnId": "UNRESOLVED", "monthAttribution": "UNRESOLVED", "excludeTestInternalCancelled": "UNRESOLVED" },
+    "teamMembers": { "peopleColumnId": "UNRESOLVED", "multiplePeopleHandling": "UNRESOLVED", "historicalReassignmentSafe": "UNRESOLVED", "memberAliases": {} },
+    "profit": { "source": "future_epcc_gmail_ingestion", "mondayField": null }
+  },
+  "itemExclusionRules": [],
+  "notes": "Conversion Rate is always derived: converted / sales_inbox_enquiries * 100. Never import a conversion percentage."
+}

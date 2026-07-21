@@ -1,0 +1,6 @@
+{
+  "status": "not-run",
+  "boardId": "UNRESOLVED",
+  "columns": [],
+  "note": "The report command creates column-map-<board-id>.json after read-only inspection."
+}

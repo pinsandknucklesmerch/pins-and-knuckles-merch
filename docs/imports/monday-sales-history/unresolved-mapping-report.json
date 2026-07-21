@@ -1,0 +1,11 @@
+{
+  "status": "unresolved",
+  "decisions": [
+    "Identify the Sales Inbox, quotes, and orders boards (they may be the same board).",
+    "Confirm the event date and status/date fields for each KPI.",
+    "Confirm Converted label and whether current status can recreate historical results.",
+    "Confirm exclusions, duplicates, subitems, ownership history, and user aliases.",
+    "Profit remains assigned to future EPCC Gmail ingestion, not Monday."
+  ],
+  "historicalAccuracy": "Unverified: Monday may retain latest state only."
+}

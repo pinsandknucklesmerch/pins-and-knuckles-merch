@@ -1,0 +1,4 @@
+{
+  "status": "not-run",
+  "reason": "No live Monday token was used during repository setup. Run the boards command with MONDAY_API_TOKEN to replace this file."
+}
