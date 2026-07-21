@@ -22,6 +22,7 @@ async function SalesDashboardPageContent({ searchParams }: Props) {
   const month = Number.isInteger(parsedMonth) && parsedMonth >= 1 && parsedMonth <= 12 ? parsedMonth : now.getMonth() + 1;
   const view = first(params.view) === "members" ? "members" : "company";
   const member = first(params.member);
-  const data = await loadSalesDashboard(year, month, access.membership?.organisation_id ?? null);
-  return <AppShell><PageHeader title="Sales Dashboard" /><SalesDashboard data={data} year={year} month={month} view={view} member={member} isAdmin={access.access?.access_level === "admin"} /></AppShell>;
+  const isAdmin = access.access?.access_level === "admin";
+  const data = await loadSalesDashboard(year, month, access.membership?.organisation_id ?? null, view, isAdmin);
+  return <AppShell><PageHeader title="Sales Dashboard" /><SalesDashboard data={data} year={year} month={month} view={view} member={member} isAdmin={isAdmin} /></AppShell>;
 }

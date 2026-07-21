@@ -42,7 +42,7 @@ export function ManualKpiEntry({ year, month, company }: { year: number; month: 
             <NumericField name="member_converted" label="Converted" />
             <NumericField name="member_profit" label="Profit" step="0.01" />
           </fieldset>
-          {state.message ? <p role="status" className={`text-sm ${state.ok ? "text-emerald-400" : "text-destructive"}`}>{state.message}</p> : null}
+          {state.message ? <p role={state.ok ? "status" : "alert"} className={`text-sm ${state.ok ? "text-emerald-400" : "text-destructive"}`}>{state.message}</p> : null}
           <button disabled={pending} className="h-9 justify-self-start rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-50" type="submit">{pending ? "Saving…" : "Save"}</button>
         </form>
       ) : null}

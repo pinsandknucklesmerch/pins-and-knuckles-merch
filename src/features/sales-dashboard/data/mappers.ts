@@ -5,9 +5,9 @@ import { calculateConversionRate } from "../domain/calculateDashboardKpis.ts";
 import { findPreviousMember, normaliseTeamMemberKey, normaliseTeamMemberName, sortMemberDashboardRows } from "../domain/normaliseTeamMember.ts";
 import { DEFAULT_SALES_KPI_TARGETS, type CompanyKpiMonth, type MemberDashboardRow, type SalesDashboardData, type SalesKpiTargets, type TeamMemberKpiMonth } from "../domain/types.ts";
 
-type CompanyRow = Database["public"]["Tables"]["sales_kpi_months"]["Row"];
-type MemberRow = Database["public"]["Tables"]["sales_kpi_member_months"]["Row"];
-type TargetRow = Database["public"]["Tables"]["sales_kpi_targets"]["Row"];
+type CompanyRow = Pick<Database["public"]["Tables"]["sales_kpi_months"]["Row"], "year" | "month" | "monthly_profit" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "notes" | "data_source">;
+type MemberRow = Pick<Database["public"]["Tables"]["sales_kpi_member_months"]["Row"], "year" | "month" | "team_member_key" | "team_member_name" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "profit" | "data_source">;
+type TargetRow = Pick<Database["public"]["Tables"]["sales_kpi_targets"]["Row"], "organisation_id" | "metric_code" | "target_value" | "effective_from" | "effective_to" | "is_active">;
 
 export function mapCompanyRow(row: CompanyRow): CompanyKpiMonth {
   return { year: row.year, month: row.month, monthlyProfit: row.monthly_profit, quotesDone: row.quotes_done, ordersProcessed: row.orders_processed, salesInboxEnquiries: row.sales_inbox_enquiries, converted: row.converted, notes: row.notes, source: row.data_source as CompanyKpiMonth["source"] };

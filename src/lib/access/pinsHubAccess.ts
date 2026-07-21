@@ -27,22 +27,17 @@ export type PinsHubAccessResult = {
   accessDeniedReason: string | null;
 };
 
-type ProfileRow = {
+type ProfileAccessRow = {
   id: string;
   email: string | null;
-};
-
-type MembershipRow = {
-  id: string;
-  organisation_id: string;
-  role: OrganisationRole;
-};
-
-type AppAccessRow = {
-  id: string;
-  organisation_member_id: string;
-  app_key: string;
-  access_level: string;
+  organisation_members: Array<Membership & {
+    app_access: Array<{
+      id: string;
+      organisation_member_id: string;
+      app_key: string;
+      access_level: string;
+    }>;
+  }>;
 };
 
 const VALID_PINS_HUB_ACCESS_LEVELS = new Set(["admin", "write", "read"]);
@@ -63,17 +58,17 @@ export const getCurrentPinsHubAccess = cache(
   async function getCurrentPinsHubAccess(): Promise<PinsHubAccessResult> {
     const supabase = await createClient();
 
-    const { data: profiles, error: profileError } = await supabase
+    const { data: profiles, error: accessQueryError } = await supabase
       .from("profiles")
-      .select("id, email")
-      .returns<ProfileRow[]>();
+      .select("id,email,organisation_members!organisation_members_user_id_fkey(id,organisation_id,role,app_access(id,organisation_member_id,app_key,access_level))")
+      .returns<ProfileAccessRow[]>();
 
-    if (profileError) {
+    if (accessQueryError) {
       return {
         ...createUnauthenticatedResult(),
-        error: profileError.message,
-        queryError: profileError.message,
-        accessDeniedReason: profileError.message,
+        error: accessQueryError.message,
+        queryError: accessQueryError.message,
+        accessDeniedReason: accessQueryError.message,
       };
     }
 
@@ -86,6 +81,7 @@ export const getCurrentPinsHubAccess = cache(
       };
     }
 
+    const memberships = profile.organisation_members;
     const baseResult: PinsHubAccessResult = {
       authenticated: true,
       user: {
@@ -99,20 +95,6 @@ export const getCurrentPinsHubAccess = cache(
       accessDeniedReason: null,
     };
 
-    const { data: memberships, error: membershipError } = await supabase
-      .from("organisation_members")
-      .select("id, organisation_id, role")
-      .eq("user_id", profile.id)
-      .returns<MembershipRow[]>();
-
-    if (membershipError) {
-      return {
-        ...baseResult,
-        error: membershipError.message,
-        queryError: membershipError.message,
-      };
-    }
-
     if (!memberships.length) {
       return {
         ...baseResult,
@@ -120,26 +102,9 @@ export const getCurrentPinsHubAccess = cache(
       };
     }
 
-    const membershipIds = memberships.map((membership) => membership.id);
-    const { data: accessRows, error: accessError } = await supabase
-      .from("app_access")
-      .select("id, organisation_member_id, app_key, access_level")
-      .eq("app_key", "pins_hub")
-      .in("organisation_member_id", membershipIds)
-      .returns<AppAccessRow[]>();
-
-    if (accessError) {
-      return {
-        ...baseResult,
-        membership: memberships[0],
-        error: accessError.message,
-        queryError: accessError.message,
-      };
-    }
-
-    const accessRow = accessRows.find((row) =>
-      VALID_PINS_HUB_ACCESS_LEVELS.has(row.access_level),
-    );
+    const accessRow = memberships
+      .flatMap((membership) => membership.app_access)
+      .find((row) => row.app_key === "pins_hub" && VALID_PINS_HUB_ACCESS_LEVELS.has(row.access_level));
     const membership =
       memberships.find(
         (candidate) => candidate.id === accessRow?.organisation_member_id,
