@@ -1,0 +1,29 @@
+[
+  {
+    "displayName": "Bux",
+    "mondayUserIds": [
+      "26816626"
+    ],
+    "leads": 6,
+    "converted": 3,
+    "conversionRate": 50
+  },
+  {
+    "displayName": "hardus",
+    "mondayUserIds": [
+      "29869326"
+    ],
+    "leads": 4,
+    "converted": 0,
+    "conversionRate": 0
+  },
+  {
+    "displayName": "Justin du Preez",
+    "mondayUserIds": [
+      "69507598"
+    ],
+    "leads": 28,
+    "converted": 8,
+    "conversionRate": 28.6
+  }
+]

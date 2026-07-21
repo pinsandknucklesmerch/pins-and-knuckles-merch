@@ -1,0 +1,47 @@
+[
+  {
+    "displayName": "Anthony Strauss",
+    "mondayUserIds": [
+      "15773637"
+    ],
+    "leads": 6,
+    "converted": 6,
+    "conversionRate": 100
+  },
+  {
+    "displayName": "Bux",
+    "mondayUserIds": [
+      "26816626"
+    ],
+    "leads": 34,
+    "converted": 14,
+    "conversionRate": 41.2
+  },
+  {
+    "displayName": "hardus",
+    "mondayUserIds": [
+      "29869326"
+    ],
+    "leads": 20,
+    "converted": 7,
+    "conversionRate": 35
+  },
+  {
+    "displayName": "Johan",
+    "mondayUserIds": [
+      "14589471"
+    ],
+    "leads": 53,
+    "converted": 34,
+    "conversionRate": 64.2
+  },
+  {
+    "displayName": "Justin du Preez",
+    "mondayUserIds": [
+      "69507598"
+    ],
+    "leads": 69,
+    "converted": 36,
+    "conversionRate": 52.2
+  }
+]

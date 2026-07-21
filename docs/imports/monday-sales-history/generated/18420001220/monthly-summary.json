@@ -1,0 +1,347 @@
+{
+  "board": {
+    "id": "18420001220",
+    "name": "JULY 2026",
+    "inferredMonth": {
+      "year": 2026,
+      "month": 7,
+      "label": "JULY 2026"
+    }
+  },
+  "fetch": {
+    "totalItemsFetched": 188,
+    "includedWeeklyItems": 183,
+    "excludedItems": 5,
+    "deletedItems": "not returned by Monday item queries",
+    "inaccessibleItems": "not returned by Monday item queries",
+    "subitems": "not requested or included; Monday top-level item query only"
+  },
+  "scopes": {
+    "allLeads": {
+      "byBoardMembership": {
+        "totalLeadItems": 183,
+        "convertedItems": 97,
+        "conversionRate": 53,
+        "byAccountManager": [
+          {
+            "displayName": "Anthony Strauss",
+            "mondayUserIds": [
+              "15773637"
+            ],
+            "leads": 6,
+            "converted": 6,
+            "conversionRate": 100
+          },
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 34,
+            "converted": 14,
+            "conversionRate": 41.2
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 20,
+            "converted": 7,
+            "conversionRate": 35
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 53,
+            "converted": 34,
+            "conversionRate": 64.2
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 69,
+            "converted": 36,
+            "conversionRate": 52.2
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "EU",
+            "leads": 7,
+            "converted": 1,
+            "conversionRate": 14.3
+          },
+          {
+            "displayLabel": "personal",
+            "leads": 134,
+            "converted": 84,
+            "conversionRate": 62.7
+          },
+          {
+            "displayLabel": "phone",
+            "leads": 1,
+            "converted": 1,
+            "conversionRate": 100
+          },
+          {
+            "displayLabel": "Reached Out",
+            "leads": 2,
+            "converted": 0,
+            "conversionRate": 0
+          },
+          {
+            "displayLabel": "sales inbox",
+            "leads": 39,
+            "converted": 11,
+            "conversionRate": 28.2
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      },
+      "byValidDateInTouchMonth": {
+        "totalLeadItems": 183,
+        "convertedItems": 97,
+        "conversionRate": 53,
+        "byAccountManager": [
+          {
+            "displayName": "Anthony Strauss",
+            "mondayUserIds": [
+              "15773637"
+            ],
+            "leads": 6,
+            "converted": 6,
+            "conversionRate": 100
+          },
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 34,
+            "converted": 14,
+            "conversionRate": 41.2
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 20,
+            "converted": 7,
+            "conversionRate": 35
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 53,
+            "converted": 34,
+            "conversionRate": 64.2
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 69,
+            "converted": 36,
+            "conversionRate": 52.2
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "EU",
+            "leads": 7,
+            "converted": 1,
+            "conversionRate": 14.3
+          },
+          {
+            "displayLabel": "personal",
+            "leads": 134,
+            "converted": 84,
+            "conversionRate": 62.7
+          },
+          {
+            "displayLabel": "phone",
+            "leads": 1,
+            "converted": 1,
+            "conversionRate": 100
+          },
+          {
+            "displayLabel": "Reached Out",
+            "leads": 2,
+            "converted": 0,
+            "conversionRate": 0
+          },
+          {
+            "displayLabel": "sales inbox",
+            "leads": 39,
+            "converted": 11,
+            "conversionRate": 28.2
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      }
+    },
+    "salesInboxOnly": {
+      "byBoardMembership": {
+        "totalLeadItems": 39,
+        "convertedItems": 11,
+        "conversionRate": 28.2,
+        "byAccountManager": [
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 6,
+            "converted": 3,
+            "conversionRate": 50
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 4,
+            "converted": 0,
+            "conversionRate": 0
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 28,
+            "converted": 8,
+            "conversionRate": 28.6
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "sales inbox",
+            "leads": 39,
+            "converted": 11,
+            "conversionRate": 28.2
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      },
+      "byValidDateInTouchMonth": {
+        "totalLeadItems": 39,
+        "convertedItems": 11,
+        "conversionRate": 28.2,
+        "byAccountManager": [
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 6,
+            "converted": 3,
+            "conversionRate": 50
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 4,
+            "converted": 0,
+            "conversionRate": 0
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 28,
+            "converted": 8,
+            "conversionRate": 28.6
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "sales inbox",
+            "leads": 39,
+            "converted": 11,
+            "conversionRate": 28.2
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      }
+    }
+  },
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 0,
+    "validDateInTouchMonthCount": 183,
+    "multiManagerItemCount": 1,
+    "multiManagerConvertedCount": 0,
+    "excludedFromMemberMetricsCount": 1,
+    "blankAccountManagerItemCount": 0
+  },
+  "excludedItems": [
+    {
+      "id": "12417283613",
+      "name": "Week 1",
+      "group": "Profit Tracking",
+      "reason": "profit-tracking-group"
+    },
+    {
+      "id": "12417283685",
+      "name": "Week 2",
+      "group": "Profit Tracking",
+      "reason": "profit-tracking-group"
+    },
+    {
+      "id": "12417273500",
+      "name": "Week 3",
+      "group": "Profit Tracking",
+      "reason": "profit-tracking-group"
+    },
+    {
+      "id": "12417298883",
+      "name": "Week 4",
+      "group": "Profit Tracking",
+      "reason": "profit-tracking-group"
+    },
+    {
+      "id": "12417246297",
+      "name": "Week 5",
+      "group": "Profit Tracking",
+      "reason": "profit-tracking-group"
+    }
+  ],
+  "missingDates": [],
+  "mismatchedDates": [],
+  "multiAccountManagers": [
+    {
+      "id": "12417998854",
+      "name": "Torus",
+      "converted": false,
+      "accountManagers": [
+        {
+          "id": "29869326",
+          "name": "hardus",
+          "normalizedName": "hardus"
+        },
+        {
+          "id": "69507598",
+          "name": "Justin du Preez",
+          "normalizedName": "justin du preez"
+        }
+      ]
+    }
+  ]
+}

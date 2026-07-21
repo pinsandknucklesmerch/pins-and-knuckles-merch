@@ -1,0 +1,33 @@
+{
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 0,
+    "validDateInTouchMonthCount": 183,
+    "multiManagerItemCount": 1,
+    "multiManagerConvertedCount": 0,
+    "excludedFromMemberMetricsCount": 1,
+    "blankAccountManagerItemCount": 0
+  },
+  "missingDates": [],
+  "mismatchedDates": [],
+  "multiAccountManagers": [
+    {
+      "id": "12417998854",
+      "name": "Torus",
+      "converted": false,
+      "accountManagers": [
+        {
+          "id": "29869326",
+          "name": "hardus",
+          "normalizedName": "hardus"
+        },
+        {
+          "id": "69507598",
+          "name": "Justin du Preez",
+          "normalizedName": "justin du preez"
+        }
+      ]
+    }
+  ],
+  "dateScopeNote": "Board-membership totals include all WEEK 1–4 items. Valid-Date totals are supplied separately and do not silently discard mismatches."
+}

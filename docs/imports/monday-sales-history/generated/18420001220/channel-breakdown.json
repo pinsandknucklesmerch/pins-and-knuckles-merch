@@ -1,0 +1,32 @@
+[
+  {
+    "displayLabel": "EU",
+    "leads": 7,
+    "converted": 1,
+    "conversionRate": 14.3
+  },
+  {
+    "displayLabel": "personal",
+    "leads": 134,
+    "converted": 84,
+    "conversionRate": 62.7
+  },
+  {
+    "displayLabel": "phone",
+    "leads": 1,
+    "converted": 1,
+    "conversionRate": 100
+  },
+  {
+    "displayLabel": "Reached Out",
+    "leads": 2,
+    "converted": 0,
+    "conversionRate": 0
+  },
+  {
+    "displayLabel": "sales inbox",
+    "leads": 39,
+    "converted": 11,
+    "conversionRate": 28.2
+  }
+]
