@@ -1,0 +1,32 @@
+[
+  {
+    "displayLabel": "EU",
+    "leads": 8,
+    "converted": 6,
+    "conversionRate": 75
+  },
+  {
+    "displayLabel": "personal",
+    "leads": 195,
+    "converted": 151,
+    "conversionRate": 77.4
+  },
+  {
+    "displayLabel": "pins & knuckles store",
+    "leads": 2,
+    "converted": 2,
+    "conversionRate": 100
+  },
+  {
+    "displayLabel": "sales inbox",
+    "leads": 70,
+    "converted": 23,
+    "conversionRate": 32.9
+  },
+  {
+    "displayLabel": "whatsapp",
+    "leads": 1,
+    "converted": 0,
+    "conversionRate": 0
+  }
+]

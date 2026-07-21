@@ -1,0 +1,791 @@
+[
+  {
+    "month": 5,
+    "selectedBoard": {
+      "id": "18411196944",
+      "name": "MAY  2026",
+      "state": "active",
+      "board_kind": "public",
+      "workspace": {
+        "id": "505410",
+        "name": "Pins & Knuckles UK"
+      },
+      "groups": [
+        {
+          "id": "new_group64603",
+          "title": "WEEK 1"
+        },
+        {
+          "id": "group_mm21zbck",
+          "title": "Profit Tracking"
+        }
+      ],
+      "columns": [
+        {
+          "id": "name",
+          "title": "Name",
+          "type": "name",
+          "settings_str": "{}"
+        },
+        {
+          "id": "subitems",
+          "title": "Subitems",
+          "type": "subtasks",
+          "settings_str": "{\"allowMultipleItems\":true,\"itemTypeName\":\"column.subtasks.title\",\"displayType\":\"BOARD_INLINE\",\"boardIds\":[18411196945]}"
+        },
+        {
+          "id": "people",
+          "title": "Acc Manager",
+          "type": "people",
+          "settings_str": "{}"
+        },
+        {
+          "id": "status_16",
+          "title": "Channel",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"1\":101,\"3\":3,\"6\":151,\"10\":10,\"12\":159,\"101\":1,\"151\":12,\"159\":6},\"deactivated_labels\":[],\"labels\":{\"0\":\"pins \\u0026 knuckles store\",\"1\":\"whatsapp\",\"2\":\"Pins Tattoo Club\",\"3\":\"Reached Out\",\"4\":\"social media\",\"6\":\"NO GO\",\"7\":\"sales inbox\",\"8\":\"Instagram\",\"9\":\"EU\",\"10\":\"The Printing Network\",\"11\":\"Instagram Lead Form\",\"12\":\"phone\",\"15\":\"website chat\",\"102\":\"leads list\",\"107\":\"USA\",\"108\":\"personal\"},\"labels_positions_v2\":{\"0\":12,\"1\":7,\"2\":13,\"3\":14,\"4\":9,\"5\":8,\"6\":15,\"7\":1,\"8\":5,\"9\":2,\"10\":4,\"11\":3,\"12\":16,\"15\":6,\"102\":10,\"107\":11,\"108\":0},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#ff7575\",\"border\":\"#ff7575\",\"var_name\":\"sunset\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"4\":{\"color\":\"#9d50dd\",\"border\":\"#9238af\",\"var_name\":\"purple\"},\"6\":{\"color\":\"#563e3e\",\"border\":\"#563e3e\",\"var_name\":\"pecan\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"8\":{\"color\":\"#cab641\",\"border\":\"#c0ab31\",\"var_name\":\"mustered\"},\"9\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"10\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"},\"11\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"12\":{\"color\":\"#cd9282\",\"border\":\"#cd9282\",\"var_name\":\"old_rose\"},\"15\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"102\":{\"color\":\"#faa1f1\",\"border\":\"#faa1f1\",\"var_name\":\"bubble\"},\"107\":{\"color\":\"#225091\",\"border\":\"#225091\",\"var_name\":\"navy\"},\"108\":{\"color\":\"#4eccc6\",\"border\":\"#4eccc6\",\"var_name\":\"australia\"}}}"
+        },
+        {
+          "id": "status_15",
+          "title": "Special",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[],\"color_mapping\":{\"0\":15,\"1\":1,\"2\":2,\"4\":9,\"8\":153,\"9\":160,\"10\":16,\"15\":0,\"16\":10,\"153\":8,\"160\":4},\"deactivated_labels\":[],\"labels\":{\"0\":\"Custom\",\"1\":\"free tees\",\"2\":\"BANNER UPSELL\",\"4\":\"SNUGGLE\",\"5\":\"\"},\"labels_positions_v2\":{\"0\":3,\"1\":4,\"2\":0,\"4\":1,\"5\":2},\"labels_colors\":{\"0\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"4\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"5\":{\"color\":\"#c4c4c4\",\"border\":\"#b0b0b0\",\"var_name\":\"grey\"}}}"
+        },
+        {
+          "id": "status7",
+          "title": "Category",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"hide_footer\":true,\"color_mapping\":{\"0\":153,\"3\":101,\"6\":151,\"10\":160,\"11\":159,\"12\":156,\"13\":0,\"15\":102,\"16\":6,\"17\":11,\"18\":10,\"101\":15,\"102\":3,\"103\":12,\"151\":16,\"153\":13,\"156\":103,\"159\":17,\"160\":18},\"labels\":{\"0\":\"Record Label\",\"1\":\"Podcast\",\"2\":\"Personal Trainer\",\"3\":\"Sports\",\"4\":\"Festival\",\"6\":\"Barber Shop\",\"7\":\"Band\",\"8\":\"Gym\",\"9\":\"Management\",\"10\":\"Key client\",\"11\":\"Restaurant\",\"12\":\"Auto Shop\",\"13\":\"Brewery\",\"14\":\"Apparel\",\"15\":\"Designer\",\"16\":\"Skate\",\"17\":\"Gaming\",\"18\":\"Retail\",\"19\":\"Charity\",\"101\":\"Wrestler\",\"102\":\"Marketing Agency\",\"103\":\"Painting Studio\",\"104\":\"Alcohol Brand\",\"105\":\"Not Sure\",\"106\":\"Tattoo\",\"107\":\"Tech Company\",\"108\":\"Other\",\"109\":\"Theatre\",\"110\":\"School\",\"155\":\"Venue\",\"158\":\"Promotions\"},\"labels_positions_v2\":{\"0\":9,\"1\":10,\"2\":11,\"3\":13,\"4\":15,\"5\":17,\"6\":16,\"7\":0,\"8\":7,\"9\":12,\"10\":3,\"11\":18,\"12\":19,\"13\":20,\"14\":1,\"15\":5,\"16\":21,\"17\":0,\"18\":0,\"19\":22,\"101\":2,\"102\":23,\"103\":24,\"104\":25,\"105\":26,\"106\":4,\"107\":27,\"108\":6,\"109\":28,\"110\":29,\"155\":8,\"158\":14},\"labels_colors\":{\"0\":{\"color\":\"#216edf\",\"border\":\"#216edf\",\"var_name\":\"sky\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#ff7575\",\"border\":\"#ff7575\",\"var_name\":\"sunset\"},\"4\":{\"color\":\"#9d50dd\",\"border\":\"#9238af\",\"var_name\":\"purple\"},\"6\":{\"color\":\"#563e3e\",\"border\":\"#563e3e\",\"var_name\":\"pecan\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"8\":{\"color\":\"#cab641\",\"border\":\"#c0ab31\",\"var_name\":\"mustered\"},\"9\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"10\":{\"color\":\"#175a63\",\"border\":\"#175a63\",\"var_name\":\"eden\"},\"11\":{\"color\":\"#cd9282\",\"border\":\"#cd9282\",\"var_name\":\"old_rose\"},\"12\":{\"color\":\"#9d99b9\",\"border\":\"#9d99b9\",\"var_name\":\"purple_gray\"},\"13\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"14\":{\"color\":\"#784bd1\",\"border\":\"#8f4dc4\",\"var_name\":\"dark-purple\"},\"15\":{\"color\":\"#faa1f1\",\"border\":\"#faa1f1\",\"var_name\":\"bubble\"},\"16\":{\"color\":\"#037f4c\",\"border\":\"#006b38\",\"var_name\":\"grass-green\"},\"17\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"18\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"},\"19\":{\"color\":\"#ff6d3b\",\"border\":\"#e05828\",\"var_name\":\"dark-orange\"},\"101\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"102\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"103\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"},\"104\":{\"color\":\"#7e3b8a\",\"border\":\"#7e3b8a\",\"var_name\":\"berry\"},\"105\":{\"color\":\"#9aadbd\",\"border\":\"#9aadbd\",\"var_name\":\"winter\"},\"106\":{\"color\":\"#74afcc\",\"border\":\"#74afcc\",\"var_name\":\"river\"},\"107\":{\"color\":\"#225091\",\"border\":\"#225091\",\"var_name\":\"navy\"},\"108\":{\"color\":\"#4eccc6\",\"border\":\"#4eccc6\",\"var_name\":\"australia\"},\"109\":{\"color\":\"#5559df\",\"border\":\"#5559df\",\"var_name\":\"indigo\"},\"110\":{\"color\":\"#401694\",\"border\":\"#401694\",\"var_name\":\"dark_indigo\"},\"155\":{\"color\":\"#e484bd\",\"border\":\"#e484bd\",\"var_name\":\"kids\"},\"158\":{\"color\":\"#a1e3f6\",\"border\":\"#a1e3f6\",\"var_name\":\"sail\"}}}"
+        },
+        {
+          "id": "date8",
+          "title": "Date In Touch",
+          "type": "date",
+          "settings_str": "{}"
+        },
+        {
+          "id": "date",
+          "title": "Follow up date",
+          "type": "date",
+          "settings_str": "{}"
+        },
+        {
+          "id": "status1",
+          "title": "Followed Up",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"hide_footer\":true,\"deactivated_labels\":[12],\"color_mapping\":{\"3\":15,\"15\":3},\"labels\":{\"0\":\"Not Needed\",\"1\":\"Yes\",\"2\":\"can't find\",\"3\":\"Busy\",\"7\":\"Can't Help\",\"12\":\"Busy With\",\"14\":\"Second Follow up\"},\"labels_positions_v2\":{\"0\":1,\"1\":0,\"2\":2,\"3\":7,\"5\":6,\"7\":3,\"12\":4,\"14\":5},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"12\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"},\"14\":{\"color\":\"#784bd1\",\"border\":\"#8f4dc4\",\"var_name\":\"dark-purple\"}}}"
+        },
+        {
+          "id": "long_text",
+          "title": "Notes",
+          "type": "long_text",
+          "settings_str": "{}"
+        },
+        {
+          "id": "status",
+          "title": "Converted",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"sumType\":\"allStatuses\",\"labels\":{\"0\":\"will order in a while\",\"1\":\"Yes\",\"2\":\"No\",\"3\":\"Replied - Interested\",\"4\":\"Replied - with other company\",\"6\":\"Will check us out\",\"7\":\"Pre-order\",\"9\":\"sent to TPC\"},\"labels_positions_v2\":{\"0\":1,\"1\":0,\"2\":2,\"3\":5,\"4\":0,\"5\":6,\"6\":0,\"7\":3,\"9\":4},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"4\":{\"color\":\"#9d50dd\",\"border\":\"#9238af\",\"var_name\":\"purple\"},\"6\":{\"color\":\"#037f4c\",\"border\":\"#006b38\",\"var_name\":\"grass-green\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"9\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"}}}"
+        },
+        {
+          "id": "date4",
+          "title": "Aftersale",
+          "type": "date",
+          "settings_str": "{}"
+        },
+        {
+          "id": "checkbox__1",
+          "title": "AFTERSALE DONE",
+          "type": "checkbox",
+          "settings_str": "{}"
+        },
+        {
+          "id": "status_1",
+          "title": "HOW?",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"0\":3,\"1\":9,\"2\":14,\"3\":15,\"4\":103,\"6\":16,\"7\":6,\"8\":110,\"9\":0,\"14\":2,\"15\":19,\"16\":155,\"19\":1,\"103\":4,\"110\":8,\"155\":7},\"labels\":{\"0\":\"facebook\",\"1\":\"instagram\",\"2\":\"google\",\"3\":\"twitter\",\"4\":\"referral\",\"6\":\"Townsend Referral\",\"7\":\"Key Client\",\"8\":\"Paid Search\",\"9\":\"return client\",\"10\":\"N/A\",\"11\":\"shannon\",\"12\":\"Self Referral\"},\"labels_positions_v2\":{\"0\":4,\"1\":3,\"2\":1,\"3\":5,\"4\":6,\"5\":7,\"6\":8,\"7\":2,\"8\":9,\"9\":0,\"10\":10,\"11\":11,\"12\":12},\"labels_colors\":{\"0\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"1\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"2\":{\"color\":\"#784bd1\",\"border\":\"#8f4dc4\",\"var_name\":\"dark-purple\"},\"3\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"4\":{\"color\":\"#ffadad\",\"border\":\"#ffadad\",\"var_name\":\"peach\"},\"6\":{\"color\":\"#66ccff\",\"border\":\"#5ab3e0\",\"var_name\":\"turquoise\"},\"7\":{\"color\":\"#037f4c\",\"border\":\"#006b38\",\"var_name\":\"grass-green\"},\"8\":{\"color\":\"#401694\",\"border\":\"#401694\",\"var_name\":\"dark_indigo\"},\"9\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"10\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"},\"11\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"12\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"}}}"
+        },
+        {
+          "id": "text6",
+          "title": "Referred By",
+          "type": "text",
+          "settings_str": "{}"
+        },
+        {
+          "id": "color_mkzwevwm",
+          "title": "Referral Plan",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"deactivated_labels\":[],\"color_mapping\":{\"3\":12,\"12\":3},\"labels\":{\"0\":\"10% on next run\",\"1\":\"10 X Free Posters\",\"2\":\"Free Prints on next run\",\"3\":\"No Go\",\"4\":\"Inactive\",\"6\":\"Thank You\",\"7\":\"Unknown\"},\"labels_positions_v2\":{\"0\":0,\"1\":1,\"2\":2,\"3\":4,\"4\":5,\"5\":3,\"6\":6,\"7\":7},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"},\"4\":{\"color\":\"#9d50dd\",\"border\":\"#9238af\",\"var_name\":\"purple\"},\"6\":{\"color\":\"#037f4c\",\"border\":\"#006b38\",\"var_name\":\"grass-green\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"}}}"
+        },
+        {
+          "id": "boolean_mm14cbft",
+          "title": "Socials",
+          "type": "checkbox",
+          "settings_str": "{}"
+        },
+        {
+          "id": "numeric_mm2196h1",
+          "title": "Profit",
+          "type": "numbers",
+          "settings_str": "{}"
+        }
+      ]
+    },
+    "rejectedCandidates": [
+      {
+        "board": {
+          "id": "18416146593",
+          "name": "May 2026",
+          "state": "active",
+          "board_kind": "public",
+          "workspace": {
+            "id": "505410",
+            "name": "Pins & Knuckles UK"
+          },
+          "groups": [
+            {
+              "id": "topics",
+              "title": "May Sales"
+            }
+          ],
+          "columns": [
+            {
+              "id": "name",
+              "title": "Name",
+              "type": "name",
+              "settings_str": "{}"
+            },
+            {
+              "id": "person",
+              "title": "ACC Manager",
+              "type": "people",
+              "settings_str": "{}"
+            },
+            {
+              "id": "status",
+              "title": "Channel",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"0\":11,\"2\":16,\"11\":153,\"16\":2,\"153\":0},\"labels\":{\"0\":\"Sales Inbox\",\"1\":\"\",\"2\":\"Personal\"},\"labels_positions_v2\":{\"0\":0,\"1\":2,\"2\":1,\"5\":3},\"labels_colors\":{\"0\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#66ccff\",\"border\":\"#5ab3e0\",\"var_name\":\"turquoise\"}}}"
+            },
+            {
+              "id": "dropdown_mm3y9n7v",
+              "title": "BY",
+              "type": "dropdown",
+              "settings_str": "{\"limit_select\":false,\"labels\":[{\"id\":1,\"name\":\"Snuggle\"},{\"id\":2,\"name\":\"EPCC\"}],\"deactivated_labels\":[]}"
+            },
+            {
+              "id": "color_mm3yr8f6",
+              "title": "Category",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"0\":11,\"1\":8,\"2\":9,\"3\":10,\"4\":19,\"6\":104,\"8\":1,\"9\":2,\"10\":3,\"11\":0,\"19\":4,\"104\":6},\"labels\":{\"0\":\"Bar\",\"1\":\"Coffee shop\",\"2\":\"Brewery\",\"3\":\"Tattoo Parlour\",\"4\":\"Wrestling\",\"5\":\"Bakery\",\"6\":\"Pizza Shop\",\"7\":\"Restaurant\",\"8\":\"Retail\",\"9\":\"Automotive\",\"10\":\"Other\",\"11\":\"Photography\",\"12\":\"Skate\",\"13\":\"Apparel\",\"14\":\"Charity\"},\"labels_positions_v2\":{\"0\":0,\"1\":1,\"2\":2,\"3\":4,\"4\":5,\"5\":3,\"6\":6,\"7\":7,\"8\":8,\"9\":9,\"10\":10,\"11\":11,\"12\":12,\"13\":13,\"14\":14},\"labels_colors\":{\"0\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"1\":{\"color\":\"#cab641\",\"border\":\"#c0ab31\",\"var_name\":\"mustered\"},\"2\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"3\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"},\"4\":{\"color\":\"#ff6d3b\",\"border\":\"#e05828\",\"var_name\":\"dark-orange\"},\"5\":{\"color\":\"#c4c4c4\",\"border\":\"#b0b0b0\",\"var_name\":\"grey\"},\"6\":{\"color\":\"#7e3b8a\",\"border\":\"#7e3b8a\",\"var_name\":\"berry\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"8\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"9\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"10\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"11\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"12\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"},\"13\":{\"color\":\"#ff5ac4\",\"border\":\"#e04fac\",\"var_name\":\"light-pink\"},\"14\":{\"color\":\"#784bd1\",\"border\":\"#8f4dc4\",\"var_name\":\"dark-purple\"}}}"
+            },
+            {
+              "id": "date_mm3y39f1",
+              "title": "Date In Touch",
+              "type": "date",
+              "settings_str": "{}"
+            },
+            {
+              "id": "date_mm3y6xsk",
+              "title": "Follow up",
+              "type": "date",
+              "settings_str": "{}"
+            },
+            {
+              "id": "color_mm3yqths",
+              "title": "Followed up",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"labels\":{\"0\":\"Not Needed\",\"1\":\"Done\",\"2\":\"Stuck\",\"3\":\"Followed up NN\"},\"labels_positions_v2\":{\"0\":0,\"1\":1,\"2\":2,\"3\":4,\"5\":3},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"}}}"
+            },
+            {
+              "id": "text_mm3yqngv",
+              "title": "Notes",
+              "type": "text",
+              "settings_str": "{}"
+            },
+            {
+              "id": "color_mm3yjxkt",
+              "title": "Converted",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"labels\":{\"0\":\"no\",\"1\":\"Yes\",\"2\":\"Stuck\"},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"}}}"
+            },
+            {
+              "id": "date_mm3y8am3",
+              "title": "After Sales",
+              "type": "date",
+              "settings_str": "{}"
+            },
+            {
+              "id": "color_mm3y44nr",
+              "title": "Aftersales Done",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"labels\":{\"0\":\"Working on it\",\"1\":\"Yes\",\"2\":\"no\"},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"}}}"
+            },
+            {
+              "id": "color_mm3ywy71",
+              "title": "How?",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"4\":10,\"10\":4},\"labels\":{\"0\":\"google\",\"1\":\"Instagram\",\"2\":\"Referral\",\"3\":\"Return Client\",\"4\":\"N/A\"},\"labels_positions_v2\":{\"0\":0,\"1\":1,\"2\":2,\"3\":4,\"4\":5,\"5\":3},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"4\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"}}}"
+            },
+            {
+              "id": "text_mm3yqr1q",
+              "title": "Referred By",
+              "type": "text",
+              "settings_str": "{}"
+            },
+            {
+              "id": "boolean_mm3y8rnr",
+              "title": "Checkbox",
+              "type": "checkbox",
+              "settings_str": "{}"
+            }
+          ]
+        },
+        "schemaScore": 10,
+        "reason": "Rejected by deterministic weekly-schema preference."
+      }
+    ]
+  },
+  {
+    "month": 6,
+    "selectedBoard": {
+      "id": "18415683219",
+      "name": "JUNE  2026",
+      "state": "active",
+      "board_kind": "public",
+      "workspace": {
+        "id": "505410",
+        "name": "Pins & Knuckles UK"
+      },
+      "groups": [
+        {
+          "id": "new_group64603",
+          "title": "WEEK 1"
+        },
+        {
+          "id": "group_mm21zbck",
+          "title": "Profit Tracking"
+        }
+      ],
+      "columns": [
+        {
+          "id": "name",
+          "title": "Name",
+          "type": "name",
+          "settings_str": "{}"
+        },
+        {
+          "id": "subitems",
+          "title": "Subitems",
+          "type": "subtasks",
+          "settings_str": "{\"allowMultipleItems\":true,\"itemTypeName\":\"column.subtasks.title\",\"displayType\":\"BOARD_INLINE\",\"boardIds\":[18415683224]}"
+        },
+        {
+          "id": "people",
+          "title": "Acc Manager",
+          "type": "people",
+          "settings_str": "{}"
+        },
+        {
+          "id": "status_16",
+          "title": "Channel",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"1\":101,\"3\":3,\"6\":151,\"10\":10,\"12\":159,\"101\":1,\"151\":12,\"159\":6},\"deactivated_labels\":[],\"labels\":{\"0\":\"pins \\u0026 knuckles store\",\"1\":\"whatsapp\",\"2\":\"Pins Tattoo Club\",\"3\":\"Reached Out\",\"4\":\"social media\",\"6\":\"NO GO\",\"7\":\"sales inbox\",\"8\":\"Instagram\",\"9\":\"EU\",\"10\":\"The Printing Network\",\"11\":\"Instagram Lead Form\",\"12\":\"phone\",\"15\":\"website chat\",\"102\":\"leads list\",\"107\":\"USA\",\"108\":\"personal\"},\"labels_positions_v2\":{\"0\":12,\"1\":7,\"2\":13,\"3\":14,\"4\":9,\"5\":8,\"6\":15,\"7\":1,\"8\":5,\"9\":2,\"10\":4,\"11\":3,\"12\":16,\"15\":6,\"102\":10,\"107\":11,\"108\":0},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#ff7575\",\"border\":\"#ff7575\",\"var_name\":\"sunset\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"4\":{\"color\":\"#9d50dd\",\"border\":\"#9238af\",\"var_name\":\"purple\"},\"6\":{\"color\":\"#563e3e\",\"border\":\"#563e3e\",\"var_name\":\"pecan\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"8\":{\"color\":\"#cab641\",\"border\":\"#c0ab31\",\"var_name\":\"mustered\"},\"9\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"10\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"},\"11\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"12\":{\"color\":\"#cd9282\",\"border\":\"#cd9282\",\"var_name\":\"old_rose\"},\"15\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"102\":{\"color\":\"#faa1f1\",\"border\":\"#faa1f1\",\"var_name\":\"bubble\"},\"107\":{\"color\":\"#225091\",\"border\":\"#225091\",\"var_name\":\"navy\"},\"108\":{\"color\":\"#4eccc6\",\"border\":\"#4eccc6\",\"var_name\":\"australia\"}}}"
+        },
+        {
+          "id": "status_15",
+          "title": "Special",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[],\"color_mapping\":{\"0\":15,\"1\":1,\"2\":2,\"4\":9,\"8\":153,\"9\":160,\"10\":16,\"15\":0,\"16\":10,\"153\":8,\"160\":4},\"deactivated_labels\":[],\"labels\":{\"0\":\"Custom\",\"1\":\"free tees\",\"2\":\"BANNER UPSELL\",\"4\":\"SNUGGLE\",\"5\":\"\"},\"labels_positions_v2\":{\"0\":3,\"1\":4,\"2\":0,\"4\":1,\"5\":2},\"labels_colors\":{\"0\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"4\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"5\":{\"color\":\"#c4c4c4\",\"border\":\"#b0b0b0\",\"var_name\":\"grey\"}}}"
+        },
+        {
+          "id": "status7",
+          "title": "Category",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"hide_footer\":true,\"color_mapping\":{\"0\":153,\"3\":101,\"6\":151,\"10\":160,\"11\":159,\"12\":156,\"13\":0,\"15\":102,\"16\":6,\"17\":11,\"18\":10,\"101\":15,\"102\":3,\"103\":12,\"151\":16,\"153\":13,\"156\":103,\"159\":17,\"160\":18},\"labels\":{\"0\":\"Record Label\",\"1\":\"Podcast\",\"2\":\"Personal Trainer\",\"3\":\"Sports\",\"4\":\"Festival\",\"6\":\"Barber Shop\",\"7\":\"Band\",\"8\":\"Gym\",\"9\":\"Management\",\"10\":\"Key client\",\"11\":\"Restaurant\",\"12\":\"Auto Shop\",\"13\":\"Brewery\",\"14\":\"Apparel\",\"15\":\"Designer\",\"16\":\"Skate\",\"17\":\"Gaming\",\"18\":\"Retail\",\"19\":\"Charity\",\"101\":\"Wrestler\",\"102\":\"Marketing Agency\",\"103\":\"Painting Studio\",\"104\":\"Alcohol Brand\",\"105\":\"Not Sure\",\"106\":\"Tattoo\",\"107\":\"Tech Company\",\"108\":\"Other\",\"109\":\"Theatre\",\"110\":\"School\",\"155\":\"Venue\",\"158\":\"Promotions\"},\"labels_positions_v2\":{\"0\":9,\"1\":10,\"2\":11,\"3\":13,\"4\":15,\"5\":17,\"6\":16,\"7\":0,\"8\":7,\"9\":12,\"10\":3,\"11\":18,\"12\":19,\"13\":20,\"14\":1,\"15\":5,\"16\":21,\"17\":0,\"18\":0,\"19\":22,\"101\":2,\"102\":23,\"103\":24,\"104\":25,\"105\":26,\"106\":4,\"107\":27,\"108\":6,\"109\":28,\"110\":29,\"155\":8,\"158\":14},\"labels_colors\":{\"0\":{\"color\":\"#216edf\",\"border\":\"#216edf\",\"var_name\":\"sky\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#ff7575\",\"border\":\"#ff7575\",\"var_name\":\"sunset\"},\"4\":{\"color\":\"#9d50dd\",\"border\":\"#9238af\",\"var_name\":\"purple\"},\"6\":{\"color\":\"#563e3e\",\"border\":\"#563e3e\",\"var_name\":\"pecan\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"8\":{\"color\":\"#cab641\",\"border\":\"#c0ab31\",\"var_name\":\"mustered\"},\"9\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"10\":{\"color\":\"#175a63\",\"border\":\"#175a63\",\"var_name\":\"eden\"},\"11\":{\"color\":\"#cd9282\",\"border\":\"#cd9282\",\"var_name\":\"old_rose\"},\"12\":{\"color\":\"#9d99b9\",\"border\":\"#9d99b9\",\"var_name\":\"purple_gray\"},\"13\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"14\":{\"color\":\"#784bd1\",\"border\":\"#8f4dc4\",\"var_name\":\"dark-purple\"},\"15\":{\"color\":\"#faa1f1\",\"border\":\"#faa1f1\",\"var_name\":\"bubble\"},\"16\":{\"color\":\"#037f4c\",\"border\":\"#006b38\",\"var_name\":\"grass-green\"},\"17\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"18\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"},\"19\":{\"color\":\"#ff6d3b\",\"border\":\"#e05828\",\"var_name\":\"dark-orange\"},\"101\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"102\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"103\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"},\"104\":{\"color\":\"#7e3b8a\",\"border\":\"#7e3b8a\",\"var_name\":\"berry\"},\"105\":{\"color\":\"#9aadbd\",\"border\":\"#9aadbd\",\"var_name\":\"winter\"},\"106\":{\"color\":\"#74afcc\",\"border\":\"#74afcc\",\"var_name\":\"river\"},\"107\":{\"color\":\"#225091\",\"border\":\"#225091\",\"var_name\":\"navy\"},\"108\":{\"color\":\"#4eccc6\",\"border\":\"#4eccc6\",\"var_name\":\"australia\"},\"109\":{\"color\":\"#5559df\",\"border\":\"#5559df\",\"var_name\":\"indigo\"},\"110\":{\"color\":\"#401694\",\"border\":\"#401694\",\"var_name\":\"dark_indigo\"},\"155\":{\"color\":\"#e484bd\",\"border\":\"#e484bd\",\"var_name\":\"kids\"},\"158\":{\"color\":\"#a1e3f6\",\"border\":\"#a1e3f6\",\"var_name\":\"sail\"}}}"
+        },
+        {
+          "id": "date8",
+          "title": "Date In Touch",
+          "type": "date",
+          "settings_str": "{}"
+        },
+        {
+          "id": "date",
+          "title": "Follow up date",
+          "type": "date",
+          "settings_str": "{}"
+        },
+        {
+          "id": "status1",
+          "title": "Followed Up",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"hide_footer\":true,\"deactivated_labels\":[12],\"color_mapping\":{\"3\":15,\"15\":3},\"labels\":{\"0\":\"Not Needed\",\"1\":\"Yes\",\"2\":\"can't find\",\"3\":\"Busy\",\"7\":\"Can't Help\",\"12\":\"Busy With\",\"14\":\"Second Follow up\"},\"labels_positions_v2\":{\"0\":1,\"1\":0,\"2\":2,\"3\":7,\"5\":6,\"7\":3,\"12\":4,\"14\":5},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"12\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"},\"14\":{\"color\":\"#784bd1\",\"border\":\"#8f4dc4\",\"var_name\":\"dark-purple\"}}}"
+        },
+        {
+          "id": "long_text",
+          "title": "Notes",
+          "type": "long_text",
+          "settings_str": "{}"
+        },
+        {
+          "id": "status",
+          "title": "Converted",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"sumType\":\"allStatuses\",\"labels\":{\"0\":\"will order in a while\",\"1\":\"Yes\",\"2\":\"No\",\"3\":\"Replied - Interested\",\"4\":\"Replied - with other company\",\"6\":\"Will check us out\",\"7\":\"Pre-order\",\"9\":\"sent to TPC\"},\"labels_positions_v2\":{\"0\":1,\"1\":0,\"2\":2,\"3\":5,\"4\":0,\"5\":6,\"6\":0,\"7\":3,\"9\":4},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"4\":{\"color\":\"#9d50dd\",\"border\":\"#9238af\",\"var_name\":\"purple\"},\"6\":{\"color\":\"#037f4c\",\"border\":\"#006b38\",\"var_name\":\"grass-green\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"9\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"}}}"
+        },
+        {
+          "id": "date4",
+          "title": "Aftersale",
+          "type": "date",
+          "settings_str": "{}"
+        },
+        {
+          "id": "checkbox__1",
+          "title": "AFTERSALE DONE",
+          "type": "checkbox",
+          "settings_str": "{}"
+        },
+        {
+          "id": "status_1",
+          "title": "HOW?",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"0\":3,\"1\":9,\"2\":14,\"3\":15,\"4\":103,\"6\":16,\"7\":6,\"8\":110,\"9\":0,\"14\":2,\"15\":19,\"16\":155,\"19\":1,\"103\":4,\"110\":8,\"155\":7},\"labels\":{\"0\":\"facebook\",\"1\":\"instagram\",\"2\":\"google\",\"3\":\"twitter\",\"4\":\"referral\",\"6\":\"Townsend Referral\",\"7\":\"Key Client\",\"8\":\"Paid Search\",\"9\":\"return client\",\"10\":\"N/A\",\"11\":\"shannon\",\"12\":\"Self Referral\"},\"labels_positions_v2\":{\"0\":4,\"1\":3,\"2\":1,\"3\":5,\"4\":6,\"5\":7,\"6\":8,\"7\":2,\"8\":9,\"9\":0,\"10\":10,\"11\":11,\"12\":12},\"labels_colors\":{\"0\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"1\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"2\":{\"color\":\"#784bd1\",\"border\":\"#8f4dc4\",\"var_name\":\"dark-purple\"},\"3\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"4\":{\"color\":\"#ffadad\",\"border\":\"#ffadad\",\"var_name\":\"peach\"},\"6\":{\"color\":\"#66ccff\",\"border\":\"#5ab3e0\",\"var_name\":\"turquoise\"},\"7\":{\"color\":\"#037f4c\",\"border\":\"#006b38\",\"var_name\":\"grass-green\"},\"8\":{\"color\":\"#401694\",\"border\":\"#401694\",\"var_name\":\"dark_indigo\"},\"9\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"10\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"},\"11\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"12\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"}}}"
+        },
+        {
+          "id": "text6",
+          "title": "Referred By",
+          "type": "text",
+          "settings_str": "{}"
+        },
+        {
+          "id": "color_mkzwevwm",
+          "title": "Referral Plan",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"deactivated_labels\":[],\"color_mapping\":{\"3\":12,\"12\":3},\"labels\":{\"0\":\"10% on next run\",\"1\":\"10 X Free Posters\",\"2\":\"Free Prints on next run\",\"3\":\"No Go\",\"4\":\"Inactive\",\"6\":\"Thank You\",\"7\":\"Unknown\"},\"labels_positions_v2\":{\"0\":0,\"1\":1,\"2\":2,\"3\":4,\"4\":5,\"5\":3,\"6\":6,\"7\":7},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"},\"4\":{\"color\":\"#9d50dd\",\"border\":\"#9238af\",\"var_name\":\"purple\"},\"6\":{\"color\":\"#037f4c\",\"border\":\"#006b38\",\"var_name\":\"grass-green\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"}}}"
+        },
+        {
+          "id": "boolean_mm14cbft",
+          "title": "Socials",
+          "type": "checkbox",
+          "settings_str": "{}"
+        },
+        {
+          "id": "numeric_mm2196h1",
+          "title": "Profit",
+          "type": "numbers",
+          "settings_str": "{}"
+        }
+      ]
+    },
+    "rejectedCandidates": [
+      {
+        "board": {
+          "id": "18415908047",
+          "name": "June 2026",
+          "state": "active",
+          "board_kind": "public",
+          "workspace": {
+            "id": "505410",
+            "name": "Pins & Knuckles UK"
+          },
+          "groups": [
+            {
+              "id": "topics",
+              "title": "June Sales"
+            }
+          ],
+          "columns": [
+            {
+              "id": "name",
+              "title": "Name",
+              "type": "name",
+              "settings_str": "{}"
+            },
+            {
+              "id": "subtasks_mm41twjm",
+              "title": "Subitems",
+              "type": "subtasks",
+              "settings_str": "{\"allowMultipleItems\":true,\"itemTypeName\":\"column.subtasks.title\",\"displayType\":\"BOARD_INLINE\",\"boardIds\":[18416503772]}"
+            },
+            {
+              "id": "person",
+              "title": "ACC Manager",
+              "type": "people",
+              "settings_str": "{}"
+            },
+            {
+              "id": "status",
+              "title": "Channel",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"0\":11,\"2\":16,\"11\":153,\"16\":2,\"153\":0},\"labels\":{\"0\":\"Sales Inbox\",\"1\":\"\",\"2\":\"Personal\"},\"labels_positions_v2\":{\"0\":0,\"1\":2,\"2\":1,\"5\":3},\"labels_colors\":{\"0\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#66ccff\",\"border\":\"#5ab3e0\",\"var_name\":\"turquoise\"}}}"
+            },
+            {
+              "id": "dropdown_mm3y9n7v",
+              "title": "BY",
+              "type": "dropdown",
+              "settings_str": "{\"limit_select\":false,\"labels\":[{\"id\":1,\"name\":\"Snuggle\"},{\"id\":2,\"name\":\"EPCC\"}],\"deactivated_labels\":[]}"
+            },
+            {
+              "id": "color_mm3yr8f6",
+              "title": "Category",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"0\":11,\"1\":8,\"2\":9,\"3\":10,\"4\":19,\"6\":104,\"8\":1,\"9\":2,\"10\":3,\"11\":0,\"19\":6,\"104\":4},\"labels\":{\"0\":\"Gym\",\"1\":\"Coffee shop\",\"2\":\"Brewery\",\"3\":\"Tattoo Parlour\",\"4\":\"Wrestling\",\"5\":\"Bakery\",\"6\":\"Pizza Shop\",\"7\":\"Restaurant\",\"8\":\"Retail\",\"9\":\"Charity\",\"10\":\"Masseuse\",\"11\":\"Clothing\",\"12\":\"Other\",\"13\":\"Skate\",\"14\":\"Clinic\",\"15\":\"School\",\"16\":\"Book shop\",\"17\":\"Drag Racing\",\"18\":\"Barber\",\"19\":\"Royal Air Force\",\"101\":\"Recording studio\"},\"labels_positions_v2\":{\"0\":0,\"1\":1,\"2\":2,\"3\":4,\"4\":5,\"5\":3,\"6\":6,\"7\":7,\"8\":8,\"9\":9,\"10\":10,\"11\":11,\"12\":12,\"13\":13,\"14\":14,\"15\":15,\"16\":16,\"17\":17,\"18\":18,\"19\":19,\"101\":20},\"labels_colors\":{\"0\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"1\":{\"color\":\"#cab641\",\"border\":\"#c0ab31\",\"var_name\":\"mustered\"},\"2\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"3\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"},\"4\":{\"color\":\"#ff6d3b\",\"border\":\"#e05828\",\"var_name\":\"dark-orange\"},\"5\":{\"color\":\"#c4c4c4\",\"border\":\"#b0b0b0\",\"var_name\":\"grey\"},\"6\":{\"color\":\"#7e3b8a\",\"border\":\"#7e3b8a\",\"var_name\":\"berry\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"8\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"9\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"10\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"11\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"12\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"},\"13\":{\"color\":\"#ff5ac4\",\"border\":\"#e04fac\",\"var_name\":\"light-pink\"},\"14\":{\"color\":\"#784bd1\",\"border\":\"#8f4dc4\",\"var_name\":\"dark-purple\"},\"15\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"16\":{\"color\":\"#66ccff\",\"border\":\"#5ab3e0\",\"var_name\":\"turquoise\"},\"17\":{\"color\":\"#757575\",\"border\":\"#707070\",\"var_name\":\"trolley-grey\"},\"18\":{\"color\":\"#7f5347\",\"border\":\"#70493e\",\"var_name\":\"brown\"},\"19\":{\"color\":\"#037f4c\",\"border\":\"#006b38\",\"var_name\":\"grass-green\"},\"101\":{\"color\":\"#ff7575\",\"border\":\"#ff7575\",\"var_name\":\"sunset\"}}}"
+            },
+            {
+              "id": "date_mm3y39f1",
+              "title": "Date In Touch",
+              "type": "date",
+              "settings_str": "{}"
+            },
+            {
+              "id": "date_mm3y6xsk",
+              "title": "Follow up",
+              "type": "date",
+              "settings_str": "{}"
+            },
+            {
+              "id": "color_mm3yqths",
+              "title": "Followed up",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"labels\":{\"0\":\"Not Needed\",\"1\":\"Done\",\"2\":\"Stuck\",\"3\":\"Followed up\",\"5\":\"\"},\"labels_positions_v2\":{\"0\":0,\"1\":1,\"2\":2,\"3\":4,\"5\":3},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"5\":{\"color\":\"#c4c4c4\",\"border\":\"#b0b0b0\",\"var_name\":\"grey\"}}}"
+            },
+            {
+              "id": "text_mm3yqngv",
+              "title": "Notes",
+              "type": "text",
+              "settings_str": "{}"
+            },
+            {
+              "id": "color_mm3yjxkt",
+              "title": "Converted",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"labels\":{\"0\":\"no\",\"1\":\"Yes\",\"2\":\"Stuck\"},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"}}}"
+            },
+            {
+              "id": "date_mm3y8am3",
+              "title": "After Sales",
+              "type": "date",
+              "settings_str": "{}"
+            },
+            {
+              "id": "color_mm3y44nr",
+              "title": "Aftersales Done",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"labels\":{\"0\":\"Working on it\",\"1\":\"Done\",\"2\":\"Awaiting Feedback\"},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"}}}"
+            },
+            {
+              "id": "color_mm3ywy71",
+              "title": "How?",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"4\":10,\"10\":4},\"labels\":{\"0\":\"google\",\"1\":\"Instagram\",\"2\":\"Referral\",\"3\":\"Return Client\",\"4\":\"N/A\",\"6\":\"Wrestlers deal\"},\"labels_positions_v2\":{\"0\":0,\"1\":1,\"2\":2,\"3\":4,\"4\":5,\"5\":3,\"6\":6},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"4\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"},\"6\":{\"color\":\"#037f4c\",\"border\":\"#006b38\",\"var_name\":\"grass-green\"}}}"
+            },
+            {
+              "id": "text_mm3yqr1q",
+              "title": "Referred By",
+              "type": "text",
+              "settings_str": "{}"
+            },
+            {
+              "id": "boolean_mm3y8rnr",
+              "title": "Checkbox",
+              "type": "checkbox",
+              "settings_str": "{}"
+            },
+            {
+              "id": "numeric_mm40na7y",
+              "title": "Sales Total EXL VAT",
+              "type": "numbers",
+              "settings_str": "{}"
+            },
+            {
+              "id": "numeric_mm40e0nq",
+              "title": "Client Comnn",
+              "type": "numbers",
+              "settings_str": "{}"
+            }
+          ]
+        },
+        "schemaScore": 10,
+        "reason": "Rejected by deterministic weekly-schema preference."
+      }
+    ]
+  },
+  {
+    "month": 7,
+    "selectedBoard": {
+      "id": "18420001220",
+      "name": "JULY 2026",
+      "state": "active",
+      "board_kind": "public",
+      "workspace": {
+        "id": "505410",
+        "name": "Pins & Knuckles UK"
+      },
+      "groups": [
+        {
+          "id": "group_mm5ex6p3",
+          "title": "WEEK 4"
+        },
+        {
+          "id": "group_mm57p07z",
+          "title": "WEEK 3"
+        },
+        {
+          "id": "group_mm507ay2",
+          "title": "WEEK 2"
+        },
+        {
+          "id": "new_group64603",
+          "title": "WEEK 1"
+        },
+        {
+          "id": "group_mm21zbck",
+          "title": "Profit Tracking"
+        }
+      ],
+      "columns": [
+        {
+          "id": "name",
+          "title": "Name",
+          "type": "name",
+          "settings_str": "{}"
+        },
+        {
+          "id": "subitems",
+          "title": "Subitems",
+          "type": "subtasks",
+          "settings_str": "{\"allowMultipleItems\":true,\"itemTypeName\":\"column.subtasks.title\",\"displayType\":\"BOARD_INLINE\",\"boardIds\":[18420001227]}"
+        },
+        {
+          "id": "people",
+          "title": "Acc Manager",
+          "type": "people",
+          "settings_str": "{}"
+        },
+        {
+          "id": "status_16",
+          "title": "Channel",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"1\":101,\"3\":3,\"6\":151,\"10\":10,\"12\":159,\"101\":1,\"151\":12,\"159\":6},\"deactivated_labels\":[],\"labels\":{\"0\":\"pins \\u0026 knuckles store\",\"1\":\"whatsapp\",\"2\":\"Pins Tattoo Club\",\"3\":\"Reached Out\",\"4\":\"social media\",\"6\":\"NO GO\",\"7\":\"sales inbox\",\"8\":\"Instagram\",\"9\":\"EU\",\"10\":\"The Printing Network\",\"11\":\"Instagram Lead Form\",\"12\":\"phone\",\"15\":\"website chat\",\"102\":\"leads list\",\"107\":\"USA\",\"108\":\"personal\"},\"labels_positions_v2\":{\"0\":12,\"1\":7,\"2\":13,\"3\":14,\"4\":9,\"5\":8,\"6\":15,\"7\":1,\"8\":5,\"9\":2,\"10\":4,\"11\":3,\"12\":16,\"15\":6,\"102\":10,\"107\":11,\"108\":0},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#ff7575\",\"border\":\"#ff7575\",\"var_name\":\"sunset\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"4\":{\"color\":\"#9d50dd\",\"border\":\"#9238af\",\"var_name\":\"purple\"},\"6\":{\"color\":\"#563e3e\",\"border\":\"#563e3e\",\"var_name\":\"pecan\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"8\":{\"color\":\"#cab641\",\"border\":\"#c0ab31\",\"var_name\":\"mustered\"},\"9\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"10\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"},\"11\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"12\":{\"color\":\"#cd9282\",\"border\":\"#cd9282\",\"var_name\":\"old_rose\"},\"15\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"102\":{\"color\":\"#faa1f1\",\"border\":\"#faa1f1\",\"var_name\":\"bubble\"},\"107\":{\"color\":\"#225091\",\"border\":\"#225091\",\"var_name\":\"navy\"},\"108\":{\"color\":\"#4eccc6\",\"border\":\"#4eccc6\",\"var_name\":\"australia\"}}}"
+        },
+        {
+          "id": "status_15",
+          "title": "Special",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[],\"color_mapping\":{\"0\":15,\"1\":1,\"2\":2,\"4\":9,\"8\":153,\"9\":160,\"10\":16,\"15\":0,\"16\":10,\"153\":8,\"160\":4},\"deactivated_labels\":[],\"labels\":{\"0\":\"Custom\",\"1\":\"free tees\",\"2\":\"BANNER UPSELL\",\"4\":\"SNUGGLE\",\"5\":\"\"},\"labels_positions_v2\":{\"0\":3,\"1\":4,\"2\":0,\"4\":1,\"5\":2},\"labels_colors\":{\"0\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"4\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"5\":{\"color\":\"#c4c4c4\",\"border\":\"#b0b0b0\",\"var_name\":\"grey\"}}}"
+        },
+        {
+          "id": "status7",
+          "title": "Category",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"hide_footer\":true,\"color_mapping\":{\"0\":153,\"3\":101,\"6\":151,\"10\":160,\"11\":159,\"12\":156,\"13\":0,\"15\":102,\"16\":6,\"17\":11,\"18\":10,\"101\":15,\"102\":3,\"103\":12,\"151\":16,\"153\":13,\"156\":103,\"159\":17,\"160\":18},\"labels\":{\"0\":\"Record Label\",\"1\":\"Podcast\",\"2\":\"Personal Trainer\",\"3\":\"Sports\",\"4\":\"Festival\",\"6\":\"Barber Shop\",\"7\":\"Band\",\"8\":\"Gym\",\"9\":\"Management\",\"10\":\"Key client\",\"11\":\"Restaurant\",\"12\":\"Auto Shop\",\"13\":\"Brewery\",\"14\":\"Apparel\",\"15\":\"Designer\",\"16\":\"Skate\",\"17\":\"Gaming\",\"18\":\"Retail\",\"19\":\"Charity\",\"101\":\"Wrestler\",\"102\":\"Marketing Agency\",\"103\":\"Painting Studio\",\"104\":\"Alcohol Brand\",\"105\":\"Not Sure\",\"106\":\"Tattoo\",\"107\":\"Tech Company\",\"108\":\"Other\",\"109\":\"Theatre\",\"110\":\"School\",\"151\":\"Film \\u0026 Production\",\"152\":\"Pro Audio\",\"155\":\"Venue\",\"158\":\"Promotions\"},\"labels_positions_v2\":{\"0\":9,\"1\":10,\"2\":11,\"3\":13,\"4\":15,\"5\":17,\"6\":16,\"7\":0,\"8\":7,\"9\":12,\"10\":3,\"11\":18,\"12\":19,\"13\":20,\"14\":1,\"15\":5,\"16\":21,\"17\":0,\"18\":0,\"19\":22,\"101\":2,\"102\":23,\"103\":24,\"104\":25,\"105\":26,\"106\":4,\"107\":27,\"108\":6,\"109\":28,\"110\":29,\"151\":30,\"152\":31,\"155\":8,\"158\":14},\"labels_colors\":{\"0\":{\"color\":\"#216edf\",\"border\":\"#216edf\",\"var_name\":\"sky\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#ff7575\",\"border\":\"#ff7575\",\"var_name\":\"sunset\"},\"4\":{\"color\":\"#9d50dd\",\"border\":\"#9238af\",\"var_name\":\"purple\"},\"6\":{\"color\":\"#563e3e\",\"border\":\"#563e3e\",\"var_name\":\"pecan\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"8\":{\"color\":\"#cab641\",\"border\":\"#c0ab31\",\"var_name\":\"mustered\"},\"9\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"10\":{\"color\":\"#175a63\",\"border\":\"#175a63\",\"var_name\":\"eden\"},\"11\":{\"color\":\"#cd9282\",\"border\":\"#cd9282\",\"var_name\":\"old_rose\"},\"12\":{\"color\":\"#9d99b9\",\"border\":\"#9d99b9\",\"var_name\":\"purple_gray\"},\"13\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"14\":{\"color\":\"#784bd1\",\"border\":\"#8f4dc4\",\"var_name\":\"dark-purple\"},\"15\":{\"color\":\"#faa1f1\",\"border\":\"#faa1f1\",\"var_name\":\"bubble\"},\"16\":{\"color\":\"#037f4c\",\"border\":\"#006b38\",\"var_name\":\"grass-green\"},\"17\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"18\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"},\"19\":{\"color\":\"#ff6d3b\",\"border\":\"#e05828\",\"var_name\":\"dark-orange\"},\"101\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"102\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"103\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"},\"104\":{\"color\":\"#7e3b8a\",\"border\":\"#7e3b8a\",\"var_name\":\"berry\"},\"105\":{\"color\":\"#9aadbd\",\"border\":\"#9aadbd\",\"var_name\":\"winter\"},\"106\":{\"color\":\"#74afcc\",\"border\":\"#74afcc\",\"var_name\":\"river\"},\"107\":{\"color\":\"#225091\",\"border\":\"#225091\",\"var_name\":\"navy\"},\"108\":{\"color\":\"#4eccc6\",\"border\":\"#4eccc6\",\"var_name\":\"australia\"},\"109\":{\"color\":\"#5559df\",\"border\":\"#5559df\",\"var_name\":\"indigo\"},\"110\":{\"color\":\"#401694\",\"border\":\"#401694\",\"var_name\":\"dark_indigo\"},\"151\":{\"color\":\"#66ccff\",\"border\":\"#5ab3e0\",\"var_name\":\"turquoise\"},\"152\":{\"color\":\"#bda8f9\",\"border\":\"#bda8f9\",\"var_name\":\"light_magic\"},\"155\":{\"color\":\"#e484bd\",\"border\":\"#e484bd\",\"var_name\":\"kids\"},\"158\":{\"color\":\"#a1e3f6\",\"border\":\"#a1e3f6\",\"var_name\":\"sail\"}}}"
+        },
+        {
+          "id": "date8",
+          "title": "Date In Touch",
+          "type": "date",
+          "settings_str": "{}"
+        },
+        {
+          "id": "date",
+          "title": "Follow up date",
+          "type": "date",
+          "settings_str": "{}"
+        },
+        {
+          "id": "status1",
+          "title": "Followed Up",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"hide_footer\":true,\"deactivated_labels\":[12],\"color_mapping\":{\"3\":15,\"15\":3},\"labels\":{\"0\":\"Not Needed\",\"1\":\"Yes\",\"2\":\"can't find\",\"3\":\"Busy\",\"7\":\"Can't Help\",\"12\":\"Busy With\",\"14\":\"Second Follow up\"},\"labels_positions_v2\":{\"0\":1,\"1\":0,\"2\":2,\"3\":7,\"5\":6,\"7\":3,\"12\":4,\"14\":5},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"12\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"},\"14\":{\"color\":\"#784bd1\",\"border\":\"#8f4dc4\",\"var_name\":\"dark-purple\"}}}"
+        },
+        {
+          "id": "long_text",
+          "title": "Notes",
+          "type": "long_text",
+          "settings_str": "{}"
+        },
+        {
+          "id": "status",
+          "title": "Converted",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"sumType\":\"allStatuses\",\"labels\":{\"0\":\"will order in a while\",\"1\":\"Yes\",\"2\":\"No\",\"3\":\"Replied - Interested\",\"4\":\"Replied - with other company\",\"6\":\"Will check us out\",\"7\":\"Pre-order\",\"9\":\"sent to TPC\"},\"labels_positions_v2\":{\"0\":1,\"1\":0,\"2\":2,\"3\":5,\"4\":0,\"5\":6,\"6\":0,\"7\":3,\"9\":4},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"4\":{\"color\":\"#9d50dd\",\"border\":\"#9238af\",\"var_name\":\"purple\"},\"6\":{\"color\":\"#037f4c\",\"border\":\"#006b38\",\"var_name\":\"grass-green\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"9\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"}}}"
+        },
+        {
+          "id": "date4",
+          "title": "Aftersale",
+          "type": "date",
+          "settings_str": "{}"
+        },
+        {
+          "id": "checkbox__1",
+          "title": "AFTERSALE DONE",
+          "type": "checkbox",
+          "settings_str": "{}"
+        },
+        {
+          "id": "status_1",
+          "title": "HOW?",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"0\":3,\"1\":9,\"2\":14,\"3\":15,\"4\":103,\"6\":16,\"7\":6,\"8\":110,\"9\":0,\"14\":2,\"15\":19,\"16\":155,\"19\":1,\"103\":4,\"110\":8,\"155\":7},\"labels\":{\"0\":\"facebook\",\"1\":\"instagram\",\"2\":\"google\",\"3\":\"twitter\",\"4\":\"referral\",\"6\":\"Townsend Referral\",\"7\":\"Key Client\",\"8\":\"Paid Search\",\"9\":\"return client\",\"10\":\"N/A\",\"11\":\"shannon\",\"12\":\"Self Referral\"},\"labels_positions_v2\":{\"0\":4,\"1\":3,\"2\":1,\"3\":5,\"4\":6,\"5\":7,\"6\":8,\"7\":2,\"8\":9,\"9\":0,\"10\":10,\"11\":11,\"12\":12},\"labels_colors\":{\"0\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"1\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"2\":{\"color\":\"#784bd1\",\"border\":\"#8f4dc4\",\"var_name\":\"dark-purple\"},\"3\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"4\":{\"color\":\"#ffadad\",\"border\":\"#ffadad\",\"var_name\":\"peach\"},\"6\":{\"color\":\"#66ccff\",\"border\":\"#5ab3e0\",\"var_name\":\"turquoise\"},\"7\":{\"color\":\"#037f4c\",\"border\":\"#006b38\",\"var_name\":\"grass-green\"},\"8\":{\"color\":\"#401694\",\"border\":\"#401694\",\"var_name\":\"dark_indigo\"},\"9\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"10\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"},\"11\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"12\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"}}}"
+        },
+        {
+          "id": "text6",
+          "title": "Referred By",
+          "type": "text",
+          "settings_str": "{}"
+        },
+        {
+          "id": "color_mkzwevwm",
+          "title": "Referral Plan",
+          "type": "status",
+          "settings_str": "{\"done_colors\":[1],\"deactivated_labels\":[],\"color_mapping\":{\"3\":12,\"12\":3},\"labels\":{\"0\":\"10% on next run\",\"1\":\"10 X Free Posters\",\"2\":\"Free Prints on next run\",\"3\":\"No Go\",\"4\":\"Inactive\",\"6\":\"Thank You\",\"7\":\"Unknown\"},\"labels_positions_v2\":{\"0\":0,\"1\":1,\"2\":2,\"3\":4,\"4\":5,\"5\":3,\"6\":6,\"7\":7},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"},\"4\":{\"color\":\"#9d50dd\",\"border\":\"#9238af\",\"var_name\":\"purple\"},\"6\":{\"color\":\"#037f4c\",\"border\":\"#006b38\",\"var_name\":\"grass-green\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"}}}"
+        },
+        {
+          "id": "boolean_mm14cbft",
+          "title": "Socials",
+          "type": "checkbox",
+          "settings_str": "{}"
+        },
+        {
+          "id": "numeric_mm2196h1",
+          "title": "Profit",
+          "type": "numbers",
+          "settings_str": "{}"
+        }
+      ]
+    },
+    "rejectedCandidates": [
+      {
+        "board": {
+          "id": "18419121579",
+          "name": "July 2026",
+          "state": "active",
+          "board_kind": "public",
+          "workspace": {
+            "id": "505410",
+            "name": "Pins & Knuckles UK"
+          },
+          "groups": [
+            {
+              "id": "topics",
+              "title": "July Sales"
+            }
+          ],
+          "columns": [
+            {
+              "id": "name",
+              "title": "Name",
+              "type": "name",
+              "settings_str": "{}"
+            },
+            {
+              "id": "subtasks_mm41twjm",
+              "title": "Subitems",
+              "type": "subtasks",
+              "settings_str": "{\"allowMultipleItems\":true,\"itemTypeName\":\"column.subtasks.title\",\"displayType\":\"BOARD_INLINE\",\"boardIds\":[18419121581]}"
+            },
+            {
+              "id": "person",
+              "title": "ACC Manager",
+              "type": "people",
+              "settings_str": "{}"
+            },
+            {
+              "id": "status",
+              "title": "Channel",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"0\":11,\"2\":16,\"11\":153,\"16\":2,\"153\":0},\"labels\":{\"0\":\"Sales Inbox\",\"1\":\"\",\"2\":\"Personal\"},\"labels_positions_v2\":{\"0\":0,\"1\":2,\"2\":1,\"5\":3},\"labels_colors\":{\"0\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#66ccff\",\"border\":\"#5ab3e0\",\"var_name\":\"turquoise\"}}}"
+            },
+            {
+              "id": "dropdown_mm3y9n7v",
+              "title": "BY",
+              "type": "dropdown",
+              "settings_str": "{\"limit_select\":false,\"labels\":[{\"id\":1,\"name\":\"Snuggle\"},{\"id\":2,\"name\":\"EPCC\"}],\"deactivated_labels\":[]}"
+            },
+            {
+              "id": "color_mm3yr8f6",
+              "title": "Category",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"0\":11,\"1\":8,\"2\":9,\"3\":10,\"4\":19,\"6\":104,\"8\":1,\"9\":2,\"10\":3,\"11\":0,\"19\":4,\"104\":6},\"labels\":{\"0\":\"Gym\",\"1\":\"Coffee shop\",\"2\":\"Brewery\",\"3\":\"Tattoo Parlour\",\"4\":\"Wrestling\",\"5\":\"Bakery\",\"6\":\"Pizza Shop\",\"7\":\"Restaurant\",\"8\":\"Retail\",\"9\":\"Charity\",\"10\":\"Masseuse\",\"11\":\"Clothing\",\"12\":\"Other\",\"13\":\"Skate\",\"14\":\"Clinic\",\"15\":\"School\",\"16\":\"Book shop\",\"17\":\"Racing\",\"18\":\"Barber\",\"19\":\"Security\"},\"labels_positions_v2\":{\"0\":0,\"1\":1,\"2\":2,\"3\":4,\"4\":5,\"5\":3,\"6\":6,\"7\":7,\"8\":8,\"9\":9,\"10\":10,\"11\":11,\"12\":12,\"13\":13,\"14\":14,\"15\":15,\"16\":16,\"17\":17,\"18\":18,\"19\":19},\"labels_colors\":{\"0\":{\"color\":\"#bb3354\",\"border\":\"#a42d4a\",\"var_name\":\"dark-red\"},\"1\":{\"color\":\"#cab641\",\"border\":\"#c0ab31\",\"var_name\":\"mustered\"},\"2\":{\"color\":\"#ffcb00\",\"border\":\"#c0ab1b\",\"var_name\":\"yellow\"},\"3\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"},\"4\":{\"color\":\"#ff6d3b\",\"border\":\"#e05828\",\"var_name\":\"dark-orange\"},\"5\":{\"color\":\"#c4c4c4\",\"border\":\"#b0b0b0\",\"var_name\":\"grey\"},\"6\":{\"color\":\"#7e3b8a\",\"border\":\"#7e3b8a\",\"var_name\":\"berry\"},\"7\":{\"color\":\"#579bfc\",\"border\":\"#4387e8\",\"var_name\":\"bright-blue\"},\"8\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"9\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"10\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"11\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"12\":{\"color\":\"#ff007f\",\"border\":\"#e01279\",\"var_name\":\"dark-pink\"},\"13\":{\"color\":\"#ff5ac4\",\"border\":\"#e04fac\",\"var_name\":\"light-pink\"},\"14\":{\"color\":\"#784bd1\",\"border\":\"#8f4dc4\",\"var_name\":\"dark-purple\"},\"15\":{\"color\":\"#9cd326\",\"border\":\"#89b921\",\"var_name\":\"lime-green\"},\"16\":{\"color\":\"#66ccff\",\"border\":\"#5ab3e0\",\"var_name\":\"turquoise\"},\"17\":{\"color\":\"#757575\",\"border\":\"#707070\",\"var_name\":\"trolley-grey\"},\"18\":{\"color\":\"#7f5347\",\"border\":\"#70493e\",\"var_name\":\"brown\"},\"19\":{\"color\":\"#9d50dd\",\"border\":\"#9238af\",\"var_name\":\"purple\"}}}"
+            },
+            {
+              "id": "date_mm3y39f1",
+              "title": "Date In Touch",
+              "type": "date",
+              "settings_str": "{}"
+            },
+            {
+              "id": "date_mm3y6xsk",
+              "title": "Follow up",
+              "type": "date",
+              "settings_str": "{}"
+            },
+            {
+              "id": "color_mm3yqths",
+              "title": "Followed up",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"labels\":{\"0\":\"Not Needed\",\"1\":\"Done\",\"2\":\"Stuck\",\"3\":\"Followed up\",\"5\":\"\"},\"labels_positions_v2\":{\"0\":0,\"1\":1,\"2\":2,\"3\":4,\"5\":3},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"5\":{\"color\":\"#c4c4c4\",\"border\":\"#b0b0b0\",\"var_name\":\"grey\"}}}"
+            },
+            {
+              "id": "text_mm3yqngv",
+              "title": "Notes",
+              "type": "text",
+              "settings_str": "{}"
+            },
+            {
+              "id": "color_mm3yjxkt",
+              "title": "Converted",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"labels\":{\"0\":\"no\",\"1\":\"Yes\",\"2\":\"Stuck\"},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"}}}"
+            },
+            {
+              "id": "date_mm3y8am3",
+              "title": "After Sales",
+              "type": "date",
+              "settings_str": "{}"
+            },
+            {
+              "id": "color_mm3y44nr",
+              "title": "Aftersales Done",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"labels\":{\"0\":\"Working on it\",\"1\":\"Done\",\"2\":\"Awaiting Feedback\"},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"}}}"
+            },
+            {
+              "id": "color_mm3ywy71",
+              "title": "How?",
+              "type": "status",
+              "settings_str": "{\"done_colors\":[1],\"color_mapping\":{\"4\":10,\"10\":4},\"labels\":{\"0\":\"google\",\"1\":\"Instagram\",\"2\":\"Referral\",\"3\":\"Return Client\",\"4\":\"N/A\"},\"labels_positions_v2\":{\"0\":0,\"1\":1,\"2\":2,\"3\":4,\"4\":5,\"5\":3},\"labels_colors\":{\"0\":{\"color\":\"#fdab3d\",\"border\":\"#e99729\",\"var_name\":\"orange\"},\"1\":{\"color\":\"#00c875\",\"border\":\"#00b461\",\"var_name\":\"green-shadow\"},\"2\":{\"color\":\"#df2f4a\",\"border\":\"#ce3048\",\"var_name\":\"red-shadow\"},\"3\":{\"color\":\"#007eb5\",\"border\":\"#3db0df\",\"var_name\":\"blue-links\"},\"4\":{\"color\":\"#333333\",\"border\":\"#000\",\"var_name\":\"soft-black\"}}}"
+            },
+            {
+              "id": "text_mm3yqr1q",
+              "title": "Referred By",
+              "type": "text",
+              "settings_str": "{}"
+            },
+            {
+              "id": "boolean_mm3y8rnr",
+              "title": "Checkbox",
+              "type": "checkbox",
+              "settings_str": "{}"
+            },
+            {
+              "id": "numeric_mm40na7y",
+              "title": "Sales Total EXL VAT",
+              "type": "numbers",
+              "settings_str": "{}"
+            },
+            {
+              "id": "numeric_mm40e0nq",
+              "title": "Client Comnn",
+              "type": "numbers",
+              "settings_str": "{}"
+            }
+          ]
+        },
+        "schemaScore": 10,
+        "reason": "Rejected by deterministic weekly-schema preference."
+      }
+    ]
+  }
+]

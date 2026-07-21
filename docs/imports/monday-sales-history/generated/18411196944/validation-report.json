@@ -2,9 +2,9 @@
   "validation": {
     "missingDateCount": 0,
     "mismatchedDateCount": 0,
-    "validDateInTouchMonthCount": 185,
+    "validDateInTouchMonthCount": 316,
     "multiManagerItemCount": 1,
-    "multiManagerConvertedCount": 0,
+    "multiManagerConvertedCount": 1,
     "excludedFromMemberMetricsCount": 1,
     "blankAccountManagerItemCount": 0
   },
@@ -12,19 +12,19 @@
   "mismatchedDates": [],
   "multiAccountManagers": [
     {
-      "id": "12417998854",
-      "name": "Torus",
-      "converted": false,
+      "id": "11938199021",
+      "name": "Evil Greed - landmvrks",
+      "converted": true,
       "accountManagers": [
         {
-          "id": "29869326",
-          "name": "hardus",
-          "normalizedName": "hardus"
+          "id": "14589471",
+          "name": "Johan",
+          "normalizedName": "johan"
         },
         {
-          "id": "69507598",
-          "name": "Justin du Preez",
-          "normalizedName": "justin du preez"
+          "id": "26816626",
+          "name": "Bux",
+          "normalizedName": "bux"
         }
       ]
     }

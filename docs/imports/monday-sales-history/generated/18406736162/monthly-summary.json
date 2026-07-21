@@ -1,0 +1,413 @@
+{
+  "board": {
+    "id": "18406736162",
+    "name": "APRIL  2026",
+    "inferredMonth": {
+      "year": 2026,
+      "month": 4,
+      "label": "APRIL 2026"
+    }
+  },
+  "fetch": {
+    "totalItemsFetched": 279,
+    "includedWeeklyItems": 274,
+    "excludedItems": 5,
+    "deletedItems": "not returned by Monday item queries",
+    "inaccessibleItems": "not returned by Monday item queries",
+    "subitems": "not requested or included; Monday top-level item query only"
+  },
+  "scopes": {
+    "allLeads": {
+      "byBoardMembership": {
+        "totalLeadItems": 274,
+        "convertedItems": 186,
+        "conversionRate": 67.9,
+        "byAccountManager": [
+          {
+            "displayName": "Anthony Strauss",
+            "mondayUserIds": [
+              "15773637"
+            ],
+            "leads": 15,
+            "converted": 15,
+            "conversionRate": 100
+          },
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 47,
+            "converted": 26,
+            "conversionRate": 55.3
+          },
+          {
+            "displayName": "Catherine Strauss",
+            "mondayUserIds": [
+              "26567721"
+            ],
+            "leads": 1,
+            "converted": 1,
+            "conversionRate": 100
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 68,
+            "converted": 49,
+            "conversionRate": 72.1
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 73,
+            "converted": 56,
+            "conversionRate": 76.7
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 58,
+            "converted": 31,
+            "conversionRate": 53.4
+          },
+          {
+            "displayName": "seth van niekerk",
+            "mondayUserIds": [
+              "102110325"
+            ],
+            "leads": 12,
+            "converted": 8,
+            "conversionRate": 66.7
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "EU",
+            "leads": 10,
+            "converted": 6,
+            "conversionRate": 60
+          },
+          {
+            "displayLabel": "personal",
+            "leads": 176,
+            "converted": 138,
+            "conversionRate": 78.4
+          },
+          {
+            "displayLabel": "pins & knuckles store",
+            "leads": 5,
+            "converted": 5,
+            "conversionRate": 100
+          },
+          {
+            "displayLabel": "Reached Out",
+            "leads": 1,
+            "converted": 1,
+            "conversionRate": 100
+          },
+          {
+            "displayLabel": "sales inbox",
+            "leads": 82,
+            "converted": 36,
+            "conversionRate": 43.9
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      },
+      "byValidDateInTouchMonth": {
+        "totalLeadItems": 273,
+        "convertedItems": 185,
+        "conversionRate": 67.8,
+        "byAccountManager": [
+          {
+            "displayName": "Anthony Strauss",
+            "mondayUserIds": [
+              "15773637"
+            ],
+            "leads": 15,
+            "converted": 15,
+            "conversionRate": 100
+          },
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 47,
+            "converted": 26,
+            "conversionRate": 55.3
+          },
+          {
+            "displayName": "Catherine Strauss",
+            "mondayUserIds": [
+              "26567721"
+            ],
+            "leads": 1,
+            "converted": 1,
+            "conversionRate": 100
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 68,
+            "converted": 49,
+            "conversionRate": 72.1
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 73,
+            "converted": 56,
+            "conversionRate": 76.7
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 58,
+            "converted": 31,
+            "conversionRate": 53.4
+          },
+          {
+            "displayName": "seth van niekerk",
+            "mondayUserIds": [
+              "102110325"
+            ],
+            "leads": 11,
+            "converted": 7,
+            "conversionRate": 63.6
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "EU",
+            "leads": 10,
+            "converted": 6,
+            "conversionRate": 60
+          },
+          {
+            "displayLabel": "personal",
+            "leads": 176,
+            "converted": 138,
+            "conversionRate": 78.4
+          },
+          {
+            "displayLabel": "pins & knuckles store",
+            "leads": 5,
+            "converted": 5,
+            "conversionRate": 100
+          },
+          {
+            "displayLabel": "Reached Out",
+            "leads": 1,
+            "converted": 1,
+            "conversionRate": 100
+          },
+          {
+            "displayLabel": "sales inbox",
+            "leads": 81,
+            "converted": 35,
+            "conversionRate": 43.2
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      }
+    },
+    "salesInboxOnly": {
+      "byBoardMembership": {
+        "totalLeadItems": 82,
+        "convertedItems": 36,
+        "conversionRate": 43.9,
+        "byAccountManager": [
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 24,
+            "converted": 7,
+            "conversionRate": 29.2
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 14,
+            "converted": 8,
+            "conversionRate": 57.1
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 1,
+            "converted": 0,
+            "conversionRate": 0
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 32,
+            "converted": 13,
+            "conversionRate": 40.6
+          },
+          {
+            "displayName": "seth van niekerk",
+            "mondayUserIds": [
+              "102110325"
+            ],
+            "leads": 11,
+            "converted": 8,
+            "conversionRate": 72.7
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "sales inbox",
+            "leads": 82,
+            "converted": 36,
+            "conversionRate": 43.9
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      },
+      "byValidDateInTouchMonth": {
+        "totalLeadItems": 81,
+        "convertedItems": 35,
+        "conversionRate": 43.2,
+        "byAccountManager": [
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 24,
+            "converted": 7,
+            "conversionRate": 29.2
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 14,
+            "converted": 8,
+            "conversionRate": 57.1
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 1,
+            "converted": 0,
+            "conversionRate": 0
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 32,
+            "converted": 13,
+            "conversionRate": 40.6
+          },
+          {
+            "displayName": "seth van niekerk",
+            "mondayUserIds": [
+              "102110325"
+            ],
+            "leads": 10,
+            "converted": 7,
+            "conversionRate": 70
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "sales inbox",
+            "leads": 81,
+            "converted": 35,
+            "conversionRate": 43.2
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      }
+    }
+  },
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 1,
+    "validDateInTouchMonthCount": 273,
+    "multiManagerItemCount": 0,
+    "multiManagerConvertedCount": 0,
+    "excludedFromMemberMetricsCount": 0,
+    "blankAccountManagerItemCount": 0
+  },
+  "excludedItems": [
+    {
+      "id": "11661874307",
+      "name": "Week 1",
+      "group": "Profit Tracking",
+      "reason": "profit-tracking-group"
+    },
+    {
+      "id": "11661886942",
+      "name": "Week 2",
+      "group": "Profit Tracking",
+      "reason": "profit-tracking-group"
+    },
+    {
+      "id": "11661861414",
+      "name": "Week 3",
+      "group": "Profit Tracking",
+      "reason": "profit-tracking-group"
+    },
+    {
+      "id": "11661874614",
+      "name": "Week 4",
+      "group": "Profit Tracking",
+      "reason": "profit-tracking-group"
+    },
+    {
+      "id": "12115025860",
+      "name": "Week 5",
+      "group": "Profit Tracking",
+      "reason": "profit-tracking-group"
+    }
+  ],
+  "missingDates": [],
+  "mismatchedDates": [
+    {
+      "sourceBoardId": "18406736162",
+      "sourceBoardMonth": "APRIL 2026",
+      "itemId": "11878567989",
+      "itemName": "The James Baker Foundation",
+      "group": "WEEK 1",
+      "actualDateInTouch": "2026-05-29",
+      "includedInBoardMembershipTotals": true,
+      "includedInValidDateTotals": false,
+      "action": "review-in-monday"
+    }
+  ],
+  "multiAccountManagers": []
+}

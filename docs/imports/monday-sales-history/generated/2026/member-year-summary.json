@@ -1,0 +1,372 @@
+[
+  {
+    "identity": "15773637",
+    "mondayUserIds": [
+      "15773637"
+    ],
+    "canonicalDisplayName": "Anthony Strauss",
+    "observedDisplayNames": [
+      "Anthony Strauss"
+    ],
+    "leads": 113,
+    "converted": 82,
+    "conversionRate": 72.6,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 17,
+        "converted": 13
+      },
+      {
+        "month": 2,
+        "leads": 18,
+        "converted": 12
+      },
+      {
+        "month": 3,
+        "leads": 24,
+        "converted": 14
+      },
+      {
+        "month": 4,
+        "leads": 15,
+        "converted": 15
+      },
+      {
+        "month": 5,
+        "leads": 20,
+        "converted": 12
+      },
+      {
+        "month": 6,
+        "leads": 13,
+        "converted": 10
+      },
+      {
+        "month": 7,
+        "leads": 6,
+        "converted": 6
+      }
+    ]
+  },
+  {
+    "identity": "26816626",
+    "mondayUserIds": [
+      "26816626"
+    ],
+    "canonicalDisplayName": "Bux",
+    "observedDisplayNames": [
+      "Bux"
+    ],
+    "leads": 297,
+    "converted": 181,
+    "conversionRate": 60.9,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 32,
+        "converted": 25
+      },
+      {
+        "month": 2,
+        "leads": 37,
+        "converted": 22
+      },
+      {
+        "month": 3,
+        "leads": 60,
+        "converted": 34
+      },
+      {
+        "month": 4,
+        "leads": 47,
+        "converted": 26
+      },
+      {
+        "month": 5,
+        "leads": 42,
+        "converted": 30
+      },
+      {
+        "month": 6,
+        "leads": 44,
+        "converted": 30
+      },
+      {
+        "month": 7,
+        "leads": 35,
+        "converted": 14
+      }
+    ]
+  },
+  {
+    "identity": "26567721",
+    "mondayUserIds": [
+      "26567721"
+    ],
+    "canonicalDisplayName": "Catherine Strauss",
+    "observedDisplayNames": [
+      "Catherine Strauss"
+    ],
+    "leads": 2,
+    "converted": 2,
+    "conversionRate": 100,
+    "monthly": [
+      {
+        "month": 2,
+        "leads": 1,
+        "converted": 1
+      },
+      {
+        "month": 4,
+        "leads": 1,
+        "converted": 1
+      }
+    ]
+  },
+  {
+    "identity": "23738460",
+    "mondayUserIds": [
+      "23738460"
+    ],
+    "canonicalDisplayName": "Deleted member",
+    "observedDisplayNames": [
+      "Deleted member"
+    ],
+    "leads": 84,
+    "converted": 38,
+    "conversionRate": 45.2,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 39,
+        "converted": 18
+      },
+      {
+        "month": 2,
+        "leads": 45,
+        "converted": 20
+      }
+    ]
+  },
+  {
+    "identity": "29869326",
+    "mondayUserIds": [
+      "29869326"
+    ],
+    "canonicalDisplayName": "hardus",
+    "observedDisplayNames": [
+      "hardus"
+    ],
+    "leads": 386,
+    "converted": 253,
+    "conversionRate": 65.5,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 54,
+        "converted": 39
+      },
+      {
+        "month": 2,
+        "leads": 54,
+        "converted": 32
+      },
+      {
+        "month": 3,
+        "leads": 62,
+        "converted": 47
+      },
+      {
+        "month": 4,
+        "leads": 68,
+        "converted": 49
+      },
+      {
+        "month": 5,
+        "leads": 59,
+        "converted": 35
+      },
+      {
+        "month": 6,
+        "leads": 68,
+        "converted": 44
+      },
+      {
+        "month": 7,
+        "leads": 21,
+        "converted": 7
+      }
+    ]
+  },
+  {
+    "identity": "14589471",
+    "mondayUserIds": [
+      "14589471"
+    ],
+    "canonicalDisplayName": "Johan",
+    "observedDisplayNames": [
+      "Johan"
+    ],
+    "leads": 519,
+    "converted": 405,
+    "conversionRate": 78,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 59,
+        "converted": 40
+      },
+      {
+        "month": 2,
+        "leads": 75,
+        "converted": 69
+      },
+      {
+        "month": 3,
+        "leads": 77,
+        "converted": 62
+      },
+      {
+        "month": 4,
+        "leads": 73,
+        "converted": 56
+      },
+      {
+        "month": 5,
+        "leads": 94,
+        "converted": 73
+      },
+      {
+        "month": 6,
+        "leads": 88,
+        "converted": 71
+      },
+      {
+        "month": 7,
+        "leads": 53,
+        "converted": 34
+      }
+    ]
+  },
+  {
+    "identity": "69507598",
+    "mondayUserIds": [
+      "69507598"
+    ],
+    "canonicalDisplayName": "Justin du Preez",
+    "observedDisplayNames": [
+      "Justin du Preez"
+    ],
+    "leads": 325,
+    "converted": 183,
+    "conversionRate": 56.3,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 19,
+        "converted": 11
+      },
+      {
+        "month": 2,
+        "leads": 45,
+        "converted": 25
+      },
+      {
+        "month": 3,
+        "leads": 46,
+        "converted": 29
+      },
+      {
+        "month": 4,
+        "leads": 58,
+        "converted": 31
+      },
+      {
+        "month": 5,
+        "leads": 35,
+        "converted": 23
+      },
+      {
+        "month": 6,
+        "leads": 53,
+        "converted": 28
+      },
+      {
+        "month": 7,
+        "leads": 69,
+        "converted": 36
+      }
+    ]
+  },
+  {
+    "identity": "98541009",
+    "mondayUserIds": [
+      "98541009"
+    ],
+    "canonicalDisplayName": "Morgan Baxter",
+    "observedDisplayNames": [
+      "Morgan Baxter"
+    ],
+    "leads": 1,
+    "converted": 1,
+    "conversionRate": 100,
+    "monthly": [
+      {
+        "month": 2,
+        "leads": 1,
+        "converted": 1
+      }
+    ]
+  },
+  {
+    "identity": "102110325",
+    "mondayUserIds": [
+      "102110325"
+    ],
+    "canonicalDisplayName": "seth van niekerk",
+    "observedDisplayNames": [
+      "seth van niekerk"
+    ],
+    "leads": 84,
+    "converted": 38,
+    "conversionRate": 45.2,
+    "monthly": [
+      {
+        "month": 4,
+        "leads": 12,
+        "converted": 8
+      },
+      {
+        "month": 5,
+        "leads": 65,
+        "converted": 27
+      },
+      {
+        "month": 6,
+        "leads": 7,
+        "converted": 3
+      }
+    ]
+  },
+  {
+    "identity": "14589779",
+    "mondayUserIds": [
+      "14589779"
+    ],
+    "canonicalDisplayName": "Shannon",
+    "observedDisplayNames": [
+      "Shannon"
+    ],
+    "leads": 19,
+    "converted": 5,
+    "conversionRate": 26.3,
+    "monthly": [
+      {
+        "month": 3,
+        "leads": 19,
+        "converted": 5
+      }
+    ]
+  }
+]

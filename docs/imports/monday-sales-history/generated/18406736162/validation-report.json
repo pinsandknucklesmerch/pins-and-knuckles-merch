@@ -1,0 +1,27 @@
+{
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 1,
+    "validDateInTouchMonthCount": 273,
+    "multiManagerItemCount": 0,
+    "multiManagerConvertedCount": 0,
+    "excludedFromMemberMetricsCount": 0,
+    "blankAccountManagerItemCount": 0
+  },
+  "missingDates": [],
+  "mismatchedDates": [
+    {
+      "sourceBoardId": "18406736162",
+      "sourceBoardMonth": "APRIL 2026",
+      "itemId": "11878567989",
+      "itemName": "The James Baker Foundation",
+      "group": "WEEK 1",
+      "actualDateInTouch": "2026-05-29",
+      "includedInBoardMembershipTotals": true,
+      "includedInValidDateTotals": false,
+      "action": "review-in-monday"
+    }
+  ],
+  "multiAccountManagers": [],
+  "dateScopeNote": "Board membership is authoritative for reporting. Date In Touch is a data-quality comparison only: mismatches remain in board totals, are excluded from valid-date comparison totals, and require review in Monday."
+}

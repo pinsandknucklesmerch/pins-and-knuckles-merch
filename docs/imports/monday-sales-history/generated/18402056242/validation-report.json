@@ -2,9 +2,9 @@
   "validation": {
     "missingDateCount": 0,
     "mismatchedDateCount": 0,
-    "validDateInTouchMonthCount": 185,
+    "validDateInTouchMonthCount": 289,
     "multiManagerItemCount": 1,
-    "multiManagerConvertedCount": 0,
+    "multiManagerConvertedCount": 1,
     "excludedFromMemberMetricsCount": 1,
     "blankAccountManagerItemCount": 0
   },
@@ -12,14 +12,14 @@
   "mismatchedDates": [],
   "multiAccountManagers": [
     {
-      "id": "12417998854",
-      "name": "Torus",
-      "converted": false,
+      "id": "11421275395",
+      "name": "Hospital Radio Music",
+      "converted": true,
       "accountManagers": [
         {
-          "id": "29869326",
-          "name": "hardus",
-          "normalizedName": "hardus"
+          "id": "14589779",
+          "name": "Shannon",
+          "normalizedName": "shannon"
         },
         {
           "id": "69507598",

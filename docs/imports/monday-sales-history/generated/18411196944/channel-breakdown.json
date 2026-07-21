@@ -1,0 +1,26 @@
+[
+  {
+    "displayLabel": "EU",
+    "leads": 14,
+    "converted": 6,
+    "conversionRate": 42.9
+  },
+  {
+    "displayLabel": "personal",
+    "leads": 218,
+    "converted": 161,
+    "conversionRate": 73.9
+  },
+  {
+    "displayLabel": "sales inbox",
+    "leads": 83,
+    "converted": 34,
+    "conversionRate": 41
+  },
+  {
+    "displayLabel": "website chat",
+    "leads": 1,
+    "converted": 0,
+    "conversionRate": 0
+  }
+]

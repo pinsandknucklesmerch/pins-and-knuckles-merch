@@ -1,0 +1,32 @@
+[
+  {
+    "displayLabel": "EU",
+    "leads": 9,
+    "converted": 5,
+    "conversionRate": 55.6
+  },
+  {
+    "displayLabel": "Instagram Lead Form",
+    "leads": 1,
+    "converted": 0,
+    "conversionRate": 0
+  },
+  {
+    "displayLabel": "personal",
+    "leads": 148,
+    "converted": 111,
+    "conversionRate": 75
+  },
+  {
+    "displayLabel": "pins & knuckles store",
+    "leads": 4,
+    "converted": 4,
+    "conversionRate": 100
+  },
+  {
+    "displayLabel": "sales inbox",
+    "leads": 58,
+    "converted": 26,
+    "conversionRate": 44.8
+  }
+]

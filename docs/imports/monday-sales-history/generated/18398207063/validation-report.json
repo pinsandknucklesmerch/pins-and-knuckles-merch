@@ -1,0 +1,27 @@
+{
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 1,
+    "validDateInTouchMonthCount": 275,
+    "multiManagerItemCount": 0,
+    "multiManagerConvertedCount": 0,
+    "excludedFromMemberMetricsCount": 0,
+    "blankAccountManagerItemCount": 0
+  },
+  "missingDates": [],
+  "mismatchedDates": [
+    {
+      "sourceBoardId": "18398207063",
+      "sourceBoardMonth": "FEBRUARY 2026",
+      "itemId": "10905103064",
+      "itemName": "Indominus",
+      "group": "WEEK 1",
+      "actualDateInTouch": "2026-01-05",
+      "includedInBoardMembershipTotals": true,
+      "includedInValidDateTotals": false,
+      "action": "review-in-monday"
+    }
+  ],
+  "multiAccountManagers": [],
+  "dateScopeNote": "Board membership is authoritative for reporting. Date In Touch is a data-quality comparison only: mismatches remain in board totals, are excluded from valid-date comparison totals, and require review in Monday."
+}

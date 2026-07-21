@@ -1,0 +1,209 @@
+{
+  "generatedAt": "2026-07-21T14:26:02.870Z",
+  "year": 2026,
+  "monthlyStatuses": [
+    {
+      "month": 1,
+      "monthName": "JANUARY",
+      "status": "summarized",
+      "boardId": "18393876400",
+      "boardName": "JANUARY 2026",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 2,
+      "monthName": "FEBRUARY",
+      "status": "summarized",
+      "boardId": "18398207063",
+      "boardName": "FEBRUARY 2026",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 3,
+      "monthName": "MARCH",
+      "status": "summarized",
+      "boardId": "18402056242",
+      "boardName": "MARCH  2026",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 4,
+      "monthName": "APRIL",
+      "status": "summarized",
+      "boardId": "18406736162",
+      "boardName": "APRIL  2026",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 5,
+      "monthName": "MAY",
+      "status": "summarized",
+      "boardId": "18411196944",
+      "boardName": "MAY  2026",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 6,
+      "monthName": "JUNE",
+      "status": "summarized",
+      "boardId": "18415683219",
+      "boardName": "JUNE  2026",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 7,
+      "monthName": "JULY",
+      "status": "summarized",
+      "boardId": "18420001220",
+      "boardName": "JULY 2026",
+      "periodStatus": "current active month",
+      "issues": []
+    },
+    {
+      "month": 8,
+      "monthName": "AUGUST",
+      "status": "future",
+      "boardId": null,
+      "boardName": null,
+      "periodStatus": "future month",
+      "issues": []
+    },
+    {
+      "month": 9,
+      "monthName": "SEPTEMBER",
+      "status": "future",
+      "boardId": null,
+      "boardName": null,
+      "periodStatus": "future month",
+      "issues": []
+    },
+    {
+      "month": 10,
+      "monthName": "OCTOBER",
+      "status": "future",
+      "boardId": null,
+      "boardName": null,
+      "periodStatus": "future month",
+      "issues": []
+    },
+    {
+      "month": 11,
+      "monthName": "NOVEMBER",
+      "status": "future",
+      "boardId": null,
+      "boardName": null,
+      "periodStatus": "future month",
+      "issues": []
+    },
+    {
+      "month": 12,
+      "monthName": "DECEMBER",
+      "status": "future",
+      "boardId": null,
+      "boardName": null,
+      "periodStatus": "future month",
+      "issues": []
+    }
+  ],
+  "annualValidation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 2,
+    "validDateInTouchMonthCount": 1831,
+    "multiManagerItemCount": 3,
+    "multiManagerConvertedCount": 2,
+    "excludedFromMemberMetricsCount": 3,
+    "blankAccountManagerItemCount": 0
+  },
+  "mismatchedDates": [
+    { "sourceBoardId": "18398207063", "sourceBoardMonth": "FEBRUARY 2026", "itemId": "10905103064", "itemName": "Indominus", "group": "WEEK 1", "actualDateInTouch": "2026-01-05", "includedInBoardMembershipTotals": true, "includedInValidDateTotals": false, "action": "review-in-monday" },
+    { "sourceBoardId": "18406736162", "sourceBoardMonth": "APRIL 2026", "itemId": "11878567989", "itemName": "The James Baker Foundation", "group": "WEEK 1", "actualDateInTouch": "2026-05-29", "includedInBoardMembershipTotals": true, "includedInValidDateTotals": false, "action": "review-in-monday" }
+  ],
+  "identityConflicts": [],
+  "currentMonthWarning": [
+    7
+  ]
+}

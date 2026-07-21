@@ -7,9 +7,9 @@
   },
   {
     "displayLabel": "personal",
-    "leads": 134,
+    "leads": 135,
     "converted": 84,
-    "conversionRate": 62.7
+    "conversionRate": 62.2
   },
   {
     "displayLabel": "phone",
@@ -25,8 +25,8 @@
   },
   {
     "displayLabel": "sales inbox",
-    "leads": 39,
+    "leads": 40,
     "converted": 11,
-    "conversionRate": 28.2
+    "conversionRate": 27.5
   }
 ]

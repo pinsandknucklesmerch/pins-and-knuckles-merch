@@ -1,0 +1,15 @@
+{
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 0,
+    "validDateInTouchMonthCount": 220,
+    "multiManagerItemCount": 0,
+    "multiManagerConvertedCount": 0,
+    "excludedFromMemberMetricsCount": 0,
+    "blankAccountManagerItemCount": 0
+  },
+  "missingDates": [],
+  "mismatchedDates": [],
+  "multiAccountManagers": [],
+  "dateScopeNote": "Board-membership totals include all WEEK 1–4 items. Valid-Date totals are supplied separately and do not silently discard mismatches."
+}
