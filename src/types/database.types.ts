@@ -784,6 +784,10 @@ export type Database = {
           id: string
           month: number
           monthly_profit: number | null
+          monday_scope_a_converted: number | null
+          monday_scope_a_conversion_rate: number | null
+          monday_scope_a_leads: number | null
+          monday_sync_metadata: Json | null
           notes: string | null
           orders_processed: number | null
           organisation_id: string | null
@@ -800,6 +804,10 @@ export type Database = {
           id?: string
           month: number
           monthly_profit?: number | null
+          monday_scope_a_converted?: number | null
+          monday_scope_a_conversion_rate?: number | null
+          monday_scope_a_leads?: number | null
+          monday_sync_metadata?: Json | null
           notes?: string | null
           orders_processed?: number | null
           organisation_id?: string | null
@@ -816,6 +824,10 @@ export type Database = {
           id?: string
           month?: number
           monthly_profit?: number | null
+          monday_scope_a_converted?: number | null
+          monday_scope_a_conversion_rate?: number | null
+          monday_scope_a_leads?: number | null
+          monday_sync_metadata?: Json | null
           notes?: string | null
           orders_processed?: number | null
           organisation_id?: string | null

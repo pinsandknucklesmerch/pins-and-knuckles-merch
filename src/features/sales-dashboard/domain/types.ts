@@ -9,6 +9,10 @@ export type CompanyKpiMonth = {
   ordersProcessed: number | null;
   salesInboxEnquiries: number | null;
   converted: number | null;
+  mondayScopeALeads: number | null;
+  mondayScopeAConverted: number | null;
+  mondayScopeAConversionRate: number | null;
+  mondaySyncMetadata: { sourceBoardId: string; fetchedAt: string } | null;
   notes: string | null;
   source: SalesKpiDataSource;
 };
@@ -36,7 +40,7 @@ export const DEFAULT_SALES_KPI_TARGETS: SalesKpiTargets = {
 };
 
 export type MetricResult = {
-  code: SalesMetricCode | "SALES_INBOX_ENQUIRIES";
+  code: SalesMetricCode | "LEADS" | "CONVERTED" | "SALES_INBOX_ENQUIRIES" | "SALES_INBOX_CONVERSION_RATE";
   label: string;
   value: number | null;
   previousYear: number | null;

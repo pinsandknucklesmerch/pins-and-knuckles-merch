@@ -11,8 +11,12 @@ function format(value: number | null, type: "currency" | "number" | "percent") {
 
 export function CompanyKpiView({ current, previous, targets }: { current: CompanyKpiMonth; previous: CompanyKpiMonth | null; targets: SalesKpiTargets }) {
   const metrics = calculateCompanyMetrics(current, previous, targets);
+  const now = new Date();
+  const isCurrentMondayPeriod = current.source === "monday" && current.year === now.getUTCFullYear() && current.month === now.getUTCMonth() + 1;
   return (
-    <dl className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+    <div className="grid gap-3">
+      {isCurrentMondayPeriod ? <p className="text-xs text-amber-300">Current month · non-final</p> : null}
+      <dl className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
       {metrics.map((metric) => (
         <BentoPanel key={metric.code} className="p-4" glow>
           <div className="flex items-start justify-between gap-2"><dt className="text-sm font-medium text-muted-foreground">{metric.label}</dt>{metric.target !== null ? <span className="text-xs tabular-nums text-muted-foreground">Target {format(metric.target, metric.format)}</span> : null}</div>
@@ -21,6 +25,7 @@ export function CompanyKpiView({ current, previous, targets }: { current: Compan
           <div className="mt-3 border-t border-border/70 pt-2 text-xs text-muted-foreground"><span>Last year {format(metric.previousYear, metric.format)}</span>{metric.percentageChange !== null ? <span className={`ml-2 ${metric.percentageChange >= 0 ? "text-emerald-400" : "text-destructive"}`}>{metric.percentageChange >= 0 ? "+" : ""}{metric.percentageChange.toFixed(1)}%</span> : null}</div>
         </BentoPanel>
       ))}
-    </dl>
+      </dl>
+    </div>
   );
 }

@@ -20,6 +20,17 @@ export function indexMonthlyBoards(boards: MondayBoard[], year: number, now = ne
   const index = months.map((monthName, position) => { const month = position + 1; const periodStatus = classifyBoardPeriod(year, month, null, now); const entries = byMonth.get(month) ?? []; if (!entries.length) return { month, monthName, status: periodStatus === "future month" ? "future" : "missing", boards: [] as unknown[], periodStatus }; const score = (entry: typeof entries[number]) => (entry.structure.weeklyGroupCount ? 100 : 0) + (entry.structure.valid ? 40 : 0) + (normalizeStatus(entry.board.workspace?.name) === "pins & knuckles uk" ? 10 : 0) + (entry.board.name === entry.parsed!.normalizedName ? 1 : 0); const ordered = [...entries].sort((a, b) => score(b) - score(a) || String(a.board.id).localeCompare(String(b.board.id))); const selected = ordered[0]; const rejected = ordered.slice(1).map((entry) => ({ board: entry.board, schemaScore: score(entry), reason: "Rejected by deterministic weekly-schema preference." })); const status = selected.structure.valid ? "ready" : "structurally invalid"; return { month, monthName, status, board: selected.board, structure: selected.structure, schemaScore: score(selected), rejectedCandidates: rejected, periodStatus }; });
   return { index, missingMonths: index.filter((entry) => entry.status === "missing").map((entry) => entry.month), futureMonths: index.filter((entry) => entry.status === "future").map((entry) => entry.month), duplicateMonths: index.filter((entry) => (entry.rejectedCandidates?.length ?? 0) > 0).map((entry) => ({ month: entry.month, selectedBoard: entry.board, rejectedCandidates: entry.rejectedCandidates ?? [] })) };
 }
+
+export async function discoverMonthlyBoards(
+  year: number,
+  listedBoards: MondayBoard[],
+  inspectBoard: (boardId: string) => Promise<MondayBoard | undefined>,
+  now = new Date(),
+) {
+  const candidates = listedBoards.filter((board) => parseMonthlyBoardName(board.name)?.year === year && board.board_kind !== "subitems");
+  const detailed = (await Promise.all(candidates.map((board) => inspectBoard(String(board.id))))).filter((board): board is MondayBoard => Boolean(board));
+  return indexMonthlyBoards(detailed, year, now);
+}
 function metric(leads: number, converted: number) { return { leads, converted, conversionRate: leads ? Math.round((converted / leads) * 1000) / 10 : 0 }; }
 export function aggregateYear(monthsToAggregate: Array<{ month: number; boardId: string; summary: { scopes: { allLeads: { byBoardMembership: Metric }; salesInboxOnly: { byBoardMembership: Metric } }; validation: Record<string, number>; mismatchedDates?: Array<Record<string, unknown>> } }>) {
   const company = { leads: 0, converted: 0 }; const inbox = { leads: 0, converted: 0 }; const member = new Map<string, { ids: string[]; names: Map<string, number>; leads: number; converted: number; monthly: Array<{ month: number; leads: number; converted: number }> }>(); const channel = new Map<string, { name: string; leads: number; converted: number; monthly: Array<{ month: number; leads: number; converted: number }> }>(); const validation: Record<string, number> = {}; const mismatchedDates: Array<Record<string, unknown>> = [];

@@ -43,6 +43,8 @@ Required local variables:
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` for the dedicated server-only team-provisioning client
+- `MONDAY_API_TOKEN` for the server-only Monday audit/sync CLI
 
 Do not add service-role keys, database URLs, Monday tokens, or other secrets to client code or `NEXT_PUBLIC_` variables.
 
@@ -77,6 +79,14 @@ Applied migrations:
   - Global calculator seed data with `organisation_id = null`.
   - Active profiles for `EU_STANDARD`, `EU_US_CLIENTS`, and `UK_TRADE`.
   - No active EU Trade profile.
+- `20260720190000_sales_dashboard_phase1.sql`
+  - Persistent company, team-member, and target KPI tables with RLS-backed Pins Hub read/admin-write policies.
+- `20260722120000_grant_service_role_team_provisioning.sql`
+  - Narrow table privileges for the dedicated service-role team-provisioning flow; RLS remains enabled.
+- `20260722130000_add_monday_sales_snapshot_fields.sql`
+  - Pending deployment: Scope A Monday fields and JSON audit provenance for monthly KPI snapshots.
+- `20260722140000_grant_service_role_monday_sales_sync.sql`
+  - Pending deployment: narrow `sales_kpi_months` read/write privileges for the server-only Monday sync CLI; RLS remains enabled.
 
 Generated database types are present at `src/types/database.types.ts`.
 
@@ -91,7 +101,7 @@ Generated database types are present at `src/types/database.types.ts`.
 | `/auth/update-password` | Implemented |
 | `/auth/error` | Implemented |
 | `/hub` | Protected dashboard shell |
-| `/hub/sales-dashboard` | Protected fixture-backed sales dashboard |
+| `/hub/sales-dashboard` | Protected Supabase-first sales dashboard with historical fixture fallback |
 | `/hub/calculators` | Protected calculator region menu |
 | `/hub/calculators/eu` | Protected EU calculator menu |
 | `/hub/calculators/eu/standard` | Protected initial EU Standard calculator |
@@ -115,19 +125,47 @@ There is no active `/test` route.
 
 ## Sales Dashboard Status
 
-- Rebuilt from the legacy reference/validated dashboard plan under `src/features/sales-dashboard`.
-- Supports company and team-member monthly views with persistent Supabase KPI and target tables after the Phase 1 migration is applied.
-- Pins Hub admins can manually enter company and team-member monthly KPIs; other access levels are read-only.
-- Targets are Monthly Profit `£155,000`, Quotes Done `300`, Orders Processed `200`, and Conversion Rate `65%`.
-- Conversion Rate is `converted / sales inbox enquiries * 100` and returns zero when enquiries are zero.
-- Includes year/month and company/team-member filtering, prior-year comparisons, target progress, a sortable member table, and selected-member detail.
-- Historical fixture source: normalized `Monthly Compare.xlsx` workbook data in `src/features/sales-dashboard/data/workbookFixture.ts`; default selection is October 2025.
-- The committed source workbook is `docs/Monthly Compare.xlsx`; its `JULY per sales rep ` sheet name has a trailing space that is normalized when imported.
-- The workbook has no unambiguous Orders Processed or lead-source field, so those surfaces show `—`/empty state rather than inferred values.
-- Workbook blanks, including November/December summary values and late-year average-profit cells, remain `null`; no missing month is treated as zero.
-- Per-sales-rep sheets have no year column and are presented as 2024-aligned historical salesperson data; `CAT` is normalized to `Catherine`.
-- Supabase values take priority; historical workbook rows fill only missing months or team members and remain marked `historical_fixture` internally.
-- Monday.com sourcing and EPCC profit-email ingestion remain deferred.
+### Complete
+
+- The Phase 1 Supabase KPI schema is implemented: `sales_kpi_months`, `sales_kpi_member_months`, and `sales_kpi_targets` with RLS.
+- The dashboard repository reads production KPI/target data from Supabase using the SSR client; no Monday API call occurs during page rendering.
+- Admin-only manual company/member KPI entry writes to Supabase. Supabase rows take precedence, with the normalized workbook fixture filling only missing periods/members as `historical_fixture`.
+- The dashboard UI has company/member views, prior-year comparison, targets, filters, member detail, loading/error fallback, and explicit blank values rather than invented zeroes.
+- Monday audit tooling exists in `scripts/audit-monday-sales-history.ts` and `scripts/lib/monday/`. It is server-only, read-only, paginated, rejects GraphQL mutations, and writes local audit artifacts under `docs/imports/monday-sales-history/`.
+- The historical workbook importer is local-only. It validates input and generates conflict-safe SQL; its default policy is `skip-existing`, so historical imports do not overwrite existing data accidentally.
+
+### Partially Complete
+
+- The dashboard is Supabase-first but still uses `workbookFixture.ts` as a fallback rather than a fully imported historical Supabase dataset.
+- Monday monthly-board discovery, validation, per-month summaries, annual aggregation, and a server-only one-month apply / year-preview sync command are implemented. The sync writes Scope A to dedicated Monday columns and Scope B to the existing Sales Inbox fields, without changing Profit, Quotes Done, or Orders Processed.
+- The dashboard displays Scope A Leads, Converted, and Conversion Rate alongside Scope B Sales Inbox Enquiries and Sales Inbox Conversion Rate. A current Monday period is marked non-final.
+
+### Not Started / Deliberately Deferred
+
+- No scheduler or automated execution path exists. The new CLI is dry-run by default; `--apply` requires one month, current months may refresh, historical months require `--force`, and future/invalid/duplicate boards are rejected.
+- No EPCC/Gmail integration exists. Profit remains separate and must continue to come from a later EPCC email integration.
+- Quotes Done and Orders Processed remain separate metrics. Their actual source and attribution/completion semantics are not confirmed, so they must not be inferred from Monday lead/conversion data.
+
+### Confirmed Monday Reporting Rules
+
+- Board membership is the reporting basis. `Date In Touch` is a data-quality comparison only.
+- Scope A is all weekly-board leads/conversions, with member and channel breakdowns. Scope B is Sales Inbox-only leads/conversions.
+- Multi-manager rows count in Scope A company/channel totals but are excluded from member totals; blank-manager rows remain in company/channel totals and are flagged.
+- Rows in Profit Tracking and non-weekly groups are excluded. Profit is out of scope for Monday.
+- Date mismatches remain in board totals, are excluded from valid-date comparison totals, and are emitted for review in Monday rather than moved between months.
+- Current active months are not final historical data. Historical months must be protected from accidental overwrite; the workbook importer already defaults to `skip-existing`.
+
+### Audited 2026 Snapshot
+
+The committed read-only audit was generated 2026-07-21 and covers January–July 2026:
+
+- Scope A: 1,833 leads, 1,190 converted, 64.9% conversion.
+- Scope B (Sales Inbox): 432 leads, 167 converted, 38.7% conversion.
+- Validation: 2 Date In Touch mismatches, 3 multi-manager items (2 converted), and 0 missing dates. The mismatches are retained in board totals and flagged in the audit artifacts.
+
+### Next Recommended Step
+
+Deploy `20260722130000_add_monday_sales_snapshot_fields.sql` and `20260722140000_grant_service_role_monday_sales_sync.sql`, then run the CLI in dry-run mode against the intended organisation/current month. Confirm the resulting audit metadata and Scope A/Scope B values before any explicit `--apply`; profit, Quotes Done, and Orders Processed remain untouched.
 
 ## Calculator Status
 
@@ -189,7 +227,8 @@ Deferred:
 - `src/components/layout`: Protected shell, sidebar, page header, access denied state.
 - `src/components/ui`: Shared UI primitives and state components.
 - `src/features/calculators`: Calculator data access, mapping, domain logic, UI, and tests.
-- `src/features/sales-dashboard`: Fixture-backed sales dashboard feature.
+- `src/features/sales-dashboard`: Supabase-first KPI repository, domain calculations, UI, manual admin writes, fixture fallback, and tests.
+- `scripts/lib/monday`, `scripts/audit-monday-sales-history.ts`, and `scripts/sync-monday-sales-dashboard.ts`: server-only Monday audit/aggregation and explicit CLI sync tooling; no browser/API route access to Monday credentials.
 - `src/lib/access`: Pins Hub access helpers.
 - `src/lib/supabase`: Supabase SSR proxy and server clients.
 - `src/types/database.types.ts`: Generated Supabase database types.
