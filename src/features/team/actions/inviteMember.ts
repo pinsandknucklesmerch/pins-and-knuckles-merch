@@ -24,8 +24,17 @@ async function findExistingUserId(admin: ReturnType<typeof createAdminClient>, e
   return data.users.find((candidate) => candidate.email?.toLowerCase() === email)?.id ?? null;
 }
 
+function inviteSuccess(message: string): InviteActionState {
+  revalidatePath("/hub/team");
+  return { status: "success", message };
+}
+
 export async function inviteMember(previousState: InviteActionState = initialInviteActionState, formData: FormData): Promise<InviteActionState> {
   void previousState;
+  // A server-action replay or malformed request must not reach Auth or provisioning.
+  const input = validateInviteInput(formData);
+  if (!input) return { status: "error", message: "Enter valid invitation details." };
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { status: "error", message: "You do not have permission to invite team members." };
@@ -33,9 +42,6 @@ export async function inviteMember(previousState: InviteActionState = initialInv
   if (!current.authenticated || current.access?.access_level !== "admin" || !current.membership?.organisation_id) {
     return { status: "error", message: "You do not have permission to invite team members." };
   }
-
-  const input = validateInviteInput(formData);
-  if (!input) return { status: "error", message: "Enter valid invitation details." };
 
   const siteUrl = resolveSiteUrl();
   if (!siteUrl) return { status: "error", message: "Invitation could not be sent." };
@@ -45,8 +51,7 @@ export async function inviteMember(previousState: InviteActionState = initialInv
   if (existingUserId) {
     try {
       if (!await provisionAccess({ ...input, userId: existingUserId, organisationId: current.membership.organisation_id })) throw new Error();
-      revalidatePath("/hub/team");
-      return { status: "success", message: "Existing account granted access." };
+      return inviteSuccess("Existing account granted access.");
     } catch {
       return { status: "error", message: "Invitation could not be sent." };
     }
@@ -67,8 +72,7 @@ export async function inviteMember(previousState: InviteActionState = initialInv
       if (existingUserIdAfterInvite) {
         try {
           if (!await provisionAccess({ ...input, userId: existingUserIdAfterInvite, organisationId: current.membership.organisation_id })) throw new Error();
-          revalidatePath("/hub/team");
-          return { status: "success", message: "Existing account granted access." };
+          return inviteSuccess("Existing account granted access.");
         } catch {
           return { status: "error", message: "Invitation could not be sent." };
         }
@@ -83,8 +87,7 @@ export async function inviteMember(previousState: InviteActionState = initialInv
     if (!await provisionAccess({ ...input, userId: data.user.id, organisationId: current.membership.organisation_id })) {
       return { status: "error", message: "Invitation sent, but access provisioning failed." };
     }
-    revalidatePath("/hub/team");
-    return { status: "success", message: "Invitation sent." };
+    return inviteSuccess("Invitation sent.");
   } catch {
     return { status: "error", message: "Invitation sent, but access provisioning failed." };
   }

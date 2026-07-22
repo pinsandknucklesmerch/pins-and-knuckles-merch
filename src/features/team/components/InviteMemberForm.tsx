@@ -1,14 +1,35 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef, type FormEvent } from "react";
 import { inviteMember } from "../actions/inviteMember";
 import { initialInviteActionState } from "../types";
 
 export function InviteMemberForm() {
   const [state, formAction, pending] = useActionState(inviteMember, initialInviteActionState);
+  const formRef = useRef<HTMLFormElement>(null);
+  const resetSuccessRef = useRef<string | null>(null);
+  const submittedRef = useRef(false);
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    if (!pending && !submittedRef.current) {
+      submittedRef.current = true;
+      return;
+    }
+    event.preventDefault();
+  }
+
+  function unlockForChangedInvite() {
+    if (!pending) submittedRef.current = false;
+  }
+
+  useEffect(() => {
+    if (state.status !== "success" || resetSuccessRef.current === state.message) return;
+    formRef.current?.reset();
+    resetSuccessRef.current = state.message;
+  }, [state.message, state.status]);
 
   return (
-    <form action={formAction} className="grid gap-3 rounded-lg border border-border bg-card/70 p-4 sm:grid-cols-2 lg:grid-cols-5">
+    <form ref={formRef} action={formAction} onSubmit={handleSubmit} onChange={unlockForChangedInvite} className="grid gap-3 rounded-lg border border-border bg-card/70 p-4 sm:grid-cols-2 lg:grid-cols-5">
       <label className="grid gap-1 text-sm">
         <span>Full name</span>
         <input required name="full_name" maxLength={200} className="h-9 rounded-md bg-background px-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-primary" />
