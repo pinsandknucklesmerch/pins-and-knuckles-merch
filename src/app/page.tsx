@@ -2,11 +2,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { connection } from "next/server";
-
+import { redirect } from "next/navigation";
 import { GalaxyPageBackground } from "@/components/backgrounds/GalaxyPageBackground";
 import { Panel } from "@/components/ui/Panel";
 import { createClient } from "@/lib/supabase/server";
 
+// async function LandingPanel() {
+//   await connection();
+
+//   const supabase = await createClient();
+//   const {
+//     data: { user },
+//   } = await supabase.auth.getUser();
+
+//   return <LoginPanel isAuthenticated={Boolean(user)} />;
+// }
 async function LandingPanel() {
   await connection();
 
@@ -15,7 +25,11 @@ async function LandingPanel() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return <LoginPanel isAuthenticated={Boolean(user)} />;
+  if (user) {
+    redirect("/hub");
+  }
+
+  return <LoginPanel isAuthenticated={false} />;
 }
 
 function LoginPanel({ isAuthenticated }: { isAuthenticated: boolean }) {

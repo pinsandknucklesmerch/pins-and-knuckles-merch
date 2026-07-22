@@ -10,7 +10,7 @@ const items: MagicBentoItem[] = hubFeatureNavigation.map((item) => ({
   title: item.label,
   href: item.href,
   icon: <item.icon size={20} strokeWidth={1.8} />,
-  status: "Ready",
+  status: "",
 }));
 
 export default function HubPage() {
@@ -18,7 +18,7 @@ export default function HubPage() {
     <Suspense fallback={<LoadingState label="Loading hub" />}>
       <AppShell>
         <PageHeader
-          title="Dashboard"
+          title="Pins Hub"
         />
         <MagicBento
           items={items}

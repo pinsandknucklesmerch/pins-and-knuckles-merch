@@ -5,7 +5,7 @@ import Image from "next/image";
 import { hubFeatureNavigation } from "@/config/hubNavigation";
 
 const navItems = [
-  { href: "/hub", label: "Dashboard", icon: Gauge },
+  { href: "/hub", label: "Pins Hub", icon: Gauge },
   ...hubFeatureNavigation,
 ];
 
