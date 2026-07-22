@@ -49,14 +49,14 @@ function LoginPanel({ isAuthenticated }: { isAuthenticated: boolean }) {
           <span>Continue with Microsoft</span>
           <span className="text-xs text-muted-foreground">Coming soon</span>
         </button>
-        <button
+        {/* <button
           type="button"
           disabled
           className="flex h-9 w-full items-center justify-between rounded-md border border-border bg-secondary px-3 text-sm font-medium text-secondary-foreground opacity-65"
         >
           <span>Continue with Google</span>
           <span className="text-xs text-muted-foreground">Coming soon</span>
-        </button>
+        </button> */}
       </div>
     </Panel>
   );
@@ -71,12 +71,12 @@ export default function Home() {
             <Image
               src="/branding/P&K_LOGO.png"
               alt="Pins & Knuckles"
-              width={220}
-              height={57}
+              width={420}
+              height={257}
               priority
-              className="h-auto w-44"
+              className="h-auto w-66"
             />
-            <h1 className="text-3xl font-semibold text-[#f4f0d0]">Pins Hub</h1>
+            {/* <h1 className="text-3xl font-semibold text-[#f4f0d0]">Pins Hub</h1> */}
           </div>
 
           <Suspense fallback={<LoginPanel isAuthenticated={false} />}>

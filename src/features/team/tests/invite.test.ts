@@ -82,3 +82,10 @@ test("provisioning failures are returned by step without raw Supabase details", 
   const { client } = mockAdmin({ accessError: { code: "23505", message: "private database detail" } });
   assert.deepEqual(await provisionPinsHubAccess(client as never, provisionInput), { ok: false, step: "app_access", error: { code: "23505", message: "private database detail" } });
 });
+
+test("a profile write failure stops privileged provisioning before membership or access writes", async () => {
+  const { client, writes } = mockAdmin({ profileError: { code: "42501", message: "private permission detail" } });
+  const result = await provisionPinsHubAccess(client as never, provisionInput);
+  assert.equal(result.ok, false);
+  assert.deepEqual(writes.map(({ table }) => table), ["profiles"]);
+});
