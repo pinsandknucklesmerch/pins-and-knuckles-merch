@@ -1,4 +1,4 @@
-import { Gauge } from "lucide-react";
+import { Gauge, Users } from "lucide-react";
 import Link from "next/link";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import Image from "next/image";
@@ -46,6 +46,11 @@ export function SidebarNav({
               {item.label}
             </Link>
           ))}
+          {accessLevel === "admin" ? (
+            <Link href="/hub/team" className="flex h-9 items-center gap-2 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+              <Users className="size-4" aria-hidden="true" />Team
+            </Link>
+          ) : null}
         </nav>
       </div>
 

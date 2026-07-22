@@ -11,7 +11,7 @@ export default function LoginPage() {
             <p className="text-xs font-medium text-muted-foreground">Pins Hub</p>
             <h1 className="text-xl font-semibold">Login</h1>
             <p className="text-sm text-muted-foreground">
-              Sign in with your Pins Hub account.
+              Sign in
             </p>
           </div>
           <LoginForm />
