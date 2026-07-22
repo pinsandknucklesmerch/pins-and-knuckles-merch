@@ -67,7 +67,7 @@ export async function loadSalesDashboard(
 
 export async function upsertCompanyKpi(input: CompanyKpiMonth, organisationId: string | null, updatedBy: string) {
   const supabase = await createClient();
-  const payload: CompanyInsert = { organisation_id: organisationId, year: input.year, month: input.month, monthly_profit: input.monthlyProfit, quotes_done: input.quotesDone, orders_processed: input.ordersProcessed, sales_inbox_enquiries: input.salesInboxEnquiries, converted: input.converted, notes: input.notes, data_source: "manual", updated_by: updatedBy };
+  const payload: CompanyInsert = { organisation_id: organisationId, year: input.year, month: input.month, monthly_profit: input.monthlyProfit, monthly_profit_source: "manual", quotes_done: input.quotesDone, orders_processed: input.ordersProcessed, sales_inbox_enquiries: input.salesInboxEnquiries, converted: input.converted, notes: input.notes, data_source: "manual", updated_by: updatedBy };
   return supabase.from("sales_kpi_months").upsert(payload, { onConflict: "organisation_id,year,month" });
 }
 

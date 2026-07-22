@@ -40,7 +40,7 @@ export const DEFAULT_SALES_KPI_TARGETS: SalesKpiTargets = {
 };
 
 export type MetricResult = {
-  code: SalesMetricCode | "LEADS" | "CONVERTED" | "SALES_INBOX_ENQUIRIES" | "SALES_INBOX_CONVERSION_RATE";
+  code: SalesMetricCode | "SALES_INBOX_ENQUIRIES" | "SALES_INBOX_CONVERSION_RATE";
   label: string;
   value: number | null;
   previousYear: number | null;

@@ -1,21 +1,27 @@
 import { classifyBoardPeriod, discoverMonthlyBoards } from "./monthlyBoardAudit.ts";
+import { auditProfitTracking, shouldWriteMondayProfit, type ProfitTrackingAudit } from "./profitTracking.ts";
 import { summarizeMonthlySalesBoard, type MondayBoard, type MondayItem } from "./salesHistoryAudit.ts";
 
 export type MondaySnapshot = {
   organisation_id: string | null;
   year: number;
   month: number;
+  quotes_done: number;
+  orders_processed: number;
   sales_inbox_enquiries: number;
   converted: number;
   monday_scope_a_leads: number;
   monday_scope_a_converted: number;
   monday_scope_a_conversion_rate: number;
+  monthly_profit?: number;
+  monthly_profit_source?: "monday";
   data_source: "monday";
   monday_sync_metadata: {
     sourceBoardId: string;
     fetchedAt: string;
     validation: Record<string, number>;
     mismatchedDates: Array<Record<string, unknown>>;
+    profitTracking: ProfitTrackingAudit;
   };
 };
 
@@ -24,6 +30,7 @@ export type SyncOutcome = {
   status: "inserted" | "updated" | "skipped" | "rejected" | "future" | "planned-insert" | "planned-update";
   reason?: string;
   snapshot?: MondaySnapshot;
+  profitPreview?: ProfitTrackingAudit & { source: "monday" | "epcc_email"; willWrite: boolean; reason?: string };
   boardSelection?: { selectedBoardId: string; rejectedBoardIds: string[] };
 };
 
@@ -74,29 +81,44 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
       outcomes.push({ month, status: "rejected", reason: "Monday board collection failed." });
       continue;
     }
+    const fetchedAt = input.fetchedAt ?? new Date().toISOString();
     const summary = summarizeMonthlySalesBoard(entry.board, collected.items, entry.structure?.resolvedColumns);
+    const profitTracking = auditProfitTracking(entry.board, collected.items, fetchedAt);
+    const willWriteMondayProfit = shouldWriteMondayProfit(input.year, month);
+    const profitPreview = {
+      ...profitTracking,
+      source: willWriteMondayProfit ? "monday" as const : "epcc_email" as const,
+      willWrite: willWriteMondayProfit,
+      ...(willWriteMondayProfit ? {} : { reason: "Monday profit skipped at the configured EPCC cutoff." }),
+    };
     const scopeA = summary.scopes.allLeads.byBoardMembership;
     const scopeB = summary.scopes.salesInboxOnly.byBoardMembership;
     const snapshot: MondaySnapshot = {
       organisation_id: input.organisationId,
       year: input.year,
       month,
+      quotes_done: scopeA.totalLeadItems,
+      orders_processed: scopeA.convertedItems,
       sales_inbox_enquiries: scopeB.totalLeadItems,
       converted: scopeB.convertedItems,
       monday_scope_a_leads: scopeA.totalLeadItems,
       monday_scope_a_converted: scopeA.convertedItems,
       monday_scope_a_conversion_rate: scopeA.conversionRate,
       data_source: "monday",
-      monday_sync_metadata: { sourceBoardId: String(entry.board.id), fetchedAt: input.fetchedAt ?? new Date().toISOString(), validation: summary.validation, mismatchedDates: summary.mismatchedDates },
+      monday_sync_metadata: { sourceBoardId: String(entry.board.id), fetchedAt, validation: summary.validation, mismatchedDates: summary.mismatchedDates, profitTracking },
     };
+    if (willWriteMondayProfit && profitTracking.calculatedMonthlyTotal !== null) {
+      snapshot.monthly_profit = profitTracking.calculatedMonthlyTotal;
+      snapshot.monthly_profit_source = "monday";
+    }
     const exists = input.existingMonths.has(month);
     if (!input.apply) {
-      outcomes.push({ month, status: exists ? "planned-update" : "planned-insert", snapshot, boardSelection });
+      outcomes.push({ month, status: exists ? "planned-update" : "planned-insert", snapshot, boardSelection, profitPreview });
       continue;
     }
     try {
       await input.write?.(snapshot);
-      outcomes.push({ month, status: exists ? "updated" : "inserted", snapshot, boardSelection });
+      outcomes.push({ month, status: exists ? "updated" : "inserted", snapshot, boardSelection, profitPreview });
     } catch {
       outcomes.push({ month, status: "rejected", reason: "Supabase write failed." });
     }

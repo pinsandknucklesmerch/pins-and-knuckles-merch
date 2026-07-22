@@ -16,14 +16,46 @@ const board = (name = "JULY 2026", id = "board-1") => ({
     { id: "status", title: "Converted", type: "status", settings_str: '{"labels":{"1":"Yes"}}' },
   ],
 });
-const items = [{ id: "lead-1", name: "Lead", group: { id: "week", title: "WEEK 1" }, column_values: [{ id: "people", text: "Alice", value: '{"personsAndTeams":[{"id":7,"kind":"person"}]}' }, { id: "status_16", text: "Sales Inbox" }, { id: "status", text: "Yes" }, { id: "date8", text: "2026-07-01" }] }];
+const items = [
+  { id: "lead-1", name: "Inbox lead", group: { id: "week", title: "WEEK 1" }, column_values: [{ id: "people", text: "Alice", value: '{"personsAndTeams":[{"id":7,"kind":"person"}]}' }, { id: "status_16", text: "Sales Inbox" }, { id: "status", text: "Yes" }, { id: "date8", text: "2026-07-01" }] },
+  { id: "lead-2", name: "Other lead", group: { id: "week", title: "WEEK 1" }, column_values: [{ id: "people", text: "Alice", value: '{"personsAndTeams":[{"id":7,"kind":"person"}]}' }, { id: "status_16", text: "Referral" }, { id: "status", text: "No" }, { id: "date8", text: "2026-07-02" }] },
+];
 const base = { year: 2026, months: [7], organisationId: null, boards: [board()], inspectBoard: async (id: string) => id === "board-1" ? board() : undefined, existingMonths: new Set<number>(), collectItems: async () => ({ items }), now: new Date("2026-07-21T00:00:00Z"), force: false, fetchedAt: "2026-07-21T10:00:00Z" };
 
 test("dry-run plans a current-month insert and preserves audit metadata", async () => {
   const outcomes = await syncMondaySalesDashboard({ ...base, apply: false });
   assert.equal(outcomes[0].status, "planned-insert");
-  assert.deepEqual(outcomes[0].snapshot?.monday_sync_metadata, { sourceBoardId: "board-1", fetchedAt: "2026-07-21T10:00:00Z", validation: { missingDateCount: 0, mismatchedDateCount: 0, validDateInTouchMonthCount: 1, multiManagerItemCount: 0, multiManagerConvertedCount: 0, excludedFromMemberMetricsCount: 0, blankAccountManagerItemCount: 0 }, mismatchedDates: [] });
-  assert.deepEqual([outcomes[0].snapshot?.monday_scope_a_leads, outcomes[0].snapshot?.sales_inbox_enquiries, outcomes[0].snapshot?.converted], [1, 1, 1]);
+  assert.equal(outcomes[0].snapshot?.monday_sync_metadata.profitTracking.calculatedMonthlyTotal, null);
+  assert.deepEqual(outcomes[0].profitPreview, { sourceBoardId: "board-1", resolvedProfitColumnId: null, includedRows: [], excludedRows: [], calculatedMonthlyTotal: null, fetchedAt: "2026-07-21T10:00:00Z", source: "epcc_email", willWrite: false, reason: "Monday profit skipped at the configured EPCC cutoff." });
+  assert.equal(outcomes[0].snapshot?.monthly_profit, undefined);
+  assert.equal(outcomes[0].snapshot?.monthly_profit_source, undefined);
+  assert.deepEqual([outcomes[0].snapshot?.quotes_done, outcomes[0].snapshot?.orders_processed, outcomes[0].snapshot?.monday_scope_a_leads, outcomes[0].snapshot?.monday_scope_a_converted], [2, 1, 2, 1]);
+  assert.deepEqual([outcomes[0].snapshot?.sales_inbox_enquiries, outcomes[0].snapshot?.converted], [1, 1]);
+});
+
+test("forced January through June syncs Monday profit without changing lead or conversion fields", async () => {
+  const juneBoard = { ...board("JUNE 2026"), groups: [{ id: "week", title: "WEEK 1" }, { id: "profit", title: "Profit Tracking" }], columns: [...board().columns, { id: "profit_value", title: "Profit", type: "numbers" }] };
+  const juneItems = [...items, { id: "profit-1", name: "Week 1", group: { id: "profit", title: "Profit Tracking" }, column_values: [{ id: "profit_value", text: "1234.56", value: "1234.56" }] }];
+  const outcome = (await syncMondaySalesDashboard({ ...base, months: [6], boards: [juneBoard], inspectBoard: async () => juneBoard, collectItems: async () => ({ items: juneItems }), apply: false, force: true }))[0];
+  assert.equal(outcome.snapshot?.monthly_profit, 1234.56);
+  assert.equal(outcome.snapshot?.monthly_profit_source, "monday");
+  assert.deepEqual([outcome.snapshot?.quotes_done, outcome.snapshot?.orders_processed, outcome.snapshot?.monday_scope_a_leads, outcome.snapshot?.monday_scope_a_converted, outcome.snapshot?.sales_inbox_enquiries, outcome.snapshot?.converted], [2, 1, 2, 1, 1, 1]);
+  assert.equal(outcome.profitPreview?.willWrite, true);
+});
+
+test("January through July previews use the confirmed Scope A KPI mapping", async () => {
+  const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY"];
+  const boards = monthNames.map((name, index) => board(`${name} 2026`, `board-${index + 1}`));
+  const outcomes = await syncMondaySalesDashboard({
+    ...base,
+    months: monthNames.map((_, index) => index + 1),
+    boards,
+    inspectBoard: async (id) => boards.find((candidate) => candidate.id === id),
+    apply: false,
+    force: true,
+  });
+  assert.deepEqual(outcomes.map((outcome) => outcome.status), Array(7).fill("planned-insert"));
+  assert.deepEqual(outcomes.map((outcome) => [outcome.snapshot?.quotes_done, outcome.snapshot?.orders_processed, outcome.snapshot?.monday_scope_a_leads, outcome.snapshot?.monday_scope_a_converted]), Array(7).fill([2, 1, 2, 1]));
 });
 
 test("apply refreshes the current month and reports updates", async () => {

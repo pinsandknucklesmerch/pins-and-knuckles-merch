@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { MondayClient, assertReadOnlyQuery, dateCoverage, normalizeBoard, normalizePeople, normalizeStatus, parseMondayDate, redactToken, sampleItem, summarizeMonthlySalesBoard } from "../lib/monday/salesHistoryAudit.ts";
 import { aggregateYear, classifyBoardPeriod, indexMonthlyBoards, parseMonthlyBoardName, validateMonthlyBoard } from "../lib/monday/monthlyBoardAudit.ts";
+import { auditProfitTracking, resolveProfitColumnId, shouldWriteMondayProfit } from "../lib/monday/profitTracking.ts";
 
 test("normalizes board, status, people, dates, and coverage deterministically", () => {
   assert.deepEqual(normalizeBoard({ id: "1", name: "Sales", state: "active", groups: [{ id: "g", title: "Inbox" }], columns: [{ id: "status", title: "Stage", type: "status" }], workspace: { id: "2", name: "Ops" } }).columns, [{ id: "status", title: "Stage", type: "status", settings: null }]);
@@ -22,6 +23,30 @@ test("summarizes weekly leads separately from Sales Inbox and validates dates", 
   const all = summary.scopes.allLeads.byBoardMembership; const inbox = summary.scopes.salesInboxOnly.byBoardMembership;
   assert.deepEqual([all.totalLeadItems, all.convertedItems, all.conversionRate], [4, 1, 25]); assert.deepEqual([inbox.totalLeadItems, inbox.convertedItems, inbox.conversionRate], [3, 1, 33.3]); assert.equal(all.blankAccountManagerCount, 1); assert.equal(all.byChannel.find((row) => row.displayLabel === "Sales Inbox")?.leads, 3); assert.equal(summary.excludedItems[0].reason, "profit-tracking-group"); assert.equal(summary.validation.mismatchedDateCount, 1); assert.equal(summary.validation.missingDateCount, 1); assert.equal(summary.validation.multiManagerItemCount, 1); assert.equal(summary.scopes.allLeads.byValidDateInTouchMonth.totalLeadItems, 2);
   assert.deepEqual(summary, summarizeMonthlySalesBoard({ id: "1", name: "JULY 2026" }, [item("1", "WEEK 1", " Alice ", " Sales Inbox ", "Yes", "2026-07-02"), item("2", "WEEK 2", "Alice", "Personal", "will order in a while", "2026-07-03"), item("3", "WEEK 3", "", "sales inbox", null, "2026-06-30"), item("4", "Profit Tracking", "Bob", "sales inbox", "Yes", "2026-07-04"), item("5", "WEEK 4", "Bob, Carol", "SALES INBOX", "No", null)]));
+});
+
+test("audits Profit Tracking rows by semantic numbers column without counting a footer", () => {
+  const board = { id: "profit-board", name: "JUNE 2026", groups: [{ id: "profit", title: "Profit Tracking" }], columns: [{ id: "legacy", title: "Profit", type: "numbers" }] };
+  const item = (id: string, name: string, value: string | null) => ({ id, name, group: { id: "profit", title: "Profit Tracking" }, column_values: [{ id: "legacy", text: value, value }] });
+  const audit = auditProfitTracking(board, [item("1", "Week 1", "100.25"), item("2", "Week 2", "200.50"), item("3", "Week 3", "0.25"), item("4", "Week 4", null), item("5", "Week 5", "not-a-number"), { id: "footer", name: "Group total", group: null, column_values: [{ id: "legacy", text: "9999", value: "9999" }] }], "2026-07-22T00:00:00Z");
+  assert.equal(resolveProfitColumnId(board), "legacy");
+  assert.equal(audit.calculatedMonthlyTotal, 301);
+  assert.deepEqual(audit.includedRows, [{ id: "1", name: "Week 1", value: 100.25 }, { id: "2", name: "Week 2", value: 200.5 }, { id: "3", name: "Week 3", value: 0.25 }]);
+  assert.deepEqual(audit.excludedRows, [{ id: "4", name: "Week 4", reason: "blank-profit" }, { id: "5", name: "Week 5", reason: "invalid-profit" }]);
+  assert.equal(shouldWriteMondayProfit(2026, 6), true);
+  assert.equal(shouldWriteMondayProfit(2026, 7), false);
+  assert.equal(shouldWriteMondayProfit(2027, 1), false);
+});
+
+test("rounds the calculated monthly profit total without changing source row precision", () => {
+  const board = { id: "may", name: "MAY 2026", columns: [{ id: "profit", title: "Profit", type: "numbers" }] };
+  const items = [
+    { id: "one", name: "Week 1", group: { id: "profit", title: "Profit Tracking" }, column_values: [{ id: "profit", value: "174881.97" }] },
+    { id: "two", name: "Week 2", group: { id: "profit", title: "Profit Tracking" }, column_values: [{ id: "profit", value: "0.01" }] },
+  ];
+  const audit = auditProfitTracking(board, items, "2026-07-22T00:00:00Z");
+  assert.deepEqual(audit.includedRows, [{ id: "one", name: "Week 1", value: 174881.97 }, { id: "two", name: "Week 2", value: 0.01 }]);
+  assert.equal(audit.calculatedMonthlyTotal, 174881.98);
 });
 test("keeps multi-manager rows in company and channel totals but excludes them from member metrics", () => {
   const item = (id: string, manager: string, channel: string, converted: string) => ({ id, name: id === "2" ? "Torus" : `Lead ${id}`, group: { id: "week", title: "WEEK 1" }, column_values: [{ id: "people", text: manager, value: '{"personsAndTeams":[{"id":1,"kind":"person"},{"id":2,"kind":"person"}]}' }, { id: "status_16", text: channel }, { id: "status", text: converted }, { id: "date8", text: "2026-07-01" }] });
