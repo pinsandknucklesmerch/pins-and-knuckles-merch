@@ -41,11 +41,17 @@ test("historical periods are protected unless forced", async () => {
   assert.equal(writes, 1);
 });
 
-test("future and invalid boards are rejected without writes", async () => {
+test("future months are reported without writes and invalid boards are rejected", async () => {
   const future = await syncMondaySalesDashboard({ ...base, months: [8], boards: [board("AUGUST 2026")], inspectBoard: async () => board("AUGUST 2026"), apply: true });
-  assert.equal(future[0].status, "rejected");
+  assert.deepEqual(future[0], { month: 8, status: "future", reason: "Future month; no board expected." });
   const invalid = await syncMondaySalesDashboard({ ...base, boards: [{ ...board(), columns: [] }], inspectBoard: async () => ({ ...board(), columns: [] }), apply: false });
   assert.equal(invalid[0].status, "rejected");
+});
+
+test("July execution treats August through December as future rather than rejected", async () => {
+  const outcomes = await syncMondaySalesDashboard({ ...base, months: [7, 8, 9, 10, 11, 12], apply: false });
+  assert.equal(outcomes[0].status, "planned-insert");
+  assert.deepEqual(outcomes.slice(1), [8, 9, 10, 11, 12].map((month) => ({ month, status: "future", reason: "Future month; no board expected." })));
 });
 
 test("one failed month does not prevent a year preview from reporting later months", async () => {

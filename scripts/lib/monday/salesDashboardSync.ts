@@ -21,7 +21,7 @@ export type MondaySnapshot = {
 
 export type SyncOutcome = {
   month: number;
-  status: "inserted" | "updated" | "skipped" | "rejected" | "planned-insert" | "planned-update";
+  status: "inserted" | "updated" | "skipped" | "rejected" | "future" | "planned-insert" | "planned-update";
   reason?: string;
   snapshot?: MondaySnapshot;
   boardSelection?: { selectedBoardId: string; rejectedBoardIds: string[] };
@@ -48,6 +48,10 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
   for (const month of input.months) {
     const entry = indexed.index[month - 1];
     const period = classifyBoardPeriod(input.year, month, entry?.board?.state, input.now);
+    if (period === "future month") {
+      outcomes.push({ month, status: "future", reason: "Future month; no board expected." });
+      continue;
+    }
     if (!entry || entry.status === "missing" || entry.status === "future") {
       outcomes.push({ month, status: "rejected", reason: "Monthly board is unavailable." });
       continue;
@@ -58,10 +62,6 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
       continue;
     }
     const boardSelection = { selectedBoardId: String(entry.board.id), rejectedBoardIds: (entry.rejectedCandidates ?? []).map((candidate) => String(candidate.board.id)) };
-    if (period === "future month") {
-      outcomes.push({ month, status: "rejected", reason: "Future months cannot be synced." });
-      continue;
-    }
     if (period !== "current active month" && !input.force) {
       outcomes.push({ month, status: "skipped", reason: "Historical month protected; use --force after review." });
       continue;
