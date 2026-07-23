@@ -28,11 +28,11 @@ function comparison(metric: MetricResult) {
   return { previous, difference, relative, state: previousYearComparisonState(metric.value, metric.previousYear) };
 }
 
-function KpiSection({ metric, divided }: { metric: MetricResult; divided?: boolean }) {
+function KpiSection({ metric, divided, className }: { metric: MetricResult; divided?: boolean; className?: string }) {
   const metricTarget = target(metric);
   const metricComparison = comparison(metric);
   return (
-    <section className={divided ? styles.divided : styles.section} aria-label={metric.label}>
+    <section className={`${divided ? styles.divided : styles.section} ${className ?? ""}`} aria-label={metric.label}>
       <div className={styles.metricLabel}>{metric.label}</div>
       <div className={styles.value}>{value(metric)}</div>
       {metricTarget ? (
@@ -77,14 +77,24 @@ function KpiSection({ metric, divided }: { metric: MetricResult; divided?: boole
   );
 }
 
-export function CombinedKpiCard({ title, first, second, verticalAlign = "start" }: { title?: string; first: MetricResult; second: MetricResult; verticalAlign?: "start" | "center" }) {
+export function CombinedKpiCard({ title, first, second, third, verticalAlign = "start" }: { title?: string; first: MetricResult; second?: MetricResult; third?: MetricResult; verticalAlign?: "start" | "center" }) {
   return (
     <BentoPanel className={`${styles.card} ${verticalAlign === "center" ? styles.centered : ""}`} glow>
       {title ? <h2 className={styles.title}>{title}</h2> : null}
-      <div className={title ? styles.sections : styles.sectionsWithoutTitle}>
-        <KpiSection metric={first} />
-        <KpiSection metric={second} divided />
-      </div>
+      {third && second ? (
+        <div className={`${title ? styles.sections : styles.sectionsWithoutTitle} ${styles.stackedSections}`}>
+          <div className={styles.topRow}>
+            <KpiSection metric={first} />
+            <KpiSection metric={second} divided />
+          </div>
+          <KpiSection metric={third} className={styles.fullWidthSection} />
+        </div>
+      ) : (
+        <div className={`${title ? styles.sections : styles.sectionsWithoutTitle} ${second ? "" : styles.singleSection}`}>
+          <KpiSection metric={first} />
+          {second ? <KpiSection metric={second} divided /> : null}
+        </div>
+      )}
     </BentoPanel>
   );
 }

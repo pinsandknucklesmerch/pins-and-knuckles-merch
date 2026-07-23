@@ -38,8 +38,9 @@ export function SalesInboxKpi({ enquiries, conversionRate }: { enquiries: Metric
 
   return (
     <BentoPanel className={styles.card} glow>
-      <section className={styles.enquiries} aria-label="Sales Inbox Enquiries">
-        <div className={styles.label}>Sales Inbox Enquiries</div>
+      <h2 className={styles.heading}>Sales Inbox</h2>
+      <section className={styles.enquiries} aria-labelledby="sales-inbox-enquiries">
+        <h3 id="sales-inbox-enquiries" className={styles.label}>Enquiries</h3>
         <div className={styles.arc}>
           <ComparisonArcGauge current={enquiries.value} previousYear={enquiries.previousYear} />
         </div>
@@ -55,8 +56,8 @@ export function SalesInboxKpi({ enquiries, conversionRate }: { enquiries: Metric
           </div>
         ) : null}
       </section>
-      <section className={styles.conversion} aria-label="Sales Inbox Conversion Rate">
-        <div className={styles.label}>Conversion Rate</div>
+      <section className={styles.conversion} aria-labelledby="sales-inbox-conversion-rate">
+        <h3 id="sales-inbox-conversion-rate" className={styles.label}>Conversion Rate</h3>
         <div className={styles.conversionValue}>{formatPercentagePoints(conversionRate.value)}</div>
         <div className={styles.conversionComparison}>
           {conversionRate.previousYear === null ? (

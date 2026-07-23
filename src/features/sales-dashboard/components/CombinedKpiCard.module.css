@@ -32,6 +32,23 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
+.singleSection { grid-template-columns: minmax(0, 1fr); }
+
+.stackedSections { grid-template-columns: minmax(0, 1fr); }
+
+.singleSection .section { padding-right: 0; }
+
+.topRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.fullWidthSection {
+  border-top: 1px solid hsl(var(--border) / 0.8);
+  margin-top: 0.875rem;
+  padding-top: 0.875rem;
+}
+
 .section,
 .divided {
   display: flex;
@@ -87,8 +104,10 @@
   .card { min-height: 0; }
   .sections,
   .sectionsWithoutTitle { grid-template-columns: minmax(0, 1fr); gap: 0.875rem; }
+  .topRow { grid-template-columns: minmax(0, 1fr); gap: 0.875rem; }
   .section { padding-right: 0; }
   .divided { border-top: 1px solid hsl(var(--border) / 0.8); border-left: 0; padding-top: 0.875rem; padding-left: 0; }
+  .fullWidthSection { margin-top: 0; }
   .comparison,
   .reference { margin-top: 0.125rem; }
 }

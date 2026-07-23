@@ -1,27 +1,12 @@
-.grid {
+.topRow {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: stretch;
   gap: 0.75rem;
 }
 
-.profitCard,
-.quotesOrdersCard,
-.salesInboxCard,
-.conversionCard {
-  display: grid;
-  min-width: 0;
-}
-
-@media (min-width: 1024px) {
-  .grid {
-    grid-template-columns: minmax(320px, 0.8fr) minmax(0, 1.2fr);
-    grid-template-areas:
-      "profit quotes"
-      "inbox conversion";
+@media (max-width: 639px) {
+  .topRow {
+    grid-template-columns: minmax(0, 1fr);
   }
-
-  .profitCard { grid-area: profit; }
-  .quotesOrdersCard { grid-area: quotes; }
-  .salesInboxCard { grid-area: inbox; }
-  .conversionCard { grid-area: conversion; }
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { calculateCompanyMetrics, calculatePreviousDifference, calculatePreviousPercentageChange } from "../domain/calculateDashboardKpis";
+import { calculateCompanyMetrics } from "../domain/calculateDashboardKpis";
 import type { CompanyKpiMonth, MetricResult, SalesKpiTargets } from "../domain/types";
 import { CombinedKpiCard } from "./CombinedKpiCard";
+import { MetricGrid } from "metricui";
 import { LiveStatus } from "./LiveStatus";
 import { ProfitShirtKpi } from "./ProfitShirtKpi";
 import { SalesInboxKpi } from "./SalesInboxKpi";
@@ -12,23 +13,6 @@ function metricByCode(metrics: MetricResult[], code: MetricResult["code"]) {
   const metric = metrics.find((candidate) => candidate.code === code);
   if (!metric) throw new Error(`Missing company metric ${code}.`);
   return metric;
-}
-
-function convertedMetric(current: CompanyKpiMonth, previous: CompanyKpiMonth | null): MetricResult {
-  const value = current.converted;
-  const previousYear = previous?.converted ?? null;
-  return {
-    code: "SALES_INBOX_ENQUIRIES",
-    label: "Converted",
-    value,
-    previousYear,
-    difference: calculatePreviousDifference(value, previousYear),
-    percentageChange: calculatePreviousPercentageChange(value, previousYear),
-    target: null,
-    targetProgress: null,
-    targetReached: false,
-    format: "number",
-  };
 }
 
 export function CompanyKpiView({ current, previous, targets }: { current: CompanyKpiMonth; previous: CompanyKpiMonth | null; targets: SalesKpiTargets }) {
@@ -45,12 +29,17 @@ export function CompanyKpiView({ current, previous, targets }: { current: Compan
   return (
     <div className="grid gap-2.5">
       {isCurrentMondayPeriod ? <LiveStatus /> : null}
-      <div className={styles.grid}>
-        <div className={styles.profitCard}><ProfitShirtKpi metric={profit} /></div>
-        <div className={styles.quotesOrdersCard}><CombinedKpiCard first={quotes} second={orders} verticalAlign="center" /></div>
-        <div className={styles.salesInboxCard}><SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} /></div>
-        <div className={styles.conversionCard}><CombinedKpiCard first={convertedMetric(current, previous)} second={conversion} verticalAlign="center" /></div>
-      </div>
+      <MetricGrid columns={12} gap={12}>
+        <MetricGrid.Item span="full">
+          <div className={styles.topRow}>
+            <ProfitShirtKpi metric={profit} />
+            <SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} />
+          </div>
+        </MetricGrid.Item>
+        <MetricGrid.Item span="full">
+          <CombinedKpiCard first={quotes} second={orders} third={conversion} verticalAlign="center" />
+        </MetricGrid.Item>
+      </MetricGrid>
     </div>
   );
 }
