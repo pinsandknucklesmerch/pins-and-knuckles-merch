@@ -1,0 +1,49 @@
+.scope {
+  --background: hsl(0 0% 4%);
+  --foreground: hsl(55 39% 81%);
+  --card-bg: hsl(0 0% 12% / 0.78);
+  --card-border: hsl(55 16% 27%);
+  --card-glow: hsl(358 72% 55% / 0.08);
+  --muted: hsl(55 20% 68%);
+  --accent: hsl(358 72% 55%);
+  --accent-dark: hsl(358 72% 55%);
+  --mu-card-bg: hsl(0 0% 12% / 0.78);
+  --mu-card-border: hsl(55 16% 27%);
+  --mu-card-border-w: 1px;
+  --mu-card-radius: 0.75rem;
+  --mu-card-shadow: 0 0 8px hsl(var(--primary) / 0.12);
+  --mu-cell-bg: hsl(0 0% 12% / 0.78);
+  --mu-padding: 0.875rem;
+  --mu-padding-x-bare: 0.75rem;
+  --mu-padding-y-bare: 0.625rem;
+  --mu-gap: 0.75rem;
+  --mu-value-size: 1.5rem;
+  --mu-value-size-bare: 1.25rem;
+  --mu-hover-border: hsl(358 72% 55% / 0.65);
+  --mu-hover-shadow: 0 6px 8px hsl(358 72% 55% / 0.12);
+  --mu-color-positive: #6fc49a;
+  --mu-color-negative: hsl(358 72% 55%);
+  --mu-color-warning: #d89862;
+  --mu-color-info: hsl(203 46% 44%);
+}
+
+.kpiCard:global([data-component="KpiCard"]) {
+  min-height: 0;
+  padding: 0.875rem;
+}
+
+.kpiCard:global([data-component="KpiCard"]) > div:not([class*="absolute"]) {
+  margin-block: auto;
+}
+
+.kpiCard :global(.mt-2) {
+  margin-top: 0.375rem;
+}
+
+.kpiCard :global(.mt-4) {
+  margin-top: 0.625rem;
+}
+
+.kpiCard :global(.mt-1\.5) {
+  margin-top: 0.25rem;
+}

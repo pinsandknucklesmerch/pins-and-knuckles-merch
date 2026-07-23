@@ -1,0 +1,19 @@
+.gauge {
+  display: block;
+  width: 154px;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.remainder,
+.below,
+.above {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 11;
+}
+
+.remainder { stroke: hsl(var(--border) / 0.95); }
+.below { stroke: hsl(var(--primary)); }
+.above { stroke: #6fc49a; }

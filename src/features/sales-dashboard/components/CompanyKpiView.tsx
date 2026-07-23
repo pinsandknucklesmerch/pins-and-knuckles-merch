@@ -1,31 +1,59 @@
-import { BentoPanel } from "@/components/ui/BentoPanel";
-import { calculateCompanyMetrics } from "../domain/calculateDashboardKpis";
-import type { CompanyKpiMonth, SalesKpiTargets } from "../domain/types";
+"use client";
 
-function format(value: number | null, type: "currency" | "number" | "percent") {
-  if (value === null) return "—";
-  if (type === "currency") return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(value);
-  if (type === "percent") return `${value.toFixed(1)}%`;
-  return value.toLocaleString("en-GB");
+import { calculateCompanyMetrics, calculatePreviousDifference, calculatePreviousPercentageChange } from "../domain/calculateDashboardKpis";
+import type { CompanyKpiMonth, MetricResult, SalesKpiTargets } from "../domain/types";
+import { MetricKpiCard } from "./MetricKpiCard";
+import { ProfitShirtKpi } from "./ProfitShirtKpi";
+import { SalesInboxComparisonKpi } from "./SalesInboxComparisonKpi";
+
+function metricByCode(metrics: MetricResult[], code: MetricResult["code"]) {
+  const metric = metrics.find((candidate) => candidate.code === code);
+  if (!metric) throw new Error(`Missing company metric ${code}.`);
+  return metric;
+}
+
+function convertedMetric(current: CompanyKpiMonth, previous: CompanyKpiMonth | null): MetricResult {
+  const value = current.converted;
+  const previousYear = previous?.converted ?? null;
+  return {
+    code: "SALES_INBOX_ENQUIRIES",
+    label: "Converted",
+    value,
+    previousYear,
+    difference: calculatePreviousDifference(value, previousYear),
+    percentageChange: calculatePreviousPercentageChange(value, previousYear),
+    target: null,
+    targetProgress: null,
+    targetReached: false,
+    format: "number",
+  };
 }
 
 export function CompanyKpiView({ current, previous, targets }: { current: CompanyKpiMonth; previous: CompanyKpiMonth | null; targets: SalesKpiTargets }) {
   const metrics = calculateCompanyMetrics(current, previous, targets);
   const now = new Date();
   const isCurrentMondayPeriod = current.source === "monday" && current.year === now.getUTCFullYear() && current.month === now.getUTCMonth() + 1;
+  const profit = metricByCode(metrics, "MONTHLY_PROFIT");
+  const quotes = metricByCode(metrics, "QUOTES_DONE");
+  const orders = metricByCode(metrics, "ORDERS_PROCESSED");
+  const inbox = metricByCode(metrics, "SALES_INBOX_ENQUIRIES");
+  const conversion = metricByCode(metrics, "CONVERSION_RATE");
+  const inboxConversion = metricByCode(metrics, "SALES_INBOX_CONVERSION_RATE");
+
   return (
     <div className="grid gap-3">
       {isCurrentMondayPeriod ? <p className="text-xs text-amber-300">Current month · non-final</p> : null}
-      <dl className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-      {metrics.map((metric) => (
-        <BentoPanel key={metric.code} className="p-4" glow>
-          <div className="flex items-start justify-between gap-2"><dt className="text-sm font-medium text-muted-foreground">{metric.label}</dt>{metric.target !== null ? <span className="text-xs tabular-nums text-muted-foreground">Target {format(metric.target, metric.format)}</span> : null}</div>
-          <dd className="mt-2 text-2xl font-semibold tabular-nums text-foreground">{format(metric.value, metric.format)}</dd>
-          {metric.targetProgress !== null ? <div className="mt-3"><div className="h-1.5 overflow-hidden rounded-full bg-secondary"><div className={`h-full rounded-full ${metric.targetReached ? "bg-emerald-400" : "bg-primary"}`} style={{ width: `${Math.min(metric.targetProgress, 100)}%` }} /></div><p className="mt-1 text-xs tabular-nums text-muted-foreground">{metric.targetProgress.toFixed(1)}%</p></div> : null}
-          <div className="mt-3 border-t border-border/70 pt-2 text-xs text-muted-foreground"><span>Last year {format(metric.previousYear, metric.format)}</span>{metric.percentageChange !== null ? <span className={`ml-2 ${metric.percentageChange >= 0 ? "text-emerald-400" : "text-destructive"}`}>{metric.percentageChange >= 0 ? "+" : ""}{metric.percentageChange.toFixed(1)}%</span> : null}</div>
-        </BentoPanel>
-      ))}
-      </dl>
+      <div className="grid gap-3 lg:grid-cols-4">
+        <div className="min-w-0 lg:col-span-2"><ProfitShirtKpi metric={profit} /></div>
+        <div className="min-w-0"><MetricKpiCard metric={quotes} /></div>
+        <div className="min-w-0"><MetricKpiCard metric={orders} /></div>
+        <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:col-span-4 lg:grid-cols-4">
+          <SalesInboxComparisonKpi metric={inbox} />
+          <MetricKpiCard metric={convertedMetric(current, previous)} />
+          <MetricKpiCard metric={conversion} />
+          <MetricKpiCard metric={inboxConversion} />
+        </div>
+      </div>
     </div>
   );
 }
