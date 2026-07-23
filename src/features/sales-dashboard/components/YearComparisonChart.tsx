@@ -50,7 +50,8 @@ export function YearComparisonChart({ comparison }: { comparison: YearComparison
           data={[{ id: String(comparison.selectedYear), data: selected }, { id: String(comparison.previousYear), data: previous }]}
           seriesStyles={{ [String(comparison.selectedYear)]: { color: "#d9474b", lineWidth: 2.5 }, [String(comparison.previousYear)]: { color: "#a8a79b", lineWidth: 1.5, lineStyle: "dashed" } }}
           format={metric.format === "currency" ? { style: "currency", compact: false, precision: 0 } : metric.format === "percent" ? { style: "percent", precision: 1 } : { style: "number", compact: false, precision: 0 }}
-          height={360}
+          height={440}
+          dense={false}
           stacked={false}
           gradient={false}
           areaOpacity={0.12}

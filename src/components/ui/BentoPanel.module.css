@@ -31,6 +31,7 @@
 .accent { --bento-accent: hsl(var(--accent)); }
 .neutral { --bento-accent: hsl(var(--foreground)); }
 .glow { border-color: hsl(var(--bento-accent) / 0.48); box-shadow: 0 0 8px hsl(var(--bento-accent) / 0.12); }
+.overflowVisible { overflow: visible; }
 
 @media (prefers-reduced-motion: reduce) {
   .panel { transition: none; }

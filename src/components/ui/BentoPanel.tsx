@@ -6,6 +6,7 @@ export type BentoPanelProps = HTMLAttributes<HTMLDivElement> & {
   interactive?: boolean;
   accent?: "primary" | "accent" | "neutral";
   glow?: boolean;
+  overflowVisible?: boolean;
 };
 
 export function BentoPanel({
@@ -13,6 +14,7 @@ export function BentoPanel({
   interactive = false,
   accent = "primary",
   glow = false,
+  overflowVisible = false,
   ...props
 }: BentoPanelProps) {
   return (
@@ -23,6 +25,7 @@ export function BentoPanel({
         accent === "neutral" && styles.neutral,
         interactive && styles.interactive,
         glow && styles.glow,
+        overflowVisible && styles.overflowVisible,
         className,
       )}
       {...props}
