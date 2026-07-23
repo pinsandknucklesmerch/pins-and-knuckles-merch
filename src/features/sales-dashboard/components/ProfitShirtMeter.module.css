@@ -1,11 +1,12 @@
 .meter {
   display: block;
-  width: 118px;
+  width: 158px;
   max-width: 100%;
   height: auto;
 }
 
 .shirtBase { fill: hsl(0 0% 12%); }
 .fill { fill: hsl(358 72% 55%); }
+.targetMet { fill: #6fc49a; }
 .outline { fill: none; stroke: hsl(55 39% 81% / 0.82); stroke-linejoin: round; stroke-width: 3; }
 .collar { fill: none; stroke: hsl(55 39% 81% / 0.45); stroke-linecap: round; stroke-width: 2.5; }

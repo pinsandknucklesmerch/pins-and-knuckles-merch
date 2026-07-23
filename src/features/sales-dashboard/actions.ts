@@ -2,17 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
-import { upsertCompanyKpi, upsertMemberKpi } from "./data/salesDashboardRepository";
-import { executeManualKpiSave, type ManualKpiActionState } from "./lib/manualKpiSave";
+import { upsertSalesKpiTargets } from "./data/salesDashboardRepository";
+import { executeTargetSave, type TargetActionState, type TargetSavePeriod } from "./lib/targetSave";
 
-export type { ManualKpiActionState } from "./lib/manualKpiSave";
+export type { TargetActionState } from "./lib/targetSave";
 
-export async function saveManualKpis(_state: ManualKpiActionState, formData: FormData): Promise<ManualKpiActionState> {
-  return executeManualKpiSave(formData, {
+export async function saveSalesKpiTargets(period: TargetSavePeriod, _state: TargetActionState, formData: FormData): Promise<TargetActionState> {
+  return executeTargetSave(period, formData, {
     getAccess: getCurrentPinsHubAccess,
-    upsertCompany: upsertCompanyKpi,
-    upsertMember: upsertMemberKpi,
+    upsertTargets: upsertSalesKpiTargets,
     revalidate: revalidatePath,
-    logWriteError: (operation, error) => console.error("Sales dashboard KPI write failed", { operation, ...error }),
+    logWriteError: (error) => console.error("Sales dashboard target write failed", error),
   });
 }

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { comparisonArcFillPercent, comparisonArcRatio, MONTHLY_PROFIT_TARGET, metricComparison, profitProgress, shirtFillPercent } from "../lib/metricDisplay.ts";
+import { comparisonArcFillPercent, comparisonArcRatio, MONTHLY_PROFIT_TARGET, metricComparison, previousYearComparisonState, profitProgress, shirtFillPercent, targetState } from "../lib/metricDisplay.ts";
 import type { MetricResult } from "../domain/types.ts";
 
 const metric: MetricResult = {
@@ -33,4 +33,21 @@ test("suppresses comparison-arc fill for zero, null, and missing current values"
   assert.equal(comparisonArcFillPercent(20, 0), 0);
   assert.equal(comparisonArcFillPercent(20, null), 0);
   assert.equal(comparisonArcFillPercent(null, 20), 0);
+});
+
+test("target state stays red below target and green at or above target", () => {
+  assert.equal(targetState(154999.99, MONTHLY_PROFIT_TARGET), "below-target");
+  assert.equal(targetState(MONTHLY_PROFIT_TARGET, MONTHLY_PROFIT_TARGET), "target-met");
+  assert.equal(targetState(200000, MONTHLY_PROFIT_TARGET), "target-met");
+  assert.equal(targetState(null, MONTHLY_PROFIT_TARGET), "below-target");
+  assert.equal(targetState(200000, null), "no-target");
+  assert.equal(targetState(200000, 0), "no-target");
+  assert.equal(targetState(200000, Number.NaN), "no-target");
+});
+
+test("Orders previous-year comparison state is positive, negative, neutral, or unavailable", () => {
+  assert.equal(previousYearComparisonState(90, 100), "negative");
+  assert.equal(previousYearComparisonState(110, 100), "positive");
+  assert.equal(previousYearComparisonState(100, 100), "neutral");
+  assert.equal(previousYearComparisonState(100, null), "unavailable");
 });

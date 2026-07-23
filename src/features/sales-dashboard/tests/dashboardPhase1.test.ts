@@ -46,4 +46,4 @@ test("maps canonical Monday values and provenance into the dashboard read model"
   assert.deepEqual([mapped.quotesDone, mapped.ordersProcessed], [194, 106]);
   assert.deepEqual(mapped.mondaySyncMetadata, { sourceBoardId: "18420001220", fetchedAt: "2026-07-22T00:00:00Z" });
 });
-test("dashboard builder merges fixture members and previous year", () => { const result = buildDashboardData({ companyRow: null, previousCompanyRow: null, memberRows: [], previousMemberRows: [], fixture: historicalSalesDashboardFixture, year: 2024, month: 1, targets: DEFAULT_SALES_KPI_TARGETS, availableYears: [2024] }); assert.equal(result.members.length, 5); assert.equal(result.members[0].source, "historical_fixture"); });
+test("dashboard builder merges fixture members and previous year", () => { const result = buildDashboardData({ companyRow: null, previousCompanyRow: null, trendCurrent: [], trendPrevious: [], memberRows: [], previousMemberRows: [], fixture: historicalSalesDashboardFixture, year: 2024, month: 1, targets: DEFAULT_SALES_KPI_TARGETS, availableYears: [2024] }); assert.equal(result.members.length, 5); assert.equal(result.members[0].source, "historical_fixture"); });

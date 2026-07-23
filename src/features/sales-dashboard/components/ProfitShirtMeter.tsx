@@ -1,13 +1,14 @@
-import { shirtFillPercent } from "../lib/metricDisplay";
+import { shirtFillPercent, type TargetState } from "../lib/metricDisplay";
 import { useId } from "react";
 import styles from "./ProfitShirtMeter.module.css";
 
 type ProfitShirtMeterProps = {
   value: number | null;
   target: number;
+  targetState: TargetState;
 };
 
-export function ProfitShirtMeter({ value, target }: ProfitShirtMeterProps) {
+export function ProfitShirtMeter({ value, target, targetState }: ProfitShirtMeterProps) {
   const clipId = `profit-shirt-fill-${useId().replace(/:/g, "")}`;
   const fillPercent = shirtFillPercent(value, target);
   const label = value === null ? "Monthly profit is unavailable." : `Monthly profit is ${fillPercent.toFixed(1)}% of target.`;
@@ -22,7 +23,7 @@ export function ProfitShirtMeter({ value, target }: ProfitShirtMeterProps) {
         </clipPath>
       </defs>
       <path className={styles.shirtBase} d="M55 28 75 18c8 8 22 8 30 0l20 10 33 26-18 28-16-12v85H56V70L40 82 22 54l33-26Z" />
-      <rect className={styles.fill} x="18" y={155 - fillHeight} width="144" height={fillHeight} clipPath={`url(#${clipId})`} />
+      <rect className={targetState === "target-met" ? styles.targetMet : styles.fill} x="18" y={155 - fillHeight} width="144" height={fillHeight} clipPath={`url(#${clipId})`} />
       <path className={styles.outline} d="M55 28 75 18c8 8 22 8 30 0l20 10 33 26-18 28-16-12v85H56V70L40 82 22 54l33-26Z" />
       <path className={styles.collar} d="M75 18c8 8 22 8 30 0" />
     </svg>

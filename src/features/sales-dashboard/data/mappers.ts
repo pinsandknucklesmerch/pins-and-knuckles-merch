@@ -4,6 +4,7 @@ import { DASHBOARD_MONTHS } from "../types.ts";
 import { calculateConversionRate } from "../domain/calculateDashboardKpis.ts";
 import { findPreviousMember, normaliseTeamMemberKey, normaliseTeamMemberName, sortMemberDashboardRows } from "../domain/normaliseTeamMember.ts";
 import { DEFAULT_SALES_KPI_TARGETS, type CompanyKpiMonth, type MemberDashboardRow, type SalesDashboardData, type SalesKpiTargets, type TeamMemberKpiMonth } from "../domain/types.ts";
+import { buildYearComparison } from "./yearComparison";
 
 type CompanyRow = Pick<Database["public"]["Tables"]["sales_kpi_months"]["Row"], "year" | "month" | "monthly_profit" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "monday_sync_metadata" | "notes" | "data_source">;
 type MemberRow = Pick<Database["public"]["Tables"]["sales_kpi_member_months"]["Row"], "year" | "month" | "team_member_key" | "team_member_name" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "profit" | "data_source">;
@@ -47,8 +48,9 @@ export function mapTargets(rows: TargetRow[], organisationId: string | null, per
   const iso = period.toISOString().slice(0, 10);
   const applicable = rows.filter((row) => row.is_active && row.effective_from <= iso && (!row.effective_to || row.effective_to >= iso));
   const result: SalesKpiTargets = { ...DEFAULT_SALES_KPI_TARGETS };
-  for (const row of applicable.filter((item) => item.organisation_id === null)) result[row.metric_code as keyof SalesKpiTargets] = row.target_value;
-  for (const row of applicable.filter((item) => item.organisation_id === organisationId)) result[row.metric_code as keyof SalesKpiTargets] = row.target_value;
+  const orderedByEffectiveDate = (scope: TargetRow[]) => [...scope].sort((left, right) => left.effective_from.localeCompare(right.effective_from));
+  for (const row of orderedByEffectiveDate(applicable.filter((item) => item.organisation_id === null))) result[row.metric_code as keyof SalesKpiTargets] = row.target_value;
+  for (const row of orderedByEffectiveDate(applicable.filter((item) => item.organisation_id === organisationId))) result[row.metric_code as keyof SalesKpiTargets] = row.target_value;
   return result;
 }
 
@@ -58,6 +60,7 @@ export function buildMemberRows(current: TeamMemberKpiMonth[], previous: TeamMem
 
 export function buildDashboardData(args: {
   companyRow: CompanyKpiMonth | null; previousCompanyRow: CompanyKpiMonth | null;
+  trendCurrent: CompanyKpiMonth[]; trendPrevious: CompanyKpiMonth[];
   memberRows: TeamMemberKpiMonth[]; previousMemberRows: TeamMemberKpiMonth[];
   fixture: HistoricalSalesDashboardFixture; year: number; month: number; targets: SalesKpiTargets;
   availableYears: number[]; setupIssue?: string | null;
@@ -66,5 +69,5 @@ export function buildDashboardData(args: {
   const previousFixture = getFixtureCompanyMonth(args.fixture, args.year - 1, args.month);
   const currentMembers = mergeMemberMonths(args.memberRows, getFixtureMembers(args.fixture, args.year, args.month));
   const previousMembers = mergeMemberMonths(args.previousMemberRows, getFixtureMembers(args.fixture, args.year - 1, args.month));
-  return { company: mergeCompanyMonth(args.companyRow, fixtureCompany), previousCompany: mergeCompanyMonth(args.previousCompanyRow, previousFixture), members: buildMemberRows(currentMembers, previousMembers), targets: args.targets, availableYears: args.availableYears, setupIssue: args.setupIssue ?? null };
+  return { company: mergeCompanyMonth(args.companyRow, fixtureCompany), previousCompany: mergeCompanyMonth(args.previousCompanyRow, previousFixture), members: buildMemberRows(currentMembers, previousMembers), targets: args.targets, yearComparison: buildYearComparison(args.year, args.trendCurrent, args.trendPrevious), availableYears: args.availableYears, setupIssue: args.setupIssue ?? null };
 }

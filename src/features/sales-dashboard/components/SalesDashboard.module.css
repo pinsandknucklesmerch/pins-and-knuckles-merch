@@ -1,0 +1,26 @@
+.select {
+  height: 2.25rem;
+  border: 1px solid hsl(var(--input));
+  border-radius: 0.375rem;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  color-scheme: dark;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.select:hover { border-color: hsl(var(--muted-foreground) / 0.7); }
+
+.select:focus-visible {
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.45);
+}
+
+.select option {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.select option:checked,
+.select option:hover { background-color: hsl(var(--accent)); }

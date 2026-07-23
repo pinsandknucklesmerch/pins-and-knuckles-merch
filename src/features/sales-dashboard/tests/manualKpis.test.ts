@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { executeManualKpiSave, type ManualKpiSaveDependencies } from "../lib/manualKpiSave.ts";
+import { executeTargetSave, type TargetSaveDependencies } from "../lib/targetSave.ts";
 import { getSalesDashboardQueryPlan } from "../lib/queryPlan.ts";
+import { mapTargets } from "../data/mappers.ts";
 import type { PinsHubAccessResult } from "../../../lib/access/pinsHubAccess.ts";
 
 const adminAccess: PinsHubAccessResult = {
@@ -16,18 +17,17 @@ const adminAccess: PinsHubAccessResult = {
 
 function validForm() {
   const formData = new FormData();
-  formData.set("year", "2025");
-  formData.set("month", "7");
-  formData.set("monthly_profit", "125000.50");
-  formData.set("quotes_done", "42");
+  formData.set("MONTHLY_PROFIT", "155000.50");
+  formData.set("QUOTES_DONE", "300");
+  formData.set("ORDERS_PROCESSED", "200");
+  formData.set("CONVERSION_RATE", "65");
   return formData;
 }
 
-function dependencies(overrides: Partial<ManualKpiSaveDependencies> = {}): ManualKpiSaveDependencies {
+function dependencies(overrides: Partial<TargetSaveDependencies> = {}): TargetSaveDependencies {
   return {
     getAccess: async () => adminAccess,
-    upsertCompany: async () => ({ error: null }),
-    upsertMember: async () => ({ error: null }),
+    upsertTargets: async () => ({ error: null }),
     revalidate: () => undefined,
     ...overrides,
   };
@@ -46,38 +46,50 @@ test("member view skips targets and fetches company only for admin entry", () =>
   assert.equal(getSalesDashboardQueryPlan("members", true, 2025).fetchCompany, true);
 });
 
-test("manual save validates before access or writes", async () => {
+test("target save rejects unsupported fields before access or writes", async () => {
   const formData = validForm();
-  formData.set("month", "13");
+  formData.set("monthly_profit", "125000.50");
   let accessCalls = 0;
-  const result = await executeManualKpiSave(formData, dependencies({
+  const result = await executeTargetSave({ year: 2025, month: 7 }, formData, dependencies({
     getAccess: async () => { accessCalls += 1; return adminAccess; },
   }));
-  assert.deepEqual(result, { ok: false, message: "Month must be between 1 and 12." });
+  assert.deepEqual(result, { ok: false, message: "Unsupported target field." });
   assert.equal(accessCalls, 0);
 });
 
-test("manual company save writes and revalidates exactly once", async () => {
-  let companyWrites = 0;
-  let memberWrites = 0;
+test("target save writes configured targets and revalidates exactly once", async () => {
+  let targetWrites = 0;
   const paths: string[] = [];
-  const result = await executeManualKpiSave(validForm(), dependencies({
-    upsertCompany: async (input) => { companyWrites += 1; assert.equal(input.monthlyProfit, 125000.5); return { error: null }; },
-    upsertMember: async () => { memberWrites += 1; return { error: null }; },
+  const result = await executeTargetSave({ year: 2025, month: 7 }, validForm(), dependencies({
+    upsertTargets: async (targets, organisationId, effectiveFrom) => {
+      targetWrites += 1;
+      assert.deepEqual(targets, { MONTHLY_PROFIT: 155000.5, QUOTES_DONE: 300, ORDERS_PROCESSED: 200, CONVERSION_RATE: 65 });
+      assert.equal(organisationId, "organisation-1");
+      assert.equal(effectiveFrom, "2025-07-01");
+      return { error: null };
+    },
     revalidate: (path) => paths.push(path),
   }));
-  assert.deepEqual(result, { ok: true, message: "Monthly KPIs saved." });
-  assert.equal(companyWrites, 1);
-  assert.equal(memberWrites, 0);
+  assert.deepEqual(result, { ok: true, message: "Targets saved." });
+  assert.equal(targetWrites, 1);
   assert.deepEqual(paths, ["/hub/sales-dashboard"]);
 });
 
-test("manual save returns a safe database failure and does not revalidate", async () => {
+test("target save returns a safe database failure and does not revalidate", async () => {
   let revalidations = 0;
-  const result = await executeManualKpiSave(validForm(), dependencies({
-    upsertCompany: async () => ({ error: { code: "42501", message: "row-level security policy detail" } }),
+  const result = await executeTargetSave({ year: 2025, month: 7 }, validForm(), dependencies({
+    upsertTargets: async () => ({ error: { code: "42501", message: "row-level security policy detail" } }),
     revalidate: () => { revalidations += 1; },
   }));
   assert.deepEqual(result, { ok: false, message: "Database access denied." });
   assert.equal(revalidations, 0);
+});
+
+test("latest organisation target takes precedence for the selected period", () => {
+  const targets = mapTargets([
+    { organisation_id: null, metric_code: "QUOTES_DONE", target_value: 300, effective_from: "2020-01-01", effective_to: null, is_active: true },
+    { organisation_id: "organisation-1", metric_code: "QUOTES_DONE", target_value: 320, effective_from: "2025-01-01", effective_to: null, is_active: true },
+    { organisation_id: "organisation-1", metric_code: "QUOTES_DONE", target_value: 340, effective_from: "2025-07-01", effective_to: null, is_active: true },
+  ], "organisation-1", new Date(Date.UTC(2025, 6, 1)));
+  assert.equal(targets.QUOTES_DONE, 340);
 });

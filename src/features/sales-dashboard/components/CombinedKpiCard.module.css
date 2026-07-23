@@ -1,0 +1,93 @@
+.card {
+  display: flex;
+  min-height: 278px;
+  flex-direction: column;
+  padding: 0.875rem;
+}
+
+.title,
+.metricLabel {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title { margin: 0; }
+
+.sections {
+  display: grid;
+  align-items: start;
+  min-height: 0;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  margin-top: 0.75rem;
+}
+
+.section,
+.divided {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.375rem;
+}
+
+.divided {
+  border-left: 1px solid hsl(var(--border) / 0.8);
+  padding-left: 0.875rem;
+}
+
+.section { padding-right: 0.875rem; }
+
+.value {
+  color: hsl(var(--foreground));
+  font-size: 1.5rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin-top: 0.25rem;
+}
+
+.target { margin-top: 0.125rem; }
+
+.targetRow,
+.comparison {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.6875rem;
+  line-height: 1rem;
+}
+
+.track {
+  height: 0.25rem;
+  margin-top: 0.25rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: hsl(var(--border));
+}
+
+.fill,
+.targetMet { display: block; height: 100%; border-radius: inherit; }
+.fill { background: hsl(var(--primary)); }
+.targetMet { background: #6fc49a; }
+
+.comparison,
+.reference { margin-top: 0.125rem; }
+
+.reference { color: hsl(var(--muted-foreground)); font-size: 0.6875rem; line-height: 1rem; }
+.positive { color: #6fc49a; font-weight: 600; }
+.negative { color: hsl(var(--destructive)); font-weight: 600; }
+.neutral { color: hsl(var(--muted-foreground)); font-weight: 600; }
+
+@media (max-width: 639px) {
+  .card { min-height: 0; }
+  .sections { grid-template-columns: minmax(0, 1fr); gap: 0.875rem; }
+  .section { padding-right: 0; }
+  .divided { border-top: 1px solid hsl(var(--border) / 0.8); border-left: 0; padding-top: 0.875rem; padding-left: 0; }
+  .comparison,
+  .reference { margin-top: 0.125rem; }
+}

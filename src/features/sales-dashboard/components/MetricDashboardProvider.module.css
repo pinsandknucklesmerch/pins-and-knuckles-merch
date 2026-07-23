@@ -13,10 +13,10 @@
   --mu-card-radius: 0.75rem;
   --mu-card-shadow: 0 0 8px hsl(var(--primary) / 0.12);
   --mu-cell-bg: hsl(0 0% 12% / 0.78);
-  --mu-padding: 0.875rem;
-  --mu-padding-x-bare: 0.75rem;
-  --mu-padding-y-bare: 0.625rem;
-  --mu-gap: 0.75rem;
+  --mu-padding: 0.75rem;
+  --mu-padding-x-bare: 0.6875rem;
+  --mu-padding-y-bare: 0.5rem;
+  --mu-gap: 0.625rem;
   --mu-value-size: 1.5rem;
   --mu-value-size-bare: 1.25rem;
   --mu-hover-border: hsl(358 72% 55% / 0.65);
@@ -28,8 +28,9 @@
 }
 
 .kpiCard:global([data-component="KpiCard"]) {
+  height: 100%;
   min-height: 0;
-  padding: 0.875rem;
+  padding: 0.75rem;
 }
 
 .kpiCard:global([data-component="KpiCard"]) > div:not([class*="absolute"]) {

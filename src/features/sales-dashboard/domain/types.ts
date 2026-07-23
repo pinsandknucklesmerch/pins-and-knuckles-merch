@@ -29,6 +29,28 @@ export type TeamMemberKpiMonth = {
 
 export type SalesKpiTargets = Partial<Record<SalesMetricCode, number>>;
 
+export type YearComparisonMetric = "MONTHLY_PROFIT" | "QUOTES_DONE" | "ORDERS_PROCESSED" | "LEADS" | "CONVERTED" | "CONVERSION_RATE" | "SALES_INBOX_ENQUIRIES" | "SALES_INBOX_CONVERSION_RATE";
+
+export type YearComparisonPoint = {
+  month: number;
+  label: string;
+  monthlyProfit: number | null;
+  quotesDone: number | null;
+  ordersProcessed: number | null;
+  leads: number | null;
+  converted: number | null;
+  conversionRate: number | null;
+  salesInboxEnquiries: number | null;
+  salesInboxConversionRate: number | null;
+};
+
+export type YearComparisonData = {
+  selectedYear: number;
+  previousYear: number;
+  selected: YearComparisonPoint[];
+  previous: YearComparisonPoint[];
+};
+
 export const DEFAULT_SALES_KPI_TARGETS: SalesKpiTargets = {
   MONTHLY_PROFIT: 155_000,
   QUOTES_DONE: 300,
@@ -59,6 +81,7 @@ export type SalesDashboardData = {
   previousCompany: CompanyKpiMonth | null;
   members: MemberDashboardRow[];
   targets: SalesKpiTargets;
+  yearComparison: YearComparisonData;
   availableYears: number[];
   setupIssue: string | null;
 };
