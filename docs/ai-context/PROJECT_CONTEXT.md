@@ -84,7 +84,7 @@ Applied migrations:
 - `20260722120000_grant_service_role_team_provisioning.sql`
   - Narrow table privileges for the dedicated service-role team-provisioning flow; RLS remains enabled.
 - `20260722130000_add_monday_sales_snapshot_fields.sql`
-  - Pending deployment: Scope A Monday fields and JSON audit provenance for monthly KPI snapshots.
+  - Pending deployment: canonical Monday KPI mapping and JSON audit provenance for monthly KPI snapshots.
 - `20260722140000_grant_service_role_monday_sales_sync.sql`
   - Pending deployment: narrow `sales_kpi_months` read/write privileges for the server-only Monday sync CLI; RLS remains enabled.
 
@@ -137,8 +137,8 @@ There is no active `/test` route.
 ### Partially Complete
 
 - The dashboard is Supabase-first but still uses `workbookFixture.ts` as a fallback rather than a fully imported historical Supabase dataset.
-- Monday monthly-board discovery, validation, per-month summaries, annual aggregation, and a server-only one-month apply / year-preview sync command are implemented. The sync writes Scope A to dedicated Monday columns and Scope B to the existing Sales Inbox fields, without changing Profit, Quotes Done, or Orders Processed.
-- The dashboard displays Scope A Leads, Converted, and Conversion Rate alongside Scope B Sales Inbox Enquiries and Sales Inbox Conversion Rate. A current Monday period is marked non-final.
+- Monday monthly-board discovery, validation, per-month summaries, annual aggregation, and a server-only one-month apply / year-preview sync command are implemented. The sync writes Scope A directly to Quotes Done and Orders Processed, retains Scope B in the Sales Inbox fields, and records source details in Monday metadata.
+- The dashboard displays Quotes Done, Orders Processed, and their derived Conversion Rate alongside Scope B Sales Inbox Enquiries and Sales Inbox Conversion Rate. A current Monday period is marked non-final.
 
 ### Not Started / Deliberately Deferred
 
@@ -165,7 +165,7 @@ The committed read-only audit was generated 2026-07-21 and covers January–July
 
 ### Next Recommended Step
 
-Deploy `20260722130000_add_monday_sales_snapshot_fields.sql` and `20260722140000_grant_service_role_monday_sales_sync.sql`, then run the CLI in dry-run mode against the intended organisation/current month. Confirm the resulting audit metadata and Scope A/Scope B values before any explicit `--apply`; profit, Quotes Done, and Orders Processed remain untouched.
+Deploy the Monday metadata migration, service-role grant, profit-source migration, and canonical Scope A migration in timestamp order. Then run the CLI in dry-run mode against the intended organisation/current month. Confirm the resulting audit metadata, Quotes Done, Orders Processed, and Scope B values before any explicit `--apply`; profit remains independent.
 
 ## Calculator Status
 

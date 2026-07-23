@@ -10,9 +10,6 @@ export type MondaySnapshot = {
   orders_processed: number;
   sales_inbox_enquiries: number;
   converted: number;
-  monday_scope_a_leads: number;
-  monday_scope_a_converted: number;
-  monday_scope_a_conversion_rate: number;
   monthly_profit?: number;
   monthly_profit_source?: "monday";
   data_source: "monday";
@@ -21,6 +18,7 @@ export type MondaySnapshot = {
     fetchedAt: string;
     validation: Record<string, number>;
     mismatchedDates: Array<Record<string, unknown>>;
+    scopeA: { leads: number; converted: number; conversionRate: number };
     profitTracking: ProfitTrackingAudit;
   };
 };
@@ -101,11 +99,8 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
       orders_processed: scopeA.convertedItems,
       sales_inbox_enquiries: scopeB.totalLeadItems,
       converted: scopeB.convertedItems,
-      monday_scope_a_leads: scopeA.totalLeadItems,
-      monday_scope_a_converted: scopeA.convertedItems,
-      monday_scope_a_conversion_rate: scopeA.conversionRate,
       data_source: "monday",
-      monday_sync_metadata: { sourceBoardId: String(entry.board.id), fetchedAt, validation: summary.validation, mismatchedDates: summary.mismatchedDates, profitTracking },
+      monday_sync_metadata: { sourceBoardId: String(entry.board.id), fetchedAt, validation: summary.validation, mismatchedDates: summary.mismatchedDates, scopeA: { leads: scopeA.totalLeadItems, converted: scopeA.convertedItems, conversionRate: scopeA.conversionRate }, profitTracking },
     };
     if (willWriteMondayProfit && profitTracking.calculatedMonthlyTotal !== null) {
       snapshot.monthly_profit = profitTracking.calculatedMonthlyTotal;

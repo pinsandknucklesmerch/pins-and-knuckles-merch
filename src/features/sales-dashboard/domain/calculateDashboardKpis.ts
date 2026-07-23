@@ -41,18 +41,14 @@ export function calculateCompanyMetrics(
   previous: CompanyKpiMonth | null,
   targets: SalesKpiTargets,
 ): MetricResult[] {
-  const currentQuotesDone = current.mondayScopeALeads ?? current.quotesDone;
-  const currentOrdersProcessed = current.mondayScopeAConverted ?? current.ordersProcessed;
-  const currentConversion = current.mondayScopeAConversionRate ?? calculateConversionRate(current.converted, current.salesInboxEnquiries);
-  const previousQuotesDone = previous ? (previous.mondayScopeALeads ?? previous.quotesDone) : null;
-  const previousOrdersProcessed = previous ? (previous.mondayScopeAConverted ?? previous.ordersProcessed) : null;
-  const previousConversion = previous ? (previous.mondayScopeAConversionRate ?? calculateConversionRate(previous.converted, previous.salesInboxEnquiries)) : null;
+  const currentConversion = calculateConversionRate(current.ordersProcessed, current.quotesDone);
+  const previousConversion = previous ? calculateConversionRate(previous.ordersProcessed, previous.quotesDone) : null;
   const currentInboxConversion = calculateConversionRate(current.converted, current.salesInboxEnquiries);
   const previousInboxConversion = previous ? calculateConversionRate(previous.converted, previous.salesInboxEnquiries) : null;
   return [
     metric("MONTHLY_PROFIT", "Monthly Profit", current.monthlyProfit, previous?.monthlyProfit ?? null, targets.MONTHLY_PROFIT ?? null, "currency"),
-    metric("QUOTES_DONE", "Quotes Done", currentQuotesDone, previousQuotesDone, targets.QUOTES_DONE ?? null, "number"),
-    metric("ORDERS_PROCESSED", "Orders Processed", currentOrdersProcessed, previousOrdersProcessed, targets.ORDERS_PROCESSED ?? null, "number"),
+    metric("QUOTES_DONE", "Quotes Done", current.quotesDone, previous?.quotesDone ?? null, targets.QUOTES_DONE ?? null, "number"),
+    metric("ORDERS_PROCESSED", "Orders Processed", current.ordersProcessed, previous?.ordersProcessed ?? null, targets.ORDERS_PROCESSED ?? null, "number"),
     metric("SALES_INBOX_ENQUIRIES", "Sales Inbox Enquiries", current.salesInboxEnquiries, previous?.salesInboxEnquiries ?? null, null, "number"),
     metric("CONVERSION_RATE", "Conversion Rate", currentConversion, previousConversion, targets.CONVERSION_RATE ?? null, "percent"),
     metric("SALES_INBOX_CONVERSION_RATE", "Sales Inbox Conversion Rate", currentInboxConversion, previousInboxConversion, null, "percent"),

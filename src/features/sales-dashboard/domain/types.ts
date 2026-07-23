@@ -9,9 +9,6 @@ export type CompanyKpiMonth = {
   ordersProcessed: number | null;
   salesInboxEnquiries: number | null;
   converted: number | null;
-  mondayScopeALeads: number | null;
-  mondayScopeAConverted: number | null;
-  mondayScopeAConversionRate: number | null;
   mondaySyncMetadata: { sourceBoardId: string; fetchedAt: string } | null;
   notes: string | null;
   source: SalesKpiDataSource;

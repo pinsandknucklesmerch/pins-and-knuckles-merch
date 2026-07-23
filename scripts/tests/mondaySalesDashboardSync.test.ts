@@ -29,7 +29,8 @@ test("dry-run plans a current-month insert and preserves audit metadata", async 
   assert.deepEqual(outcomes[0].profitPreview, { sourceBoardId: "board-1", resolvedProfitColumnId: null, includedRows: [], excludedRows: [], calculatedMonthlyTotal: null, fetchedAt: "2026-07-21T10:00:00Z", source: "epcc_email", willWrite: false, reason: "Monday profit skipped at the configured EPCC cutoff." });
   assert.equal(outcomes[0].snapshot?.monthly_profit, undefined);
   assert.equal(outcomes[0].snapshot?.monthly_profit_source, undefined);
-  assert.deepEqual([outcomes[0].snapshot?.quotes_done, outcomes[0].snapshot?.orders_processed, outcomes[0].snapshot?.monday_scope_a_leads, outcomes[0].snapshot?.monday_scope_a_converted], [2, 1, 2, 1]);
+  assert.deepEqual([outcomes[0].snapshot?.quotes_done, outcomes[0].snapshot?.orders_processed], [2, 1]);
+  assert.deepEqual(outcomes[0].snapshot?.monday_sync_metadata.scopeA, { leads: 2, converted: 1, conversionRate: 50 });
   assert.deepEqual([outcomes[0].snapshot?.sales_inbox_enquiries, outcomes[0].snapshot?.converted], [1, 1]);
 });
 
@@ -39,7 +40,7 @@ test("forced January through June syncs Monday profit without changing lead or c
   const outcome = (await syncMondaySalesDashboard({ ...base, months: [6], boards: [juneBoard], inspectBoard: async () => juneBoard, collectItems: async () => ({ items: juneItems }), apply: false, force: true }))[0];
   assert.equal(outcome.snapshot?.monthly_profit, 1234.56);
   assert.equal(outcome.snapshot?.monthly_profit_source, "monday");
-  assert.deepEqual([outcome.snapshot?.quotes_done, outcome.snapshot?.orders_processed, outcome.snapshot?.monday_scope_a_leads, outcome.snapshot?.monday_scope_a_converted, outcome.snapshot?.sales_inbox_enquiries, outcome.snapshot?.converted], [2, 1, 2, 1, 1, 1]);
+  assert.deepEqual([outcome.snapshot?.quotes_done, outcome.snapshot?.orders_processed, outcome.snapshot?.sales_inbox_enquiries, outcome.snapshot?.converted], [2, 1, 1, 1]);
   assert.equal(outcome.profitPreview?.willWrite, true);
 });
 
@@ -55,7 +56,7 @@ test("January through July previews use the confirmed Scope A KPI mapping", asyn
     force: true,
   });
   assert.deepEqual(outcomes.map((outcome) => outcome.status), Array(7).fill("planned-insert"));
-  assert.deepEqual(outcomes.map((outcome) => [outcome.snapshot?.quotes_done, outcome.snapshot?.orders_processed, outcome.snapshot?.monday_scope_a_leads, outcome.snapshot?.monday_scope_a_converted]), Array(7).fill([2, 1, 2, 1]));
+  assert.deepEqual(outcomes.map((outcome) => [outcome.snapshot?.quotes_done, outcome.snapshot?.orders_processed]), Array(7).fill([2, 1]));
 });
 
 test("apply refreshes the current month and reports updates", async () => {

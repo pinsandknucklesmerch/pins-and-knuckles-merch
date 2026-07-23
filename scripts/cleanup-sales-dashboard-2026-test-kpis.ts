@@ -10,7 +10,7 @@ import {
   type MondayKpiCleanupRow,
 } from "./lib/salesDashboard2026Cleanup.ts";
 
-const SELECT_COLUMNS = "organisation_id,year,month,monthly_profit,quotes_done,orders_processed,monday_scope_a_leads,monday_scope_a_converted,monday_scope_a_conversion_rate,sales_inbox_enquiries,converted,monday_sync_metadata,data_source";
+const SELECT_COLUMNS = "organisation_id,year,month,monthly_profit,quotes_done,orders_processed,sales_inbox_enquiries,converted,monday_sync_metadata,data_source";
 
 function parseArgs(args: string[]) {
   if (args.some((arg) => arg !== "--apply")) throw new Error("Only --apply is supported. Run without arguments for a dry run.");

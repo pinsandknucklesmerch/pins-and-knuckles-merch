@@ -13,7 +13,7 @@ import {
 import { DEFAULT_SALES_KPI_TARGETS, type CompanyKpiMonth } from "../domain/types.ts";
 import { normaliseTeamMemberKey, normaliseTeamMemberName, sortTeamMembers } from "../domain/normaliseTeamMember.ts";
 
-const current: CompanyKpiMonth = { year: 2025, month: 10, monthlyProfit: 155000, quotesDone: 300, ordersProcessed: 200, salesInboxEnquiries: 100, converted: 65, mondayScopeALeads: null, mondayScopeAConverted: null, mondayScopeAConversionRate: null, mondaySyncMetadata: null, notes: null, source: "manual" };
+const current: CompanyKpiMonth = { year: 2025, month: 10, monthlyProfit: 155000, quotesDone: 300, ordersProcessed: 200, salesInboxEnquiries: 100, converted: 65, mondaySyncMetadata: null, notes: null, source: "manual" };
 
 test("conversion rate uses converted divided by sales inbox enquiries", () => assert.equal(calculateConversionRate(13, 20), 65));
 test("conversion rate returns zero for zero enquiries", () => assert.equal(calculateConversionRate(5, 0), 0));
@@ -30,21 +30,20 @@ test("Supabase month overrides the historical fixture", () => { const fixture = 
 test("normalises inconsistent team-member casing and keys", () => { assert.equal(normaliseTeamMemberName("  cAtHerine  smith "), "Catherine Smith"); assert.equal(normaliseTeamMemberKey(" Catherine  Smith "), "catherine-smith"); });
 test("sorts team members case-insensitively", () => assert.deepEqual(sortTeamMembers([{ teamMemberName: "zed", teamMemberKey: "zed" }, { teamMemberName: "Amy", teamMemberKey: "amy" }]).map((row) => row.teamMemberKey), ["amy", "zed"]));
 test("target reached supports values at and above target", () => { assert.equal(isTargetReached(65, 65), true); assert.equal(isTargetReached(66, 65), true); assert.equal(isTargetReached(64, 65), false); });
-test("company metrics preserve legacy/manual values when Monday Scope A fields are absent", () => { const metrics = calculateCompanyMetrics(current, null, DEFAULT_SALES_KPI_TARGETS); assert.deepEqual(metrics.map((item) => item.label), ["Monthly Profit", "Quotes Done", "Orders Processed", "Sales Inbox Enquiries", "Conversion Rate", "Sales Inbox Conversion Rate"]); assert.equal(metrics.find((metric) => metric.code === "CONVERSION_RATE")?.value, 65); assert.equal(metrics.find((metric) => metric.code === "QUOTES_DONE")?.value, 300); assert.equal(metrics.find((metric) => metric.code === "ORDERS_PROCESSED")?.value, 200); });
-test("Monday Scope A controls the main metrics while Sales Inbox remains separate", () => {
-  const july = { ...current, year: 2026, month: 7, salesInboxEnquiries: 43, converted: 11, mondayScopeALeads: 194, mondayScopeAConverted: 106, mondayScopeAConversionRate: 54.6, mondaySyncMetadata: { sourceBoardId: "18420001220", fetchedAt: "2026-07-22T00:00:00Z" }, source: "monday" as const };
+test("company metrics derive main conversion from canonical values and keep Scope B separate", () => { const metrics = calculateCompanyMetrics(current, null, DEFAULT_SALES_KPI_TARGETS); assert.deepEqual(metrics.map((item) => item.label), ["Monthly Profit", "Quotes Done", "Orders Processed", "Sales Inbox Enquiries", "Conversion Rate", "Sales Inbox Conversion Rate"]); assert.equal(metrics.find((metric) => metric.code === "CONVERSION_RATE")?.value, 66.7); assert.equal(metrics.find((metric) => metric.code === "QUOTES_DONE")?.value, 300); assert.equal(metrics.find((metric) => metric.code === "ORDERS_PROCESSED")?.value, 200); });
+test("Monday canonical metrics and Scope B inbox metrics remain separate", () => {
+  const july = { ...current, year: 2026, month: 7, quotesDone: 194, ordersProcessed: 106, salesInboxEnquiries: 43, converted: 11, mondaySyncMetadata: { sourceBoardId: "18420001220", fetchedAt: "2026-07-22T00:00:00Z" }, source: "monday" as const };
   const metrics = calculateCompanyMetrics(july, null, DEFAULT_SALES_KPI_TARGETS);
   assert.equal(metrics.find((metric) => metric.code === "QUOTES_DONE")?.value, 194);
   assert.equal(metrics.find((metric) => metric.code === "ORDERS_PROCESSED")?.value, 106);
   assert.equal(metrics.find((metric) => metric.code === "CONVERSION_RATE")?.value, 54.6);
   assert.equal(metrics.find((metric) => metric.code === "SALES_INBOX_CONVERSION_RATE")?.value, 25.6);
   assert.equal(metrics.find((metric) => metric.code === "MONTHLY_PROFIT")?.value, 155000);
-  assert.equal(metrics.find((metric) => metric.code === "MONTHLY_PROFIT")?.value, 155000);
   assert.equal(metrics.some((metric) => metric.label === "Leads" || metric.label === "Converted"), false);
 });
-test("maps stored Monday Scope A fields and provenance into the dashboard read model", () => {
-  const mapped = mapCompanyRow({ year: 2026, month: 7, monthly_profit: 155000, quotes_done: 300, orders_processed: 200, sales_inbox_enquiries: 43, converted: 11, monday_scope_a_leads: 194, monday_scope_a_converted: 106, monday_scope_a_conversion_rate: 54.6, monday_sync_metadata: { sourceBoardId: "18420001220", fetchedAt: "2026-07-22T00:00:00Z" }, notes: null, data_source: "monday" } as never);
-  assert.deepEqual([mapped.mondayScopeALeads, mapped.mondayScopeAConverted, mapped.mondayScopeAConversionRate], [194, 106, 54.6]);
+test("maps canonical Monday values and provenance into the dashboard read model", () => {
+  const mapped = mapCompanyRow({ year: 2026, month: 7, monthly_profit: 155000, quotes_done: 194, orders_processed: 106, sales_inbox_enquiries: 43, converted: 11, monday_sync_metadata: { sourceBoardId: "18420001220", fetchedAt: "2026-07-22T00:00:00Z", scopeA: { leads: 194, converted: 106, conversionRate: 54.6 } }, notes: null, data_source: "monday" } as never);
+  assert.deepEqual([mapped.quotesDone, mapped.ordersProcessed], [194, 106]);
   assert.deepEqual(mapped.mondaySyncMetadata, { sourceBoardId: "18420001220", fetchedAt: "2026-07-22T00:00:00Z" });
 });
 test("dashboard builder merges fixture members and previous year", () => { const result = buildDashboardData({ companyRow: null, previousCompanyRow: null, memberRows: [], previousMemberRows: [], fixture: historicalSalesDashboardFixture, year: 2024, month: 1, targets: DEFAULT_SALES_KPI_TARGETS, availableYears: [2024] }); assert.equal(result.members.length, 5); assert.equal(result.members[0].source, "historical_fixture"); });

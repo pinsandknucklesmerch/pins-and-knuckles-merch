@@ -15,9 +15,6 @@ const mondayRow: MondayKpiCleanupRow = {
   monthly_profit: 666666,
   quotes_done: 666,
   orders_processed: 66666,
-  monday_scope_a_leads: 194,
-  monday_scope_a_converted: 106,
-  monday_scope_a_conversion_rate: 54.6,
   sales_inbox_enquiries: 43,
   converted: 11,
   monday_sync_metadata: { sourceBoardId: "18420001220", fetchedAt: "2026-07-22T00:00:00Z" },
@@ -34,9 +31,6 @@ test("plans only the scoped Monday rows and preserves every Monday field", () =>
   assert.deepEqual(plan.fieldsToClear, ["monthly_profit", "quotes_done", "orders_processed"]);
   assert.deepEqual(plan.mondayFieldsUnchanged, [{
     month: 7,
-    monday_scope_a_leads: 194,
-    monday_scope_a_converted: 106,
-    monday_scope_a_conversion_rate: 54.6,
     sales_inbox_enquiries: 43,
     converted: 11,
     monday_sync_metadata: { sourceBoardId: "18420001220", fetchedAt: "2026-07-22T00:00:00Z" },

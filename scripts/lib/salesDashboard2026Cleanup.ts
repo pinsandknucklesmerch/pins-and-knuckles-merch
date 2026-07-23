@@ -4,9 +4,6 @@ export const CLEANUP_MONTHS = [1, 2, 3, 4, 5, 6, 7] as const;
 
 export const FIELDS_TO_CLEAR = ["monthly_profit", "quotes_done", "orders_processed"] as const;
 export const MONDAY_FIELDS_TO_PRESERVE = [
-  "monday_scope_a_leads",
-  "monday_scope_a_converted",
-  "monday_scope_a_conversion_rate",
   "sales_inbox_enquiries",
   "converted",
   "monday_sync_metadata",
@@ -26,9 +23,6 @@ export type MondayKpiCleanupRow = {
   monthly_profit: number | null;
   quotes_done: number | null;
   orders_processed: number | null;
-  monday_scope_a_leads: number | null;
-  monday_scope_a_converted: number | null;
-  monday_scope_a_conversion_rate: number | null;
   sales_inbox_enquiries: number | null;
   converted: number | null;
   monday_sync_metadata: unknown;
@@ -49,9 +43,6 @@ export function planMondayKpiCleanup(rows: MondayKpiCleanupRow[]) {
     fieldsToClear: [...FIELDS_TO_CLEAR],
     mondayFieldsUnchanged: targets.map((row) => ({
       month: row.month,
-      monday_scope_a_leads: row.monday_scope_a_leads,
-      monday_scope_a_converted: row.monday_scope_a_converted,
-      monday_scope_a_conversion_rate: row.monday_scope_a_conversion_rate,
       sales_inbox_enquiries: row.sales_inbox_enquiries,
       converted: row.converted,
       monday_sync_metadata: row.monday_sync_metadata,
