@@ -77,9 +77,9 @@ function KpiSection({ metric, divided }: { metric: MetricResult; divided?: boole
   );
 }
 
-export function CombinedKpiCard({ title, first, second }: { title?: string; first: MetricResult; second: MetricResult }) {
+export function CombinedKpiCard({ title, first, second, verticalAlign = "start" }: { title?: string; first: MetricResult; second: MetricResult; verticalAlign?: "start" | "center" }) {
   return (
-    <BentoPanel className={styles.card} glow>
+    <BentoPanel className={`${styles.card} ${verticalAlign === "center" ? styles.centered : ""}`} glow>
       {title ? <h2 className={styles.title}>{title}</h2> : null}
       <div className={title ? styles.sections : styles.sectionsWithoutTitle}>
         <KpiSection metric={first} />

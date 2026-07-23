@@ -5,6 +5,7 @@ export const MONTHLY_PROFIT_TARGET = 155_000;
 
 export type TargetState = "no-target" | "below-target" | "target-met";
 export type PreviousYearComparisonState = "unavailable" | "negative" | "neutral" | "positive";
+export type TargetBullet = { value: number; target: number; max: number; measureColor: string };
 
 export const percentFormat: FormatOption = {
   style: "percent",
@@ -34,6 +35,16 @@ export function targetState(value: number | null, target: number | null): Target
   if (target === null || !Number.isFinite(target) || target <= 0) return "no-target";
   if (value === null || !Number.isFinite(value)) return "below-target";
   return value >= target ? "target-met" : "below-target";
+}
+
+export function targetBullet(value: number | null, target: number | null): TargetBullet | null {
+  if (value === null || !Number.isFinite(value) || target === null || !Number.isFinite(target) || target <= 0) return null;
+  return {
+    value,
+    target,
+    max: Math.max(value, target) * 1.12,
+    measureColor: targetState(value, target) === "target-met" ? "#6fc49a" : "#d9474b",
+  };
 }
 
 export function previousYearComparisonState(value: number | null, previousYear: number | null): PreviousYearComparisonState {

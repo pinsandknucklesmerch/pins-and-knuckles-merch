@@ -1,8 +1,10 @@
 .card {
   display: flex;
   flex-direction: column;
-  padding: 0.875rem;
+  padding: 0.75rem 0.875rem;
 }
+
+.centered { justify-content: center; }
 
 .title,
 .metricLabel {
@@ -55,7 +57,11 @@
   margin-top: 0.25rem;
 }
 
-.target { margin-top: 0.125rem; }
+.target {
+  display: grid;
+  gap: 0.375rem;
+  margin-top: 0.125rem;
+}
 
 .targetRow,
 .comparison {
@@ -67,10 +73,10 @@
   line-height: 1rem;
 }
 
-.bullet { margin-top: -0.25rem; }
+.bullet { margin-top: 0; }
 
 .comparison,
-.reference { margin-top: 0.125rem; }
+.reference { margin-top: 0.375rem; }
 
 .reference { color: hsl(var(--muted-foreground)); font-size: 0.6875rem; line-height: 1rem; }
 .positive { color: #6fc49a; font-weight: 600; }

@@ -46,14 +46,10 @@ export function CompanyKpiView({ current, previous, targets }: { current: Compan
     <div className="grid gap-2.5">
       {isCurrentMondayPeriod ? <LiveStatus /> : null}
       <div className={styles.grid}>
-        <div className={styles.left}>
-          <ProfitShirtKpi metric={profit} />
-        </div>
-        <div className={styles.right}>
-          <CombinedKpiCard first={quotes} second={orders} />
-          <CombinedKpiCard first={convertedMetric(current, previous)} second={conversion} />
-          <SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} />
-        </div>
+        <div className={styles.profitCard}><ProfitShirtKpi metric={profit} /></div>
+        <div className={styles.quotesOrdersCard}><CombinedKpiCard first={quotes} second={orders} verticalAlign="center" /></div>
+        <div className={styles.salesInboxCard}><SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} /></div>
+        <div className={styles.conversionCard}><CombinedKpiCard first={convertedMetric(current, previous)} second={conversion} verticalAlign="center" /></div>
       </div>
     </div>
   );

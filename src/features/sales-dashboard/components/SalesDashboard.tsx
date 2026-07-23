@@ -17,9 +17,9 @@ export function SalesDashboard({ data, year, month, view, member, isAdmin }: { d
       <label className="grid gap-1 text-xs font-medium text-muted-foreground">View<select name="view" defaultValue={view} className={styles.select}><option value="company">Company</option><option value="members">Team Members</option></select></label>
       {member ? <input name="member" type="hidden" value={member} /> : null}
       <button className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground" type="submit">Apply</button>
+      {isAdmin ? <ManualKpiEntry year={year} month={month} targets={data.targets} /> : null}
     </form></Panel>
     {data.setupIssue ? <p role="alert" className="text-sm text-destructive">{data.setupIssue}</p> : null}
-    {isAdmin ? <ManualKpiEntry year={year} month={month} targets={data.targets} /> : null}
     {view === "company" ? <><CompanyKpiView current={data.company} previous={data.previousCompany} targets={data.targets} /><YearComparisonChart comparison={data.yearComparison} /></> : data.members.length ? <TeamMemberKpiView rows={data.members} selectedKey={member} query={{ year, month }} /> : <EmptyState title="No team member data" />}
   </div></MetricDashboardProvider>;
 }

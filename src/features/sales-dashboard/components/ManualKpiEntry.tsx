@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { createPortal } from "react-dom";
 import { saveSalesKpiTargets, type TargetActionState } from "../actions";
 import type { SalesKpiTargets, SalesMetricCode } from "../domain/types";
 
@@ -21,9 +22,9 @@ export function ManualKpiEntry({ year, month, targets }: { year: number; month: 
   const configuredFields = fields.filter((field) => targets[field.code] !== undefined);
 
   return (
-    <section>
-      <button type="button" onClick={() => setOpen(true)} className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Edit Targets</button>
-      {open ? (
+    <>
+      <button type="button" onClick={() => setOpen(true)} className="h-9 rounded-md border border-input bg-card px-3 text-sm font-medium text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Edit Targets</button>
+      {open ? createPortal(
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/65 p-4" role="dialog" aria-modal="true" aria-labelledby="edit-targets-title">
           <form action={formAction} className="grid w-full max-w-2xl gap-4 rounded-lg border border-border bg-card p-4 shadow-lg">
             <div className="flex items-center justify-between gap-3">
@@ -45,7 +46,7 @@ export function ManualKpiEntry({ year, month, targets }: { year: number; month: 
             <button disabled={pending} className="h-9 justify-self-start rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-50" type="submit">{pending ? "Saving…" : "Save Targets"}</button>
           </form>
         </div>
-      ) : null}
-    </section>
+      , document.body) : null}
+    </>
   );
 }

@@ -1,21 +1,27 @@
 .grid {
   display: grid;
   align-items: stretch;
-  gap: 0.625rem;
+  gap: 0.75rem;
 }
 
-.left,
-.right {
+.profitCard,
+.quotesOrdersCard,
+.salesInboxCard,
+.conversionCard {
   display: grid;
   min-width: 0;
-  align-content: start;
-  gap: 0.625rem;
 }
-
-.left > * { height: 100%; }
 
 @media (min-width: 1024px) {
   .grid {
-    grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.4fr);
+    grid-template-columns: minmax(320px, 0.8fr) minmax(0, 1.2fr);
+    grid-template-areas:
+      "profit quotes"
+      "inbox conversion";
   }
+
+  .profitCard { grid-area: profit; }
+  .quotesOrdersCard { grid-area: quotes; }
+  .salesInboxCard { grid-area: inbox; }
+  .conversionCard { grid-area: conversion; }
 }

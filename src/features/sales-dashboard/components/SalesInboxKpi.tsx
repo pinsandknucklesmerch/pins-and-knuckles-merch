@@ -10,16 +10,18 @@ function number(value: number | null) {
   return value === null ? "—" : value.toLocaleString("en-GB");
 }
 
-function delta(value: number | null, format: "number" | "percent") {
+function delta(value: number | null) {
   if (value === null) return null;
   const sign = value > 0 ? "+" : "";
-  return format === "percent"
-    ? `${sign}${formatPercentagePoints(value)}`
-    : `${sign}${value.toLocaleString("en-GB")}`;
+  return `${sign}${value.toLocaleString("en-GB")}`;
 }
 
 function relativeChange(value: number | null) {
   return value === null ? null : `${value > 0 ? "+" : ""}${value.toFixed(1)}%`;
+}
+
+function percentagePointDelta(value: number | null) {
+  return value === null ? null : `${value > 0 ? "+" : ""}${value.toFixed(1)} pts`;
 }
 
 function comparisonTone(value: number | null) {
@@ -29,9 +31,9 @@ function comparisonTone(value: number | null) {
 export function SalesInboxKpi({ enquiries, conversionRate }: { enquiries: MetricResult; conversionRate: MetricResult }) {
   const enquiriesRatio = comparisonArcRatio(enquiries.value, enquiries.previousYear);
   const hasEnquiriesComparison = enquiriesRatio !== null;
-  const enquiriesDelta = delta(enquiries.difference, "number");
+  const enquiriesDelta = delta(enquiries.difference);
   const enquiriesChange = relativeChange(enquiries.percentageChange);
-  const conversionDelta = delta(conversionRate.difference, "percent");
+  const conversionDelta = percentagePointDelta(conversionRate.difference);
   const conversionChange = relativeChange(conversionRate.percentageChange);
 
   return (
@@ -54,18 +56,18 @@ export function SalesInboxKpi({ enquiries, conversionRate }: { enquiries: Metric
         ) : null}
       </section>
       <section className={styles.conversion} aria-label="Sales Inbox Conversion Rate">
-        <div className={styles.label}>Sales Inbox Conversion Rate</div>
+        <div className={styles.label}>Conversion Rate</div>
         <div className={styles.conversionValue}>{formatPercentagePoints(conversionRate.value)}</div>
-        {conversionRate.previousYear === null ? (
-          <div className={styles.reference}>No previous-year comparison</div>
-        ) : (
-          <div className={styles.reference}>Last year {formatPercentagePoints(conversionRate.previousYear)}</div>
-        )}
-        {conversionRate.previousYear !== null && conversionDelta && conversionChange ? (
-          <div className={comparisonTone(conversionRate.difference)}>
-            {conversionDelta} · {conversionChange} vs last year
-          </div>
-        ) : null}
+        <div className={styles.conversionComparison}>
+          {conversionRate.previousYear === null ? (
+            <div className={styles.reference}>No previous-year comparison</div>
+          ) : (
+            <>
+              <div className={styles.reference}>Last year {formatPercentagePoints(conversionRate.previousYear)}</div>
+              {conversionDelta && conversionChange ? <div className={comparisonTone(conversionRate.difference)}>{conversionDelta} · {conversionChange} vs last year</div> : null}
+            </>
+          )}
+        </div>
       </section>
     </BentoPanel>
   );

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { comparisonArcFillPercent, comparisonArcRatio, MONTHLY_PROFIT_TARGET, metricComparison, previousYearComparisonState, profitProgress, shirtFillPercent, targetState } from "../lib/metricDisplay.ts";
+import { comparisonArcFillPercent, comparisonArcRatio, MONTHLY_PROFIT_TARGET, metricComparison, previousYearComparisonState, profitProgress, shirtFillPercent, targetBullet, targetState } from "../lib/metricDisplay.ts";
 import type { MetricResult } from "../domain/types.ts";
 
 const metric: MetricResult = {
@@ -50,4 +50,12 @@ test("Orders previous-year comparison state is positive, negative, neutral, or u
   assert.equal(previousYearComparisonState(110, 100), "positive");
   assert.equal(previousYearComparisonState(100, 100), "neutral");
   assert.equal(previousYearComparisonState(100, null), "unavailable");
+});
+
+test("target bullet maps actuals, targets, and below/at/above colours", () => {
+  assert.deepEqual(targetBullet(150, 300), { value: 150, target: 300, max: 336, measureColor: "#d9474b" });
+  assert.equal(targetBullet(300, 300)?.measureColor, "#6fc49a");
+  assert.equal(targetBullet(350, 300)?.measureColor, "#6fc49a");
+  assert.equal(targetBullet(150, null), null);
+  assert.equal(targetBullet(null, 300), null);
 });
