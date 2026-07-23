@@ -1,27 +1,26 @@
-.card {
-  min-width: 0;
-  min-height: 520px;
-  padding: 0.875rem 0.875rem 1.75rem;
+.chartContainer {
+  width: 100%;
+  min-height: 0;
+  overflow: visible;
+  padding-bottom: 1.5rem;
 }
-.header { display: flex; justify-content: flex-end; gap: 0.75rem; margin-bottom: 0.5rem; }
-.controls { display: flex; align-items: center; gap: 0.75rem; }
+
+.chartControls { display: flex; justify-content: flex-end; margin-bottom: 0.75rem; }
+.chartControls > div { display: flex; align-items: center; gap: 0.75rem; }
+.chartArea { min-height: 0; overflow: visible; }
 .legend { display: flex; align-items: center; gap: 0.625rem; margin: 0; padding: 0; color: hsl(var(--muted-foreground)); font-size: 0.75rem; list-style: none; }
 .legend li { display: inline-flex; align-items: center; gap: 0.25rem; }
 .currentSwatch, .previousSwatch { display: inline-block; width: 1rem; border-top: 2px solid; }
 .currentSwatch { border-color: #d9474b; }
-.previousSwatch { border-color: #a8a79b; border-top-style: dashed; }
+.previousSwatch { border-color: #4f8cff; border-top-style: dashed; }
 .selectorLabel { min-width: 0; }
-.chart { min-height: 464px; }
 
-@media (max-width: 1023px) {
-  .card { min-height: 480px; }
-  .chart { min-height: 424px; }
-}
+/* MetricUI renders this comparison footer unconditionally when comparisonData exists. */
+.chartRoot:global([data-component="AreaChart"]) > :global(div:last-child) { display: none; }
 
+/* MetricUI derives comparisonData from the primary series colour. */
+.chartRoot :global(path[stroke="#d9474b61"]) { stroke: #4f8cff !important; }
+.chartRoot :global(path[fill="#d9474b61"]) { fill: #4f8cff !important; }
 @media (max-width: 639px) {
-  .header,
-  .controls { align-items: flex-start; flex-direction: column; }
-
-  .card { min-height: 460px; }
-  .chart { min-height: 404px; }
+  .chartControls { align-items: flex-start; flex-direction: column; }
 }
