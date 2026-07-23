@@ -62,14 +62,4 @@
   line-height: 1.125rem;
 }
 
-.above,
-.below {
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1.125rem;
-}
-
-.above { color: #6fc49a; }
-.below { color: hsl(var(--destructive)); }
-
 .conversionComparison { display: grid; gap: 0.125rem; }

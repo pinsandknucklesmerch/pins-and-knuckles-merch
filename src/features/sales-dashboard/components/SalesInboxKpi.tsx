@@ -2,39 +2,18 @@
 
 import { BentoPanel } from "@/components/ui/BentoPanel";
 import type { MetricResult } from "../domain/types";
-import { comparisonArcRatio, formatPercentagePoints } from "../lib/metricDisplay";
+import { comparisonArcRatio, formatPercentagePoints, previousYearComparisonState } from "../lib/metricDisplay";
 import { ComparisonArcGauge } from "./ComparisonArcGauge";
+import { ComparisonBadge } from "./ComparisonBadge";
 import styles from "./SalesInboxKpi.module.css";
 
 function number(value: number | null) {
   return value === null ? "—" : value.toLocaleString("en-GB");
 }
 
-function delta(value: number | null) {
-  if (value === null) return null;
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toLocaleString("en-GB")}`;
-}
-
-function relativeChange(value: number | null) {
-  return value === null ? null : `${value > 0 ? "+" : ""}${value.toFixed(1)}%`;
-}
-
-function percentagePointDelta(value: number | null) {
-  return value === null ? null : `${value > 0 ? "+" : ""}${value.toFixed(1)} pts`;
-}
-
-function comparisonTone(value: number | null) {
-  return value !== null && value < 0 ? styles.below : styles.above;
-}
-
 export function SalesInboxKpi({ enquiries, conversionRate }: { enquiries: MetricResult; conversionRate: MetricResult }) {
   const enquiriesRatio = comparisonArcRatio(enquiries.value, enquiries.previousYear);
   const hasEnquiriesComparison = enquiriesRatio !== null;
-  const enquiriesDelta = delta(enquiries.difference);
-  const enquiriesChange = relativeChange(enquiries.percentageChange);
-  const conversionDelta = percentagePointDelta(conversionRate.difference);
-  const conversionChange = relativeChange(conversionRate.percentageChange);
 
   return (
     <BentoPanel className={styles.card} glow>
@@ -50,11 +29,7 @@ export function SalesInboxKpi({ enquiries, conversionRate }: { enquiries: Metric
         ) : (
           <div className={styles.reference}>No previous-year comparison</div>
         )}
-        {hasEnquiriesComparison && enquiriesDelta && enquiriesChange ? (
-          <div className={comparisonTone(enquiries.difference)}>
-            {enquiriesDelta} · {enquiriesChange} vs last year
-          </div>
-        ) : null}
+        {hasEnquiriesComparison ? <ComparisonBadge absoluteChange={enquiries.difference} percentageChange={enquiries.percentageChange} state={previousYearComparisonState(enquiries.value, enquiries.previousYear)} /> : null}
       </section>
       <section className={styles.conversion} aria-labelledby="sales-inbox-conversion-rate">
         <h3 id="sales-inbox-conversion-rate" className={styles.label}>Conversion Rate</h3>
@@ -65,7 +40,7 @@ export function SalesInboxKpi({ enquiries, conversionRate }: { enquiries: Metric
           ) : (
             <>
               <div className={styles.reference}>Last year {formatPercentagePoints(conversionRate.previousYear)}</div>
-              {conversionDelta && conversionChange ? <div className={comparisonTone(conversionRate.difference)}>{conversionDelta} · {conversionChange} vs last year</div> : null}
+              <ComparisonBadge percentagePointChange={conversionRate.difference} percentageChange={conversionRate.percentageChange} state={previousYearComparisonState(conversionRate.value, conversionRate.previousYear)} />
             </>
           )}
         </div>

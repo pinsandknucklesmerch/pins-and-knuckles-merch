@@ -70,7 +70,7 @@ test("target save writes configured targets and revalidates exactly once", async
     },
     revalidate: (path) => paths.push(path),
   }));
-  assert.deepEqual(result, { ok: true, message: "Targets saved." });
+  assert.deepEqual(result, { ok: true, message: "Targets updated for this month and future months." });
   assert.equal(targetWrites, 1);
   assert.deepEqual(paths, ["/hub/sales-dashboard"]);
 });
@@ -85,11 +85,34 @@ test("target save returns a safe database failure and does not revalidate", asyn
   assert.equal(revalidations, 0);
 });
 
-test("latest organisation target takes precedence for the selected period", () => {
-  const targets = mapTargets([
+test("effective targets update the selected month and all future months without changing June", () => {
+  const rows = [
     { organisation_id: null, metric_code: "QUOTES_DONE", target_value: 300, effective_from: "2020-01-01", effective_to: null, is_active: true },
     { organisation_id: "organisation-1", metric_code: "QUOTES_DONE", target_value: 320, effective_from: "2025-01-01", effective_to: null, is_active: true },
     { organisation_id: "organisation-1", metric_code: "QUOTES_DONE", target_value: 340, effective_from: "2025-07-01", effective_to: null, is_active: true },
-  ], "organisation-1", new Date(Date.UTC(2025, 6, 1)));
-  assert.equal(targets.QUOTES_DONE, 340);
+  ];
+  assert.equal(mapTargets(rows, "organisation-1", new Date(Date.UTC(2025, 5, 1))).QUOTES_DONE, 320);
+  assert.equal(mapTargets(rows, "organisation-1", new Date(Date.UTC(2025, 6, 1))).QUOTES_DONE, 340);
+  assert.equal(mapTargets(rows, "organisation-1", new Date(Date.UTC(2027, 0, 1))).QUOTES_DONE, 340);
+  assert.equal(mapTargets(rows, "organisation-2", new Date(Date.UTC(2025, 6, 1))).QUOTES_DONE, 300);
+});
+
+test("a later effective target supersedes the selected-and-future target only from its own month", () => {
+  const rows = [
+    { organisation_id: "organisation-1", metric_code: "CONVERSION_RATE", target_value: 65, effective_from: "2026-07-01", effective_to: null, is_active: true },
+    { organisation_id: "organisation-1", metric_code: "CONVERSION_RATE", target_value: 70, effective_from: "2026-10-01", effective_to: null, is_active: true },
+  ];
+  assert.equal(mapTargets(rows, "organisation-1", new Date(Date.UTC(2026, 8, 1))).CONVERSION_RATE, 65);
+  assert.equal(mapTargets(rows, "organisation-1", new Date(Date.UTC(2026, 9, 1))).CONVERSION_RATE, 70);
+});
+
+test("target validation rejects invalid numeric values and keeps rate representation as percentage points", async () => {
+  const invalid = validForm();
+  invalid.set("CONVERSION_RATE", "101");
+  assert.deepEqual(await executeTargetSave({ year: 2026, month: 7 }, invalid, dependencies()), { ok: false, message: "Targets must use valid non-negative values." });
+  const rate = validForm();
+  rate.set("CONVERSION_RATE", "56.9");
+  await executeTargetSave({ year: 2026, month: 7 }, rate, dependencies({
+    upsertTargets: async (targets) => { assert.equal(targets.CONVERSION_RATE, 56.9); return { error: null }; },
+  }));
 });

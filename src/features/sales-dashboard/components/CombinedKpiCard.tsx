@@ -4,6 +4,7 @@ import { BentoPanel } from "@/components/ui/BentoPanel";
 import { BulletChart } from "metricui";
 import type { MetricResult } from "../domain/types";
 import { formatPercentagePoints, previousYearComparisonState, targetBullet } from "../lib/metricDisplay";
+import { ComparisonBadge } from "./ComparisonBadge";
 import styles from "./CombinedKpiCard.module.css";
 
 function value(metric: MetricResult) {
@@ -20,17 +21,9 @@ function target(metric: MetricResult) {
   return { display, progress: metric.targetProgress, bullet };
 }
 
-function comparison(metric: MetricResult) {
-  if (metric.previousYear === null) return "No previous-year comparison";
-  const previous = metric.format === "percent" ? formatPercentagePoints(metric.previousYear) : metric.previousYear.toLocaleString("en-GB");
-  const difference = metric.difference === null ? null : metric.format === "percent" ? formatPercentagePoints(metric.difference) : metric.difference.toLocaleString("en-GB");
-  const relative = metric.percentageChange === null ? null : `${metric.percentageChange > 0 ? "+" : ""}${metric.percentageChange.toFixed(1)}%`;
-  return { previous, difference, relative, state: previousYearComparisonState(metric.value, metric.previousYear) };
-}
-
 function KpiSection({ metric, divided, className }: { metric: MetricResult; divided?: boolean; className?: string }) {
   const metricTarget = target(metric);
-  const metricComparison = comparison(metric);
+  const state = previousYearComparisonState(metric.value, metric.previousYear);
   return (
     <section className={`${divided ? styles.divided : styles.section} ${className ?? ""}`} aria-label={metric.label}>
       <div className={styles.metricLabel}>{metric.label}</div>
@@ -61,16 +54,12 @@ function KpiSection({ metric, divided, className }: { metric: MetricResult; divi
           />
         </div>
       ) : null}
-      {typeof metricComparison === "string" ? (
-        <div className={styles.reference}>{metricComparison}</div>
+      {metric.previousYear === null ? (
+        <div className={styles.reference}>No previous-year comparison</div>
       ) : (
         <div className={styles.comparison}>
-          <span>Last year {metricComparison.previous}</span>
-          {metricComparison.difference !== null ? (
-            <span className={metricComparison.state === "negative" ? styles.negative : metricComparison.state === "positive" ? styles.positive : styles.neutral}>
-              {metricComparison.difference.startsWith("-") ? "" : "+"}{metricComparison.difference}{metricComparison.relative ? ` · ${metricComparison.relative}` : ""}
-            </span>
-          ) : null}
+          <span>Last year {metric.format === "percent" ? formatPercentagePoints(metric.previousYear) : metric.previousYear.toLocaleString("en-GB")}</span>
+          <ComparisonBadge absoluteChange={metric.format === "percent" ? null : metric.difference} percentagePointChange={metric.format === "percent" ? metric.difference : null} percentageChange={metric.percentageChange} state={state} />
         </div>
       )}
     </section>

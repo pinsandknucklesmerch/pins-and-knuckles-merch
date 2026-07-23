@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { comparisonArcFillPercent, comparisonArcRatio, MONTHLY_PROFIT_TARGET, metricComparison, previousYearComparisonState, profitProgress, shirtFillPercent, targetBullet, targetState } from "../lib/metricDisplay.ts";
 import type { MetricResult } from "../domain/types.ts";
+import { comparisonBadgeDetails } from "../lib/comparisonBadge.ts";
 
 const metric: MetricResult = {
   code: "MONTHLY_PROFIT", label: "Monthly Profit", value: 91571.84, previousYear: 70000, difference: 21571.84, percentageChange: 30.8,
@@ -50,6 +51,18 @@ test("Orders previous-year comparison state is positive, negative, neutral, or u
   assert.equal(previousYearComparisonState(110, 100), "positive");
   assert.equal(previousYearComparisonState(100, 100), "neutral");
   assert.equal(previousYearComparisonState(100, null), "unavailable");
+});
+
+test("formats compact comparison badges with direction, absolute magnitudes, and accessible labels", () => {
+  assert.deepEqual(comparisonBadgeDetails({ absoluteChange: -95, percentageChange: -32, state: "negative" }), { icon: "↓", values: ["95", "32.0%"], accessibleLabel: "Down 95, 32.0 percent versus last year" });
+  assert.deepEqual(comparisonBadgeDetails({ absoluteChange: 23, percentageChange: 34.3, state: "positive" }), { icon: "↑", values: ["23", "34.3%"], accessibleLabel: "Up 23, 34.3 percent versus last year" });
+  assert.deepEqual(comparisonBadgeDetails({ absoluteChange: 0, percentageChange: 0, state: "neutral" }), { icon: "−", values: ["0", "0.0%"], accessibleLabel: "No change 0, 0.0 percent versus last year" });
+  assert.equal(comparisonBadgeDetails({ absoluteChange: null, percentageChange: null, state: "unavailable" }), null);
+});
+
+test("uses percentage points and keeps zero-denominator comparisons relative-free", () => {
+  assert.deepEqual(comparisonBadgeDetails({ percentagePointChange: -9.3, percentageChange: -27.1, state: "negative" }), { icon: "↓", values: ["9.3 pts", "27.1%"], accessibleLabel: "Down 9.3 percentage points, 27.1 percent versus last year" });
+  assert.deepEqual(comparisonBadgeDetails({ percentagePointChange: 56.9, percentageChange: null, state: "positive" }), { icon: "↑", values: ["56.9 pts"], accessibleLabel: "Up 56.9 percentage points versus last year" });
 });
 
 test("target bullet maps actuals, targets, and below/at/above colours", () => {

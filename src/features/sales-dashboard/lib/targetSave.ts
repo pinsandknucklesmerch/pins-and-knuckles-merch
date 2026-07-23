@@ -71,7 +71,7 @@ export async function executeTargetSave(
     }
 
     dependencies.revalidate("/hub/sales-dashboard");
-    return { ok: true, message: "Targets saved." };
+    return { ok: true, message: "Targets updated for this month and future months." };
   } catch (error) {
     return { ok: false, message: error instanceof Error ? error.message : "Invalid target values." };
   }

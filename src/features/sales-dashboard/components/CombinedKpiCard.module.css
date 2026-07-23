@@ -96,9 +96,6 @@
 .reference { margin-top: 0.375rem; }
 
 .reference { color: hsl(var(--muted-foreground)); font-size: 0.6875rem; line-height: 1rem; }
-.positive { color: #6fc49a; font-weight: 600; }
-.negative { color: hsl(var(--destructive)); font-weight: 600; }
-.neutral { color: hsl(var(--muted-foreground)); font-weight: 600; }
 
 @media (max-width: 639px) {
   .card { min-height: 0; }
@@ -110,4 +107,5 @@
   .fullWidthSection { margin-top: 0; }
   .comparison,
   .reference { margin-top: 0.125rem; }
+  .comparison { align-items: flex-start; flex-wrap: wrap; }
 }

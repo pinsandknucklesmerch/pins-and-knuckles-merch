@@ -2,7 +2,8 @@
 
 import { BentoPanel } from "@/components/ui/BentoPanel";
 import type { MetricResult } from "../domain/types";
-import { MONTHLY_PROFIT_TARGET, profitProgress, targetState } from "../lib/metricDisplay";
+import { MONTHLY_PROFIT_TARGET, previousYearComparisonState, profitProgress, targetState } from "../lib/metricDisplay";
+import { ComparisonBadge } from "./ComparisonBadge";
 import { ProfitShirtMeter } from "./ProfitShirtMeter";
 import styles from "./ProfitShirtKpi.module.css";
 
@@ -14,8 +15,7 @@ export function ProfitShirtKpi({ metric }: { metric: MetricResult }) {
   const progress = profitProgress(metric.value, MONTHLY_PROFIT_TARGET);
   const state = targetState(metric.value, MONTHLY_PROFIT_TARGET);
   const isAboveTarget = progress !== null && progress > 1;
-  const comparison = metric.previousYear === null ? "—" : currency(metric.previousYear);
-  const delta = metric.percentageChange === null ? "—" : `${metric.percentageChange > 0 ? "+" : ""}${metric.percentageChange.toFixed(1)}%`;
+  const comparisonState = previousYearComparisonState(metric.value, metric.previousYear);
 
   return (
     <BentoPanel className={styles.card} glow>
@@ -25,8 +25,7 @@ export function ProfitShirtKpi({ metric }: { metric: MetricResult }) {
       <div className={styles.progress}>{progress === null ? "—" : `${(progress * 100).toFixed(1)}% of £155,000`}</div>
       {isAboveTarget ? <span className={styles.aboveTarget}>+{((progress - 1) * 100).toFixed(1)}%</span> : null}
       <div className={styles.comparison}>
-        <span>Last year <strong>{comparison}</strong></span>
-        <span className={metric.percentageChange !== null && metric.percentageChange < 0 ? styles.negative : styles.delta}>{delta}</span>
+        {metric.previousYear === null ? <span>No previous-year comparison</span> : <><span>Last year <strong>{currency(metric.previousYear)}</strong></span><ComparisonBadge percentageChange={metric.percentageChange} state={comparisonState} /></>}
       </div>
     </BentoPanel>
   );
