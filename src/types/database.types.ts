@@ -848,6 +848,59 @@ export type Database = {
           },
         ]
       }
+      sales_kpi_profit_email_sources: {
+        Row: {
+          aggregation_rule: string
+          created_at: string
+          id: string
+          message_id: string
+          organisation_id: string | null
+          parsed_row_count: number
+          received_at: string
+          report_month: number
+          report_year: number
+          sender: string
+          source_hash: string
+          subject: string
+        }
+        Insert: {
+          aggregation_rule: string
+          created_at?: string
+          id?: string
+          message_id: string
+          organisation_id?: string | null
+          parsed_row_count: number
+          received_at: string
+          report_month: number
+          report_year: number
+          sender: string
+          source_hash: string
+          subject: string
+        }
+        Update: {
+          aggregation_rule?: string
+          created_at?: string
+          id?: string
+          message_id?: string
+          organisation_id?: string | null
+          parsed_row_count?: number
+          received_at?: string
+          report_month?: number
+          report_year?: number
+          sender?: string
+          source_hash?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_kpi_profit_email_sources_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sales_kpi_targets: {
         Row: {
           created_at: string
@@ -1050,6 +1103,22 @@ export type Database = {
     Functions: {
       has_pins_hub_access: {
         Args: { required_access_level?: string }
+        Returns: boolean
+      }
+      ingest_epcc_monthly_profit: {
+        Args: {
+          p_aggregation_rule: string
+          p_message_id: string
+          p_month: number
+          p_monthly_profit: number
+          p_organisation_id: string | null
+          p_parsed_row_count: number
+          p_received_at: string
+          p_sender: string
+          p_source_hash: string
+          p_subject: string
+          p_year: number
+        }
         Returns: boolean
       }
       is_organisation_member: {
