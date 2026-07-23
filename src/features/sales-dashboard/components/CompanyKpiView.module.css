@@ -1,0 +1,21 @@
+.grid {
+  display: grid;
+  align-items: stretch;
+  gap: 0.625rem;
+}
+
+.left,
+.right {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 0.625rem;
+}
+
+.left > * { height: 100%; }
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.4fr);
+  }
+}

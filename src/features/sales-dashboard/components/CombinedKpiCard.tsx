@@ -1,8 +1,9 @@
 "use client";
 
 import { BentoPanel } from "@/components/ui/BentoPanel";
+import { BulletChart } from "metricui";
 import type { MetricResult } from "../domain/types";
-import { formatPercentagePoints, previousYearComparisonState, targetState } from "../lib/metricDisplay";
+import { formatPercentagePoints, previousYearComparisonState, targetBullet } from "../lib/metricDisplay";
 import styles from "./CombinedKpiCard.module.css";
 
 function value(metric: MetricResult) {
@@ -13,9 +14,10 @@ function value(metric: MetricResult) {
 }
 
 function target(metric: MetricResult) {
-  if (metric.target === null || metric.targetProgress === null) return null;
+  const bullet = targetBullet(metric.value, metric.target);
+  if (metric.target === null || metric.targetProgress === null || !bullet) return null;
   const display = metric.format === "percent" ? formatPercentagePoints(metric.target) : metric.target.toLocaleString("en-GB");
-  return { display, progress: Math.min(100, Math.max(0, metric.targetProgress)), state: targetState(metric.value, metric.target) };
+  return { display, progress: metric.targetProgress, bullet };
 }
 
 function comparison(metric: MetricResult) {
@@ -36,9 +38,27 @@ function KpiSection({ metric, divided }: { metric: MetricResult; divided?: boole
       {metricTarget ? (
         <div className={styles.target}>
           <div className={styles.targetRow}><span>Target {metricTarget.display}</span><span>{metric.targetProgress?.toFixed(1)}%</span></div>
-          <div className={styles.track} role="progressbar" aria-label={`${metric.label} target progress`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={metricTarget.progress}>
-            <span className={metricTarget.state === "target-met" ? styles.targetMet : styles.fill} style={{ width: `${metricTarget.progress}%` }} />
-          </div>
+          <BulletChart
+            data={[{
+              id: metric.code,
+              title: null,
+              ranges: [metricTarget.bullet.max],
+              measures: [metricTarget.bullet.value],
+              markers: [metricTarget.bullet.target],
+            }]}
+            format={metric.format === "percent" ? { style: "percent", precision: 1 } : { style: "number", compact: false, precision: 0 }}
+            height={28}
+            layout="horizontal"
+            spacing={0}
+            rangeColors={["hsl(var(--border))"]}
+            measureColors={[metricTarget.bullet.measureColor]}
+            markerColors={["hsl(var(--foreground))"]}
+            measureSize={0.5}
+            markerSize={0.85}
+            showAxis={false}
+            animate
+            className={styles.bullet}
+          />
         </div>
       ) : null}
       {typeof metricComparison === "string" ? (
@@ -57,11 +77,11 @@ function KpiSection({ metric, divided }: { metric: MetricResult; divided?: boole
   );
 }
 
-export function CombinedKpiCard({ title, first, second }: { title: string; first: MetricResult; second: MetricResult }) {
+export function CombinedKpiCard({ title, first, second }: { title?: string; first: MetricResult; second: MetricResult }) {
   return (
     <BentoPanel className={styles.card} glow>
-      <h2 className={styles.title}>{title}</h2>
-      <div className={styles.sections}>
+      {title ? <h2 className={styles.title}>{title}</h2> : null}
+      <div className={title ? styles.sections : styles.sectionsWithoutTitle}>
         <KpiSection metric={first} />
         <KpiSection metric={second} divided />
       </div>

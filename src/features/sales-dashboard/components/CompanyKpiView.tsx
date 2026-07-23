@@ -6,6 +6,7 @@ import { CombinedKpiCard } from "./CombinedKpiCard";
 import { LiveStatus } from "./LiveStatus";
 import { ProfitShirtKpi } from "./ProfitShirtKpi";
 import { SalesInboxKpi } from "./SalesInboxKpi";
+import styles from "./CompanyKpiView.module.css";
 
 function metricByCode(metrics: MetricResult[], code: MetricResult["code"]) {
   const metric = metrics.find((candidate) => candidate.code === code);
@@ -44,11 +45,15 @@ export function CompanyKpiView({ current, previous, targets }: { current: Compan
   return (
     <div className="grid gap-2.5">
       {isCurrentMondayPeriod ? <LiveStatus /> : null}
-      <div className="grid items-stretch gap-2.5 lg:grid-cols-2">
-        <div className="min-w-0 h-full"><ProfitShirtKpi metric={profit} /></div>
-        <div className="min-w-0 h-full"><CombinedKpiCard title="Quotes & Orders" first={quotes} second={orders} /></div>
-        <div className="min-w-0 h-full"><SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} /></div>
-        <div className="min-w-0 h-full"><CombinedKpiCard title="Conversion" first={convertedMetric(current, previous)} second={conversion} /></div>
+      <div className={styles.grid}>
+        <div className={styles.left}>
+          <ProfitShirtKpi metric={profit} />
+        </div>
+        <div className={styles.right}>
+          <CombinedKpiCard first={quotes} second={orders} />
+          <CombinedKpiCard first={convertedMetric(current, previous)} second={conversion} />
+          <SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} />
+        </div>
       </div>
     </div>
   );

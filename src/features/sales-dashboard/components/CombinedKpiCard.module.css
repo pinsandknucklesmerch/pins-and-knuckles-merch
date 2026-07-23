@@ -1,6 +1,5 @@
 .card {
   display: flex;
-  min-height: 278px;
   flex-direction: column;
   padding: 0.875rem;
 }
@@ -20,9 +19,15 @@
   display: grid;
   align-items: start;
   min-height: 0;
-  flex: 1;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   margin-top: 0.75rem;
+}
+
+.sectionsWithoutTitle {
+  display: grid;
+  align-items: start;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
 .section,
@@ -62,18 +67,7 @@
   line-height: 1rem;
 }
 
-.track {
-  height: 0.25rem;
-  margin-top: 0.25rem;
-  overflow: hidden;
-  border-radius: 999px;
-  background: hsl(var(--border));
-}
-
-.fill,
-.targetMet { display: block; height: 100%; border-radius: inherit; }
-.fill { background: hsl(var(--primary)); }
-.targetMet { background: #6fc49a; }
+.bullet { margin-top: -0.25rem; }
 
 .comparison,
 .reference { margin-top: 0.125rem; }
@@ -85,7 +79,8 @@
 
 @media (max-width: 639px) {
   .card { min-height: 0; }
-  .sections { grid-template-columns: minmax(0, 1fr); gap: 0.875rem; }
+  .sections,
+  .sectionsWithoutTitle { grid-template-columns: minmax(0, 1fr); gap: 0.875rem; }
   .section { padding-right: 0; }
   .divided { border-top: 1px solid hsl(var(--border) / 0.8); border-left: 0; padding-top: 0.875rem; padding-left: 0; }
   .comparison,

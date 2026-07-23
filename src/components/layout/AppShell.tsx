@@ -15,7 +15,7 @@ export async function AppShell({ children }: AppShellProps) {
   }
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
+    <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
       <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
         <Galaxy mouseRepulsion={false} mouseInteraction={false} density={0.7} glowIntensity={0.16} saturation={0} hueShift={140} twinkleIntensity={0.15} rotationSpeed={0.03} starSpeed={0.2} speed={0.4} transparent />
       </div>
