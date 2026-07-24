@@ -848,52 +848,64 @@ export type Database = {
           },
         ]
       }
-      sales_kpi_profit_email_sources: {
+      sales_kpi_profit_email_ingestions: {
         Row: {
-          aggregation_rule: string
-          created_at: string
+          gmail_message_id: string
           id: string
-          message_id: string
-          organisation_id: string | null
-          parsed_row_count: number
+          organisation_id: string
+          outcome: string
+          processed_at: string
           received_at: string
+          report_end: string
           report_month: number
+          report_start: string
           report_year: number
           sender: string
           source_hash: string
           subject: string
+          total_pk_tax: number
+          total_profit: number
+          total_sales: number
         }
         Insert: {
-          aggregation_rule: string
-          created_at?: string
+          gmail_message_id: string
           id?: string
-          message_id: string
-          organisation_id?: string | null
-          parsed_row_count: number
+          organisation_id: string
+          outcome?: string
+          processed_at?: string
           received_at: string
+          report_end: string
           report_month: number
+          report_start: string
           report_year: number
           sender: string
           source_hash: string
           subject: string
+          total_pk_tax: number
+          total_profit: number
+          total_sales: number
         }
         Update: {
-          aggregation_rule?: string
-          created_at?: string
+          gmail_message_id?: string
           id?: string
-          message_id?: string
-          organisation_id?: string | null
-          parsed_row_count?: number
+          organisation_id?: string
+          outcome?: string
+          processed_at?: string
           received_at?: string
+          report_end?: string
           report_month?: number
+          report_start?: string
           report_year?: number
           sender?: string
           source_hash?: string
           subject?: string
+          total_pk_tax?: number
+          total_profit?: number
+          total_sales?: number
         }
         Relationships: [
           {
-            foreignKeyName: "sales_kpi_profit_email_sources_organisation_id_fkey"
+            foreignKeyName: "sales_kpi_profit_email_ingestions_organisation_id_fkey"
             columns: ["organisation_id"]
             isOneToOne: false
             referencedRelation: "organisations"
@@ -1107,19 +1119,21 @@ export type Database = {
       }
       ingest_epcc_monthly_profit: {
         Args: {
-          p_aggregation_rule: string
           p_message_id: string
           p_month: number
-          p_monthly_profit: number
-          p_organisation_id: string | null
-          p_parsed_row_count: number
+          p_organisation_id: string
           p_received_at: string
+          p_report_end: string
+          p_report_start: string
           p_sender: string
           p_source_hash: string
           p_subject: string
+          p_total_pk_tax: number
+          p_total_profit: number
+          p_total_sales: number
           p_year: number
         }
-        Returns: boolean
+        Returns: string
       }
       is_organisation_member: {
         Args: { target_organisation_id: string }

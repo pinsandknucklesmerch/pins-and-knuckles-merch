@@ -1,39 +1,79 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { parseEpccProfitEmail, EPCC_PROFIT_SUBJECT } from "../lib/epccProfitEmail.ts";
 import { parseEpccProfitImportArgs } from "../import-epcc-profit-email.ts";
+import { isEpccAuthoritativePeriod, parseEpccProfitEmail, type EpccProfitEmailReport } from "../lib/epccProfitEmail.ts";
+import { runEpccProfitIngestion, type EpccProfitStore } from "../../src/features/sales-dashboard/server/epccProfitImporter.ts";
 
-const fixturePath = "docs/imports/epcc-profit-email/fixtures/Pins Knuckles Profits V2 ALL SALES.eml";
+const fixturePath = "scripts/tests/fixtures/epcc-profit-report.eml";
+const fixture = () => readFile(fixturePath, "utf8");
 
-async function fixture() {
-  const eml = await readFile(fixturePath, "utf8");
-  return eml.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, (address) => /netsuite\.com$/i.test(address) ? address : "redacted@example.test");
-}
-
-test("parses item-level EPCC rows and excludes sales-rep summary rows", async () => {
+test("parses the final overall Total row and ignores salesperson subtotals", async () => {
   const report = parseEpccProfitEmail(await fixture());
-  assert.equal(report.subject, EPCC_PROFIT_SUBJECT);
-  assert.equal(report.reportPeriod.year, 2026);
-  assert.equal(report.reportPeriod.month, 7);
-  assert.equal(report.parsedRowCount, 319);
-  assert.equal(report.monthlyProfit, 91571.84);
-  assert.equal(report.numericErrors.length, 0);
-  assert.ok(report.transactions.some((row) => row.transactionType === "Credit Memo" && row.total < 0 && row.profitTotal === null));
-  assert.equal(report.transactions.filter((row) => row.num === "Inv69198").length, 6);
-  assert.match(report.aggregationRule, /repeated Num values are retained/);
+  assert.deepEqual({ sales: report.totalSales, profit: report.monthlyProfit, tax: report.totalPkTax }, {
+    sales: 192581.71, profit: 93853.79, tax: 2353.60,
+  });
+  assert.deepEqual(report.reportPeriod, { year: 2026, month: 7 });
+  assert.equal(report.reportStart, "2026-07-01");
+  assert.equal(report.reportEnd, "2026-07-31");
 });
 
-test("rejects invalid source validation inputs deterministically", async () => {
+test("parses a base64 multipart Gmail message", async () => {
+  const body = "1 July 2026 - 31 July 2026\nTotal £192,581.71 93,853.79 2,353.60";
+  const eml = `From: system@sent-via.netsuite.com\nSubject: Pins Knuckles Profits V2 ALL SALES\nDate: Fri, 24 Jul 2026 09:00:00 +0100\nMessage-ID: <multipart@example.test>\nContent-Type: multipart/alternative; boundary="report"\n\n--report\nContent-Type: text/plain; charset=utf-8\nContent-Transfer-Encoding: base64\n\n${Buffer.from(body).toString("base64")}\n--report--`;
+  assert.equal(parseEpccProfitEmail(eml).monthlyProfit, 93853.79);
+});
+
+test("rejects malformed totals and reports before July 2026", async () => {
   const eml = await fixture();
-  assert.throws(() => parseEpccProfitEmail(eml.replace(EPCC_PROFIT_SUBJECT, "Unexpected report")), /Unexpected subject/);
-  assert.throws(() => parseEpccProfitEmail(eml.replace('rawvalue=3D"182.6"', 'rawvalue=3D"not-a-number"')), /numeric parsing errors/);
-  assert.throws(() => parseEpccProfitEmail(eml.replace(/Profit Total<\/td=\r?\n>/, "Missing Profit</td=\r\n>")), /columns are missing/);
-  assert.throws(() => parseEpccProfitEmail(eml.replace(">1/7/2026</td>", ">1/8/2026</td>")), /exactly one report month/);
+  assert.throws(() => parseEpccProfitEmail(eml.replace("93,853.79", "not-money")), /malformed/);
+  assert.throws(() => parseEpccProfitEmail(eml.replaceAll("July", "June")), /before July 2026/);
+  assert.equal(isEpccAuthoritativePeriod(2026, 6), false);
+  assert.equal(isEpccAuthoritativePeriod(2026, 7), true);
+  assert.equal(isEpccAuthoritativePeriod(2027, 1), true);
 });
 
-test("requires an organisation and local EML input while remaining dry-run by default", () => {
-  assert.deepEqual(parseEpccProfitImportArgs(["--organisation-id", "global", "--input", fixturePath]), { organisationId: null, input: fixturePath, apply: false });
-  assert.throws(() => parseEpccProfitImportArgs(["--input", fixturePath]), /organisation-id is required/);
-  assert.throws(() => parseEpccProfitImportArgs(["--organisation-id", "global"]), /input must point/);
+test("CLI is dry-run by default and accepts report filters", () => {
+  assert.deepEqual(parseEpccProfitImportArgs(["--message-id", "abc", "--year", "2026", "--month", "7"]), {
+    apply: false, messageId: "abc", year: 2026, month: 7,
+  });
+  assert.equal(parseEpccProfitImportArgs(["--apply"]).apply, true);
+});
+
+test("dry-run does not write", async () => {
+  let writes = 0;
+  const raw = await fixture();
+  const result = await runEpccProfitIngestion({ apply: false }, {
+    gmail: { findMessages: async () => [{ id: "dry-run", receivedAt: "2026-07-24T08:00:00.000Z", raw }] },
+    store: { ingest: async () => { writes += 1; return "applied"; } },
+  });
+  assert.equal(result.outcome, "dry-run");
+  assert.equal(writes, 0);
+});
+
+test("same message is idempotent, older cannot overwrite, and newer preserves Monday metrics", async () => {
+  const raw = await fixture();
+  const monthlyRow = { monthly_profit: 100, monthly_profit_source: "monday", quotes_done: 12, orders_processed: 8, sales_inbox_enquiries: 30, converted: 7, data_source: "monday" };
+  const seen = new Set<string>();
+  let latest = "";
+  const store: EpccProfitStore = {
+    async ingest(report: EpccProfitEmailReport) {
+      if (seen.has(report.messageId)) return "duplicate";
+      seen.add(report.messageId);
+      if (latest && report.receivedAt <= latest) return "older";
+      latest = report.receivedAt;
+      monthlyRow.monthly_profit = report.monthlyProfit;
+      monthlyRow.monthly_profit_source = "epcc_email";
+      return "applied";
+    },
+  };
+  const run = (id: string, receivedAt: string, profit = "93,853.79") => runEpccProfitIngestion({ apply: true }, {
+    gmail: { findMessages: async () => [{ id, receivedAt, raw: raw.replace("93,853.79", profit) }] }, store,
+  });
+  assert.equal((await run("new", "2026-07-24T09:00:00.000Z")).outcome, "applied");
+  assert.equal((await run("new", "2026-07-24T09:00:00.000Z")).outcome, "duplicate");
+  assert.equal((await run("old", "2026-07-23T09:00:00.000Z", "80,000.00")).outcome, "older");
+  assert.equal(monthlyRow.monthly_profit, 93853.79);
+  assert.equal((await run("newer", "2026-07-25T09:00:00.000Z", "95,000.00")).outcome, "applied");
+  assert.deepEqual(monthlyRow, { monthly_profit: 95000, monthly_profit_source: "epcc_email", quotes_done: 12, orders_processed: 8, sales_inbox_enquiries: 30, converted: 7, data_source: "monday" });
 });
