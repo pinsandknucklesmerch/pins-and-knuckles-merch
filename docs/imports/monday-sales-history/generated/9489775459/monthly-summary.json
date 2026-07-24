@@ -1,0 +1,406 @@
+{
+  "board": {
+    "id": "9489775459",
+    "name": "JULY 2025",
+    "inferredMonth": {
+      "year": 2025,
+      "month": 7,
+      "label": "JULY 2025"
+    }
+  },
+  "fetch": {
+    "totalItemsFetched": 296,
+    "includedWeeklyItems": 296,
+    "excludedItems": 0,
+    "deletedItems": "not returned by Monday item queries",
+    "inaccessibleItems": "not returned by Monday item queries",
+    "subitems": "not requested or included; Monday top-level item query only"
+  },
+  "scopes": {
+    "allLeads": {
+      "byBoardMembership": {
+        "totalLeadItems": 296,
+        "convertedItems": 177,
+        "conversionRate": 59.8,
+        "byAccountManager": [
+          {
+            "displayName": "Anthony Strauss",
+            "mondayUserIds": [
+              "15773637"
+            ],
+            "leads": 15,
+            "converted": 10,
+            "conversionRate": 66.7
+          },
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 55,
+            "converted": 29,
+            "conversionRate": 52.7
+          },
+          {
+            "displayName": "Catherine Strauss",
+            "mondayUserIds": [
+              "26567721"
+            ],
+            "leads": 1,
+            "converted": 0,
+            "conversionRate": 0
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 57,
+            "converted": 30,
+            "conversionRate": 52.6
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 74,
+            "converted": 57,
+            "conversionRate": 77
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 69,
+            "converted": 43,
+            "conversionRate": 62.3
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 23,
+            "converted": 7,
+            "conversionRate": 30.4
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "EU",
+            "leads": 11,
+            "converted": 5,
+            "conversionRate": 45.5
+          },
+          {
+            "displayLabel": "personal",
+            "leads": 216,
+            "converted": 148,
+            "conversionRate": 68.5
+          },
+          {
+            "displayLabel": "phone",
+            "leads": 1,
+            "converted": 1,
+            "conversionRate": 100
+          },
+          {
+            "displayLabel": "sales inbox",
+            "leads": 67,
+            "converted": 23,
+            "conversionRate": 34.3
+          },
+          {
+            "displayLabel": "social media",
+            "leads": 1,
+            "converted": 0,
+            "conversionRate": 0
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      },
+      "byValidDateInTouchMonth": {
+        "totalLeadItems": 296,
+        "convertedItems": 177,
+        "conversionRate": 59.8,
+        "byAccountManager": [
+          {
+            "displayName": "Anthony Strauss",
+            "mondayUserIds": [
+              "15773637"
+            ],
+            "leads": 15,
+            "converted": 10,
+            "conversionRate": 66.7
+          },
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 55,
+            "converted": 29,
+            "conversionRate": 52.7
+          },
+          {
+            "displayName": "Catherine Strauss",
+            "mondayUserIds": [
+              "26567721"
+            ],
+            "leads": 1,
+            "converted": 0,
+            "conversionRate": 0
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 57,
+            "converted": 30,
+            "conversionRate": 52.6
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 74,
+            "converted": 57,
+            "conversionRate": 77
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 69,
+            "converted": 43,
+            "conversionRate": 62.3
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 23,
+            "converted": 7,
+            "conversionRate": 30.4
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "EU",
+            "leads": 11,
+            "converted": 5,
+            "conversionRate": 45.5
+          },
+          {
+            "displayLabel": "personal",
+            "leads": 216,
+            "converted": 148,
+            "conversionRate": 68.5
+          },
+          {
+            "displayLabel": "phone",
+            "leads": 1,
+            "converted": 1,
+            "conversionRate": 100
+          },
+          {
+            "displayLabel": "sales inbox",
+            "leads": 67,
+            "converted": 23,
+            "conversionRate": 34.3
+          },
+          {
+            "displayLabel": "social media",
+            "leads": 1,
+            "converted": 0,
+            "conversionRate": 0
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      }
+    },
+    "salesInboxOnly": {
+      "byBoardMembership": {
+        "totalLeadItems": 67,
+        "convertedItems": 23,
+        "conversionRate": 34.3,
+        "byAccountManager": [
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 13,
+            "converted": 6,
+            "conversionRate": 46.2
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 24,
+            "converted": 8,
+            "conversionRate": 33.3
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 11,
+            "converted": 5,
+            "conversionRate": 45.5
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 2,
+            "converted": 2,
+            "conversionRate": 100
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 16,
+            "converted": 2,
+            "conversionRate": 12.5
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "sales inbox",
+            "leads": 67,
+            "converted": 23,
+            "conversionRate": 34.3
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      },
+      "byValidDateInTouchMonth": {
+        "totalLeadItems": 67,
+        "convertedItems": 23,
+        "conversionRate": 34.3,
+        "byAccountManager": [
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 13,
+            "converted": 6,
+            "conversionRate": 46.2
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 24,
+            "converted": 8,
+            "conversionRate": 33.3
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 11,
+            "converted": 5,
+            "conversionRate": 45.5
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 2,
+            "converted": 2,
+            "conversionRate": 100
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 16,
+            "converted": 2,
+            "conversionRate": 12.5
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "sales inbox",
+            "leads": 67,
+            "converted": 23,
+            "conversionRate": 34.3
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      }
+    }
+  },
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 0,
+    "validDateInTouchMonthCount": 296,
+    "multiManagerItemCount": 2,
+    "multiManagerConvertedCount": 1,
+    "excludedFromMemberMetricsCount": 2,
+    "blankAccountManagerItemCount": 0,
+    "blankChannelItemCount": 0
+  },
+  "excludedItems": [],
+  "missingDates": [],
+  "mismatchedDates": [],
+  "multiAccountManagers": [
+    {
+      "id": "9660864586",
+      "name": "Lame Daze",
+      "converted": false,
+      "accountManagers": [
+        {
+          "id": "26816626",
+          "name": "Bux",
+          "normalizedName": "bux"
+        },
+        {
+          "id": "14589471",
+          "name": "Johan",
+          "normalizedName": "johan"
+        }
+      ]
+    },
+    {
+      "id": "9683149591",
+      "name": "LucasLive",
+      "converted": true,
+      "accountManagers": [
+        {
+          "id": "23738460",
+          "name": "Deleted member",
+          "normalizedName": "deleted member"
+        },
+        {
+          "id": "29869326",
+          "name": "hardus",
+          "normalizedName": "hardus"
+        }
+      ]
+    }
+  ]
+}

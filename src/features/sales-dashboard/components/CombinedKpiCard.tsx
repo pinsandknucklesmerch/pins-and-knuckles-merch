@@ -1,7 +1,7 @@
 "use client";
 
 import { BentoPanel } from "@/components/ui/BentoPanel";
-import { BulletChart } from "metricui";
+import { BulletChart, CardShell, type DataRow } from "metricui";
 import type { MetricResult } from "../domain/types";
 import { formatPercentagePoints, previousYearComparisonState, targetBullet } from "../lib/metricDisplay";
 import { ComparisonBadge } from "./ComparisonBadge";
@@ -50,6 +50,7 @@ function KpiSection({ metric, divided, className }: { metric: MetricResult; divi
             markerSize={0.85}
             showAxis={false}
             animate
+            exportable={false}
             className={styles.bullet}
           />
         </div>
@@ -66,9 +67,10 @@ function KpiSection({ metric, divided, className }: { metric: MetricResult; divi
   );
 }
 
-export function CombinedKpiCard({ title, first, second, third, verticalAlign = "start" }: { title?: string; first: MetricResult; second?: MetricResult; third?: MetricResult; verticalAlign?: "start" | "center" }) {
+export function CombinedKpiCard({ title, first, second, third, exportData }: { title?: string; first: MetricResult; second?: MetricResult; third?: MetricResult; exportData: DataRow[] }) {
   return (
-    <BentoPanel className={`${styles.card} ${verticalAlign === "center" ? styles.centered : ""}`} glow>
+    <CardShell aiTitle={title ?? "Sales Performance"} bare className="sales-kpi-export !p-0" exportable={{ data: exportData }}>
+      <BentoPanel className={styles.card} glow>
       {title ? <h2 className={styles.title}>{title}</h2> : null}
       {third && second ? (
         <div className={`${title ? styles.sections : styles.sectionsWithoutTitle} ${styles.stackedSections}`}>
@@ -84,6 +86,7 @@ export function CombinedKpiCard({ title, first, second, third, verticalAlign = "
           {second ? <KpiSection metric={second} divided /> : null}
         </div>
       )}
-    </BentoPanel>
+      </BentoPanel>
+    </CardShell>
   );
 }

@@ -1,0 +1,16 @@
+{
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 0,
+    "validDateInTouchMonthCount": 255,
+    "multiManagerItemCount": 0,
+    "multiManagerConvertedCount": 0,
+    "excludedFromMemberMetricsCount": 0,
+    "blankAccountManagerItemCount": 0,
+    "blankChannelItemCount": 0
+  },
+  "missingDates": [],
+  "mismatchedDates": [],
+  "multiAccountManagers": [],
+  "dateScopeNote": "Board membership is authoritative for reporting. Date In Touch is a data-quality comparison only: mismatches remain in board totals, are excluded from valid-date comparison totals, and require review in Monday."
+}

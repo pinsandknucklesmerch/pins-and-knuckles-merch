@@ -5,6 +5,7 @@ import { LoadingState } from "@/components/ui/LoadingState";
 import { getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
 import { SalesDashboard } from "@/features/sales-dashboard/components/SalesDashboard";
 import { loadSalesDashboard } from "@/features/sales-dashboard/data/salesDashboardRepository";
+import { parseDashboardView } from "@/features/sales-dashboard/lib/dashboardView";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 function first(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
@@ -22,7 +23,8 @@ async function SalesDashboardPageContent({ searchParams }: Props) {
   const month = Number.isInteger(parsedMonth) && parsedMonth >= 1 && parsedMonth <= 12 ? parsedMonth : now.getMonth() + 1;
   const view = first(params.view) === "members" ? "members" : "company";
   const member = first(params.member);
+  const dashboardView = parseDashboardView(first(params.dashboardView));
   const isAdmin = access.access?.access_level === "admin";
   const data = await loadSalesDashboard(year, month, access.membership?.organisation_id ?? null, view, isAdmin);
-  return <AppShell><PageHeader title="Sales Dashboard" /><SalesDashboard data={data} year={year} month={month} view={view} member={member} isAdmin={isAdmin} /></AppShell>;
+  return <AppShell><PageHeader title="Sales Dashboard" /><SalesDashboard data={data} year={year} month={month} view={view} member={member} isAdmin={isAdmin} initialDashboardView={dashboardView} /></AppShell>;
 }

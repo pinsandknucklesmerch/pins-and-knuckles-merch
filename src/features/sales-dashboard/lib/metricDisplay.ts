@@ -1,5 +1,5 @@
 import type { FormatOption } from "metricui";
-import type { MetricResult } from "../domain/types";
+import type { MetricResult } from "../domain/types.ts";
 
 export const MONTHLY_PROFIT_TARGET = 155_000;
 

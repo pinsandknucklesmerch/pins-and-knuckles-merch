@@ -7,7 +7,7 @@ import { getSalesDashboardQueryPlan, type DashboardView } from "../lib/queryPlan
 
 type TargetInsert = Database["public"]["Tables"]["sales_kpi_targets"]["Insert"];
 const QUERY_TIMEOUT_MS = 10_000;
-const COMPANY_COLUMNS = "organisation_id,year,month,monthly_profit,quotes_done,orders_processed,sales_inbox_enquiries,converted,monday_sync_metadata,notes,data_source";
+const COMPANY_COLUMNS = "organisation_id,year,month,monthly_profit,monthly_profit_source,quotes_done,orders_processed,sales_inbox_enquiries,converted,monday_sync_metadata,notes,data_source";
 const MEMBER_COLUMNS = "organisation_id,year,month,team_member_key,team_member_name,quotes_done,orders_processed,sales_inbox_enquiries,converted,profit,data_source";
 const TARGET_COLUMNS = "organisation_id,metric_code,target_value,effective_from,effective_to,is_active";
 

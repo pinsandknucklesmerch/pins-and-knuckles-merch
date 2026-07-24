@@ -1,0 +1,389 @@
+{
+  "board": {
+    "id": "9723061329",
+    "name": "AUGUST 2025",
+    "inferredMonth": {
+      "year": 2025,
+      "month": 8,
+      "label": "AUGUST 2025"
+    }
+  },
+  "fetch": {
+    "totalItemsFetched": 293,
+    "includedWeeklyItems": 293,
+    "excludedItems": 0,
+    "deletedItems": "not returned by Monday item queries",
+    "inaccessibleItems": "not returned by Monday item queries",
+    "subitems": "not requested or included; Monday top-level item query only"
+  },
+  "scopes": {
+    "allLeads": {
+      "byBoardMembership": {
+        "totalLeadItems": 293,
+        "convertedItems": 200,
+        "conversionRate": 68.3,
+        "byAccountManager": [
+          {
+            "displayName": "Anthony Strauss",
+            "mondayUserIds": [
+              "15773637"
+            ],
+            "leads": 10,
+            "converted": 9,
+            "conversionRate": 90
+          },
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 61,
+            "converted": 33,
+            "conversionRate": 54.1
+          },
+          {
+            "displayName": "Catherine Strauss",
+            "mondayUserIds": [
+              "26567721"
+            ],
+            "leads": 1,
+            "converted": 1,
+            "conversionRate": 100
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 72,
+            "converted": 56,
+            "conversionRate": 77.8
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 55,
+            "converted": 36,
+            "conversionRate": 65.5
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 67,
+            "converted": 44,
+            "conversionRate": 65.7
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 26,
+            "converted": 20,
+            "conversionRate": 76.9
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "EU",
+            "leads": 5,
+            "converted": 0,
+            "conversionRate": 0
+          },
+          {
+            "displayLabel": "personal",
+            "leads": 201,
+            "converted": 152,
+            "conversionRate": 75.6
+          },
+          {
+            "displayLabel": "pins & knuckles store",
+            "leads": 5,
+            "converted": 5,
+            "conversionRate": 100
+          },
+          {
+            "displayLabel": "Reached Out",
+            "leads": 3,
+            "converted": 1,
+            "conversionRate": 33.3
+          },
+          {
+            "displayLabel": "sales inbox",
+            "leads": 79,
+            "converted": 42,
+            "conversionRate": 53.2
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      },
+      "byValidDateInTouchMonth": {
+        "totalLeadItems": 293,
+        "convertedItems": 200,
+        "conversionRate": 68.3,
+        "byAccountManager": [
+          {
+            "displayName": "Anthony Strauss",
+            "mondayUserIds": [
+              "15773637"
+            ],
+            "leads": 10,
+            "converted": 9,
+            "conversionRate": 90
+          },
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 61,
+            "converted": 33,
+            "conversionRate": 54.1
+          },
+          {
+            "displayName": "Catherine Strauss",
+            "mondayUserIds": [
+              "26567721"
+            ],
+            "leads": 1,
+            "converted": 1,
+            "conversionRate": 100
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 72,
+            "converted": 56,
+            "conversionRate": 77.8
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 55,
+            "converted": 36,
+            "conversionRate": 65.5
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 67,
+            "converted": 44,
+            "conversionRate": 65.7
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 26,
+            "converted": 20,
+            "conversionRate": 76.9
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "EU",
+            "leads": 5,
+            "converted": 0,
+            "conversionRate": 0
+          },
+          {
+            "displayLabel": "personal",
+            "leads": 201,
+            "converted": 152,
+            "conversionRate": 75.6
+          },
+          {
+            "displayLabel": "pins & knuckles store",
+            "leads": 5,
+            "converted": 5,
+            "conversionRate": 100
+          },
+          {
+            "displayLabel": "Reached Out",
+            "leads": 3,
+            "converted": 1,
+            "conversionRate": 33.3
+          },
+          {
+            "displayLabel": "sales inbox",
+            "leads": 79,
+            "converted": 42,
+            "conversionRate": 53.2
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      }
+    },
+    "salesInboxOnly": {
+      "byBoardMembership": {
+        "totalLeadItems": 79,
+        "convertedItems": 42,
+        "conversionRate": 53.2,
+        "byAccountManager": [
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 14,
+            "converted": 6,
+            "conversionRate": 42.9
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 31,
+            "converted": 19,
+            "conversionRate": 61.3
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 19,
+            "converted": 6,
+            "conversionRate": 31.6
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 1,
+            "converted": 0,
+            "conversionRate": 0
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 14,
+            "converted": 11,
+            "conversionRate": 78.6
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "sales inbox",
+            "leads": 79,
+            "converted": 42,
+            "conversionRate": 53.2
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      },
+      "byValidDateInTouchMonth": {
+        "totalLeadItems": 79,
+        "convertedItems": 42,
+        "conversionRate": 53.2,
+        "byAccountManager": [
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 14,
+            "converted": 6,
+            "conversionRate": 42.9
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 31,
+            "converted": 19,
+            "conversionRate": 61.3
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 19,
+            "converted": 6,
+            "conversionRate": 31.6
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 1,
+            "converted": 0,
+            "conversionRate": 0
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 14,
+            "converted": 11,
+            "conversionRate": 78.6
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "sales inbox",
+            "leads": 79,
+            "converted": 42,
+            "conversionRate": 53.2
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      }
+    }
+  },
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 0,
+    "validDateInTouchMonthCount": 293,
+    "multiManagerItemCount": 1,
+    "multiManagerConvertedCount": 1,
+    "excludedFromMemberMetricsCount": 1,
+    "blankAccountManagerItemCount": 0,
+    "blankChannelItemCount": 0
+  },
+  "excludedItems": [],
+  "missingDates": [],
+  "mismatchedDates": [],
+  "multiAccountManagers": [
+    {
+      "id": "9735316703",
+      "name": "Guillotine Records - Marauder",
+      "converted": true,
+      "accountManagers": [
+        {
+          "id": "29869326",
+          "name": "hardus",
+          "normalizedName": "hardus"
+        },
+        {
+          "id": "23738460",
+          "name": "Deleted member",
+          "normalizedName": "deleted member"
+        }
+      ]
+    }
+  ]
+}

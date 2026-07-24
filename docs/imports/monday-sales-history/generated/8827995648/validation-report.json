@@ -1,0 +1,51 @@
+{
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 0,
+    "validDateInTouchMonthCount": 272,
+    "multiManagerItemCount": 2,
+    "multiManagerConvertedCount": 1,
+    "excludedFromMemberMetricsCount": 2,
+    "blankAccountManagerItemCount": 0,
+    "blankChannelItemCount": 0
+  },
+  "missingDates": [],
+  "mismatchedDates": [],
+  "multiAccountManagers": [
+    {
+      "id": "8862202890",
+      "name": "Jamie Binnie",
+      "converted": false,
+      "accountManagers": [
+        {
+          "id": "29869326",
+          "name": "hardus",
+          "normalizedName": "hardus"
+        },
+        {
+          "id": "23738460",
+          "name": "Deleted member",
+          "normalizedName": "deleted member"
+        }
+      ]
+    },
+    {
+      "id": "8945706475",
+      "name": "40000 Leagues",
+      "converted": true,
+      "accountManagers": [
+        {
+          "id": "23738460",
+          "name": "Deleted member",
+          "normalizedName": "deleted member"
+        },
+        {
+          "id": "29869326",
+          "name": "hardus",
+          "normalizedName": "hardus"
+        }
+      ]
+    }
+  ],
+  "dateScopeNote": "Board membership is authoritative for reporting. Date In Touch is a data-quality comparison only: mismatches remain in board totals, are excluded from valid-date comparison totals, and require review in Monday."
+}

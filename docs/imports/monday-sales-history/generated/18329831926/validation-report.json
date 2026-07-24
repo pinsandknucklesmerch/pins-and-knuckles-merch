@@ -1,0 +1,28 @@
+{
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 1,
+    "validDateInTouchMonthCount": 203,
+    "multiManagerItemCount": 0,
+    "multiManagerConvertedCount": 0,
+    "excludedFromMemberMetricsCount": 0,
+    "blankAccountManagerItemCount": 0,
+    "blankChannelItemCount": 0
+  },
+  "missingDates": [],
+  "mismatchedDates": [
+    {
+      "sourceBoardId": "18329831926",
+      "sourceBoardMonth": "NOVEMBER 2025",
+      "itemId": "18330440123",
+      "itemName": "Death Stranding - Manhead UK",
+      "group": "WEEK 1",
+      "actualDateInTouch": "2025-10-31",
+      "includedInBoardMembershipTotals": true,
+      "includedInValidDateTotals": false,
+      "action": "review-in-monday"
+    }
+  ],
+  "multiAccountManagers": [],
+  "dateScopeNote": "Board membership is authoritative for reporting. Date In Touch is a data-quality comparison only: mismatches remain in board totals, are excluded from valid-date comparison totals, and require review in Monday."
+}

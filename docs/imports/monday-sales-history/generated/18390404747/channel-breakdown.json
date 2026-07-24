@@ -1,0 +1,20 @@
+[
+  {
+    "displayLabel": "EU",
+    "leads": 9,
+    "converted": 6,
+    "conversionRate": 66.7
+  },
+  {
+    "displayLabel": "personal",
+    "leads": 55,
+    "converted": 44,
+    "conversionRate": 80
+  },
+  {
+    "displayLabel": "sales inbox",
+    "leads": 29,
+    "converted": 11,
+    "conversionRate": 37.9
+  }
+]

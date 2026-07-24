@@ -1,0 +1,56 @@
+[
+  {
+    "displayName": "Anthony Strauss",
+    "mondayUserIds": [
+      "15773637"
+    ],
+    "leads": 25,
+    "converted": 20,
+    "conversionRate": 80
+  },
+  {
+    "displayName": "Bux",
+    "mondayUserIds": [
+      "26816626"
+    ],
+    "leads": 61,
+    "converted": 33,
+    "conversionRate": 54.1
+  },
+  {
+    "displayName": "Deleted member",
+    "mondayUserIds": [
+      "23738460"
+    ],
+    "leads": 62,
+    "converted": 41,
+    "conversionRate": 66.1
+  },
+  {
+    "displayName": "hardus",
+    "mondayUserIds": [
+      "29869326"
+    ],
+    "leads": 63,
+    "converted": 37,
+    "conversionRate": 58.7
+  },
+  {
+    "displayName": "Johan",
+    "mondayUserIds": [
+      "14589471"
+    ],
+    "leads": 61,
+    "converted": 46,
+    "conversionRate": 75.4
+  },
+  {
+    "displayName": "Justin du Preez",
+    "mondayUserIds": [
+      "69507598"
+    ],
+    "leads": 15,
+    "converted": 11,
+    "conversionRate": 73.3
+  }
+]

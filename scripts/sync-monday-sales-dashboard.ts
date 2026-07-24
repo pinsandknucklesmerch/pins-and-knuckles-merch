@@ -1,18 +1,20 @@
 import { createClient } from "@supabase/supabase-js";
 import { pathToFileURL } from "node:url";
 import { MondayClient } from "./lib/monday/salesHistoryAudit.ts";
-import { syncMondaySalesDashboard, type MondaySnapshot } from "./lib/monday/salesDashboardSync.ts";
+import { mondaySalesWritePayload, syncMondaySalesDashboard, type MondaySnapshot } from "./lib/monday/salesDashboardSync.ts";
 
 function option(args: string[], name: string) { const index = args.indexOf(name); return index === -1 ? undefined : args[index + 1]; }
 function formatSupabaseError(error: { message?: string | null; code?: string | null; details?: string | null; hint?: string | null }) {
   return JSON.stringify({ message: error.message ?? null, code: error.code ?? null, details: error.details ?? null, hint: error.hint ?? null });
 }
-function parseArgs(args: string[]) {
+export function parseArgs(args: string[]) {
   const year = Number(option(args, "--year")); const monthValue = option(args, "--month"); const month = monthValue ? Number(monthValue) : undefined;
   if (!Number.isInteger(year) || year < 2020) throw new Error("--year must be a four-digit year.");
   if (month !== undefined && (!Number.isInteger(month) || month < 1 || month > 12)) throw new Error("--month must be between 1 and 12.");
   const apply = args.includes("--apply");
   if (apply && month === undefined) throw new Error("--apply requires --month; year-only mode is preview-only.");
+  if (apply && year !== 2025) throw new Error("Historical apply is restricted to --year 2025; 2026 data is preserved.");
+  if (apply && !args.includes("--force")) throw new Error("Historical apply requires --force after reviewing the dry-run audit.");
   const organisation = option(args, "--organisation-id") ?? "global";
   if (organisation !== "global" && !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(organisation)) throw new Error("--organisation-id must be a UUID or global.");
   return { year, months: month ? [month] : Array.from({ length: 12 }, (_, index) => index + 1), apply, force: args.includes("--force"), organisationId: organisation === "global" ? null : organisation };
@@ -38,8 +40,14 @@ export async function runMondaySalesDashboardSync(args = process.argv.slice(2)) 
   const outcomes = await syncMondaySalesDashboard({
     ...options, boards, existingMonths: existing, now: new Date(), inspectBoard: (boardId) => monday.inspectBoard(boardId),
     collectItems: (boardId) => monday.collectItems(boardId),
-    write: async (snapshot: MondaySnapshot) => {
-      const { error } = await database.from("sales_kpi_months").upsert(snapshot as never, { onConflict: "organisation_id,year,month" });
+    write: async (snapshot: MondaySnapshot, exists: boolean) => {
+      const payload = mondaySalesWritePayload(snapshot);
+      const query = exists
+        ? database.from("sales_kpi_months").update(payload as never).eq("year", snapshot.year).eq("month", snapshot.month)
+        : database.from("sales_kpi_months").insert(payload as never);
+      const { error } = options.organisationId === null
+        ? await query.is("organisation_id", null)
+        : await query.eq("organisation_id", options.organisationId);
       if (error) throw error;
     },
   });

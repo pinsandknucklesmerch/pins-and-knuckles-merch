@@ -23,6 +23,16 @@ export type MondaySnapshot = {
   };
 };
 
+/** A patch payload deliberately omits unavailable profit fields so existing values survive. */
+export function mondaySalesWritePayload(snapshot: MondaySnapshot) {
+  const { monthly_profit, monthly_profit_source, ...payload } = snapshot;
+  return {
+    ...payload,
+    ...(monthly_profit === undefined ? {} : { monthly_profit }),
+    ...(monthly_profit_source === undefined ? {} : { monthly_profit_source }),
+  };
+}
+
 export type SyncOutcome = {
   month: number;
   status: "inserted" | "updated" | "skipped" | "rejected" | "future" | "planned-insert" | "planned-update";
@@ -30,6 +40,15 @@ export type SyncOutcome = {
   snapshot?: MondaySnapshot;
   profitPreview?: ProfitTrackingAudit & { source: "monday" | "epcc_email"; willWrite: boolean; reason?: string };
   boardSelection?: { selectedBoardId: string; rejectedBoardIds: string[] };
+  audit?: {
+    resolvedWeeklyGroups: Array<{ id: string; title: string }>;
+    resolvedColumns: Record<string, string>;
+    validation: Record<string, number>;
+    missingDates: Array<Record<string, unknown>>;
+    mismatchedDates: Array<Record<string, unknown>>;
+    multiAccountManagers: Array<Record<string, unknown>>;
+    safety: { safe: boolean; reasons: string[] };
+  };
 };
 
 type SyncInput = {
@@ -44,7 +63,7 @@ type SyncInput = {
   force: boolean;
   apply: boolean;
   fetchedAt?: string;
-  write?: (snapshot: MondaySnapshot) => Promise<void>;
+  write?: (snapshot: MondaySnapshot, exists: boolean) => Promise<void>;
 };
 
 export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOutcome[]> {
@@ -67,7 +86,7 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
       continue;
     }
     const boardSelection = { selectedBoardId: String(entry.board.id), rejectedBoardIds: (entry.rejectedCandidates ?? []).map((candidate) => String(candidate.board.id)) };
-    if (period !== "current active month" && !input.force) {
+    if (input.apply && period !== "current active month" && !input.force) {
       outcomes.push({ month, status: "skipped", reason: "Historical month protected; use --force after review." });
       continue;
     }
@@ -82,6 +101,20 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
     const fetchedAt = input.fetchedAt ?? new Date().toISOString();
     const summary = summarizeMonthlySalesBoard(entry.board, collected.items, entry.structure?.resolvedColumns);
     const profitTracking = auditProfitTracking(entry.board, collected.items, fetchedAt);
+    const safetyReasons: string[] = [];
+    if (summary.validation.missingDateCount) safetyReasons.push(`${summary.validation.missingDateCount} weekly item(s) have no valid Date In Touch.`);
+    if (summary.validation.blankAccountManagerItemCount) safetyReasons.push(`${summary.validation.blankAccountManagerItemCount} weekly item(s) have no account manager.`);
+    if (summary.validation.blankChannelItemCount) safetyReasons.push(`${summary.validation.blankChannelItemCount} weekly item(s) have no channel.`);
+    if (profitTracking.excludedRows.some((row) => row.reason === "invalid-profit")) safetyReasons.push("Profit Tracking contains invalid profit values.");
+    const audit = {
+      resolvedWeeklyGroups: (entry.board.groups ?? []).filter((group) => /^week\s+[1-5]$/i.test(group.title)).map((group) => ({ id: String(group.id), title: group.title })),
+      resolvedColumns: entry.structure.resolvedColumns,
+      validation: summary.validation,
+      missingDates: summary.missingDates,
+      mismatchedDates: summary.mismatchedDates,
+      multiAccountManagers: summary.multiAccountManagers,
+      safety: { safe: safetyReasons.length === 0, reasons: safetyReasons },
+    };
     const willWriteMondayProfit = shouldWriteMondayProfit(input.year, month);
     const profitPreview = {
       ...profitTracking,
@@ -108,12 +141,16 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
     }
     const exists = input.existingMonths.has(month);
     if (!input.apply) {
-      outcomes.push({ month, status: exists ? "planned-update" : "planned-insert", snapshot, boardSelection, profitPreview });
+      outcomes.push({ month, status: exists ? "planned-update" : "planned-insert", snapshot, boardSelection, profitPreview, audit });
+      continue;
+    }
+    if (!audit.safety.safe) {
+      outcomes.push({ month, status: "rejected", reason: `Unsafe historical import: ${audit.safety.reasons.join(" ")}`, snapshot, boardSelection, profitPreview, audit });
       continue;
     }
     try {
-      await input.write?.(snapshot);
-      outcomes.push({ month, status: exists ? "updated" : "inserted", snapshot, boardSelection, profitPreview });
+      await input.write?.(snapshot, exists);
+      outcomes.push({ month, status: exists ? "updated" : "inserted", snapshot, boardSelection, profitPreview, audit });
     } catch {
       outcomes.push({ month, status: "rejected", reason: "Supabase write failed." });
     }

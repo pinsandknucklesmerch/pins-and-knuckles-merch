@@ -4,7 +4,8 @@ import { readFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import test from "node:test";
 
-import { syncMondaySalesDashboard } from "../lib/monday/salesDashboardSync.ts";
+import { mondaySalesWritePayload, syncMondaySalesDashboard } from "../lib/monday/salesDashboardSync.ts";
+import { parseArgs } from "../sync-monday-sales-dashboard.ts";
 
 const board = (name = "JULY 2026", id = "board-1") => ({
   id, name, state: "active", board_kind: "public",
@@ -42,6 +43,23 @@ test("forced January through June syncs Monday profit without changing lead or c
   assert.equal(outcome.snapshot?.monthly_profit_source, "monday");
   assert.deepEqual([outcome.snapshot?.quotes_done, outcome.snapshot?.orders_processed, outcome.snapshot?.sales_inbox_enquiries, outcome.snapshot?.converted], [2, 1, 1, 1]);
   assert.equal(outcome.profitPreview?.willWrite, true);
+});
+
+test("missing Profit Tracking creates a metrics patch that preserves existing profit and source", async () => {
+  const outcome = (await syncMondaySalesDashboard({ ...base, year: 2025, months: [1], boards: [board("JANUARY 2025")], inspectBoard: async () => board("JANUARY 2025"), now: new Date("2026-07-21T00:00:00Z"), force: true, apply: false }))[0];
+  const payload = mondaySalesWritePayload(outcome.snapshot!);
+  assert.equal("monthly_profit" in payload, false);
+  assert.equal("monthly_profit_source" in payload, false);
+  assert.deepEqual([payload.quotes_done, payload.orders_processed, payload.sales_inbox_enquiries, payload.converted], [2, 1, 1, 1]);
+});
+
+test("valid Profit Tracking includes both profit fields in the metrics patch", async () => {
+  const juneBoard = { ...board("JUNE 2025"), groups: [{ id: "week", title: "WEEK 1" }, { id: "profit", title: "Profit Tracking" }], columns: [...board().columns, { id: "profit_value", title: "Profit", type: "numbers" }] };
+  const juneItems = [...items, { id: "profit-1", name: "Week 1", group: { id: "profit", title: "Profit Tracking" }, column_values: [{ id: "profit_value", text: "1234.56", value: "1234.56" }] }];
+  const outcome = (await syncMondaySalesDashboard({ ...base, year: 2025, months: [6], boards: [juneBoard], inspectBoard: async () => juneBoard, collectItems: async () => ({ items: juneItems }), now: new Date("2026-07-21T00:00:00Z"), force: true, apply: false }))[0];
+  const payload = mondaySalesWritePayload(outcome.snapshot!);
+  assert.deepEqual([payload.monthly_profit, payload.monthly_profit_source], [1234.56, "monday"]);
+  assert.deepEqual([payload.quotes_done, payload.orders_processed, payload.sales_inbox_enquiries, payload.converted], [2, 1, 1, 1]);
 });
 
 test("January through July previews use the confirmed Scope A KPI mapping", async () => {
@@ -101,6 +119,42 @@ test("uses the canonical July duplicate decision and reports selected/rejected I
   const rejected = await syncMondaySalesDashboard({ ...base, boards: [alternate], inspectBoard: async () => alternate, apply: false });
   assert.equal(rejected[0].status, "rejected");
   assert.match(rejected[0].reason ?? "", /NO_WEEK_GROUP/);
+});
+
+test("2025 structures resolve semantic columns and include WEEK 5 without relying on 2026 IDs", async () => {
+  const historicalBoard = {
+    id: "2025-jan", name: "JANUARY 2025", state: "archived", board_kind: "public",
+    groups: [1, 2, 3, 4, 5].map((week) => ({ id: `old-week-${week}`, title: `Week ${week}` })),
+    columns: [
+      { id: "old-owner", title: "Account Manager", type: "people" },
+      { id: "old-source", title: "Lead Channel", type: "status", settings_str: '{"labels":{"1":"Sales Inbox"}}' },
+      { id: "old-contacted", title: "Contact Date", type: "date" },
+      { id: "old-won", title: "Conversion", type: "status", settings_str: '{"labels":{"1":"Yes"}}' },
+    ],
+  };
+  const historicalItems = [{ id: "week-five", name: "Week five lead", group: { id: "old-week-5", title: "Week 5" }, column_values: [{ id: "old-owner", text: "Alice", value: '{"personsAndTeams":[{"id":7,"kind":"person"}]}' }, { id: "old-source", text: "Sales Inbox" }, { id: "old-contacted", text: "2025-01-31" }, { id: "old-won", text: "Yes" }] }];
+  const outcome = (await syncMondaySalesDashboard({ ...base, year: 2025, months: [1], boards: [historicalBoard], inspectBoard: async () => historicalBoard, collectItems: async () => ({ items: historicalItems }), now: new Date("2026-07-21T00:00:00Z"), force: true, apply: false }))[0];
+  assert.equal(outcome.status, "planned-insert");
+  assert.deepEqual(outcome.audit?.resolvedWeeklyGroups, [1, 2, 3, 4, 5].map((week) => ({ id: `old-week-${week}`, title: `Week ${week}` })));
+  assert.deepEqual(outcome.audit?.resolvedColumns, { people: "old-owner", channel: "old-source", dateInTouch: "old-contacted", converted: "old-won" });
+  assert.deepEqual([outcome.snapshot?.quotes_done, outcome.snapshot?.orders_processed, outcome.snapshot?.sales_inbox_enquiries, outcome.snapshot?.converted], [1, 1, 1, 1]);
+});
+
+test("unsafe historical data remains previewable but cannot be applied", async () => {
+  let writes = 0;
+  const unsafeItems = [{ ...items[0], column_values: items[0].column_values.map((column) => column.id === "date8" ? { ...column, text: null } : column) }];
+  const outcome = (await syncMondaySalesDashboard({ ...base, year: 2025, months: [1], boards: [board("JANUARY 2025")], inspectBoard: async () => board("JANUARY 2025"), collectItems: async () => ({ items: unsafeItems }), now: new Date("2026-07-21T00:00:00Z"), force: true, apply: true, write: async () => { writes += 1; } }))[0];
+  assert.equal(outcome.status, "rejected");
+  assert.equal(outcome.audit?.safety.safe, false);
+  assert.match(outcome.reason ?? "", /Date In Touch/);
+  assert.equal(writes, 0);
+});
+
+test("historical CLI apply requires the explicit 2025 month and force gate", () => {
+  assert.throws(() => parseArgs(["--year", "2025", "--apply"]), /--month/);
+  assert.throws(() => parseArgs(["--year", "2025", "--month", "1", "--apply"]), /--force/);
+  assert.throws(() => parseArgs(["--year", "2026", "--month", "1", "--force", "--apply"]), /--year 2025/);
+  assert.deepEqual(parseArgs(["--year", "2025", "--month", "1", "--force", "--apply"]).months, [1]);
 });
 
 test("the CLI imports under plain Node and keeps the Monday token out of client modules", async () => {

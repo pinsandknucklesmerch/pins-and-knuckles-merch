@@ -63,9 +63,9 @@ test("Sales Inbox card uses the required semantic heading hierarchy", () => {
 
 test("Overview renders the two top cards before the full-width performance card", () => {
   const component = readFileSync(new URL("../components/CompanyKpiView.tsx", import.meta.url), "utf8");
-  const profitIndex = component.indexOf("<ProfitShirtKpi metric={profit} />");
-  const inboxIndex = component.indexOf("<SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} />");
-  const performanceIndex = component.indexOf("<CombinedKpiCard first={quotes} second={orders} third={conversion} verticalAlign=\"center\" />");
+  const profitIndex = component.indexOf("<ProfitShirtKpi metric={profit}");
+  const inboxIndex = component.indexOf("<SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion}");
+  const performanceIndex = component.indexOf("<CombinedKpiCard first={quotes} second={orders} third={conversion}");
 
   assert.match(component, /<MetricGrid columns=\{12\} gap=\{12\}>/);
   assert.ok(profitIndex >= 0 && profitIndex < inboxIndex);

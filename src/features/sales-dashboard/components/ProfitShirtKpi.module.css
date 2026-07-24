@@ -1,7 +1,9 @@
 .card {
-  display: flex;
-  flex-direction: column;
-  padding: 0.875rem;
+  display: grid;
+  height: 100%;
+  align-content: start;
+  gap: var(--sales-kpi-layer-gap);
+  padding: var(--sales-kpi-card-padding);
   text-align: center;
 }
 
@@ -16,7 +18,7 @@
 .shirt {
   display: flex;
   justify-content: center;
-  margin: 0.125rem 0 -0.375rem;
+  margin: -0.25rem 0 -0.375rem;
 }
 
 .value {
@@ -35,7 +37,7 @@
 
 .aboveTarget {
   align-self: center;
-  margin-top: 0.25rem;
+  justify-self: center;
   border: 1px solid hsl(var(--primary) / 0.55);
   border-radius: 999px;
   color: hsl(var(--foreground));
@@ -49,8 +51,8 @@
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
+  margin-top: calc(var(--sales-kpi-footer-gap) - var(--sales-kpi-layer-gap));
+  padding-top: var(--sales-kpi-footer-gap);
   border-top: 1px solid hsl(var(--border) / 0.8);
   color: hsl(var(--muted-foreground));
   font-size: 0.6875rem;

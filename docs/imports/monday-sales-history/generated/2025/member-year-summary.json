@@ -1,0 +1,507 @@
+[
+  {
+    "identity": "15773637",
+    "mondayUserIds": [
+      "15773637"
+    ],
+    "canonicalDisplayName": "Anthony Strauss",
+    "observedDisplayNames": [
+      "Anthony Strauss"
+    ],
+    "leads": 166,
+    "converted": 122,
+    "conversionRate": 73.5,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 25,
+        "converted": 20
+      },
+      {
+        "month": 2,
+        "leads": 10,
+        "converted": 5
+      },
+      {
+        "month": 3,
+        "leads": 16,
+        "converted": 12
+      },
+      {
+        "month": 4,
+        "leads": 14,
+        "converted": 12
+      },
+      {
+        "month": 5,
+        "leads": 10,
+        "converted": 7
+      },
+      {
+        "month": 6,
+        "leads": 11,
+        "converted": 8
+      },
+      {
+        "month": 7,
+        "leads": 15,
+        "converted": 10
+      },
+      {
+        "month": 8,
+        "leads": 10,
+        "converted": 9
+      },
+      {
+        "month": 9,
+        "leads": 23,
+        "converted": 18
+      },
+      {
+        "month": 10,
+        "leads": 20,
+        "converted": 13
+      },
+      {
+        "month": 11,
+        "leads": 9,
+        "converted": 7
+      },
+      {
+        "month": 12,
+        "leads": 3,
+        "converted": 1
+      }
+    ]
+  },
+  {
+    "identity": "26816626",
+    "mondayUserIds": [
+      "26816626"
+    ],
+    "canonicalDisplayName": "Bux",
+    "observedDisplayNames": [
+      "Bux"
+    ],
+    "leads": 559,
+    "converted": 295,
+    "conversionRate": 52.8,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 61,
+        "converted": 33
+      },
+      {
+        "month": 2,
+        "leads": 61,
+        "converted": 29
+      },
+      {
+        "month": 3,
+        "leads": 63,
+        "converted": 33
+      },
+      {
+        "month": 4,
+        "leads": 43,
+        "converted": 29
+      },
+      {
+        "month": 5,
+        "leads": 57,
+        "converted": 24
+      },
+      {
+        "month": 6,
+        "leads": 54,
+        "converted": 30
+      },
+      {
+        "month": 7,
+        "leads": 55,
+        "converted": 29
+      },
+      {
+        "month": 8,
+        "leads": 61,
+        "converted": 33
+      },
+      {
+        "month": 9,
+        "leads": 27,
+        "converted": 5
+      },
+      {
+        "month": 10,
+        "leads": 28,
+        "converted": 18
+      },
+      {
+        "month": 11,
+        "leads": 36,
+        "converted": 25
+      },
+      {
+        "month": 12,
+        "leads": 13,
+        "converted": 7
+      }
+    ]
+  },
+  {
+    "identity": "26567721",
+    "mondayUserIds": [
+      "26567721"
+    ],
+    "canonicalDisplayName": "Catherine Strauss",
+    "observedDisplayNames": [
+      "Catherine Strauss"
+    ],
+    "leads": 28,
+    "converted": 16,
+    "conversionRate": 57.1,
+    "monthly": [
+      {
+        "month": 2,
+        "leads": 3,
+        "converted": 1
+      },
+      {
+        "month": 4,
+        "leads": 8,
+        "converted": 4
+      },
+      {
+        "month": 5,
+        "leads": 1,
+        "converted": 1
+      },
+      {
+        "month": 7,
+        "leads": 1,
+        "converted": 0
+      },
+      {
+        "month": 8,
+        "leads": 1,
+        "converted": 1
+      },
+      {
+        "month": 9,
+        "leads": 1,
+        "converted": 1
+      },
+      {
+        "month": 10,
+        "leads": 4,
+        "converted": 3
+      },
+      {
+        "month": 11,
+        "leads": 9,
+        "converted": 5
+      }
+    ]
+  },
+  {
+    "identity": "23738460",
+    "mondayUserIds": [
+      "23738460"
+    ],
+    "canonicalDisplayName": "Deleted member",
+    "observedDisplayNames": [
+      "Deleted member"
+    ],
+    "leads": 683,
+    "converted": 401,
+    "conversionRate": 58.7,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 62,
+        "converted": 41
+      },
+      {
+        "month": 2,
+        "leads": 55,
+        "converted": 31
+      },
+      {
+        "month": 3,
+        "leads": 58,
+        "converted": 27
+      },
+      {
+        "month": 4,
+        "leads": 64,
+        "converted": 39
+      },
+      {
+        "month": 5,
+        "leads": 56,
+        "converted": 33
+      },
+      {
+        "month": 6,
+        "leads": 58,
+        "converted": 33
+      },
+      {
+        "month": 7,
+        "leads": 57,
+        "converted": 30
+      },
+      {
+        "month": 8,
+        "leads": 72,
+        "converted": 56
+      },
+      {
+        "month": 9,
+        "leads": 71,
+        "converted": 44
+      },
+      {
+        "month": 10,
+        "leads": 68,
+        "converted": 38
+      },
+      {
+        "month": 11,
+        "leads": 38,
+        "converted": 17
+      },
+      {
+        "month": 12,
+        "leads": 24,
+        "converted": 12
+      }
+    ]
+  },
+  {
+    "identity": "29869326",
+    "mondayUserIds": [
+      "29869326"
+    ],
+    "canonicalDisplayName": "hardus",
+    "observedDisplayNames": [
+      "hardus"
+    ],
+    "leads": 688,
+    "converted": 457,
+    "conversionRate": 66.4,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 63,
+        "converted": 37
+      },
+      {
+        "month": 2,
+        "leads": 64,
+        "converted": 39
+      },
+      {
+        "month": 3,
+        "leads": 72,
+        "converted": 39
+      },
+      {
+        "month": 4,
+        "leads": 47,
+        "converted": 35
+      },
+      {
+        "month": 5,
+        "leads": 68,
+        "converted": 51
+      },
+      {
+        "month": 6,
+        "leads": 68,
+        "converted": 46
+      },
+      {
+        "month": 7,
+        "leads": 74,
+        "converted": 57
+      },
+      {
+        "month": 8,
+        "leads": 55,
+        "converted": 36
+      },
+      {
+        "month": 9,
+        "leads": 61,
+        "converted": 42
+      },
+      {
+        "month": 10,
+        "leads": 68,
+        "converted": 45
+      },
+      {
+        "month": 11,
+        "leads": 42,
+        "converted": 26
+      },
+      {
+        "month": 12,
+        "leads": 6,
+        "converted": 4
+      }
+    ]
+  },
+  {
+    "identity": "14589471",
+    "mondayUserIds": [
+      "14589471"
+    ],
+    "canonicalDisplayName": "Johan",
+    "observedDisplayNames": [
+      "Johan"
+    ],
+    "leads": 735,
+    "converted": 517,
+    "conversionRate": 70.3,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 61,
+        "converted": 46
+      },
+      {
+        "month": 2,
+        "leads": 51,
+        "converted": 34
+      },
+      {
+        "month": 3,
+        "leads": 58,
+        "converted": 46
+      },
+      {
+        "month": 4,
+        "leads": 66,
+        "converted": 39
+      },
+      {
+        "month": 5,
+        "leads": 68,
+        "converted": 55
+      },
+      {
+        "month": 6,
+        "leads": 61,
+        "converted": 42
+      },
+      {
+        "month": 7,
+        "leads": 69,
+        "converted": 43
+      },
+      {
+        "month": 8,
+        "leads": 67,
+        "converted": 44
+      },
+      {
+        "month": 9,
+        "leads": 47,
+        "converted": 26
+      },
+      {
+        "month": 10,
+        "leads": 99,
+        "converted": 76
+      },
+      {
+        "month": 11,
+        "leads": 56,
+        "converted": 39
+      },
+      {
+        "month": 12,
+        "leads": 32,
+        "converted": 27
+      }
+    ]
+  },
+  {
+    "identity": "69507598",
+    "mondayUserIds": [
+      "69507598"
+    ],
+    "canonicalDisplayName": "Justin du Preez",
+    "observedDisplayNames": [
+      "Justin du Preez"
+    ],
+    "leads": 247,
+    "converted": 142,
+    "conversionRate": 57.5,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 15,
+        "converted": 11
+      },
+      {
+        "month": 2,
+        "leads": 6,
+        "converted": 5
+      },
+      {
+        "month": 3,
+        "leads": 7,
+        "converted": 1
+      },
+      {
+        "month": 4,
+        "leads": 28,
+        "converted": 14
+      },
+      {
+        "month": 5,
+        "leads": 41,
+        "converted": 27
+      },
+      {
+        "month": 6,
+        "leads": 14,
+        "converted": 9
+      },
+      {
+        "month": 7,
+        "leads": 23,
+        "converted": 7
+      },
+      {
+        "month": 8,
+        "leads": 26,
+        "converted": 20
+      },
+      {
+        "month": 9,
+        "leads": 25,
+        "converted": 16
+      },
+      {
+        "month": 10,
+        "leads": 33,
+        "converted": 11
+      },
+      {
+        "month": 11,
+        "leads": 14,
+        "converted": 11
+      },
+      {
+        "month": 12,
+        "leads": 15,
+        "converted": 10
+      }
+    ]
+  }
+]

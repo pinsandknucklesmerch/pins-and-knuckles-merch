@@ -1,0 +1,57 @@
+{
+  "validation": {
+    "missingDateCount": 2,
+    "mismatchedDateCount": 1,
+    "validDateInTouchMonthCount": 249,
+    "multiManagerItemCount": 1,
+    "multiManagerConvertedCount": 1,
+    "excludedFromMemberMetricsCount": 1,
+    "blankAccountManagerItemCount": 1,
+    "blankChannelItemCount": 1
+  },
+  "missingDates": [
+    {
+      "id": "8539217956",
+      "name": "2 Promoters, 1 Pod",
+      "group": "WEEK 1"
+    },
+    {
+      "id": "8740965862",
+      "name": "Grizz Phys",
+      "group": "WEEK 1"
+    }
+  ],
+  "mismatchedDates": [
+    {
+      "sourceBoardId": "8383674020",
+      "sourceBoardMonth": "FEBRUARY 2025",
+      "itemId": "8369650444",
+      "itemName": "Moon Reaper",
+      "group": "WEEK 1",
+      "actualDateInTouch": "2025-01-31",
+      "includedInBoardMembershipTotals": true,
+      "includedInValidDateTotals": false,
+      "action": "review-in-monday"
+    }
+  ],
+  "multiAccountManagers": [
+    {
+      "id": "8495130402",
+      "name": "Evil Greed - Full Of Hell",
+      "converted": true,
+      "accountManagers": [
+        {
+          "id": "14589471",
+          "name": "Johan",
+          "normalizedName": "johan"
+        },
+        {
+          "id": "26816626",
+          "name": "Bux",
+          "normalizedName": "bux"
+        }
+      ]
+    }
+  ],
+  "dateScopeNote": "Board membership is authoritative for reporting. Date In Touch is a data-quality comparison only: mismatches remain in board totals, are excluded from valid-date comparison totals, and require review in Monday."
+}

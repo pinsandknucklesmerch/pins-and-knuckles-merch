@@ -1,0 +1,47 @@
+[
+  {
+    "displayName": "Bux",
+    "mondayUserIds": [
+      "26816626"
+    ],
+    "leads": 3,
+    "converted": 1,
+    "conversionRate": 33.3
+  },
+  {
+    "displayName": "Deleted member",
+    "mondayUserIds": [
+      "23738460"
+    ],
+    "leads": 17,
+    "converted": 5,
+    "conversionRate": 29.4
+  },
+  {
+    "displayName": "hardus",
+    "mondayUserIds": [
+      "29869326"
+    ],
+    "leads": 2,
+    "converted": 2,
+    "conversionRate": 100
+  },
+  {
+    "displayName": "Johan",
+    "mondayUserIds": [
+      "14589471"
+    ],
+    "leads": 4,
+    "converted": 3,
+    "conversionRate": 75
+  },
+  {
+    "displayName": "Justin du Preez",
+    "mondayUserIds": [
+      "69507598"
+    ],
+    "leads": 3,
+    "converted": 0,
+    "conversionRate": 0
+  }
+]

@@ -1,0 +1,329 @@
+{
+  "board": {
+    "id": "18390404747",
+    "name": "DECEMBER 2025",
+    "inferredMonth": {
+      "year": 2025,
+      "month": 12,
+      "label": "DECEMBER 2025"
+    }
+  },
+  "fetch": {
+    "totalItemsFetched": 93,
+    "includedWeeklyItems": 93,
+    "excludedItems": 0,
+    "deletedItems": "not returned by Monday item queries",
+    "inaccessibleItems": "not returned by Monday item queries",
+    "subitems": "not requested or included; Monday top-level item query only"
+  },
+  "scopes": {
+    "allLeads": {
+      "byBoardMembership": {
+        "totalLeadItems": 93,
+        "convertedItems": 61,
+        "conversionRate": 65.6,
+        "byAccountManager": [
+          {
+            "displayName": "Anthony Strauss",
+            "mondayUserIds": [
+              "15773637"
+            ],
+            "leads": 3,
+            "converted": 1,
+            "conversionRate": 33.3
+          },
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 13,
+            "converted": 7,
+            "conversionRate": 53.8
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 24,
+            "converted": 12,
+            "conversionRate": 50
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 6,
+            "converted": 4,
+            "conversionRate": 66.7
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 32,
+            "converted": 27,
+            "conversionRate": 84.4
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 15,
+            "converted": 10,
+            "conversionRate": 66.7
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "EU",
+            "leads": 9,
+            "converted": 6,
+            "conversionRate": 66.7
+          },
+          {
+            "displayLabel": "personal",
+            "leads": 55,
+            "converted": 44,
+            "conversionRate": 80
+          },
+          {
+            "displayLabel": "sales inbox",
+            "leads": 29,
+            "converted": 11,
+            "conversionRate": 37.9
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      },
+      "byValidDateInTouchMonth": {
+        "totalLeadItems": 93,
+        "convertedItems": 61,
+        "conversionRate": 65.6,
+        "byAccountManager": [
+          {
+            "displayName": "Anthony Strauss",
+            "mondayUserIds": [
+              "15773637"
+            ],
+            "leads": 3,
+            "converted": 1,
+            "conversionRate": 33.3
+          },
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 13,
+            "converted": 7,
+            "conversionRate": 53.8
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 24,
+            "converted": 12,
+            "conversionRate": 50
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 6,
+            "converted": 4,
+            "conversionRate": 66.7
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 32,
+            "converted": 27,
+            "conversionRate": 84.4
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 15,
+            "converted": 10,
+            "conversionRate": 66.7
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "EU",
+            "leads": 9,
+            "converted": 6,
+            "conversionRate": 66.7
+          },
+          {
+            "displayLabel": "personal",
+            "leads": 55,
+            "converted": 44,
+            "conversionRate": 80
+          },
+          {
+            "displayLabel": "sales inbox",
+            "leads": 29,
+            "converted": 11,
+            "conversionRate": 37.9
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      }
+    },
+    "salesInboxOnly": {
+      "byBoardMembership": {
+        "totalLeadItems": 29,
+        "convertedItems": 11,
+        "conversionRate": 37.9,
+        "byAccountManager": [
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 3,
+            "converted": 1,
+            "conversionRate": 33.3
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 17,
+            "converted": 5,
+            "conversionRate": 29.4
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 2,
+            "converted": 2,
+            "conversionRate": 100
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 4,
+            "converted": 3,
+            "conversionRate": 75
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 3,
+            "converted": 0,
+            "conversionRate": 0
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "sales inbox",
+            "leads": 29,
+            "converted": 11,
+            "conversionRate": 37.9
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      },
+      "byValidDateInTouchMonth": {
+        "totalLeadItems": 29,
+        "convertedItems": 11,
+        "conversionRate": 37.9,
+        "byAccountManager": [
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 3,
+            "converted": 1,
+            "conversionRate": 33.3
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 17,
+            "converted": 5,
+            "conversionRate": 29.4
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 2,
+            "converted": 2,
+            "conversionRate": 100
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 4,
+            "converted": 3,
+            "conversionRate": 75
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 3,
+            "converted": 0,
+            "conversionRate": 0
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "sales inbox",
+            "leads": 29,
+            "converted": 11,
+            "conversionRate": 37.9
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      }
+    }
+  },
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 0,
+    "validDateInTouchMonthCount": 93,
+    "multiManagerItemCount": 0,
+    "multiManagerConvertedCount": 0,
+    "excludedFromMemberMetricsCount": 0,
+    "blankAccountManagerItemCount": 0,
+    "blankChannelItemCount": 0
+  },
+  "excludedItems": [],
+  "missingDates": [],
+  "mismatchedDates": [],
+  "multiAccountManagers": []
+}

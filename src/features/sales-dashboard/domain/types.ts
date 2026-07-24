@@ -5,6 +5,7 @@ export type CompanyKpiMonth = {
   year: number;
   month: number;
   monthlyProfit: number | null;
+  monthlyProfitSource?: SalesKpiDataSource | null;
   quotesDone: number | null;
   ordersProcessed: number | null;
   salesInboxEnquiries: number | null;
@@ -78,6 +79,7 @@ export type MemberDashboardRow = TeamMemberKpiMonth & {
 
 export type SalesDashboardData = {
   company: CompanyKpiMonth;
+  companyYear: CompanyKpiMonth[];
   previousCompany: CompanyKpiMonth | null;
   members: MemberDashboardRow[];
   targets: SalesKpiTargets;

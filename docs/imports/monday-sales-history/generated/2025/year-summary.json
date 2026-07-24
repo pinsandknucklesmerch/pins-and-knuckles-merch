@@ -1,0 +1,1377 @@
+{
+  "generatedAt": "2026-07-23T15:17:38.091Z",
+  "year": 2025,
+  "reportingBasis": "board-membership",
+  "annual": {
+    "company": {
+      "leads": 3120,
+      "converted": 1959,
+      "conversionRate": 62.8,
+      "monthly": [
+        {
+          "month": 1,
+          "boardId": "8141656282",
+          "leads": 288,
+          "converted": 189,
+          "conversionRate": 65.6
+        },
+        {
+          "month": 2,
+          "boardId": "8383674020",
+          "leads": 252,
+          "converted": 145,
+          "conversionRate": 57.5
+        },
+        {
+          "month": 3,
+          "boardId": "8603896984",
+          "leads": 277,
+          "converted": 160,
+          "conversionRate": 57.8
+        },
+        {
+          "month": 4,
+          "boardId": "8827995648",
+          "leads": 272,
+          "converted": 173,
+          "conversionRate": 63.6
+        },
+        {
+          "month": 5,
+          "boardId": "9046160827",
+          "leads": 302,
+          "converted": 198,
+          "conversionRate": 65.6
+        },
+        {
+          "month": 6,
+          "boardId": "9277646661",
+          "leads": 267,
+          "converted": 169,
+          "conversionRate": 63.3
+        },
+        {
+          "month": 7,
+          "boardId": "9489775459",
+          "leads": 296,
+          "converted": 177,
+          "conversionRate": 59.8
+        },
+        {
+          "month": 8,
+          "boardId": "9723061329",
+          "leads": 293,
+          "converted": 200,
+          "conversionRate": 68.3
+        },
+        {
+          "month": 9,
+          "boardId": "9939962178",
+          "leads": 255,
+          "converted": 152,
+          "conversionRate": 59.6
+        },
+        {
+          "month": 10,
+          "boardId": "18083157900",
+          "leads": 321,
+          "converted": 205,
+          "conversionRate": 63.9
+        },
+        {
+          "month": 11,
+          "boardId": "18329831926",
+          "leads": 204,
+          "converted": 130,
+          "conversionRate": 63.7
+        },
+        {
+          "month": 12,
+          "boardId": "18390404747",
+          "leads": 93,
+          "converted": 61,
+          "conversionRate": 65.6
+        }
+      ]
+    },
+    "salesInbox": {
+      "leads": 808,
+      "converted": 321,
+      "conversionRate": 39.7,
+      "monthly": [
+        {
+          "month": 1,
+          "boardId": "8141656282",
+          "leads": 74,
+          "converted": 28,
+          "conversionRate": 37.8
+        },
+        {
+          "month": 2,
+          "boardId": "8383674020",
+          "leads": 80,
+          "converted": 34,
+          "conversionRate": 42.5
+        },
+        {
+          "month": 3,
+          "boardId": "8603896984",
+          "leads": 79,
+          "converted": 22,
+          "conversionRate": 27.8
+        },
+        {
+          "month": 4,
+          "boardId": "8827995648",
+          "leads": 81,
+          "converted": 36,
+          "conversionRate": 44.4
+        },
+        {
+          "month": 5,
+          "boardId": "9046160827",
+          "leads": 86,
+          "converted": 38,
+          "conversionRate": 44.2
+        },
+        {
+          "month": 6,
+          "boardId": "9277646661",
+          "leads": 49,
+          "converted": 24,
+          "conversionRate": 49
+        },
+        {
+          "month": 7,
+          "boardId": "9489775459",
+          "leads": 67,
+          "converted": 23,
+          "conversionRate": 34.3
+        },
+        {
+          "month": 8,
+          "boardId": "9723061329",
+          "leads": 79,
+          "converted": 42,
+          "conversionRate": 53.2
+        },
+        {
+          "month": 9,
+          "boardId": "9939962178",
+          "leads": 78,
+          "converted": 35,
+          "conversionRate": 44.9
+        },
+        {
+          "month": 10,
+          "boardId": "18083157900",
+          "leads": 67,
+          "converted": 17,
+          "conversionRate": 25.4
+        },
+        {
+          "month": 11,
+          "boardId": "18329831926",
+          "leads": 39,
+          "converted": 11,
+          "conversionRate": 28.2
+        },
+        {
+          "month": 12,
+          "boardId": "18390404747",
+          "leads": 29,
+          "converted": 11,
+          "conversionRate": 37.9
+        }
+      ]
+    },
+    "members": [
+      {
+        "identity": "15773637",
+        "mondayUserIds": [
+          "15773637"
+        ],
+        "canonicalDisplayName": "Anthony Strauss",
+        "observedDisplayNames": [
+          "Anthony Strauss"
+        ],
+        "leads": 166,
+        "converted": 122,
+        "conversionRate": 73.5,
+        "monthly": [
+          {
+            "month": 1,
+            "leads": 25,
+            "converted": 20
+          },
+          {
+            "month": 2,
+            "leads": 10,
+            "converted": 5
+          },
+          {
+            "month": 3,
+            "leads": 16,
+            "converted": 12
+          },
+          {
+            "month": 4,
+            "leads": 14,
+            "converted": 12
+          },
+          {
+            "month": 5,
+            "leads": 10,
+            "converted": 7
+          },
+          {
+            "month": 6,
+            "leads": 11,
+            "converted": 8
+          },
+          {
+            "month": 7,
+            "leads": 15,
+            "converted": 10
+          },
+          {
+            "month": 8,
+            "leads": 10,
+            "converted": 9
+          },
+          {
+            "month": 9,
+            "leads": 23,
+            "converted": 18
+          },
+          {
+            "month": 10,
+            "leads": 20,
+            "converted": 13
+          },
+          {
+            "month": 11,
+            "leads": 9,
+            "converted": 7
+          },
+          {
+            "month": 12,
+            "leads": 3,
+            "converted": 1
+          }
+        ]
+      },
+      {
+        "identity": "26816626",
+        "mondayUserIds": [
+          "26816626"
+        ],
+        "canonicalDisplayName": "Bux",
+        "observedDisplayNames": [
+          "Bux"
+        ],
+        "leads": 559,
+        "converted": 295,
+        "conversionRate": 52.8,
+        "monthly": [
+          {
+            "month": 1,
+            "leads": 61,
+            "converted": 33
+          },
+          {
+            "month": 2,
+            "leads": 61,
+            "converted": 29
+          },
+          {
+            "month": 3,
+            "leads": 63,
+            "converted": 33
+          },
+          {
+            "month": 4,
+            "leads": 43,
+            "converted": 29
+          },
+          {
+            "month": 5,
+            "leads": 57,
+            "converted": 24
+          },
+          {
+            "month": 6,
+            "leads": 54,
+            "converted": 30
+          },
+          {
+            "month": 7,
+            "leads": 55,
+            "converted": 29
+          },
+          {
+            "month": 8,
+            "leads": 61,
+            "converted": 33
+          },
+          {
+            "month": 9,
+            "leads": 27,
+            "converted": 5
+          },
+          {
+            "month": 10,
+            "leads": 28,
+            "converted": 18
+          },
+          {
+            "month": 11,
+            "leads": 36,
+            "converted": 25
+          },
+          {
+            "month": 12,
+            "leads": 13,
+            "converted": 7
+          }
+        ]
+      },
+      {
+        "identity": "26567721",
+        "mondayUserIds": [
+          "26567721"
+        ],
+        "canonicalDisplayName": "Catherine Strauss",
+        "observedDisplayNames": [
+          "Catherine Strauss"
+        ],
+        "leads": 28,
+        "converted": 16,
+        "conversionRate": 57.1,
+        "monthly": [
+          {
+            "month": 2,
+            "leads": 3,
+            "converted": 1
+          },
+          {
+            "month": 4,
+            "leads": 8,
+            "converted": 4
+          },
+          {
+            "month": 5,
+            "leads": 1,
+            "converted": 1
+          },
+          {
+            "month": 7,
+            "leads": 1,
+            "converted": 0
+          },
+          {
+            "month": 8,
+            "leads": 1,
+            "converted": 1
+          },
+          {
+            "month": 9,
+            "leads": 1,
+            "converted": 1
+          },
+          {
+            "month": 10,
+            "leads": 4,
+            "converted": 3
+          },
+          {
+            "month": 11,
+            "leads": 9,
+            "converted": 5
+          }
+        ]
+      },
+      {
+        "identity": "23738460",
+        "mondayUserIds": [
+          "23738460"
+        ],
+        "canonicalDisplayName": "Deleted member",
+        "observedDisplayNames": [
+          "Deleted member"
+        ],
+        "leads": 683,
+        "converted": 401,
+        "conversionRate": 58.7,
+        "monthly": [
+          {
+            "month": 1,
+            "leads": 62,
+            "converted": 41
+          },
+          {
+            "month": 2,
+            "leads": 55,
+            "converted": 31
+          },
+          {
+            "month": 3,
+            "leads": 58,
+            "converted": 27
+          },
+          {
+            "month": 4,
+            "leads": 64,
+            "converted": 39
+          },
+          {
+            "month": 5,
+            "leads": 56,
+            "converted": 33
+          },
+          {
+            "month": 6,
+            "leads": 58,
+            "converted": 33
+          },
+          {
+            "month": 7,
+            "leads": 57,
+            "converted": 30
+          },
+          {
+            "month": 8,
+            "leads": 72,
+            "converted": 56
+          },
+          {
+            "month": 9,
+            "leads": 71,
+            "converted": 44
+          },
+          {
+            "month": 10,
+            "leads": 68,
+            "converted": 38
+          },
+          {
+            "month": 11,
+            "leads": 38,
+            "converted": 17
+          },
+          {
+            "month": 12,
+            "leads": 24,
+            "converted": 12
+          }
+        ]
+      },
+      {
+        "identity": "29869326",
+        "mondayUserIds": [
+          "29869326"
+        ],
+        "canonicalDisplayName": "hardus",
+        "observedDisplayNames": [
+          "hardus"
+        ],
+        "leads": 688,
+        "converted": 457,
+        "conversionRate": 66.4,
+        "monthly": [
+          {
+            "month": 1,
+            "leads": 63,
+            "converted": 37
+          },
+          {
+            "month": 2,
+            "leads": 64,
+            "converted": 39
+          },
+          {
+            "month": 3,
+            "leads": 72,
+            "converted": 39
+          },
+          {
+            "month": 4,
+            "leads": 47,
+            "converted": 35
+          },
+          {
+            "month": 5,
+            "leads": 68,
+            "converted": 51
+          },
+          {
+            "month": 6,
+            "leads": 68,
+            "converted": 46
+          },
+          {
+            "month": 7,
+            "leads": 74,
+            "converted": 57
+          },
+          {
+            "month": 8,
+            "leads": 55,
+            "converted": 36
+          },
+          {
+            "month": 9,
+            "leads": 61,
+            "converted": 42
+          },
+          {
+            "month": 10,
+            "leads": 68,
+            "converted": 45
+          },
+          {
+            "month": 11,
+            "leads": 42,
+            "converted": 26
+          },
+          {
+            "month": 12,
+            "leads": 6,
+            "converted": 4
+          }
+        ]
+      },
+      {
+        "identity": "14589471",
+        "mondayUserIds": [
+          "14589471"
+        ],
+        "canonicalDisplayName": "Johan",
+        "observedDisplayNames": [
+          "Johan"
+        ],
+        "leads": 735,
+        "converted": 517,
+        "conversionRate": 70.3,
+        "monthly": [
+          {
+            "month": 1,
+            "leads": 61,
+            "converted": 46
+          },
+          {
+            "month": 2,
+            "leads": 51,
+            "converted": 34
+          },
+          {
+            "month": 3,
+            "leads": 58,
+            "converted": 46
+          },
+          {
+            "month": 4,
+            "leads": 66,
+            "converted": 39
+          },
+          {
+            "month": 5,
+            "leads": 68,
+            "converted": 55
+          },
+          {
+            "month": 6,
+            "leads": 61,
+            "converted": 42
+          },
+          {
+            "month": 7,
+            "leads": 69,
+            "converted": 43
+          },
+          {
+            "month": 8,
+            "leads": 67,
+            "converted": 44
+          },
+          {
+            "month": 9,
+            "leads": 47,
+            "converted": 26
+          },
+          {
+            "month": 10,
+            "leads": 99,
+            "converted": 76
+          },
+          {
+            "month": 11,
+            "leads": 56,
+            "converted": 39
+          },
+          {
+            "month": 12,
+            "leads": 32,
+            "converted": 27
+          }
+        ]
+      },
+      {
+        "identity": "69507598",
+        "mondayUserIds": [
+          "69507598"
+        ],
+        "canonicalDisplayName": "Justin du Preez",
+        "observedDisplayNames": [
+          "Justin du Preez"
+        ],
+        "leads": 247,
+        "converted": 142,
+        "conversionRate": 57.5,
+        "monthly": [
+          {
+            "month": 1,
+            "leads": 15,
+            "converted": 11
+          },
+          {
+            "month": 2,
+            "leads": 6,
+            "converted": 5
+          },
+          {
+            "month": 3,
+            "leads": 7,
+            "converted": 1
+          },
+          {
+            "month": 4,
+            "leads": 28,
+            "converted": 14
+          },
+          {
+            "month": 5,
+            "leads": 41,
+            "converted": 27
+          },
+          {
+            "month": 6,
+            "leads": 14,
+            "converted": 9
+          },
+          {
+            "month": 7,
+            "leads": 23,
+            "converted": 7
+          },
+          {
+            "month": 8,
+            "leads": 26,
+            "converted": 20
+          },
+          {
+            "month": 9,
+            "leads": 25,
+            "converted": 16
+          },
+          {
+            "month": 10,
+            "leads": 33,
+            "converted": 11
+          },
+          {
+            "month": 11,
+            "leads": 14,
+            "converted": 11
+          },
+          {
+            "month": 12,
+            "leads": 15,
+            "converted": 10
+          }
+        ]
+      }
+    ],
+    "channels": [
+      {
+        "channel": "EU",
+        "leads": 127,
+        "converted": 62,
+        "conversionRate": 48.8,
+        "monthly": [
+          {
+            "month": 1,
+            "leads": 12,
+            "converted": 8
+          },
+          {
+            "month": 2,
+            "leads": 14,
+            "converted": 7
+          },
+          {
+            "month": 3,
+            "leads": 14,
+            "converted": 10
+          },
+          {
+            "month": 4,
+            "leads": 8,
+            "converted": 4
+          },
+          {
+            "month": 5,
+            "leads": 8,
+            "converted": 6
+          },
+          {
+            "month": 6,
+            "leads": 13,
+            "converted": 5
+          },
+          {
+            "month": 7,
+            "leads": 11,
+            "converted": 5
+          },
+          {
+            "month": 8,
+            "leads": 5,
+            "converted": 0
+          },
+          {
+            "month": 9,
+            "leads": 7,
+            "converted": 1
+          },
+          {
+            "month": 10,
+            "leads": 15,
+            "converted": 5
+          },
+          {
+            "month": 11,
+            "leads": 11,
+            "converted": 5
+          },
+          {
+            "month": 12,
+            "leads": 9,
+            "converted": 6
+          }
+        ]
+      },
+      {
+        "channel": "personal",
+        "leads": 2136,
+        "converted": 1539,
+        "conversionRate": 72.1,
+        "monthly": [
+          {
+            "month": 1,
+            "leads": 198,
+            "converted": 149
+          },
+          {
+            "month": 2,
+            "leads": 155,
+            "converted": 102
+          },
+          {
+            "month": 3,
+            "leads": 179,
+            "converted": 124
+          },
+          {
+            "month": 4,
+            "leads": 165,
+            "converted": 122
+          },
+          {
+            "month": 5,
+            "leads": 208,
+            "converted": 154
+          },
+          {
+            "month": 6,
+            "leads": 205,
+            "converted": 140
+          },
+          {
+            "month": 7,
+            "leads": 216,
+            "converted": 148
+          },
+          {
+            "month": 8,
+            "leads": 201,
+            "converted": 152
+          },
+          {
+            "month": 9,
+            "leads": 165,
+            "converted": 111
+          },
+          {
+            "month": 10,
+            "leads": 237,
+            "converted": 181
+          },
+          {
+            "month": 11,
+            "leads": 152,
+            "converted": 112
+          },
+          {
+            "month": 12,
+            "leads": 55,
+            "converted": 44
+          }
+        ]
+      },
+      {
+        "channel": "phone",
+        "leads": 1,
+        "converted": 1,
+        "conversionRate": 100,
+        "monthly": [
+          {
+            "month": 7,
+            "leads": 1,
+            "converted": 1
+          }
+        ]
+      },
+      {
+        "channel": "pins & knuckles store",
+        "leads": 33,
+        "converted": 33,
+        "conversionRate": 100,
+        "monthly": [
+          {
+            "month": 1,
+            "leads": 4,
+            "converted": 4
+          },
+          {
+            "month": 2,
+            "leads": 2,
+            "converted": 2
+          },
+          {
+            "month": 3,
+            "leads": 4,
+            "converted": 4
+          },
+          {
+            "month": 4,
+            "leads": 9,
+            "converted": 9
+          },
+          {
+            "month": 8,
+            "leads": 5,
+            "converted": 5
+          },
+          {
+            "month": 9,
+            "leads": 5,
+            "converted": 5
+          },
+          {
+            "month": 10,
+            "leads": 2,
+            "converted": 2
+          },
+          {
+            "month": 11,
+            "leads": 2,
+            "converted": 2
+          }
+        ]
+      },
+      {
+        "channel": "Reached Out",
+        "leads": 11,
+        "converted": 3,
+        "conversionRate": 27.3,
+        "monthly": [
+          {
+            "month": 4,
+            "leads": 8,
+            "converted": 2
+          },
+          {
+            "month": 8,
+            "leads": 3,
+            "converted": 1
+          }
+        ]
+      },
+      {
+        "channel": "sales inbox",
+        "leads": 808,
+        "converted": 321,
+        "conversionRate": 39.7,
+        "monthly": [
+          {
+            "month": 1,
+            "leads": 74,
+            "converted": 28
+          },
+          {
+            "month": 2,
+            "leads": 80,
+            "converted": 34
+          },
+          {
+            "month": 3,
+            "leads": 79,
+            "converted": 22
+          },
+          {
+            "month": 4,
+            "leads": 81,
+            "converted": 36
+          },
+          {
+            "month": 5,
+            "leads": 86,
+            "converted": 38
+          },
+          {
+            "month": 6,
+            "leads": 49,
+            "converted": 24
+          },
+          {
+            "month": 7,
+            "leads": 67,
+            "converted": 23
+          },
+          {
+            "month": 8,
+            "leads": 79,
+            "converted": 42
+          },
+          {
+            "month": 9,
+            "leads": 78,
+            "converted": 35
+          },
+          {
+            "month": 10,
+            "leads": 67,
+            "converted": 17
+          },
+          {
+            "month": 11,
+            "leads": 39,
+            "converted": 11
+          },
+          {
+            "month": 12,
+            "leads": 29,
+            "converted": 11
+          }
+        ]
+      },
+      {
+        "channel": "social media",
+        "leads": 1,
+        "converted": 0,
+        "conversionRate": 0,
+        "monthly": [
+          {
+            "month": 7,
+            "leads": 1,
+            "converted": 0
+          }
+        ]
+      },
+      {
+        "channel": "website chat",
+        "leads": 1,
+        "converted": 0,
+        "conversionRate": 0,
+        "monthly": [
+          {
+            "month": 3,
+            "leads": 1,
+            "converted": 0
+          }
+        ]
+      },
+      {
+        "channel": "whatsapp",
+        "leads": 1,
+        "converted": 0,
+        "conversionRate": 0,
+        "monthly": [
+          {
+            "month": 4,
+            "leads": 1,
+            "converted": 0
+          }
+        ]
+      }
+    ],
+    "validation": {
+      "missingDateCount": 2,
+      "mismatchedDateCount": 3,
+      "validDateInTouchMonthCount": 3115,
+      "multiManagerItemCount": 12,
+      "multiManagerConvertedCount": 9,
+      "excludedFromMemberMetricsCount": 12,
+      "blankAccountManagerItemCount": 2,
+      "blankChannelItemCount": 1
+    },
+    "mismatchedDates": [
+      {
+        "sourceBoardId": "8383674020",
+        "sourceBoardMonth": "FEBRUARY 2025",
+        "itemId": "8369650444",
+        "itemName": "Moon Reaper",
+        "group": "WEEK 1",
+        "actualDateInTouch": "2025-01-31",
+        "includedInBoardMembershipTotals": true,
+        "includedInValidDateTotals": false,
+        "action": "review-in-monday"
+      },
+      {
+        "sourceBoardId": "8603896984",
+        "sourceBoardMonth": "MARCH 2025",
+        "itemId": "8591004111",
+        "itemName": "The Temperance Movement",
+        "group": "WEEK 1",
+        "actualDateInTouch": "2025-02-28",
+        "includedInBoardMembershipTotals": true,
+        "includedInValidDateTotals": false,
+        "action": "review-in-monday"
+      },
+      {
+        "sourceBoardId": "18329831926",
+        "sourceBoardMonth": "NOVEMBER 2025",
+        "itemId": "18330440123",
+        "itemName": "Death Stranding - Manhead UK",
+        "group": "WEEK 1",
+        "actualDateInTouch": "2025-10-31",
+        "includedInBoardMembershipTotals": true,
+        "includedInValidDateTotals": false,
+        "action": "review-in-monday"
+      }
+    ],
+    "identityConflicts": []
+  },
+  "validation": {
+    "missingDateCount": 2,
+    "mismatchedDateCount": 3,
+    "validDateInTouchMonthCount": 3115,
+    "multiManagerItemCount": 12,
+    "multiManagerConvertedCount": 9,
+    "excludedFromMemberMetricsCount": 12,
+    "blankAccountManagerItemCount": 2,
+    "blankChannelItemCount": 1,
+    "mismatchedDates": [
+      {
+        "sourceBoardId": "8383674020",
+        "sourceBoardMonth": "FEBRUARY 2025",
+        "itemId": "8369650444",
+        "itemName": "Moon Reaper",
+        "group": "WEEK 1",
+        "actualDateInTouch": "2025-01-31",
+        "includedInBoardMembershipTotals": true,
+        "includedInValidDateTotals": false,
+        "action": "review-in-monday"
+      },
+      {
+        "sourceBoardId": "8603896984",
+        "sourceBoardMonth": "MARCH 2025",
+        "itemId": "8591004111",
+        "itemName": "The Temperance Movement",
+        "group": "WEEK 1",
+        "actualDateInTouch": "2025-02-28",
+        "includedInBoardMembershipTotals": true,
+        "includedInValidDateTotals": false,
+        "action": "review-in-monday"
+      },
+      {
+        "sourceBoardId": "18329831926",
+        "sourceBoardMonth": "NOVEMBER 2025",
+        "itemId": "18330440123",
+        "itemName": "Death Stranding - Manhead UK",
+        "group": "WEEK 1",
+        "actualDateInTouch": "2025-10-31",
+        "includedInBoardMembershipTotals": true,
+        "includedInValidDateTotals": false,
+        "action": "review-in-monday"
+      }
+    ]
+  },
+  "monthlyStatuses": [
+    {
+      "month": 1,
+      "monthName": "JANUARY",
+      "status": "summarized",
+      "boardId": "8141656282",
+      "boardName": "JANUARY 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 2,
+      "monthName": "FEBRUARY",
+      "status": "summarized",
+      "boardId": "8383674020",
+      "boardName": "FEBRUARY 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 3,
+      "monthName": "MARCH",
+      "status": "summarized",
+      "boardId": "8603896984",
+      "boardName": "MARCH 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 4,
+      "monthName": "APRIL",
+      "status": "summarized",
+      "boardId": "8827995648",
+      "boardName": "APRIL 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 5,
+      "monthName": "MAY",
+      "status": "summarized",
+      "boardId": "9046160827",
+      "boardName": "MAY 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 6,
+      "monthName": "JUNE",
+      "status": "summarized",
+      "boardId": "9277646661",
+      "boardName": "JUNE 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 7,
+      "monthName": "JULY",
+      "status": "summarized",
+      "boardId": "9489775459",
+      "boardName": "JULY 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 8,
+      "monthName": "AUGUST",
+      "status": "summarized",
+      "boardId": "9723061329",
+      "boardName": "AUGUST 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 9,
+      "monthName": "SEPTEMBER",
+      "status": "summarized",
+      "boardId": "9939962178",
+      "boardName": "SEPTEMBER 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 10,
+      "monthName": "OCTOBER",
+      "status": "summarized",
+      "boardId": "18083157900",
+      "boardName": "OCTOBER 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 11,
+      "monthName": "NOVEMBER",
+      "status": "summarized",
+      "boardId": "18329831926",
+      "boardName": "NOVEMBER 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 12,
+      "monthName": "DECEMBER",
+      "status": "summarized",
+      "boardId": "18390404747",
+      "boardName": "DECEMBER 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    }
+  ]
+}

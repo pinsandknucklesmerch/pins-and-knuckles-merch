@@ -1,8 +1,7 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 import { createPortal } from "react-dom";
-import { useRouter } from "next/navigation";
 import { saveSalesKpiTargets, type TargetActionState } from "../actions";
 import type { SalesKpiTargets, SalesMetricCode } from "../domain/types";
 
@@ -18,22 +17,27 @@ const fields: Array<{ code: SalesMetricCode; label: string; step: string; suffix
 
 export function ManualKpiEntry({ year, month, targets }: { year: number; month: number; targets: SalesKpiTargets }) {
   const [open, setOpen] = useState(false);
-  const router = useRouter();
-  const action = saveSalesKpiTargets.bind(null, { year, month });
-  const [state, formAction, pending] = useActionState(action, initialState);
-  const configuredFields = fields.filter((field) => targets[field.code] !== undefined);
-  const effectiveMonth = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(year, month - 1, 1)));
-  useEffect(() => { if (state.ok) router.refresh(); }, [router, state]);
 
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} className="h-9 rounded-md border border-input bg-card px-3 text-sm font-medium text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Edit Targets</button>
-      {open ? createPortal(
+      {open ? <ManualKpiForm year={year} month={month} targets={targets} onClose={() => setOpen(false)} /> : null}
+    </>
+  );
+}
+
+function ManualKpiForm({ year, month, targets, onClose }: { year: number; month: number; targets: SalesKpiTargets; onClose: () => void }) {
+  const action = saveSalesKpiTargets.bind(null, { year, month });
+  const [state, formAction, pending] = useActionState(action, initialState);
+  const configuredFields = fields.filter((field) => targets[field.code] !== undefined);
+  const effectiveMonth = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(year, month - 1, 1)));
+
+  return createPortal(
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/65 p-4" role="dialog" aria-modal="true" aria-labelledby="edit-targets-title">
           <form action={formAction} className="grid w-full max-w-2xl gap-4 rounded-lg border border-border bg-card p-4 shadow-lg">
             <div className="flex items-center justify-between gap-3">
               <h2 id="edit-targets-title" className="text-base font-semibold text-foreground">Edit Targets</h2>
-              <button type="button" onClick={() => setOpen(false)} className="h-8 rounded-md border border-input px-2 text-sm text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Close</button>
+              <button type="button" onClick={onClose} className="h-8 rounded-md border border-input px-2 text-sm text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Close</button>
             </div>
             <p className="text-sm text-muted-foreground">Changes apply from {effectiveMonth} onward.</p>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -51,7 +55,5 @@ export function ManualKpiEntry({ year, month, targets }: { year: number; month: 
             <button disabled={pending} className="h-9 justify-self-start rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-50" type="submit">{pending ? "Saving…" : "Save Targets"}</button>
           </form>
         </div>
-      , document.body) : null}
-    </>
-  );
+      , document.body);
 }

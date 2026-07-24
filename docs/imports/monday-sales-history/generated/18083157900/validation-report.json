@@ -1,0 +1,34 @@
+{
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 0,
+    "validDateInTouchMonthCount": 321,
+    "multiManagerItemCount": 1,
+    "multiManagerConvertedCount": 1,
+    "excludedFromMemberMetricsCount": 1,
+    "blankAccountManagerItemCount": 0,
+    "blankChannelItemCount": 0
+  },
+  "missingDates": [],
+  "mismatchedDates": [],
+  "multiAccountManagers": [
+    {
+      "id": "18310053372",
+      "name": "WhyNow - President, Waterparks, Ghost",
+      "converted": true,
+      "accountManagers": [
+        {
+          "id": "15773637",
+          "name": "Anthony Strauss",
+          "normalizedName": "anthony strauss"
+        },
+        {
+          "id": "69507598",
+          "name": "Justin du Preez",
+          "normalizedName": "justin du preez"
+        }
+      ]
+    }
+  ],
+  "dateScopeNote": "Board membership is authoritative for reporting. Date In Touch is a data-quality comparison only: mismatches remain in board totals, are excluded from valid-date comparison totals, and require review in Monday."
+}

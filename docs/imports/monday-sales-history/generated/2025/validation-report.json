@@ -1,0 +1,317 @@
+{
+  "generatedAt": "2026-07-23T15:17:38.090Z",
+  "year": 2025,
+  "monthlyStatuses": [
+    {
+      "month": 1,
+      "monthName": "JANUARY",
+      "status": "summarized",
+      "boardId": "8141656282",
+      "boardName": "JANUARY 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 2,
+      "monthName": "FEBRUARY",
+      "status": "summarized",
+      "boardId": "8383674020",
+      "boardName": "FEBRUARY 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 3,
+      "monthName": "MARCH",
+      "status": "summarized",
+      "boardId": "8603896984",
+      "boardName": "MARCH 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 4,
+      "monthName": "APRIL",
+      "status": "summarized",
+      "boardId": "8827995648",
+      "boardName": "APRIL 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 5,
+      "monthName": "MAY",
+      "status": "summarized",
+      "boardId": "9046160827",
+      "boardName": "MAY 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 6,
+      "monthName": "JUNE",
+      "status": "summarized",
+      "boardId": "9277646661",
+      "boardName": "JUNE 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 7,
+      "monthName": "JULY",
+      "status": "summarized",
+      "boardId": "9489775459",
+      "boardName": "JULY 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 8,
+      "monthName": "AUGUST",
+      "status": "summarized",
+      "boardId": "9723061329",
+      "boardName": "AUGUST 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 9,
+      "monthName": "SEPTEMBER",
+      "status": "summarized",
+      "boardId": "9939962178",
+      "boardName": "SEPTEMBER 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 10,
+      "monthName": "OCTOBER",
+      "status": "summarized",
+      "boardId": "18083157900",
+      "boardName": "OCTOBER 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 11,
+      "monthName": "NOVEMBER",
+      "status": "summarized",
+      "boardId": "18329831926",
+      "boardName": "NOVEMBER 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    },
+    {
+      "month": 12,
+      "monthName": "DECEMBER",
+      "status": "summarized",
+      "boardId": "18390404747",
+      "boardName": "DECEMBER 2025",
+      "periodStatus": "complete/historical",
+      "issues": [
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 2; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 3; historical groups may be consolidated."
+        },
+        {
+          "code": "MISSING_WEEK_GROUP",
+          "message": "Missing week 4; historical groups may be consolidated."
+        }
+      ]
+    }
+  ],
+  "annualValidation": {
+    "missingDateCount": 2,
+    "mismatchedDateCount": 3,
+    "validDateInTouchMonthCount": 3115,
+    "multiManagerItemCount": 12,
+    "multiManagerConvertedCount": 9,
+    "excludedFromMemberMetricsCount": 12,
+    "blankAccountManagerItemCount": 2,
+    "blankChannelItemCount": 1
+  },
+  "mismatchedDates": [
+    {
+      "sourceBoardId": "8383674020",
+      "sourceBoardMonth": "FEBRUARY 2025",
+      "itemId": "8369650444",
+      "itemName": "Moon Reaper",
+      "group": "WEEK 1",
+      "actualDateInTouch": "2025-01-31",
+      "includedInBoardMembershipTotals": true,
+      "includedInValidDateTotals": false,
+      "action": "review-in-monday"
+    },
+    {
+      "sourceBoardId": "8603896984",
+      "sourceBoardMonth": "MARCH 2025",
+      "itemId": "8591004111",
+      "itemName": "The Temperance Movement",
+      "group": "WEEK 1",
+      "actualDateInTouch": "2025-02-28",
+      "includedInBoardMembershipTotals": true,
+      "includedInValidDateTotals": false,
+      "action": "review-in-monday"
+    },
+    {
+      "sourceBoardId": "18329831926",
+      "sourceBoardMonth": "NOVEMBER 2025",
+      "itemId": "18330440123",
+      "itemName": "Death Stranding - Manhead UK",
+      "group": "WEEK 1",
+      "actualDateInTouch": "2025-10-31",
+      "includedInBoardMembershipTotals": true,
+      "includedInValidDateTotals": false,
+      "action": "review-in-monday"
+    }
+  ],
+  "identityConflicts": [],
+  "currentMonthWarning": []
+}

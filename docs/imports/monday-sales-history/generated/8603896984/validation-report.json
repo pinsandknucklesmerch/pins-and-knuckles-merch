@@ -1,0 +1,80 @@
+{
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 1,
+    "validDateInTouchMonthCount": 276,
+    "multiManagerItemCount": 3,
+    "multiManagerConvertedCount": 2,
+    "excludedFromMemberMetricsCount": 3,
+    "blankAccountManagerItemCount": 0,
+    "blankChannelItemCount": 0
+  },
+  "missingDates": [],
+  "mismatchedDates": [
+    {
+      "sourceBoardId": "8603896984",
+      "sourceBoardMonth": "MARCH 2025",
+      "itemId": "8591004111",
+      "itemName": "The Temperance Movement",
+      "group": "WEEK 1",
+      "actualDateInTouch": "2025-02-28",
+      "includedInBoardMembershipTotals": true,
+      "includedInValidDateTotals": false,
+      "action": "review-in-monday"
+    }
+  ],
+  "multiAccountManagers": [
+    {
+      "id": "8678058403",
+      "name": "The Soul Revival - Patches",
+      "converted": true,
+      "accountManagers": [
+        {
+          "id": "15773637",
+          "name": "Anthony Strauss",
+          "normalizedName": "anthony strauss"
+        },
+        {
+          "id": "69507598",
+          "name": "Justin du Preez",
+          "normalizedName": "justin du preez"
+        }
+      ]
+    },
+    {
+      "id": "8817177385",
+      "name": "Muriel",
+      "converted": false,
+      "accountManagers": [
+        {
+          "id": "29869326",
+          "name": "hardus",
+          "normalizedName": "hardus"
+        },
+        {
+          "id": "69507598",
+          "name": "Justin du Preez",
+          "normalizedName": "justin du preez"
+        }
+      ]
+    },
+    {
+      "id": "8817680237",
+      "name": "Cafe Cuil",
+      "converted": true,
+      "accountManagers": [
+        {
+          "id": "29869326",
+          "name": "hardus",
+          "normalizedName": "hardus"
+        },
+        {
+          "id": "69507598",
+          "name": "Justin du Preez",
+          "normalizedName": "justin du preez"
+        }
+      ]
+    }
+  ],
+  "dateScopeNote": "Board membership is authoritative for reporting. Date In Touch is a data-quality comparison only: mismatches remain in board totals, are excluded from valid-date comparison totals, and require review in Monday."
+}

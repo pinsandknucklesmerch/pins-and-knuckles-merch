@@ -1,4 +1,4 @@
-import type { PreviousYearComparisonState } from "./metricDisplay";
+import type { PreviousYearComparisonState } from "./metricDisplay.ts";
 
 export type ComparisonBadgeInput = {
   absoluteChange?: number | null;

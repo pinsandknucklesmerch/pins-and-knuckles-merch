@@ -1,0 +1,324 @@
+[
+  {
+    "channel": "EU",
+    "leads": 127,
+    "converted": 62,
+    "conversionRate": 48.8,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 12,
+        "converted": 8
+      },
+      {
+        "month": 2,
+        "leads": 14,
+        "converted": 7
+      },
+      {
+        "month": 3,
+        "leads": 14,
+        "converted": 10
+      },
+      {
+        "month": 4,
+        "leads": 8,
+        "converted": 4
+      },
+      {
+        "month": 5,
+        "leads": 8,
+        "converted": 6
+      },
+      {
+        "month": 6,
+        "leads": 13,
+        "converted": 5
+      },
+      {
+        "month": 7,
+        "leads": 11,
+        "converted": 5
+      },
+      {
+        "month": 8,
+        "leads": 5,
+        "converted": 0
+      },
+      {
+        "month": 9,
+        "leads": 7,
+        "converted": 1
+      },
+      {
+        "month": 10,
+        "leads": 15,
+        "converted": 5
+      },
+      {
+        "month": 11,
+        "leads": 11,
+        "converted": 5
+      },
+      {
+        "month": 12,
+        "leads": 9,
+        "converted": 6
+      }
+    ]
+  },
+  {
+    "channel": "personal",
+    "leads": 2136,
+    "converted": 1539,
+    "conversionRate": 72.1,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 198,
+        "converted": 149
+      },
+      {
+        "month": 2,
+        "leads": 155,
+        "converted": 102
+      },
+      {
+        "month": 3,
+        "leads": 179,
+        "converted": 124
+      },
+      {
+        "month": 4,
+        "leads": 165,
+        "converted": 122
+      },
+      {
+        "month": 5,
+        "leads": 208,
+        "converted": 154
+      },
+      {
+        "month": 6,
+        "leads": 205,
+        "converted": 140
+      },
+      {
+        "month": 7,
+        "leads": 216,
+        "converted": 148
+      },
+      {
+        "month": 8,
+        "leads": 201,
+        "converted": 152
+      },
+      {
+        "month": 9,
+        "leads": 165,
+        "converted": 111
+      },
+      {
+        "month": 10,
+        "leads": 237,
+        "converted": 181
+      },
+      {
+        "month": 11,
+        "leads": 152,
+        "converted": 112
+      },
+      {
+        "month": 12,
+        "leads": 55,
+        "converted": 44
+      }
+    ]
+  },
+  {
+    "channel": "phone",
+    "leads": 1,
+    "converted": 1,
+    "conversionRate": 100,
+    "monthly": [
+      {
+        "month": 7,
+        "leads": 1,
+        "converted": 1
+      }
+    ]
+  },
+  {
+    "channel": "pins & knuckles store",
+    "leads": 33,
+    "converted": 33,
+    "conversionRate": 100,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 4,
+        "converted": 4
+      },
+      {
+        "month": 2,
+        "leads": 2,
+        "converted": 2
+      },
+      {
+        "month": 3,
+        "leads": 4,
+        "converted": 4
+      },
+      {
+        "month": 4,
+        "leads": 9,
+        "converted": 9
+      },
+      {
+        "month": 8,
+        "leads": 5,
+        "converted": 5
+      },
+      {
+        "month": 9,
+        "leads": 5,
+        "converted": 5
+      },
+      {
+        "month": 10,
+        "leads": 2,
+        "converted": 2
+      },
+      {
+        "month": 11,
+        "leads": 2,
+        "converted": 2
+      }
+    ]
+  },
+  {
+    "channel": "Reached Out",
+    "leads": 11,
+    "converted": 3,
+    "conversionRate": 27.3,
+    "monthly": [
+      {
+        "month": 4,
+        "leads": 8,
+        "converted": 2
+      },
+      {
+        "month": 8,
+        "leads": 3,
+        "converted": 1
+      }
+    ]
+  },
+  {
+    "channel": "sales inbox",
+    "leads": 808,
+    "converted": 321,
+    "conversionRate": 39.7,
+    "monthly": [
+      {
+        "month": 1,
+        "leads": 74,
+        "converted": 28
+      },
+      {
+        "month": 2,
+        "leads": 80,
+        "converted": 34
+      },
+      {
+        "month": 3,
+        "leads": 79,
+        "converted": 22
+      },
+      {
+        "month": 4,
+        "leads": 81,
+        "converted": 36
+      },
+      {
+        "month": 5,
+        "leads": 86,
+        "converted": 38
+      },
+      {
+        "month": 6,
+        "leads": 49,
+        "converted": 24
+      },
+      {
+        "month": 7,
+        "leads": 67,
+        "converted": 23
+      },
+      {
+        "month": 8,
+        "leads": 79,
+        "converted": 42
+      },
+      {
+        "month": 9,
+        "leads": 78,
+        "converted": 35
+      },
+      {
+        "month": 10,
+        "leads": 67,
+        "converted": 17
+      },
+      {
+        "month": 11,
+        "leads": 39,
+        "converted": 11
+      },
+      {
+        "month": 12,
+        "leads": 29,
+        "converted": 11
+      }
+    ]
+  },
+  {
+    "channel": "social media",
+    "leads": 1,
+    "converted": 0,
+    "conversionRate": 0,
+    "monthly": [
+      {
+        "month": 7,
+        "leads": 1,
+        "converted": 0
+      }
+    ]
+  },
+  {
+    "channel": "website chat",
+    "leads": 1,
+    "converted": 0,
+    "conversionRate": 0,
+    "monthly": [
+      {
+        "month": 3,
+        "leads": 1,
+        "converted": 0
+      }
+    ]
+  },
+  {
+    "channel": "whatsapp",
+    "leads": 1,
+    "converted": 0,
+    "conversionRate": 0,
+    "monthly": [
+      {
+        "month": 4,
+        "leads": 1,
+        "converted": 0
+      }
+    ]
+  }
+]

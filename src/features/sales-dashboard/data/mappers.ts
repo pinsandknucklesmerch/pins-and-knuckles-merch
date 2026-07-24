@@ -4,9 +4,9 @@ import { DASHBOARD_MONTHS } from "../types.ts";
 import { calculateConversionRate } from "../domain/calculateDashboardKpis.ts";
 import { findPreviousMember, normaliseTeamMemberKey, normaliseTeamMemberName, sortMemberDashboardRows } from "../domain/normaliseTeamMember.ts";
 import { DEFAULT_SALES_KPI_TARGETS, type CompanyKpiMonth, type MemberDashboardRow, type SalesDashboardData, type SalesKpiTargets, type TeamMemberKpiMonth } from "../domain/types.ts";
-import { buildYearComparison } from "./yearComparison";
+import { buildYearComparison } from "./yearComparison.ts";
 
-type CompanyRow = Pick<Database["public"]["Tables"]["sales_kpi_months"]["Row"], "year" | "month" | "monthly_profit" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "monday_sync_metadata" | "notes" | "data_source">;
+type CompanyRow = Pick<Database["public"]["Tables"]["sales_kpi_months"]["Row"], "year" | "month" | "monthly_profit" | "monthly_profit_source" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "monday_sync_metadata" | "notes" | "data_source">;
 type MemberRow = Pick<Database["public"]["Tables"]["sales_kpi_member_months"]["Row"], "year" | "month" | "team_member_key" | "team_member_name" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "profit" | "data_source">;
 type TargetRow = Pick<Database["public"]["Tables"]["sales_kpi_targets"]["Row"], "organisation_id" | "metric_code" | "target_value" | "effective_from" | "effective_to" | "is_active">;
 
@@ -14,7 +14,7 @@ export function mapCompanyRow(row: CompanyRow): CompanyKpiMonth {
   const metadata = row.monday_sync_metadata && typeof row.monday_sync_metadata === "object" && !Array.isArray(row.monday_sync_metadata)
     ? row.monday_sync_metadata as { sourceBoardId?: unknown; fetchedAt?: unknown }
     : null;
-  return { year: row.year, month: row.month, monthlyProfit: row.monthly_profit, quotesDone: row.quotes_done, ordersProcessed: row.orders_processed, salesInboxEnquiries: row.sales_inbox_enquiries, converted: row.converted, mondaySyncMetadata: typeof metadata?.sourceBoardId === "string" && typeof metadata.fetchedAt === "string" ? { sourceBoardId: metadata.sourceBoardId, fetchedAt: metadata.fetchedAt } : null, notes: row.notes, source: row.data_source as CompanyKpiMonth["source"] };
+  return { year: row.year, month: row.month, monthlyProfit: row.monthly_profit, monthlyProfitSource: row.monthly_profit_source as CompanyKpiMonth["source"] | null, quotesDone: row.quotes_done, ordersProcessed: row.orders_processed, salesInboxEnquiries: row.sales_inbox_enquiries, converted: row.converted, mondaySyncMetadata: typeof metadata?.sourceBoardId === "string" && typeof metadata.fetchedAt === "string" ? { sourceBoardId: metadata.sourceBoardId, fetchedAt: metadata.fetchedAt } : null, notes: row.notes, source: row.data_source as CompanyKpiMonth["source"] };
 }
 
 export function mapMemberRow(row: MemberRow): TeamMemberKpiMonth {
@@ -25,7 +25,7 @@ export function getFixtureCompanyMonth(fixture: HistoricalSalesDashboardFixture,
   const index = month - 1;
   const general = fixture.years.find((row) => row.year === year);
   const inbox = fixture.salesInbox.find((row) => row.year === year);
-  return { year, month, monthlyProfit: general?.profit[index] ?? null, quotesDone: general?.enquiries[index] ?? null, ordersProcessed: null, salesInboxEnquiries: inbox?.enquiries[index] ?? null, converted: inbox?.conversions[index] ?? null, mondaySyncMetadata: null, notes: null, source: "historical_fixture" };
+  return { year, month, monthlyProfit: general?.profit[index] ?? null, monthlyProfitSource: "historical_fixture", quotesDone: general?.enquiries[index] ?? null, ordersProcessed: null, salesInboxEnquiries: inbox?.enquiries[index] ?? null, converted: inbox?.conversions[index] ?? null, mondaySyncMetadata: null, notes: null, source: "historical_fixture" };
 }
 
 export function getFixtureMembers(fixture: HistoricalSalesDashboardFixture, year: number, month: number): TeamMemberKpiMonth[] {
@@ -69,5 +69,5 @@ export function buildDashboardData(args: {
   const previousFixture = getFixtureCompanyMonth(args.fixture, args.year - 1, args.month);
   const currentMembers = mergeMemberMonths(args.memberRows, getFixtureMembers(args.fixture, args.year, args.month));
   const previousMembers = mergeMemberMonths(args.previousMemberRows, getFixtureMembers(args.fixture, args.year - 1, args.month));
-  return { company: mergeCompanyMonth(args.companyRow, fixtureCompany), previousCompany: mergeCompanyMonth(args.previousCompanyRow, previousFixture), members: buildMemberRows(currentMembers, previousMembers), targets: args.targets, yearComparison: buildYearComparison(args.year, args.trendCurrent, args.trendPrevious), availableYears: args.availableYears, setupIssue: args.setupIssue ?? null };
+  return { company: mergeCompanyMonth(args.companyRow, fixtureCompany), companyYear: args.trendCurrent, previousCompany: mergeCompanyMonth(args.previousCompanyRow, previousFixture), members: buildMemberRows(currentMembers, previousMembers), targets: args.targets, yearComparison: buildYearComparison(args.year, args.trendCurrent, args.trendPrevious), availableYears: args.availableYears, setupIssue: args.setupIssue ?? null };
 }

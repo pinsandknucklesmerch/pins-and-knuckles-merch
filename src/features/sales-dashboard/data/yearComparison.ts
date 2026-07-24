@@ -1,5 +1,5 @@
-import { calculateConversionRate } from "../domain/calculateDashboardKpis";
-import type { CompanyKpiMonth, YearComparisonData, YearComparisonMetric, YearComparisonPoint } from "../domain/types";
+import { calculateConversionRate } from "../domain/calculateDashboardKpis.ts";
+import type { CompanyKpiMonth, YearComparisonData, YearComparisonMetric, YearComparisonPoint } from "../domain/types.ts";
 
 const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
 

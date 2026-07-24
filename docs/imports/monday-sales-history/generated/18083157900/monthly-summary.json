@@ -1,0 +1,395 @@
+{
+  "board": {
+    "id": "18083157900",
+    "name": "OCTOBER 2025",
+    "inferredMonth": {
+      "year": 2025,
+      "month": 10,
+      "label": "OCTOBER 2025"
+    }
+  },
+  "fetch": {
+    "totalItemsFetched": 321,
+    "includedWeeklyItems": 321,
+    "excludedItems": 0,
+    "deletedItems": "not returned by Monday item queries",
+    "inaccessibleItems": "not returned by Monday item queries",
+    "subitems": "not requested or included; Monday top-level item query only"
+  },
+  "scopes": {
+    "allLeads": {
+      "byBoardMembership": {
+        "totalLeadItems": 321,
+        "convertedItems": 205,
+        "conversionRate": 63.9,
+        "byAccountManager": [
+          {
+            "displayName": "Anthony Strauss",
+            "mondayUserIds": [
+              "15773637"
+            ],
+            "leads": 20,
+            "converted": 13,
+            "conversionRate": 65
+          },
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 28,
+            "converted": 18,
+            "conversionRate": 64.3
+          },
+          {
+            "displayName": "Catherine Strauss",
+            "mondayUserIds": [
+              "26567721"
+            ],
+            "leads": 4,
+            "converted": 3,
+            "conversionRate": 75
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 68,
+            "converted": 38,
+            "conversionRate": 55.9
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 68,
+            "converted": 45,
+            "conversionRate": 66.2
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 99,
+            "converted": 76,
+            "conversionRate": 76.8
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 33,
+            "converted": 11,
+            "conversionRate": 33.3
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "EU",
+            "leads": 15,
+            "converted": 5,
+            "conversionRate": 33.3
+          },
+          {
+            "displayLabel": "personal",
+            "leads": 237,
+            "converted": 181,
+            "conversionRate": 76.4
+          },
+          {
+            "displayLabel": "pins & knuckles store",
+            "leads": 2,
+            "converted": 2,
+            "conversionRate": 100
+          },
+          {
+            "displayLabel": "sales inbox",
+            "leads": 67,
+            "converted": 17,
+            "conversionRate": 25.4
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      },
+      "byValidDateInTouchMonth": {
+        "totalLeadItems": 321,
+        "convertedItems": 205,
+        "conversionRate": 63.9,
+        "byAccountManager": [
+          {
+            "displayName": "Anthony Strauss",
+            "mondayUserIds": [
+              "15773637"
+            ],
+            "leads": 20,
+            "converted": 13,
+            "conversionRate": 65
+          },
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 28,
+            "converted": 18,
+            "conversionRate": 64.3
+          },
+          {
+            "displayName": "Catherine Strauss",
+            "mondayUserIds": [
+              "26567721"
+            ],
+            "leads": 4,
+            "converted": 3,
+            "conversionRate": 75
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 68,
+            "converted": 38,
+            "conversionRate": 55.9
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 68,
+            "converted": 45,
+            "conversionRate": 66.2
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 99,
+            "converted": 76,
+            "conversionRate": 76.8
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 33,
+            "converted": 11,
+            "conversionRate": 33.3
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "EU",
+            "leads": 15,
+            "converted": 5,
+            "conversionRate": 33.3
+          },
+          {
+            "displayLabel": "personal",
+            "leads": 237,
+            "converted": 181,
+            "conversionRate": 76.4
+          },
+          {
+            "displayLabel": "pins & knuckles store",
+            "leads": 2,
+            "converted": 2,
+            "conversionRate": 100
+          },
+          {
+            "displayLabel": "sales inbox",
+            "leads": 67,
+            "converted": 17,
+            "conversionRate": 25.4
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      }
+    },
+    "salesInboxOnly": {
+      "byBoardMembership": {
+        "totalLeadItems": 67,
+        "convertedItems": 17,
+        "conversionRate": 25.4,
+        "byAccountManager": [
+          {
+            "displayName": "Anthony Strauss",
+            "mondayUserIds": [
+              "15773637"
+            ],
+            "leads": 2,
+            "converted": 1,
+            "conversionRate": 50
+          },
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 9,
+            "converted": 4,
+            "conversionRate": 44.4
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 30,
+            "converted": 7,
+            "conversionRate": 23.3
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 12,
+            "converted": 3,
+            "conversionRate": 25
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 1,
+            "converted": 1,
+            "conversionRate": 100
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 13,
+            "converted": 1,
+            "conversionRate": 7.7
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "sales inbox",
+            "leads": 67,
+            "converted": 17,
+            "conversionRate": 25.4
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      },
+      "byValidDateInTouchMonth": {
+        "totalLeadItems": 67,
+        "convertedItems": 17,
+        "conversionRate": 25.4,
+        "byAccountManager": [
+          {
+            "displayName": "Anthony Strauss",
+            "mondayUserIds": [
+              "15773637"
+            ],
+            "leads": 2,
+            "converted": 1,
+            "conversionRate": 50
+          },
+          {
+            "displayName": "Bux",
+            "mondayUserIds": [
+              "26816626"
+            ],
+            "leads": 9,
+            "converted": 4,
+            "conversionRate": 44.4
+          },
+          {
+            "displayName": "Deleted member",
+            "mondayUserIds": [
+              "23738460"
+            ],
+            "leads": 30,
+            "converted": 7,
+            "conversionRate": 23.3
+          },
+          {
+            "displayName": "hardus",
+            "mondayUserIds": [
+              "29869326"
+            ],
+            "leads": 12,
+            "converted": 3,
+            "conversionRate": 25
+          },
+          {
+            "displayName": "Johan",
+            "mondayUserIds": [
+              "14589471"
+            ],
+            "leads": 1,
+            "converted": 1,
+            "conversionRate": 100
+          },
+          {
+            "displayName": "Justin du Preez",
+            "mondayUserIds": [
+              "69507598"
+            ],
+            "leads": 13,
+            "converted": 1,
+            "conversionRate": 7.7
+          }
+        ],
+        "byChannel": [
+          {
+            "displayLabel": "sales inbox",
+            "leads": 67,
+            "converted": 17,
+            "conversionRate": 25.4
+          }
+        ],
+        "blankChannelCount": 0,
+        "blankAccountManagerCount": 0
+      }
+    }
+  },
+  "validation": {
+    "missingDateCount": 0,
+    "mismatchedDateCount": 0,
+    "validDateInTouchMonthCount": 321,
+    "multiManagerItemCount": 1,
+    "multiManagerConvertedCount": 1,
+    "excludedFromMemberMetricsCount": 1,
+    "blankAccountManagerItemCount": 0,
+    "blankChannelItemCount": 0
+  },
+  "excludedItems": [],
+  "missingDates": [],
+  "mismatchedDates": [],
+  "multiAccountManagers": [
+    {
+      "id": "18310053372",
+      "name": "WhyNow - President, Waterparks, Ghost",
+      "converted": true,
+      "accountManagers": [
+        {
+          "id": "15773637",
+          "name": "Anthony Strauss",
+          "normalizedName": "anthony strauss"
+        },
+        {
+          "id": "69507598",
+          "name": "Justin du Preez",
+          "normalizedName": "justin du preez"
+        }
+      ]
+    }
+  ]
+}
