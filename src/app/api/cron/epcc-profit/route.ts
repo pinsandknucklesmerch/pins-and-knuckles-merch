@@ -4,7 +4,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { runEpccProfitIngestion } from "@/features/sales-dashboard/server/epccProfitImporter";
 
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
 
 function authorised(request: Request) {
   const secret = process.env.CRON_SECRET;
