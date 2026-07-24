@@ -1,10 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
 import { MetricGrid } from "metricui";
 import { calculateCompanyMetrics } from "../domain/calculateDashboardKpis";
 import type { CompanyKpiMonth, MetricResult, SalesKpiTargets } from "../domain/types";
-import { buildMetricExportRows, type DashboardExportFilters } from "../lib/metricsExport";
 import { CombinedKpiCard } from "./CombinedKpiCard";
 import { LiveStatus } from "./LiveStatus";
 import { ProfitShirtKpi } from "./ProfitShirtKpi";
@@ -17,30 +15,8 @@ function metricByCode(metrics: MetricResult[], code: MetricResult["code"]) {
   return metric;
 }
 
-export function CompanyKpiView({ current, previous, targets, filters }: { current: CompanyKpiMonth; previous: CompanyKpiMonth | null; targets: SalesKpiTargets; filters: DashboardExportFilters }) {
-  const { year: selectedYear, month: selectedMonth, view: selectedView, member: selectedMember } = filters;
-  const { metrics, exportData } = useMemo(() => {
-    const calculatedMetrics = calculateCompanyMetrics(current, previous, targets);
-    const rows = buildMetricExportRows(current, calculatedMetrics, {
-      year: selectedYear,
-      month: selectedMonth,
-      view: selectedView,
-      member: selectedMember,
-    });
-    const rowsFor = (code: MetricResult["code"]) => {
-      const label = metricByCode(calculatedMetrics, code).label;
-      return rows.filter((row) => row.metric_name === label);
-    };
-
-    return {
-      metrics: calculatedMetrics,
-      exportData: {
-        profit: rowsFor("MONTHLY_PROFIT"),
-        salesInbox: [...rowsFor("SALES_INBOX_ENQUIRIES"), ...rowsFor("SALES_INBOX_CONVERSION_RATE")],
-        performance: [...rowsFor("QUOTES_DONE"), ...rowsFor("ORDERS_PROCESSED"), ...rowsFor("CONVERSION_RATE")],
-      },
-    };
-  }, [current, previous, targets, selectedYear, selectedMonth, selectedView, selectedMember]);
+export function CompanyKpiView({ current, previous, targets }: { current: CompanyKpiMonth; previous: CompanyKpiMonth | null; targets: SalesKpiTargets }) {
+  const metrics = calculateCompanyMetrics(current, previous, targets);
   const now = new Date();
   const isCurrentMondayPeriod = current.source === "monday" && current.year === now.getUTCFullYear() && current.month === now.getUTCMonth() + 1;
   const profit = metricByCode(metrics, "MONTHLY_PROFIT");
@@ -56,12 +32,12 @@ export function CompanyKpiView({ current, previous, targets, filters }: { curren
       <MetricGrid columns={12} gap={12}>
         <MetricGrid.Item span="full">
           <div className={styles.topRow}>
-            <ProfitShirtKpi metric={profit} exportData={exportData.profit} />
-            <SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} exportData={exportData.salesInbox} />
+            <ProfitShirtKpi metric={profit} />
+            <SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} />
           </div>
         </MetricGrid.Item>
         <MetricGrid.Item span="full">
-          <CombinedKpiCard first={quotes} second={orders} third={conversion} exportData={exportData.performance} />
+          <CombinedKpiCard first={quotes} second={orders} third={conversion} />
         </MetricGrid.Item>
       </MetricGrid>
     </div>

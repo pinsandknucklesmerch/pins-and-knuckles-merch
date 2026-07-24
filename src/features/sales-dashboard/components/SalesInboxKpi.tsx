@@ -1,7 +1,6 @@
 "use client";
 
 import { BentoPanel } from "@/components/ui/BentoPanel";
-import { CardShell, type DataRow } from "metricui";
 import type { MetricResult } from "../domain/types";
 import { comparisonArcRatio, formatPercentagePoints, previousYearComparisonState } from "../lib/metricDisplay";
 import { ComparisonArcGauge } from "./ComparisonArcGauge";
@@ -12,13 +11,12 @@ function number(value: number | null) {
   return value === null ? "—" : value.toLocaleString("en-GB");
 }
 
-export function SalesInboxKpi({ enquiries, conversionRate, exportData }: { enquiries: MetricResult; conversionRate: MetricResult; exportData: DataRow[] }) {
+export function SalesInboxKpi({ enquiries, conversionRate }: { enquiries: MetricResult; conversionRate: MetricResult }) {
   const enquiriesRatio = comparisonArcRatio(enquiries.value, enquiries.previousYear);
   const hasEnquiriesComparison = enquiriesRatio !== null;
 
   return (
-    <CardShell aiTitle="Sales Inbox" bare className="sales-kpi-export !p-0" exportable={{ data: exportData }}>
-      <BentoPanel className={styles.card} glow>
+    <BentoPanel className={styles.card} glow>
       <h2 className={styles.heading}>Sales Inbox</h2>
       <section className={styles.enquiries} aria-labelledby="sales-inbox-enquiries">
         <h3 id="sales-inbox-enquiries" className={styles.label}>Enquiries</h3>
@@ -45,7 +43,6 @@ export function SalesInboxKpi({ enquiries, conversionRate, exportData }: { enqui
           )}
         </div>
       </section>
-      </BentoPanel>
-    </CardShell>
+    </BentoPanel>
   );
 }

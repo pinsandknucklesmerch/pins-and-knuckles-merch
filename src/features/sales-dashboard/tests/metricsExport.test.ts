@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { calculateCompanyMetrics } from "../domain/calculateDashboardKpis.ts";
 import type { CompanyKpiMonth } from "../domain/types.ts";
-import { buildMetricExportRows } from "../lib/metricsExport.ts";
+import { buildMetricExportCsv, buildMetricExportRows, getMetricExportFilename } from "../lib/metricsExport.ts";
 
 function month(overrides: Partial<CompanyKpiMonth> = {}): CompanyKpiMonth {
   return {
@@ -27,7 +27,7 @@ function rows(current = month()) {
   return buildMetricExportRows(current, metrics, { year: 2025, month: 7, view: "company", member: "selected-member" }, new Date("2026-07-24T00:00:00Z"));
 }
 
-test("enables MetricUI export for all six dashboard KPIs", () => {
+test("dashboard export includes all six dashboard KPIs", () => {
   const output = rows();
   assert.deepEqual(output.map((row) => row.metric_name), [
     "Monthly Profit",
@@ -38,12 +38,6 @@ test("enables MetricUI export for all six dashboard KPIs", () => {
     "Sales Inbox Conversion Rate",
   ]);
 
-  const provider = readFileSync(new URL("../components/MetricDashboardProvider.tsx", import.meta.url), "utf8");
-  const profit = readFileSync(new URL("../components/ProfitShirtKpi.tsx", import.meta.url), "utf8");
-  const inbox = readFileSync(new URL("../components/SalesInboxKpi.tsx", import.meta.url), "utf8");
-  const combined = readFileSync(new URL("../components/CombinedKpiCard.tsx", import.meta.url), "utf8");
-  assert.match(provider, /<MetricProvider[^>]*exportable>/);
-  for (const component of [profit, inbox, combined]) assert.match(component, /exportable=\{\{ data: exportData \}\}/);
 });
 
 test("exports raw numbers instead of abbreviated display strings", () => {
@@ -73,6 +67,7 @@ test("limits export columns to public KPI values and comparison context", () => 
   assert.deepEqual(Object.keys(profit), [
     "year",
     "month",
+    "view",
     "metric_name",
     "raw_value",
     "target",
@@ -82,14 +77,29 @@ test("limits export columns to public KPI values and comparison context", () => 
   ]);
 });
 
-test("MetricUI export controls are persistently visible and support all built-in actions", () => {
-  const styles = readFileSync(new URL("../components/MetricDashboardProvider.module.css", import.meta.url), "utf8");
-  assert.match(styles, /sales-kpi-export[^}]*button\[aria-label="Export"\][^{]*\{[^}]*opacity:\s*1/);
+test("renders one dashboard export control and no per-card export controls", () => {
+  const dashboard = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
+  const button = readFileSync(new URL("../components/ExportMetricsButton.tsx", import.meta.url), "utf8");
+  const provider = readFileSync(new URL("../components/MetricDashboardProvider.tsx", import.meta.url), "utf8");
+  const cards = ["ProfitShirtKpi.tsx", "SalesInboxKpi.tsx", "CombinedKpiCard.tsx"]
+    .map((file) => readFileSync(new URL(`../components/${file}`, import.meta.url), "utf8"))
+    .join("\n");
 
-  const metricUi = readFileSync(new URL("../../../../node_modules/metricui/dist/index.js", import.meta.url), "utf8");
-  assert.match(metricUi, /Save as image/);
-  assert.match(metricUi, /Download CSV/);
-  assert.match(metricUi, /Copy to clipboard/);
+  assert.match(dashboard, /<ExportMetricsButton rows=\{exportRows\}/);
+  assert.equal(button.match(/Export Metrics/g)?.length, 1);
+  assert.doesNotMatch(provider, /\bexportable\b/);
+  assert.doesNotMatch(cards, /CardShell|exportable|exportData|sales-kpi-export/);
+});
+
+test("generates the selected-period filename", () => {
+  assert.equal(getMetricExportFilename(2026, 7), "pins-sales-metrics-2026-07.csv");
+});
+
+test("builds CSV from raw public values", () => {
+  const csv = buildMetricExportCsv(rows());
+  assert.match(csv, /^year,month,view,metric_name,raw_value,target,prior_year_value,data_source,status\r\n/);
+  assert.match(csv, /Monthly Profit,155432\.75,/);
+  assert.doesNotMatch(csv, /155\.4K|sourceBoardId|secret-board-123|fetchedAt|internal audit note/);
 });
 
 test("buildMetricExportRows is pure and returns plain serializable data", () => {
@@ -110,10 +120,10 @@ test("buildMetricExportRows is pure and returns plain serializable data", () => 
   assert.doesNotMatch(moduleSource, /use[A-Z]|router|fetch\(|setState|set[A-Z][A-Za-z]+\(/);
 });
 
-test("CompanyKpiView stabilizes export payloads without render-time state updates", () => {
-  const component = readFileSync(new URL("../components/CompanyKpiView.tsx", import.meta.url), "utf8");
-  assert.match(component, /const \{ metrics, exportData \} = useMemo\(/);
-  assert.doesNotMatch(component, /useEffect|useState|router\.refresh|set[A-Z][A-Za-z]+\(/);
+test("SalesDashboard memoizes the single export payload without navigation effects", () => {
+  const component = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
+  assert.match(component, /const exportRows = useMemo\(\(\) => buildMetricExportRows\(/);
+  assert.doesNotMatch(component, /useEffect|router\.refresh|syncUrl=/);
 
   const manualEntry = readFileSync(new URL("../components/ManualKpiEntry.tsx", import.meta.url), "utf8");
   assert.doesNotMatch(manualEntry, /router\.refresh|useRouter/);
