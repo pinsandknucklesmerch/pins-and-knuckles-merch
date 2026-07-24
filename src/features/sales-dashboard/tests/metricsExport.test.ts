@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { calculateCompanyMetrics } from "../domain/calculateDashboardKpis.ts";
 import type { CompanyKpiMonth } from "../domain/types.ts";
-import { buildMetricExportCsv, buildMetricExportRows, getMetricExportFilename } from "../lib/metricsExport.ts";
+import { buildMetricExportRows } from "../lib/metricsExport.ts";
 
 function month(overrides: Partial<CompanyKpiMonth> = {}): CompanyKpiMonth {
   return {
@@ -80,26 +80,86 @@ test("limits export columns to public KPI values and comparison context", () => 
 test("renders one dashboard export control and no per-card export controls", () => {
   const dashboard = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
   const button = readFileSync(new URL("../components/ExportMetricsButton.tsx", import.meta.url), "utf8");
+  const buttonStyles = readFileSync(new URL("../components/ExportMetricsButton.module.css", import.meta.url), "utf8");
   const provider = readFileSync(new URL("../components/MetricDashboardProvider.tsx", import.meta.url), "utf8");
   const cards = ["ProfitShirtKpi.tsx", "SalesInboxKpi.tsx", "CombinedKpiCard.tsx"]
     .map((file) => readFileSync(new URL(`../components/${file}`, import.meta.url), "utf8"))
     .join("\n");
 
-  assert.match(dashboard, /<ExportMetricsButton rows=\{exportRows\}/);
-  assert.equal(button.match(/Export Metrics/g)?.length, 1);
+  assert.equal(dashboard.match(/<ExportMetricsButton /g)?.length, 1);
+  assert.equal(button.match(/<ExportButton /g)?.length, 1);
+  assert.equal(buttonStyles.match(/content: "Export Metrics"/g)?.length, 1);
   assert.doesNotMatch(provider, /\bexportable\b/);
   assert.doesNotMatch(cards, /CardShell|exportable|exportData|sales-kpi-export/);
 });
 
-test("generates the selected-period filename", () => {
-  assert.equal(getMetricExportFilename(2026, 7), "pins-sales-metrics-2026-07.csv");
+test("MetricUI dropdown exposes image, CSV, and clipboard export", () => {
+  const metricUi = readFileSync(new URL("../../../../node_modules/metricui/dist/index.js", import.meta.url), "utf8");
+  assert.match(metricUi, /Save as image/);
+  assert.match(metricUi, /Download CSV/);
+  assert.match(metricUi, /Copy to clipboard/);
+  assert.match(metricUi, /import\('modern-screenshot'\)/);
 });
 
-test("builds CSV from raw public values", () => {
-  const csv = buildMetricExportCsv(rows());
-  assert.match(csv, /^year,month,view,metric_name,raw_value,target,prior_year_value,data_source,status\r\n/);
-  assert.match(csv, /Monthly Profit,155432\.75,/);
-  assert.doesNotMatch(csv, /155\.4K|sourceBoardId|secret-board-123|fetchedAt|internal audit note/);
+test("MetricUI image export targets the visible dashboard metrics wrapper", () => {
+  const dashboard = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
+  const button = readFileSync(new URL("../components/ExportMetricsButton.tsx", import.meta.url), "utf8");
+  const buttonStyles = readFileSync(new URL("../components/ExportMetricsButton.module.css", import.meta.url), "utf8");
+  assert.match(dashboard, /const dashboardMetricsRef = useRef<HTMLDivElement>\(null\)/);
+  assert.match(dashboard, /<div ref=\{dashboardMetricsRef\} data-testid="sales-dashboard-export-content"/);
+  assert.match(dashboard, /targetRef=\{dashboardMetricsRef\}/);
+  assert.match(button, /<ExportButton title=\{title\} targetRef=\{targetRef\} data=\{rows\}/);
+  assert.match(dashboard, /Pins Sales Metrics — \$\{DASHBOARD_MONTHS\[month - 1\]\} \$\{year\} —/);
+  assert.match(button, /data-testid="sales-dashboard-export-control"/);
+  assert.match(buttonStyles, /min-width:\s*9\.75rem/);
+});
+
+test("image capture excludes filter options and the export toolbar", () => {
+  const dashboard = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
+  const filterPanel = dashboard.indexOf('<form data-testid="sales-dashboard-filter-form"');
+  const exportControl = dashboard.indexOf("<ExportMetricsButton");
+  const filterPanelEnd = dashboard.indexOf("</div></Panel>", filterPanel);
+  const captureTarget = dashboard.indexOf('<div ref={dashboardMetricsRef} data-testid="sales-dashboard-export-content"');
+  const tabs = dashboard.indexOf("<DashboardNav", captureTarget);
+  const metrics = dashboard.indexOf("<CompanyKpiView", captureTarget);
+
+  assert.ok(filterPanel >= 0 && exportControl > filterPanel);
+  assert.ok(filterPanelEnd > exportControl && captureTarget > filterPanelEnd);
+  assert.ok(tabs > captureTarget && metrics > tabs);
+  assert.doesNotMatch(dashboard.slice(captureTarget), /sales-dashboard-filter-form|<ExportMetricsButton|<ManualKpiEntry/);
+});
+
+test("export trigger stays mounted with a fixed footprint during export", () => {
+  const button = readFileSync(new URL("../components/ExportMetricsButton.tsx", import.meta.url), "utf8");
+  const styles = readFileSync(new URL("../components/ExportMetricsButton.module.css", import.meta.url), "utf8");
+  assert.match(button, /return <div className=\{styles\.control\}[\s\S]*<ExportButton/);
+  assert.doesNotMatch(button, /exporting\s*\?|isExporting|hidden|setState|useState/);
+  assert.match(styles, /width:\s*9\.75rem/);
+  assert.match(styles, /height:\s*2\.25rem/);
+  assert.match(styles, /opacity:\s*1/);
+  assert.match(styles, /white-space:\s*nowrap/);
+  assert.match(styles, /display:\s*inline-flex/);
+  assert.match(styles, /gap:\s*0\.5rem/);
+  assert.doesNotMatch(styles, /display:\s*none|visibility:\s*hidden|opacity:\s*0(?:\D|$)/);
+});
+
+test("export dropdown is outside the filter form and cannot submit it", () => {
+  const dashboard = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
+  const metricUi = readFileSync(new URL("../../../../node_modules/metricui/dist/index.js", import.meta.url), "utf8");
+  const formStart = dashboard.indexOf('<form data-testid="sales-dashboard-filter-form"');
+  const formEnd = dashboard.indexOf("</form>", formStart);
+  const actionsStart = dashboard.indexOf('<div data-testid="sales-dashboard-actions"');
+  const filterForm = dashboard.slice(formStart, formEnd);
+
+  assert.ok(formStart >= 0 && formEnd > formStart);
+  assert.ok(actionsStart > formEnd);
+  assert.equal(filterForm.match(/<button /g)?.length, 1);
+  assert.match(filterForm, /<button[^>]*type="submit">Apply<\/button>/);
+  assert.doesNotMatch(filterForm, /ExportMetricsButton|ManualKpiEntry/);
+  assert.match(dashboard.slice(actionsStart), /<ManualKpiEntry[\s\S]*<ExportMetricsButton/);
+
+  assert.match(metricUi, /createPortal\(/);
+  for (const option of ["Save as image", "Download CSV", "Copy to clipboard"]) assert.match(metricUi, new RegExp(option));
 });
 
 test("buildMetricExportRows is pure and returns plain serializable data", () => {
@@ -123,7 +183,7 @@ test("buildMetricExportRows is pure and returns plain serializable data", () => 
 test("SalesDashboard memoizes the single export payload without navigation effects", () => {
   const component = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
   assert.match(component, /const exportRows = useMemo\(\(\) => buildMetricExportRows\(/);
-  assert.doesNotMatch(component, /useEffect|router\.refresh|syncUrl=/);
+  assert.doesNotMatch(component, /useEffect|router\.(?:push|replace|refresh)|history\.replaceState|syncUrl=/);
 
   const manualEntry = readFileSync(new URL("../components/ManualKpiEntry.tsx", import.meta.url), "utf8");
   assert.doesNotMatch(manualEntry, /router\.refresh|useRouter/);

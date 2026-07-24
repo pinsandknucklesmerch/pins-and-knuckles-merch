@@ -48,21 +48,3 @@ export function buildMetricExportRows(
     status: statusForPeriod(current.year, current.month, now),
   }));
 }
-
-function escapeCsv(value: string | number | null) {
-  if (value === null) return "";
-  const text = String(value);
-  return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-}
-
-export function buildMetricExportCsv(rows: MetricExportRow[]) {
-  if (rows.length === 0) return "";
-  const columns = Object.keys(rows[0]) as Array<keyof MetricExportRow>;
-  return [columns, ...rows.map((row) => columns.map((column) => row[column]))]
-    .map((row) => row.map(escapeCsv).join(","))
-    .join("\r\n");
-}
-
-export function getMetricExportFilename(year: number, month: number) {
-  return `pins-sales-metrics-${year}-${String(month).padStart(2, "0")}.csv`;
-}
