@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   formatEuStandardQuote,
+  formatUsClientQuote,
   getEuItemLabel,
   type EuQuoteLine,
 } from "../domain/euQuoteFormatter.ts";
@@ -99,6 +100,15 @@ test("default EU quote has exact single-item spacing", () => {
 
 test("EU quote has exact digitising spacing", () => {
   assert.equal(formatEuStandardQuote([createLine({}, true)], totals), "Item 1:\n\n5001 AS Colour Staple Tee (1 Col Front, Small embroidery)\n\nDigitizing fee = €31.75 (incl. VAT)\n\n50 x €9.19 (excl vat) ea = €583.57");
+});
+
+test("US Clients quote matches the legacy wording exactly", () => {
+  const line = createLine();
+  line.result.customerSubtotalExVat = 559.5;
+  assert.equal(
+    formatUsClientQuote([line], { ...totals, customerSubtotalExVat: 559.5, vatRate: 27 }),
+    "Item 1:\n\n5001 AS Colour Staple Tee (1c front + base)\n\n50 x €11.19 each (€559.50 ex vat)\nVAT = €151.07\nTOTAL = €710.57",
+  );
 });
 
 test("multiple items are separated by exactly two newline characters", () => {

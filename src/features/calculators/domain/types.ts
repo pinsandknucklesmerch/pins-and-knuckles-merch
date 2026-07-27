@@ -132,6 +132,13 @@ export type CalculatorReferenceData = {
   deliveryRates: DeliveryRate[];
 };
 
+export type UkTradePrintPosition = "FRONT" | "BACK" | "LEFT_SLEEVE" | "RIGHT_SLEEVE" | "NECK_PRINT_STANDARD" | "NECK_PRINT_TRANSFER";
+export type UkTradePrintTier = { pricingSetCode: string; positionCode: "STANDARD" | "NECK_PRINT_STANDARD" | "NECK_PRINT_TRANSFER"; colourCount: number | null; quantityTier: number; unitPrice: number; setupScreenCountStrategy: "colour_count" | "one" | "none" };
+export type UkTradeEmbroideryTier = { pricingSetCode: string; stitchCount: number; isExtra1000Stitches: boolean; quantityTier: number; unitPrice: number };
+export type UkTradeReferenceData = Pick<CalculatorReferenceData, "profile" | "priceSets" | "garments" | "fees"> & { printTiers: UkTradePrintTier[]; embroideryTiers: UkTradeEmbroideryTier[] };
+export type UkTradeItemInput = { id: string; itemLabel?: string; garmentId: string | null; quantity: number; printPositions: Array<{ position: UkTradePrintPosition; colourCount?: number }>; embroideryStitches: Array<number | null> };
+export type UkTradeItemResult = { itemId: string; garmentId: string; quantity: number; garmentCost: number; printCost: number; screenSetupCount: number; screenSetupCost: number; embroideryCost: number; embroiderySetupCost: number; totalCost: number; errors: CalculatorValidationError[] };
+
 export type EuPrintSelection = {
   position: EuPrintPosition;
   colourCount?: number;

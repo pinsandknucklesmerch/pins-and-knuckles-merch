@@ -11,6 +11,7 @@ import type {
 const PROFILE_ID = "profile-eu-standard";
 const GARMENT_ID = "garment-hoodie";
 const TSHIRT_ID = "garment-tshirt";
+const LONGSLEEVE_ID = "garment-longsleeve";
 
 function buildEuPrintTiers(): EuPrintPriceTier[] {
   const rows = [
@@ -192,6 +193,19 @@ function createReferenceData(): CalculatorReferenceData {
         extraSizeCost: 0.7,
         tags: "",
       },
+      {
+        id: LONGSLEEVE_ID,
+        code: "LS01",
+        altCode: "",
+        brandName: "Gildan",
+        name: "Long Sleeve",
+        colour: "",
+        garmentType: "LONGSLEEVE",
+        eurBasePrice: 4,
+        gbpPrice: null,
+        extraSizeCost: null,
+        tags: "",
+      },
     ],
     garmentMarkups: [
       {
@@ -328,6 +342,23 @@ test("calculates 50 qty hoodie with 1-colour front", () => {
   assertNearlyEqual(result.totals.vatAmount, 199.665);
   assertNearlyEqual(result.totals.customerTotalIncVat, 939.165);
   assert.equal(result.totals.profitExVat, 257);
+});
+
+test("US Clients uses the seeded T-shirt, long-sleeve, and hoodie markups", () => {
+  const reference = createReferenceData();
+  reference.profile = { ...reference.profile, id: "profile-us", code: "EU_US_CLIENTS", name: "EU US Clients" };
+  reference.priceSets = reference.priceSets.map((set) => ({ ...set, calculatorProfileId: "profile-us" }));
+  reference.garmentMarkups = [
+    { calculatorProfileId: "profile-us", garmentType: "TSHIRT", markupValue: 2 },
+    { calculatorProfileId: "profile-us", garmentType: "LONGSLEEVE", markupValue: 3 },
+    { calculatorProfileId: "profile-us", garmentType: "HOODIE", markupValue: 4 },
+  ];
+  reference.fees = reference.fees.map((fee) => ({ ...fee, calculatorProfileId: "profile-us" }));
+  for (const [garmentId, expected] of [[TSHIRT_ID, 100], [LONGSLEEVE_ID, 150], [GARMENT_ID, 200]] as const) {
+    const result = calculateEuStandardPrice({ ...createInput({ garmentId }), profileCode: "EU_US_CLIENTS" }, reference);
+    assert.equal(result.ok, true, result.ok ? "" : JSON.stringify(result.errors));
+    if (result.ok) assert.equal(result.items[0].garmentMarkupCost, expected);
+  }
 });
 
 test("validates EU quantity boundaries", () => {

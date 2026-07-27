@@ -105,6 +105,8 @@ Generated database types are present at `src/types/database.types.ts`.
 | `/hub/calculators` | Protected calculator region menu |
 | `/hub/calculators/eu` | Protected EU calculator menu |
 | `/hub/calculators/eu/standard` | Protected initial EU Standard calculator |
+| `/hub/calculators/eu/us-clients` | Protected EU US Clients calculator |
+| `/hub/calculators/uk/trade` | Protected UK Trade calculator |
 | `/hub/pk-tax` | Protected calculation-only PK Tax allocation calculator |
 
 ## PK Tax
@@ -176,16 +178,17 @@ Implemented:
 - EU Standard route and initial UI.
 - EU calculator repository loading global reference data.
 - EU domain engine, validation, price lookup, profile constants, mappers, and tests.
+- EU US Clients route using the shared EU foundation and its seeded profile: garment markups are T-shirt €2, long-sleeve €3, and hoodie €4. Its pure formatter preserves legacy lowercase decoration wording and `+ base` copy.
+- UK Trade route, Supabase reference-data loading, pure tier engine, copy formatter, and tests. Print uses floor tiers through 10,000 with £20 screen setup; embroidery uses 7,000–15,000 stitch tiers, additional 1,000-stitch blocks, £30 setup per position, and the 2,500 tier above 2,500 units.
+- Calculator state is client-local only; no browser persistence is used and revisiting a route starts fresh.
 
 Not implemented yet:
 
-- EU US Clients route/UI behaviour.
-- UK Trade route/UI/domain implementation.
 - Admin tooling for editing calculator reference data.
 
 Deferred:
 
-- EU Trade. No active profile should be added until rules are explicitly confirmed.
+- EU Trade. It remains deferred/inactive; no active profile should be added until rules are explicitly confirmed.
 
 ## Commercial Invoice Generator
 

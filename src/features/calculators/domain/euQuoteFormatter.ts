@@ -70,3 +70,18 @@ export function formatEuStandardQuote(lines: EuQuoteLine[], totals: EuCalculator
     })
     .join("\n\n");
 }
+
+export function formatUsClientQuote(lines: EuQuoteLine[], totals: EuCalculatorTotals) {
+  return lines.map(({ input, result, garment }, index) => {
+    const printSummary = result.printBreakdowns.map((print) => `${print.colourCount ?? 1}c ${positionLabels[print.position].toLowerCase()}`);
+    const embroiderySummary = result.embroideryBreakdowns.map((embroidery) => embroideryLabels[embroidery.size]);
+    const decorationSummary = [...printSummary, ...embroiderySummary].join(", ");
+    const garmentSummary = [garment.code, garment.brandName, garment.name, garment.colour].map((part) => part.trim()).filter(Boolean).join(" ") || "No garment";
+    const subtotal = result.customerSubtotalExVat;
+    const vat = subtotal * (totals.vatRate / 100);
+    const digitising = result.digitisingCustomerCost > 0 ? `Digitizing fee = ${money(result.digitisingCustomerCost * (1 + totals.vatRate / 100))} (incl. VAT)` : null;
+    const heading = `${getEuItemLabel(input.itemLabel, index)}:\n\n${garmentSummary}${decorationSummary ? ` (${decorationSummary} + base)` : ""}`;
+    const fee = digitising ? `\n\n${digitising}` : "";
+    return `${heading}${fee}\n\n${result.quantity} x ${money(subtotal / result.quantity)} each (${money(subtotal)} ex vat)\nVAT = ${money(vat)}\nTOTAL = ${money(subtotal + vat)}`;
+  }).join("\n\n");
+}

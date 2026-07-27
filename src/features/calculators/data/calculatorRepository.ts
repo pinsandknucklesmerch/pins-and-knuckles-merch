@@ -3,6 +3,7 @@ import type { Database, Tables } from "@/types/database.types";
 import type {
   CalculatorProfileCode,
   CalculatorReferenceData,
+  UkTradeReferenceData,
   PriceKind,
 } from "../domain/types.ts";
 import {
@@ -26,6 +27,8 @@ type EuPrintPriceTierRow = Tables<"eu_print_price_tiers">;
 type EuEmbroideryPriceRow = Tables<"eu_embroidery_pricing">;
 type CalculatorFeeRow = Tables<"calculator_fees">;
 type DeliveryRateRow = Tables<"delivery_rates">;
+type UkTradePrintTierRow = Tables<"uk_trade_print_price_tiers">;
+type UkTradeEmbroideryTierRow = Tables<"uk_trade_embroidery_pricing">;
 
 function throwIfError(error: { message: string } | null, context: string) {
   if (error) {
@@ -207,4 +210,31 @@ export async function loadEuCalculatorReferenceData(
   profileCode: Extract<CalculatorProfileCode, "EU_STANDARD" | "EU_US_CLIENTS">,
 ) {
   return loadCalculatorReferenceData(supabase, profileCode);
+}
+
+export async function loadUkTradeCalculatorReferenceData(supabase: CalculatorSupabaseClient): Promise<UkTradeReferenceData> {
+  const effectiveDate = getUtcDateString();
+  const validToFilter = `valid_to.is.null,valid_to.gte.${effectiveDate}`;
+  const base = await loadProfileBase(supabase, "UK_TRADE", effectiveDate, validToFilter);
+  const printSet = getPricingSetCode(base.priceSets, "print");
+  const embroiderySet = getPricingSetCode(base.priceSets, "embroidery");
+  const [prints, embroidery] = await Promise.all([
+    supabase.from("uk_trade_print_price_tiers").select("*").eq("pricing_set_code", printSet ?? "").eq("is_active", true).lte("valid_from", effectiveDate).or(validToFilter).returns<UkTradePrintTierRow[]>(),
+    supabase.from("uk_trade_embroidery_pricing").select("*").eq("pricing_set_code", embroiderySet ?? "").eq("is_active", true).lte("valid_from", effectiveDate).or(validToFilter).returns<UkTradeEmbroideryTierRow[]>(),
+  ]);
+  throwIfError(prints.error, "Failed to load UK print tiers"); throwIfError(embroidery.error, "Failed to load UK embroidery tiers");
+  return { ...base, printTiers: (prints.data ?? []).map((row) => ({ pricingSetCode: row.pricing_set_code, positionCode: row.position_code as "STANDARD" | "NECK_PRINT_STANDARD" | "NECK_PRINT_TRANSFER", colourCount: row.colour_count, quantityTier: Number(row.quantity_tier), unitPrice: Number(row.unit_price), setupScreenCountStrategy: row.setup_screen_count_strategy as "colour_count" | "one" | "none" })), embroideryTiers: (embroidery.data ?? []).map((row) => ({ pricingSetCode: row.pricing_set_code, stitchCount: Number(row.stitch_count), isExtra1000Stitches: row.is_extra_1000_stitches, quantityTier: Number(row.quantity_tier), unitPrice: Number(row.unit_price) })) };
+}
+
+async function loadProfileBase(supabase: CalculatorSupabaseClient, code: "UK_TRADE", effectiveDate: string, validToFilter: string) {
+  const profileResponse = await supabase.from("calculator_profiles").select("*").eq("code", code).eq("is_active", true).maybeSingle();
+  throwIfError(profileResponse.error, "Failed to load calculator profile"); if (!profileResponse.data) throw new Error(`Calculator profile not found: ${code}`);
+  const profile = mapCalculatorProfile(profileResponse.data as CalculatorProfileRow);
+  const [sets, garments, fees] = await Promise.all([
+    supabase.from("calculator_profile_price_sets").select("*").eq("calculator_profile_id", profile.id).returns<CalculatorProfilePriceSetRow[]>(),
+    supabase.from("garments").select("*").eq("is_active", true).order("code").returns<GarmentRow[]>(),
+    supabase.from("calculator_fees").select("*").eq("calculator_profile_id", profile.id).eq("is_active", true).lte("valid_from", effectiveDate).or(validToFilter).returns<CalculatorFeeRow[]>(),
+  ]);
+  throwIfError(sets.error, "Failed to load calculator price sets"); throwIfError(garments.error, "Failed to load garments"); throwIfError(fees.error, "Failed to load calculator fees");
+  return { profile, priceSets: (sets.data ?? []).map(mapCalculatorProfilePriceSet), garments: (garments.data ?? []).map(mapGarment), fees: (fees.data ?? []).map(mapCalculatorFee) };
 }

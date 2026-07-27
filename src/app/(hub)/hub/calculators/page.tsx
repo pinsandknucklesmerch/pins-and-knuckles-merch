@@ -17,8 +17,7 @@ const euCalculators: MagicBentoItem[] = [
     title: "EU US Clients",
     label: "EU · USD",
     href: "/hub/calculators/eu/us-clients",
-    status: "Coming soon",
-    disabled: true,
+    status: "Available",
   },
 ];
 
@@ -28,8 +27,7 @@ const ukCalculators: MagicBentoItem[] = [
     title: "UK Trade",
     label: "UK · GBP",
     href: "/hub/calculators/uk/trade",
-    status: "Coming soon",
-    disabled: true,
+    status: "Available",
   },
 ];
 

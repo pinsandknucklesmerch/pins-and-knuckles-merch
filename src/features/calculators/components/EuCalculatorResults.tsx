@@ -12,6 +12,8 @@ type EuCalculatorResultsProps = {
   showSummary?: boolean;
   showBreakdown?: boolean;
   showEmptyState?: boolean;
+  quoteFormatter?: (items: EuQuoteLine[], totals: EuCalculatorTotals) => string;
+  onReset?: () => void;
 };
 
 const currencyFormatter = new Intl.NumberFormat("en-GB", {
@@ -102,6 +104,8 @@ export function EuCalculatorResults({
   showSummary = true,
   showBreakdown = true,
   showEmptyState = true,
+  quoteFormatter = formatEuStandardQuote,
+  onReset,
 }: EuCalculatorResultsProps) {
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const copyResetTimeout = useRef<number | null>(null);
@@ -112,7 +116,7 @@ export function EuCalculatorResults({
 
   async function copyQuote() {
     try {
-      await navigator.clipboard.writeText(formatEuStandardQuote(items, totals));
+      await navigator.clipboard.writeText(quoteFormatter(items, totals));
       setCopyState("copied");
       if (copyResetTimeout.current !== null) window.clearTimeout(copyResetTimeout.current);
       copyResetTimeout.current = window.setTimeout(() => setCopyState("idle"), 2200);
@@ -149,6 +153,8 @@ export function EuCalculatorResults({
           </div>
         </button>
       </div> : null}
+
+      {showSummary && onReset ? <button type="button" onClick={onReset} className="justify-self-start text-sm text-muted-foreground transition-colors hover:text-foreground">Reset</button> : null}
 
       {showBreakdown ? <details className="group min-w-0 rounded-lg border border-border/90 bg-card/75 backdrop-blur-sm">
         <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">

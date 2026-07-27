@@ -1,0 +1,34 @@
+"use client";
+
+import { Check, Copy, Plus, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ActionButton } from "@/components/ui/ActionButton";
+import { Panel } from "@/components/ui/Panel";
+import { calculateUkTradeItem } from "../domain/ukTradePricingEngine.ts";
+import type { UkTradeItemInput, UkTradePrintPosition, UkTradeReferenceData } from "../domain/types.ts";
+import { getEuItemLabel } from "../domain/euQuoteFormatter.ts";
+import { formatUkTradeQuote } from "../domain/ukTradeQuoteFormatter.ts";
+import { GarmentCombobox } from "./GarmentCombobox";
+import { CalculatorErrors } from "./CalculatorErrors";
+
+const positions: Array<{ value: UkTradePrintPosition; label: string }> = [{ value: "FRONT", label: "Front" }, { value: "BACK", label: "Back" }, { value: "LEFT_SLEEVE", label: "Left Sleeve" }, { value: "RIGHT_SLEEVE", label: "Right Sleeve" }, { value: "NECK_PRINT_STANDARD", label: "Neck Print Standard" }, { value: "NECK_PRINT_TRANSFER", label: "Neck Print Transfer" }];
+const emptyItem = (index: number): UkTradeItemInput => ({ id: `item-${index}`, itemLabel: "", garmentId: null, quantity: 50, printPositions: [{ position: "FRONT", colourCount: 1 }], embroideryStitches: [null, null, null] });
+const money = (value: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(value);
+
+export function UkTradeCalculator({ referenceData }: { referenceData: UkTradeReferenceData }) {
+  const [items, setItems] = useState<UkTradeItemInput[]>([emptyItem(1)]); const [copied, setCopied] = useState(false);
+  const results = useMemo(() => items.map((item) => calculateUkTradeItem(item, referenceData)), [items, referenceData]);
+  const totals = results.filter((result) => result.errors.length === 0).reduce((sum, result) => sum + result.totalCost, 0);
+  const update = (item: UkTradeItemInput) => setItems((current) => current.map((row) => row.id === item.id ? item : row));
+  async function copyQuote() { const text = formatUkTradeQuote(items, results, referenceData.garments); if (!text) return; await navigator.clipboard.writeText(text); setCopied(true); window.setTimeout(() => setCopied(false), 2200); }
+  return <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="grid gap-4">{items.map((item, index) => <Panel key={item.id} className="grid gap-4">
+      <div className="flex items-center justify-between gap-3"><input aria-label={`Design name for item ${index + 1}`} value={item.itemLabel ?? ""} placeholder={getEuItemLabel(undefined, index)} onChange={(event) => update({ ...item, itemLabel: event.target.value })} onBlur={(event) => update({ ...item, itemLabel: event.target.value.trim() })} className="min-w-0 bg-transparent text-sm font-semibold outline-none" /><button type="button" disabled={items.length === 1} onClick={() => setItems((current) => current.filter((row) => row.id !== item.id))} className="inline-flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground disabled:opacity-40" aria-label={`Remove item ${index + 1}`}><Trash2 className="size-4" /></button></div>
+      <div className="grid gap-4 md:grid-cols-[1fr_140px]"><GarmentCombobox garments={referenceData.garments} value={item.garmentId} onChange={(garmentId) => update({ ...item, garmentId })} /><label className="grid gap-2 text-xs text-muted-foreground">Quantity<input min={50} max={10000} type="number" value={item.quantity} onChange={(event) => update({ ...item, quantity: Number(event.target.value) })} className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground" /></label></div>
+      <div className="grid gap-2"><span className="text-xs font-medium text-muted-foreground">Print</span><div className="grid gap-2 sm:grid-cols-2">{positions.map((position) => { const selection = item.printPositions.find((row) => row.position === position.value); return <label key={position.value} className="flex min-h-10 items-center justify-between gap-2 rounded-md border border-border bg-background px-3 text-sm"><span><input type="checkbox" checked={Boolean(selection)} onChange={(event) => update({ ...item, printPositions: event.target.checked ? [...item.printPositions, { position: position.value, colourCount: position.value.startsWith("NECK_") ? undefined : 1 }] : item.printPositions.filter((row) => row.position !== position.value) })} className="mr-2 accent-primary" />{position.label}</span>{selection && !position.value.startsWith("NECK_") ? <input aria-label={`${position.label} colours`} type="number" min={1} max={10} value={selection.colourCount ?? 1} onChange={(event) => update({ ...item, printPositions: item.printPositions.map((row) => row.position === position.value ? { ...row, colourCount: Number(event.target.value) } : row) })} className="h-7 w-14 rounded border border-input bg-card px-2" /> : null}</label>; })}</div></div>
+      <div className="grid gap-2"><span className="text-xs font-medium text-muted-foreground">Embroidery stitch count</span><div className="grid gap-2 sm:grid-cols-3">{item.embroideryStitches.map((value, slot) => <input key={slot} type="number" min={7000} step={1} placeholder="None" value={value ?? ""} onChange={(event) => { const next = [...item.embroideryStitches]; next[slot] = event.target.value === "" ? null : Number(event.target.value); update({ ...item, embroideryStitches: next }); }} className="h-9 rounded-md border border-input bg-background px-3 text-sm" />)}</div></div>
+      <CalculatorErrors errors={results[index].errors} />
+    </Panel>)}<ActionButton onClick={() => setItems((current) => [...current, emptyItem(current.length + 1)])}><Plus className="mr-2 size-4" />Add item</ActionButton></div>
+    <div className="grid content-start gap-4"><Panel className="p-4"><div className="text-xs text-muted-foreground">Total Cost</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(totals)}</div><div className="mt-4 flex gap-3"><button type="button" onClick={copyQuote} className="inline-flex items-center gap-2 text-sm text-accent"><>{copied ? <Check className="size-4" /> : <Copy className="size-4" />}</> {copied ? "Copied" : "Copy quote"}</button><button type="button" onClick={() => setItems([emptyItem(1)])} className="text-sm text-muted-foreground hover:text-foreground">Reset</button></div></Panel><Panel title="Breakdown" className="text-sm"><dl className="space-y-2">{results.map((result, index) => <div key={result.itemId} className="border-b border-border/60 pb-2 last:border-0"><dt className="font-medium">{getEuItemLabel(items[index].itemLabel, index)}</dt><dd className="mt-1 text-muted-foreground">Garment {money(result.garmentCost)} · Print {money(result.printCost)} · Setup {money(result.screenSetupCost + result.embroiderySetupCost)} · Embroidery {money(result.embroideryCost)}</dd></div>)}</dl></Panel></div>
+  </div>;
+}

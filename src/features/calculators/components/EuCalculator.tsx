@@ -14,9 +14,11 @@ import type {
 import { EuItemCard } from "./EuItemCard";
 import { EuCalculatorResults } from "./EuCalculatorResults";
 import type { EuQuoteLine } from "../domain/euQuoteFormatter.ts";
+import { formatEuStandardQuote, formatUsClientQuote } from "../domain/euQuoteFormatter.ts";
 
 type EuCalculatorProps = {
   referenceData: CalculatorReferenceData;
+  profileCode?: "EU_STANDARD" | "EU_US_CLIENTS";
 };
 
 type ItemCalculation = {
@@ -53,7 +55,7 @@ function addTotals(
   };
 }
 
-export function EuCalculator({ referenceData }: EuCalculatorProps) {
+export function EuCalculator({ referenceData, profileCode = "EU_STANDARD" }: EuCalculatorProps) {
   const [nextItemIndex, setNextItemIndex] = useState(2);
   const [items, setItems] = useState<EuCalculatorItemInput[]>([
     createDefaultEuCalculatorItem(1),
@@ -63,7 +65,7 @@ export function EuCalculator({ referenceData }: EuCalculatorProps) {
     return items.map((item) => {
       const result = calculateEuStandardPrice(
         {
-          profileCode: "EU_STANDARD",
+          profileCode,
           items: [item],
         },
         referenceData,
@@ -78,7 +80,7 @@ export function EuCalculator({ referenceData }: EuCalculatorProps) {
           }
         : { itemId: item.id, errors: result.errors, totals: null, result: null };
     });
-  }, [items, referenceData]);
+  }, [items, profileCode, referenceData]);
 
   const totals = calculations.reduce(
     (current, calculation) =>
@@ -121,6 +123,11 @@ export function EuCalculator({ referenceData }: EuCalculatorProps) {
     );
   }
 
+  function reset() {
+    setItems([createDefaultEuCalculatorItem(1)]);
+    setNextItemIndex(2);
+  }
+
   return (
     <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="grid min-w-0 gap-4">
@@ -154,11 +161,11 @@ export function EuCalculator({ referenceData }: EuCalculatorProps) {
       </div>
 
       <div className="grid min-w-0 content-start gap-4">
-        <EuCalculatorResults items={validQuoteLines} totals={totals} showBreakdown={false} showEmptyState={false} />
+        <EuCalculatorResults items={validQuoteLines} totals={totals} onReset={reset} quoteFormatter={profileCode === "EU_US_CLIENTS" ? formatUsClientQuote : formatEuStandardQuote} showBreakdown={false} showEmptyState={false} />
       </div>
 
       <div className="col-span-full min-w-0">
-        <EuCalculatorResults items={validQuoteLines} totals={totals} showSummary={false} />
+        <EuCalculatorResults items={validQuoteLines} totals={totals} quoteFormatter={profileCode === "EU_US_CLIENTS" ? formatUsClientQuote : formatEuStandardQuote} showSummary={false} />
       </div>
     </div>
   );
