@@ -76,6 +76,54 @@ test("numeric strings are converted correctly at the mapper boundary", () => {
   assert.equal(garment.extraSizeCost, 0.7);
 });
 
+test("mapper accepts OTHER as a garment pricing category", () => {
+  const garment = mapGarment({
+    id: "garment-other",
+    organisation_id: null,
+    product_type_id: null,
+    code: "BB610",
+    alt_code: "",
+    brand_name: "Beechfield",
+    name: "5-panel snapback rapper cap",
+    colour: "",
+    garment_type: "OTHER",
+    eur_base_price: "2.7000",
+    gbp_price: null,
+    extra_size_cost: null,
+    tags: "cap",
+    is_active: true,
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-01-01T00:00:00Z",
+  } as unknown as Tables<"garments">);
+
+  assert.equal(garment.garmentType, "OTHER");
+});
+
+test("mapper rejects unsupported garment pricing categories", () => {
+  assert.throws(
+    () =>
+      mapGarment({
+        id: "garment-invalid",
+        organisation_id: null,
+        product_type_id: null,
+        code: "INVALID",
+        alt_code: "",
+        brand_name: "",
+        name: "Invalid garment",
+        colour: "",
+        garment_type: "UNCLASSIFIED",
+        eur_base_price: null,
+        gbp_price: null,
+        extra_size_cost: null,
+        tags: "",
+        is_active: true,
+        created_at: "2026-01-01T00:00:00Z",
+        updated_at: "2026-01-01T00:00:00Z",
+      } as unknown as Tables<"garments">),
+    /Unsupported garment type: UNCLASSIFIED/,
+  );
+});
+
 test("invalid numeric strings produce a clear field error", () => {
   assert.throws(
     () =>

@@ -494,6 +494,36 @@ test("returns an explicit error for missing garment markup", () => {
   ]);
 });
 
+test("calculates an OTHER garment when its profile markup exists", () => {
+  const referenceData = createReferenceData();
+  referenceData.garments[0] = {
+    ...referenceData.garments[0],
+    garmentType: "OTHER",
+  };
+  referenceData.garmentMarkups = [
+    ...referenceData.garmentMarkups,
+    { calculatorProfileId: PROFILE_ID, garmentType: "OTHER", markupValue: 1.5 },
+  ];
+
+  const result = assertOk(
+    calculateEuStandardPrice(createInput(), referenceData),
+  );
+
+  assert.equal(result.items[0].garmentMarkupCost, 75);
+});
+
+test("returns MISSING_GARMENT_MARKUP for an OTHER garment without a profile markup", () => {
+  const referenceData = createReferenceData();
+  referenceData.garments[0] = {
+    ...referenceData.garments[0],
+    garmentType: "OTHER",
+  };
+
+  assertErrorCodes(calculateEuStandardPrice(createInput(), referenceData), [
+    "MISSING_GARMENT_MARKUP",
+  ]);
+});
+
 test("returns an explicit error for missing embroidery pricing", () => {
   const referenceData = createReferenceData();
   referenceData.euEmbroideryPricing = referenceData.euEmbroideryPricing.filter(

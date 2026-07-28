@@ -83,6 +83,10 @@ Repository migrations:
   - Global calculator seed data with `organisation_id = null`.
   - Active profiles for `EU_STANDARD`, `EU_US_CLIENTS`, and `UK_TRADE`.
   - No active EU Trade profile.
+- `20260728150000_add_product_types_and_other_category.sql`
+  - Global `product_types` reference-data foundation and nullable `garments.product_type_id` staged relationship.
+  - `OTHER` calculator pricing category support; no Product Types or OTHER markup values are seeded.
+  - `garment_type` remains transitional until legacy garment data is migrated and Product Type pricing categories become authoritative.
 - `20260720190000_sales_dashboard_phase1.sql`
   - Persistent company, team-member, and target KPI tables with RLS-backed Pins Hub read/admin-write policies.
 - `20260722120000_grant_service_role_team_provisioning.sql`
@@ -334,6 +338,7 @@ npm run build
 - Monday audit/import/sync tooling exists, but production configuration and deployment verification remain required.
 - EPCC Gmail profit ingestion exists, but Gmail OAuth, cron, service-role configuration, and migration deployment require production verification.
 - Admin workflows for calculator data are not implemented.
+- Product Type records and legacy garment-data import remain pending; garment Product Type assignment is staged through nullable `product_type_id`.
 - EU Trade remains deferred pending confirmed rules.
 - Garment Directory and Quick Reference have no active routes.
 

@@ -570,6 +570,7 @@ export type Database = {
           is_active: boolean
           name: string
           organisation_id: string | null
+          product_type_id: string | null
           tags: string
           updated_at: string
         }
@@ -587,6 +588,7 @@ export type Database = {
           is_active?: boolean
           name: string
           organisation_id?: string | null
+          product_type_id?: string | null
           tags?: string
           updated_at?: string
         }
@@ -604,6 +606,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           organisation_id?: string | null
+          product_type_id?: string | null
           tags?: string
           updated_at?: string
         }
@@ -613,6 +616,13 @@ export type Database = {
             columns: ["organisation_id"]
             isOneToOne: false
             referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "garments_product_type_id_fkey"
+            columns: ["product_type_id"]
+            isOneToOne: false
+            referencedRelation: "product_types"
             referencedColumns: ["id"]
           },
         ]
@@ -677,6 +687,36 @@ export type Database = {
           name?: string
           slug?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      product_types: {
+        Row: {
+          commodity_code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          pricing_category: string
+          updated_at: string
+        }
+        Insert: {
+          commodity_code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          pricing_category: string
+          updated_at?: string
+        }
+        Update: {
+          commodity_code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          pricing_category?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -776,16 +816,51 @@ export type Database = {
           },
         ]
       }
+      sales_kpi_monday_sync_locks: {
+        Row: {
+          expires_at: string
+          lock_token: string
+          locked_at: string
+          month: number
+          organisation_id: string
+          year: number
+        }
+        Insert: {
+          expires_at: string
+          lock_token: string
+          locked_at?: string
+          month: number
+          organisation_id: string
+          year: number
+        }
+        Update: {
+          expires_at?: string
+          lock_token?: string
+          locked_at?: string
+          month?: number
+          organisation_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_kpi_monday_sync_locks_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sales_kpi_months: {
         Row: {
           converted: number | null
           created_at: string
           data_source: string
           id: string
+          monday_sync_metadata: Json | null
           month: number
           monthly_profit: number | null
           monthly_profit_source: string | null
-          monday_sync_metadata: Json | null
           notes: string | null
           orders_processed: number | null
           organisation_id: string | null
@@ -800,10 +875,10 @@ export type Database = {
           created_at?: string
           data_source?: string
           id?: string
+          monday_sync_metadata?: Json | null
           month: number
           monthly_profit?: number | null
           monthly_profit_source?: string | null
-          monday_sync_metadata?: Json | null
           notes?: string | null
           orders_processed?: number | null
           organisation_id?: string | null
@@ -818,10 +893,10 @@ export type Database = {
           created_at?: string
           data_source?: string
           id?: string
+          monday_sync_metadata?: Json | null
           month?: number
           monthly_profit?: number | null
           monthly_profit_source?: string | null
-          monday_sync_metadata?: Json | null
           notes?: string | null
           orders_processed?: number | null
           organisation_id?: string | null
@@ -906,6 +981,59 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "sales_kpi_profit_email_ingestions_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_kpi_profit_email_sources: {
+        Row: {
+          aggregation_rule: string
+          created_at: string
+          id: string
+          message_id: string
+          organisation_id: string | null
+          parsed_row_count: number
+          received_at: string
+          report_month: number
+          report_year: number
+          sender: string
+          source_hash: string
+          subject: string
+        }
+        Insert: {
+          aggregation_rule: string
+          created_at?: string
+          id?: string
+          message_id: string
+          organisation_id?: string | null
+          parsed_row_count: number
+          received_at: string
+          report_month: number
+          report_year: number
+          sender: string
+          source_hash: string
+          subject: string
+        }
+        Update: {
+          aggregation_rule?: string
+          created_at?: string
+          id?: string
+          message_id?: string
+          organisation_id?: string | null
+          parsed_row_count?: number
+          received_at?: string
+          report_month?: number
+          report_year?: number
+          sender?: string
+          source_hash?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_kpi_profit_email_sources_organisation_id_fkey"
             columns: ["organisation_id"]
             isOneToOne: false
             referencedRelation: "organisations"
@@ -1117,30 +1245,79 @@ export type Database = {
         Args: { required_access_level?: string }
         Returns: boolean
       }
-      ingest_epcc_monthly_profit: {
-        Args: {
-          p_message_id: string
-          p_month: number
-          p_organisation_id: string
-          p_received_at: string
-          p_report_end: string
-          p_report_start: string
-          p_sender: string
-          p_source_hash: string
-          p_subject: string
-          p_total_pk_tax: number
-          p_total_profit: number
-          p_total_sales: number
-          p_year: number
-        }
-        Returns: string
-      }
+      ingest_epcc_monthly_profit:
+        | {
+            Args: {
+              p_message_id: string
+              p_month: number
+              p_organisation_id: string
+              p_received_at: string
+              p_report_end: string
+              p_report_start: string
+              p_sender: string
+              p_source_hash: string
+              p_subject: string
+              p_total_pk_tax: number
+              p_total_profit: number
+              p_total_sales: number
+              p_year: number
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_aggregation_rule: string
+              p_message_id: string
+              p_month: number
+              p_monthly_profit: number
+              p_organisation_id: string
+              p_parsed_row_count: number
+              p_received_at: string
+              p_sender: string
+              p_source_hash: string
+              p_subject: string
+              p_year: number
+            }
+            Returns: boolean
+          }
       is_organisation_member: {
         Args: { target_organisation_id: string }
         Returns: boolean
       }
       is_own_organisation_membership: {
         Args: { target_member_id: string }
+        Returns: boolean
+      }
+      read_epcc_profit_ingestion_audit: {
+        Args: { p_month: number; p_source_hash?: string; p_year: number }
+        Returns: {
+          outcome: string
+          processed_at: string
+          received_at: string
+          report_end: string
+          report_month: number
+          report_start: string
+          report_year: number
+          source_hash_matches: boolean
+          source_hash_present: boolean
+        }[]
+      }
+      release_monday_sales_sync_lock: {
+        Args: {
+          p_lock_token: string
+          p_month: number
+          p_organisation_id: string
+          p_year: number
+        }
+        Returns: undefined
+      }
+      try_acquire_monday_sales_sync_lock: {
+        Args: {
+          p_lock_token: string
+          p_month: number
+          p_organisation_id: string
+          p_year: number
+        }
         Returns: boolean
       }
     }

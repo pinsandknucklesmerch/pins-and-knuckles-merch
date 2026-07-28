@@ -6,7 +6,7 @@ export type CurrencyCode = "EUR" | "GBP";
 
 export type PriceKind = "print" | "embroidery" | "delivery";
 
-export type GarmentType = "TSHIRT" | "LONGSLEEVE" | "HOODIE";
+export type GarmentType = "TSHIRT" | "LONGSLEEVE" | "HOODIE" | "OTHER";
 
 export type EuPrintPosition =
   | "FRONT"

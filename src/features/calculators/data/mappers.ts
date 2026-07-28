@@ -81,7 +81,12 @@ function assertPriceKind(value: string): PriceKind {
 }
 
 function assertGarmentType(value: string): GarmentType {
-  if (value === "TSHIRT" || value === "LONGSLEEVE" || value === "HOODIE") {
+  if (
+    value === "TSHIRT" ||
+    value === "LONGSLEEVE" ||
+    value === "HOODIE" ||
+    value === "OTHER"
+  ) {
     return value;
   }
 
