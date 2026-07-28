@@ -5,6 +5,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test": "node --experimental-strip-types --test src/features/*/tests/*.test.ts scripts/tests/*.test.ts",
     "import:epcc-profit": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/import-epcc-profit-email.ts",
     "generate:metricui-styles": "node scripts/generate-metricui-styles.mjs",
     "postinstall": "npm run generate:metricui-styles"

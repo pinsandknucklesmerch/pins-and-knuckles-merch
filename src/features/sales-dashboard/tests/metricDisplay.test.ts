@@ -66,7 +66,12 @@ test("uses percentage points and keeps zero-denominator comparisons relative-fre
 });
 
 test("target bullet maps actuals, targets, and below/at/above colours", () => {
-  assert.deepEqual(targetBullet(150, 300), { value: 150, target: 300, max: 336, measureColor: "#d9474b" });
+  const belowTarget = targetBullet(150, 300);
+  assert.ok(belowTarget);
+  assert.equal(belowTarget.value, 150);
+  assert.equal(belowTarget.target, 300);
+  assert.ok(Math.abs(belowTarget.max - 336) < 1e-12);
+  assert.equal(belowTarget.measureColor, "#d9474b");
   assert.equal(targetBullet(300, 300)?.measureColor, "#6fc49a");
   assert.equal(targetBullet(350, 300)?.measureColor, "#6fc49a");
   assert.equal(targetBullet(150, null), null);

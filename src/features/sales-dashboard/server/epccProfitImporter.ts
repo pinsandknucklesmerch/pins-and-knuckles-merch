@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.types";
-import { EPCC_PROFIT_ORGANISATION_ID, parseEpccProfitEmail, type EpccProfitEmailReport } from "../lib/epccProfitEmail";
-import { createGmailProfitClient, type GmailProfitClient } from "./gmailProfitClient";
+import { EPCC_PROFIT_ORGANISATION_ID, parseEpccProfitEmail, type EpccProfitEmailReport } from "../lib/epccProfitEmail.ts";
+import { createGmailProfitClient, type GmailProfitClient } from "./gmailProfitClient.ts";
 
 export type EpccIngestionOptions = { apply: boolean; messageId?: string; year?: number; month?: number };
 export type EpccIngestionResult = { mode: "dry-run" | "apply"; outcome: "dry-run" | "applied" | "duplicate" | "older"; report: EpccProfitEmailReport };

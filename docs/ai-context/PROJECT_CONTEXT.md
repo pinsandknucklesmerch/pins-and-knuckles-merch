@@ -45,6 +45,10 @@ Required local variables:
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` for the dedicated server-only team-provisioning client
 - `MONDAY_API_TOKEN` for the server-only Monday audit/sync CLI
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, and `GMAIL_REPORT_ADDRESS` for server-only EPCC Gmail ingestion
+- `CRON_SECRET` for the authenticated Vercel EPCC cron route
+
+Optional Monday board-ID overrides are `MONDAY_SALES_BOARD_ID`, `MONDAY_QUOTES_BOARD_ID`, and `MONDAY_ORDERS_BOARD_ID`; board discovery is used when they are unset.
 
 Do not add service-role keys, database URLs, Monday tokens, or other secrets to client code or `NEXT_PUBLIC_` variables.
 
@@ -59,7 +63,7 @@ Do not add service-role keys, database URLs, Monday tokens, or other secrets to 
 
 ## Supabase Schema State
 
-Applied migrations:
+Repository migrations:
 
 - `20260709120000_foundation_auth_access.sql`
   - Organisations, profiles, organisation members, app access.
@@ -84,11 +88,43 @@ Applied migrations:
 - `20260722120000_grant_service_role_team_provisioning.sql`
   - Narrow table privileges for the dedicated service-role team-provisioning flow; RLS remains enabled.
 - `20260722130000_add_monday_sales_snapshot_fields.sql`
-  - Pending deployment: canonical Monday KPI mapping and JSON audit provenance for monthly KPI snapshots.
+  - Canonical Monday KPI mapping and JSON audit provenance for monthly KPI snapshots.
 - `20260722140000_grant_service_role_monday_sales_sync.sql`
-  - Pending deployment: narrow `sales_kpi_months` read/write privileges for the server-only Monday sync CLI; RLS remains enabled.
+  - Narrow `sales_kpi_months` read/write privileges for the server-only Monday sync CLI; RLS remains enabled.
+- `20260722150000_add_monthly_profit_source.sql`
+  - Monthly profit source provenance.
+- `20260722160000_remove_duplicate_monday_scope_a_fields.sql`
+  - Canonical Scope A field cleanup.
+- `20260723100000_add_epcc_profit_email_ingestion.sql`
+  - EPCC ingestion table and service-role-only RPC.
+- `20260728120000_restore_epcc_profit_ingestion.sql`
+  - Forward-only restoration of the missing EPCC ingestion table and service-role-only RPC.
+- `20260728130000_add_epcc_profit_ingestion_audit_reader.sql`
+  - Service-role-only metadata audit RPC for EPCC ingestion reconciliation; it returns no message, sender, subject, or source-hash values.
 
 Generated database types are present at `src/types/database.types.ts`.
+
+## Production Database Verification
+
+Verified 2026-07-28 against the linked Supabase project:
+
+- Remote migration history lists every repository migration through `20260728130000_add_epcc_profit_ingestion_audit_reader.sql`.
+- Migration history had drifted from schema contents for the original EPCC migration; the most likely cause is a migration recorded from different SQL or later manual object removal. The forward restoration migration recreated the missing ingestion table and RPC without dropping data.
+- The EPCC ingestion table has RLS enabled; its RPC is `SECURITY DEFINER`, sets `search_path = public`, and grants execution only to `service_role`.
+- Calculator reference data matches the seeded profile/count expectations: EU Standard, EU US Clients, and UK Trade are active; EU Trade has no active profile; no invalid pricing validity windows were found.
+- Regenerated remote types still differ from `src/types/database.types.ts` because the remote has an additional `sales_kpi_profit_email_sources` table not represented in repository migrations. Repository types were intentionally not replaced pending separate review of that unrelated drift.
+- `sales_kpi_profit_email_sources` is unused by current application code, scripts, RPCs, and documentation, but contains one historical source-metadata row. It is retained temporarily because ownership and retention requirements are unconfirmed; no reconciliation migration was applied and generated types remain deferred.
+- Sales KPI tables, Monday snapshot/profit-source fields, and admin-gated RLS policies were confirmed remotely.
+- Vercel production verification on 2026-07-28 found the intended project linked and its active deployment Ready. The deployed cron route and `0 10 * * *` schedule are present, and an unauthenticated probe returns 401 before apply mode. Production currently has the Supabase, Monday, and required public variable names, but is missing the Gmail OAuth variables, report-address variable, and `CRON_SECRET`; it also predates the current EPCC hardening/audit-reader code. Do not enable cron reliance until variables are added and a current revision is deployed.
+
+## Production Integration Verification
+
+Verified 2026-07-28 using read-only/dry-run checks only; no live writes were performed.
+
+- Monday: required local server-side configuration is present. The API is reachable and the July 2026 dry-run resolved an accessible monthly board, its expected columns and weekly groups, and a safe planned snapshot with no writes. Monday's sync command is dry-run by default; writes require explicit `--apply`, a single month, `--year 2025`, and `--force`, so it cannot currently write 2026 snapshots.
+- EPCC Gmail: Gmail OAuth and parsing succeeded for the bounded July 2026 report. The existing conflicting KPI value had no tracked ingestion record; after metadata-only audit verification, one approved report was applied and a duplicate rerun was a no-op. July profit is now EPCC-sourced, while Monday quote/order fields were preserved. The audit reader is service-role-only and returns no message, sender, subject, or source-hash values.
+- Cron and service role: `vercel.json` schedules `GET /api/cron/epcc-profit` daily at `0 10 * * *`; the production deployment includes the route and schedule, and an unauthenticated probe returned 401. Production is missing the Gmail OAuth, report-address, and cron-secret variable names, and its revision predates the current EPCC hardening/audit-reader code. Add the variables and deploy a current revision before enabling operational cron reliance.
+- Remaining blocker: configure the missing Production variables and deploy the current EPCC code; do not trigger cron manually beforehand.
 
 ## Current Routes
 
@@ -107,6 +143,8 @@ Generated database types are present at `src/types/database.types.ts`.
 | `/hub/calculators/eu/standard` | Protected initial EU Standard calculator |
 | `/hub/calculators/eu/us-clients` | Protected EU US Clients calculator |
 | `/hub/calculators/uk/trade` | Protected UK Trade calculator |
+| `/hub/garments` | No active route |
+| `/hub/quick-reference` | No active route |
 | `/hub/pk-tax` | Protected calculation-only PK Tax allocation calculator |
 
 ## PK Tax
@@ -142,10 +180,10 @@ There is no active `/test` route.
 - Monday monthly-board discovery, validation, per-month summaries, annual aggregation, and a server-only one-month apply / year-preview sync command are implemented. The sync writes Scope A directly to Quotes Done and Orders Processed, retains Scope B in the Sales Inbox fields, and records source details in Monday metadata.
 - The dashboard displays Quotes Done, Orders Processed, and their derived Conversion Rate alongside Scope B Sales Inbox Enquiries and Sales Inbox Conversion Rate. A current Monday period is marked non-final.
 
-### Not Started / Deliberately Deferred
+### Operationally Blocked / Deliberately Deferred
 
-- No scheduler or automated execution path exists. The new CLI is dry-run by default; `--apply` requires one month, current months may refresh, historical months require `--force`, and future/invalid/duplicate boards are rejected.
-- No EPCC/Gmail integration exists. Profit remains separate and must continue to come from a later EPCC email integration.
+- Monday has no scheduler. Its CLI is dry-run by default; `--apply` requires one month, is restricted to 2025, and requires `--force` after review. Production persistence for 2026 remains intentionally blocked by that guard.
+- EPCC/Gmail ingestion exists: the CLI is dry-run by default, while the authenticated Vercel cron applies valid reports through the service-role-only RPC. July 2026 ingestion and duplicate handling were verified after resolving an untracked historical KPI value; Vercel configuration verification remains required before cron enablement.
 - Quotes Done and Orders Processed remain separate metrics. Their actual source and attribution/completion semantics are not confirmed, so they must not be inferred from Monday lead/conversion data.
 
 ### Confirmed Monday Reporting Rules
@@ -167,7 +205,7 @@ The committed read-only audit was generated 2026-07-21 and covers January–July
 
 ### Next Recommended Step
 
-Deploy the Monday metadata migration, service-role grant, profit-source migration, and canonical Scope A migration in timestamp order. Then run the CLI in dry-run mode against the intended organisation/current month. Confirm the resulting audit metadata, Quotes Done, Orders Processed, and Scope B values before any explicit `--apply`; profit remains independent.
+Verify production deployment/configuration for the Monday sync and EPCC Gmail ingestion, then validate the persisted KPI output before operational use.
 
 ## Calculator Status
 
@@ -280,15 +318,15 @@ npm run build
 ## Known Issues
 
 - Turbopack HMR caused repeated reload/request loops; local development uses Webpack.
-- Sales dashboard is fixture-backed.
-- EU US Clients and UK Trade are seeded but not implemented in UI/domain routes yet.
+- Sales dashboard is Supabase-first with historical fixture fallback when persistent data is unavailable.
+- Monday audit/import/sync tooling exists, but production configuration and deployment verification remain required.
+- EPCC Gmail profit ingestion exists, but Gmail OAuth, cron, service-role configuration, and migration deployment require production verification.
 - Admin workflows for calculator data are not implemented.
 - EU Trade remains deferred pending confirmed rules.
+- Garment Directory and Quick Reference have no active routes.
 
 ## Next Recommended Work
 
-1. Implement EU US Clients using the existing EU engine and seeded profile data.
-2. Implement UK Trade domain engine, route, and UI against the seeded UK tables.
-3. Replace sales dashboard fixtures with server-side source mapping after source configuration is confirmed.
-4. Add focused parity tests for EU US Clients and UK Trade copy/output behaviour.
-5. Design admin-only calculator reference data editing after read-only calculator flows are stable.
+1. Verify the Monday sync and EPCC Gmail ingestion in production configuration before operational use.
+2. Replace or explicitly bound the sales-dashboard fixture fallback as persistent historical KPI coverage is confirmed.
+3. Design admin-only calculator reference-data editing after read-only calculator flows are stable.

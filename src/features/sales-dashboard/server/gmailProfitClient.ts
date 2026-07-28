@@ -1,7 +1,8 @@
-import { EPCC_PROFIT_SENDER, EPCC_PROFIT_SUBJECT } from "../lib/epccProfitEmail";
+import { EPCC_PROFIT_SENDER, EPCC_PROFIT_SUBJECT } from "../lib/epccProfitEmail.ts";
 
 type GmailListResponse = { messages?: Array<{ id: string }> };
 type GmailMessageResponse = { id: string; internalDate: string; raw: string };
+type GoogleOAuthErrorResponse = { error?: string };
 
 export type GmailProfitMessage = { id: string; receivedAt: string; raw: string };
 
@@ -19,6 +20,13 @@ function decodeBase64Url(value: string) {
   return Buffer.from(value.replaceAll("-", "+").replaceAll("_", "/"), "base64").toString("utf8");
 }
 
+export function classifyGoogleOAuthRefreshFailure(status: number, error?: string) {
+  if (error === "invalid_grant") return `Google OAuth refresh failed (${status} invalid_grant): the refresh token was rejected. Re-authorise the intended mailbox with the configured OAuth client.`;
+  if (error === "invalid_client") return `Google OAuth refresh failed (${status} invalid_client): verify the configured OAuth client ID and secret belong to the same client.`;
+  if (error === "unauthorized_client") return `Google OAuth refresh failed (${status} unauthorized_client): verify the OAuth client, consent configuration, and Gmail read-only scope.`;
+  return `Google OAuth token refresh failed (${status}${error ? ` ${error}` : ""}).`;
+}
+
 export function createGmailProfitClient(): GmailProfitClient {
   const clientId = required("GOOGLE_CLIENT_ID");
   const clientSecret = required("GOOGLE_CLIENT_SECRET");
@@ -32,9 +40,9 @@ export function createGmailProfitClient(): GmailProfitClient {
       body: new URLSearchParams({ client_id: clientId, client_secret: clientSecret, refresh_token: refreshToken, grant_type: "refresh_token" }),
       cache: "no-store",
     });
-    if (!response.ok) throw new Error(`Google OAuth token refresh failed (${response.status}).`);
-    const payload = await response.json() as { access_token?: string };
-    if (!payload.access_token) throw new Error("Google OAuth response did not include an access token.");
+    const payload = await response.json().catch(() => null) as ({ access_token?: string } & GoogleOAuthErrorResponse) | null;
+    if (!response.ok) throw new Error(classifyGoogleOAuthRefreshFailure(response.status, payload?.error));
+    if (!payload?.access_token) throw new Error("Google OAuth response did not include an access token.");
     return payload.access_token;
   }
 

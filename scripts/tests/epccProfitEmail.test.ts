@@ -4,9 +4,25 @@ import test from "node:test";
 import { parseEpccProfitImportArgs } from "../import-epcc-profit-email.ts";
 import { isEpccAuthoritativePeriod, parseEpccProfitEmail, type EpccProfitEmailReport } from "../lib/epccProfitEmail.ts";
 import { runEpccProfitIngestion, type EpccProfitStore } from "../../src/features/sales-dashboard/server/epccProfitImporter.ts";
+import { classifyGoogleOAuthRefreshFailure } from "../../src/features/sales-dashboard/server/gmailProfitClient.ts";
 
 const fixturePath = "scripts/tests/fixtures/epcc-profit-report.eml";
 const fixture = () => readFile(fixturePath, "utf8");
+
+test("classifies OAuth refresh failures without exposing response details", () => {
+  assert.match(classifyGoogleOAuthRefreshFailure(401, "invalid_grant"), /refresh token was rejected/);
+  assert.match(classifyGoogleOAuthRefreshFailure(401, "invalid_client"), /client ID and secret/);
+  assert.equal(classifyGoogleOAuthRefreshFailure(401), "Google OAuth token refresh failed (401).");
+});
+
+test("EPCC audit reader exposes only service-role metadata", async () => {
+  const migration = await readFile("supabase/migrations/20260728130000_add_epcc_profit_ingestion_audit_reader.sql", "utf8");
+  assert.match(migration, /security definer/);
+  assert.match(migration, /set search_path = public/);
+  assert.match(migration, /grant execute on function public\.read_epcc_profit_ingestion_audit\(integer, integer, text\) to service_role/);
+  assert.match(migration, /revoke all on function public\.read_epcc_profit_ingestion_audit\(integer, integer, text\) from public, anon, authenticated/);
+  assert.doesNotMatch(migration, /gmail_message_id|subject text|sender text/);
+});
 
 test("parses the final overall Total row and ignores salesperson subtotals", async () => {
   const report = parseEpccProfitEmail(await fixture());
@@ -27,7 +43,10 @@ test("parses a base64 multipart Gmail message", async () => {
 test("rejects malformed totals and reports before July 2026", async () => {
   const eml = await fixture();
   assert.throws(() => parseEpccProfitEmail(eml.replace("93,853.79", "not-money")), /malformed/);
-  assert.throws(() => parseEpccProfitEmail(eml.replaceAll("July", "June")), /before July 2026/);
+  assert.throws(
+    () => parseEpccProfitEmail(eml.replace("1 July 2026 - 31 July 2026", "1 June 2026 - 30 June 2026")),
+    /before July 2026/,
+  );
   assert.equal(isEpccAuthoritativePeriod(2026, 6), false);
   assert.equal(isEpccAuthoritativePeriod(2026, 7), true);
   assert.equal(isEpccAuthoritativePeriod(2027, 1), true);
