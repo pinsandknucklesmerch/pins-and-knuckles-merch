@@ -2,11 +2,11 @@
   "crons": [
     {
       "path": "/api/cron/epcc-profit",
-      "schedule": "0 10 * * *"
+      "schedule": "5 8 * * *"
     },
     {
       "path": "/api/cron/monday-sales-sync",
-      "schedule": "15 10 * * *"
+      "schedule": "15 8 * * *"
     }
   ]
 }
