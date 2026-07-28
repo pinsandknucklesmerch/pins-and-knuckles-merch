@@ -180,10 +180,13 @@ There is no active `/test` route.
 - Monday monthly-board discovery, validation, per-month summaries, annual aggregation, and a server-only one-month apply / year-preview sync command are implemented. The sync writes Scope A directly to Quotes Done and Orders Processed, retains Scope B in the Sales Inbox fields, and records source details in Monday metadata.
 - The dashboard displays Quotes Done, Orders Processed, and their derived Conversion Rate alongside Scope B Sales Inbox Enquiries and Sales Inbox Conversion Rate. A current Monday period is marked non-final.
 
-### Operationally Blocked / Deliberately Deferred
+### Scheduled Operations / Deliberately Deferred
 
-- Monday has no scheduler. Its CLI is dry-run by default. A 2025 apply requires one month and `--force`; a 2026 apply additionally requires the explicit matching reviewed scope (`--reviewed-year` and `--reviewed-month`). This is bounded one-month-only support, not a broad 2026 range or automatic write path.
-- EPCC/Gmail ingestion exists: the CLI is dry-run by default, while the authenticated Vercel cron applies valid reports through the service-role-only RPC. July 2026 ingestion and duplicate handling were verified after resolving an untracked historical KPI value; Vercel configuration verification remains required before cron enablement.
+- The repository Vercel configuration schedules EPCC/Gmail independently at `10:00` daily through `/api/cron/epcc-profit`, then Monday 15 minutes later at `10:15` through `/api/cron/monday-sales-sync`. Both routes require constant-time Bearer `CRON_SECRET` authentication and fail independently.
+- The Monday cron is restricted to the UTC current month and the Pins & Knuckles organisation. It uses a database-backed per-organisation/month lock, validates the selected board, writes no member KPI rows, and cannot accept query-string period overrides. Its temporary daily cadence remains in place only until the Vercel plan supports a more frequent approved schedule.
+- Monday owns `quotes_done` and `orders_processed`; it owns profit only through June 2026. From July 2026 onward the Monday payload omits both profit fields, leaving EPCC/NetSuite as the sole profit source.
+- The manual Monday CLI remains dry-run by default. A 2025 apply requires one month and `--force`; a 2026 apply additionally requires the explicit matching reviewed scope (`--reviewed-year` and `--reviewed-month`). This is bounded one-month-only support, not a historical/range sync path.
+- EPCC/Gmail ingestion CLI remains dry-run by default while its authenticated cron applies valid reports through the service-role-only RPC. July 2026 ingestion and duplicate handling were verified after resolving an untracked historical KPI value.
 - Quotes Done and Orders Processed remain separate metrics. Their actual source and attribution/completion semantics are not confirmed, so they must not be inferred from Monday lead/conversion data.
 
 ### Confirmed Monday Reporting Rules
@@ -210,7 +213,7 @@ The committed read-only audit was generated 2026-07-21 and covers January–July
 - Reporting-date audit metadata records `dateSourceCounts` for `date_in_touch` and `created_at_fallback` so fallback use is visible on each Monday snapshot.
 - Week 3 Batch 4 dry-run and bounded apply (2026-07-28): the canonical July board was `18420001220`; the organisation-owned July KPI row was selected and updated with `quotes_done=249` and `orders_processed=141`. The reviewed run had no missing, malformed, or cross-month reporting dates; its current source count was `249` Date In Touch and `0` creation fallbacks. Its existing profit remained `116494.08` with source `epcc_email`, outside the Monday payload.
 - The exact bounded July apply was rerun once. Quotes/orders and EPCC profit fields remained stable; only intended Monday snapshot metadata was refreshed. The sync does not write member KPI rows or other company months.
-- Automation remains deferred pending historical reconciliation, board rollover handling, failure alerts, retained audits, and an approved cadence.
+- The temporary daily cadence is configured pending deployment; historical reconciliation, board rollover handling, failure alerts, retained audits, and a future approved higher-frequency cadence remain outstanding.
 
 ### Next Recommended Step
 

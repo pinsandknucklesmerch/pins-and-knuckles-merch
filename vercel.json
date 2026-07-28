@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/epcc-profit",
       "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/monday-sales-sync",
+      "schedule": "15 10 * * *"
     }
   ]
 }

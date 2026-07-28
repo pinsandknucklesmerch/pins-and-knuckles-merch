@@ -18,6 +18,10 @@ export type MondaySnapshot = {
     fetchedAt: string;
     validation: Record<string, number>;
     dateSourceCounts: { date_in_touch: number; created_at_fallback: number };
+    reportingPeriod?: { year: number; month: number };
+    quotesDone?: number;
+    ordersProcessed?: number;
+    trigger?: "cron";
     mismatchedDates: Array<Record<string, unknown>>;
     scopeA: { leads: number; converted: number; conversionRate: number };
     profitTracking: ProfitTrackingAudit;
@@ -79,6 +83,7 @@ type SyncInput = {
   now: Date;
   force: boolean;
   apply: boolean;
+  trigger?: "cron";
   fetchedAt?: string;
   write?: (snapshot: MondaySnapshot, exists: boolean) => Promise<void>;
 };
@@ -151,7 +156,7 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
       sales_inbox_enquiries: scopeB.totalLeadItems,
       converted: scopeB.convertedItems,
       data_source: "monday",
-      monday_sync_metadata: { sourceBoardId: String(entry.board.id), fetchedAt, validation: summary.validation, dateSourceCounts: summary.dateSourceCounts, mismatchedDates: summary.mismatchedDates, scopeA: { leads: scopeA.totalLeadItems, converted: scopeA.convertedItems, conversionRate: scopeA.conversionRate }, profitTracking },
+      monday_sync_metadata: { sourceBoardId: String(entry.board.id), fetchedAt, validation: summary.validation, dateSourceCounts: summary.dateSourceCounts, mismatchedDates: summary.mismatchedDates, scopeA: { leads: scopeA.totalLeadItems, converted: scopeA.convertedItems, conversionRate: scopeA.conversionRate }, profitTracking, ...(input.trigger === "cron" ? { reportingPeriod: { year: input.year, month }, quotesDone: scopeA.totalLeadItems, ordersProcessed: scopeA.convertedItems, trigger: "cron" as const } : {}) },
     };
     if (willWriteMondayProfit && profitTracking.calculatedMonthlyTotal !== null) {
       snapshot.monthly_profit = profitTracking.calculatedMonthlyTotal;
