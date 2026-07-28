@@ -4,17 +4,34 @@ import { MondayClient } from "./lib/monday/salesHistoryAudit.ts";
 import { mondaySalesWritePayload, syncMondaySalesDashboard, type MondaySnapshot } from "./lib/monday/salesDashboardSync.ts";
 
 function option(args: string[], name: string) { const index = args.indexOf(name); return index === -1 ? undefined : args[index + 1]; }
+function optionCount(args: string[], name: string) { return args.filter((arg) => arg === name).length; }
+function requiredSingleOption(args: string[], name: string) {
+  if (optionCount(args, name) !== 1 || option(args, name)?.startsWith("--")) throw new Error(`${name} must be provided exactly once.`);
+  return option(args, name)!;
+}
 function formatSupabaseError(error: { message?: string | null; code?: string | null; details?: string | null; hint?: string | null }) {
   return JSON.stringify({ message: error.message ?? null, code: error.code ?? null, details: error.details ?? null, hint: error.hint ?? null });
 }
 export function parseArgs(args: string[]) {
-  const year = Number(option(args, "--year")); const monthValue = option(args, "--month"); const month = monthValue ? Number(monthValue) : undefined;
+  const supported = new Set(["--year", "--month", "--organisation-id", "--reviewed-year", "--reviewed-month", "--apply", "--force"]);
+  for (const arg of args) if (arg.startsWith("--") && !supported.has(arg)) throw new Error(`Unsupported option ${arg}; ranges and multi-month apply are not supported.`);
+  const year = Number(requiredSingleOption(args, "--year")); const monthValue = option(args, "--month"); const month = monthValue ? Number(monthValue) : undefined;
+  if (optionCount(args, "--month") > 1) throw new Error("--month must be provided at most once; range and multi-month apply are not supported.");
   if (!Number.isInteger(year) || year < 2020) throw new Error("--year must be a four-digit year.");
   if (month !== undefined && (!Number.isInteger(month) || month < 1 || month > 12)) throw new Error("--month must be between 1 and 12.");
   const apply = args.includes("--apply");
   if (apply && month === undefined) throw new Error("--apply requires --month; year-only mode is preview-only.");
-  if (apply && year !== 2025) throw new Error("Historical apply is restricted to --year 2025; 2026 data is preserved.");
+  if (apply && year !== 2025 && year !== 2026) throw new Error("Historical apply is restricted to --year 2025 or a bounded reviewed 2026 month.");
   if (apply && !args.includes("--force")) throw new Error("Historical apply requires --force after reviewing the dry-run audit.");
+  const reviewedYearValue = option(args, "--reviewed-year"); const reviewedMonthValue = option(args, "--reviewed-month");
+  if (optionCount(args, "--reviewed-year") > 1 || optionCount(args, "--reviewed-month") > 1) throw new Error("Reviewed scope options must be provided at most once.");
+  if (apply && year === 2026) {
+    const reviewedYear = Number(requiredSingleOption(args, "--reviewed-year"));
+    const reviewedMonth = Number(requiredSingleOption(args, "--reviewed-month"));
+    if (reviewedYear !== year || reviewedMonth !== month) throw new Error("2026 apply target must exactly match the reviewed dry-run scope.");
+  } else if (reviewedYearValue !== undefined || reviewedMonthValue !== undefined) {
+    throw new Error("--reviewed-year and --reviewed-month are only valid for bounded 2026 apply.");
+  }
   const organisation = option(args, "--organisation-id") ?? "global";
   if (organisation !== "global" && !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(organisation)) throw new Error("--organisation-id must be a UUID or global.");
   return { year, months: month ? [month] : Array.from({ length: 12 }, (_, index) => index + 1), apply, force: args.includes("--force"), organisationId: organisation === "global" ? null : organisation };

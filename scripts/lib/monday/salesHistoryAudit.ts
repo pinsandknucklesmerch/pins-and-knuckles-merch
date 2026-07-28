@@ -29,10 +29,22 @@ export const MONTHLY_SALES_COLUMNS = { people: "people", channel: "status_16", d
 // rather than its Monday id, is the stable reporting contract.
 const weeklyGroup = /^week\s+[1-5]$/i;
 type Person = { id: string | null; name: string; normalizedName: string };
-type SummaryItem = { item: MondayItem; people: Person[]; channel: string | null; channelNormalized: string; converted: boolean; date: string | null; dateMatchesBoardMonth: boolean };
+type DateSource = "date_in_touch" | "created_at_fallback";
+type DateIssue = "invalid_date_in_touch" | "missing_created_at" | "invalid_created_at";
+type SummaryItem = { item: MondayItem; people: Person[]; channel: string | null; channelNormalized: string; converted: boolean; date: string | null; dateSource: DateSource | null; dateIssue: DateIssue | null; dateMatchesBoardMonth: boolean };
 type Month = { year: number; month: number; label: string };
 
 function column(item: MondayItem, id: string) { return item.column_values?.find((value) => value.id === id); }
+function dateResolution(item: MondayItem, dateInTouchColumnId: string) {
+  const rawDateInTouch = column(item, dateInTouchColumnId)?.text ?? column(item, dateInTouchColumnId)?.value;
+  if (rawDateInTouch?.trim()) {
+    const date = parseMondayDate(rawDateInTouch);
+    return date ? { date, dateSource: "date_in_touch" as const, dateIssue: null } : { date: null, dateSource: null, dateIssue: "invalid_date_in_touch" as const };
+  }
+  if (!item.created_at?.trim()) return { date: null, dateSource: null, dateIssue: "missing_created_at" as const };
+  const date = parseMondayDate(item.created_at);
+  return date ? { date, dateSource: "created_at_fallback" as const, dateIssue: null } : { date: null, dateSource: null, dateIssue: "invalid_created_at" as const };
+}
 function boardMonth(name: string): Month | null {
   const match = name.trim().match(/^(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})$/i); if (!match) return null;
   const month = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"].indexOf(match[1].toLowerCase()) + 1;
@@ -62,14 +74,15 @@ export function summarizeMonthlySalesBoard(board: Pick<MondayBoard, "id" | "name
   const expectedMonth = boardMonth(board.name); const excludedItems: Array<{ id: string; name: string; group: string | null; reason: string }> = []; const included: SummaryItem[] = [];
   for (const item of items) {
     const group = item.group?.title ?? null; if (!group || !weeklyGroup.test(group)) { excludedItems.push({ id: String(item.id), name: item.name, group, reason: group?.toLowerCase() === "profit tracking" ? "profit-tracking-group" : "non-weekly-group" }); continue; }
-    const date = parseMondayDate(column(item, columns.dateInTouch)?.text ?? column(item, columns.dateInTouch)?.value); const dateMatchesBoardMonth = Boolean(date && expectedMonth && date.startsWith(`${expectedMonth.year}-${String(expectedMonth.month).padStart(2, "0")}-`));
-    included.push({ item, people: people(column(item, columns.people)), channel: column(item, columns.channel)?.text?.trim() || null, channelNormalized: normalizeStatus(column(item, columns.channel)?.text), converted: normalizeStatus(column(item, columns.converted)?.text) === "yes", date, dateMatchesBoardMonth });
+    const resolvedDate = dateResolution(item, columns.dateInTouch); const dateMatchesBoardMonth = Boolean(resolvedDate.date && expectedMonth && resolvedDate.date.startsWith(`${expectedMonth.year}-${String(expectedMonth.month).padStart(2, "0")}-`));
+    included.push({ item, people: people(column(item, columns.people)), channel: column(item, columns.channel)?.text?.trim() || null, channelNormalized: normalizeStatus(column(item, columns.channel)?.text), converted: normalizeStatus(column(item, columns.converted)?.text) === "yes", ...resolvedDate, dateMatchesBoardMonth });
   }
   const validDates = included.filter((item) => item.dateMatchesBoardMonth); const salesInbox = (rows: SummaryItem[]) => rows.filter((item) => item.channelNormalized === "sales inbox"); const multiAccountManagers = included.filter((item) => item.people.length > 1).map((item) => ({ id: String(item.item.id), name: item.item.name, converted: item.converted, accountManagers: item.people }));
-  const missingDates = included.filter((item) => !item.date).map((item) => ({ id: String(item.item.id), name: item.item.name, group: item.item.group?.title ?? null })); const mismatchedDates = included.filter((item) => item.date && !item.dateMatchesBoardMonth).map((item) => ({ sourceBoardId: String(board.id), sourceBoardMonth: expectedMonth?.label ?? board.name, itemId: String(item.item.id), itemName: item.item.name, group: item.item.group?.title ?? null, actualDateInTouch: item.date, includedInBoardMembershipTotals: true, includedInValidDateTotals: false, action: "review-in-monday" as const }));
+  const missingDates = included.filter((item) => !item.date).map((item) => ({ id: String(item.item.id), name: item.item.name, group: item.item.group?.title ?? null, reason: item.dateIssue })); const mismatchedDates = included.filter((item) => item.date && !item.dateMatchesBoardMonth).map((item) => ({ sourceBoardId: String(board.id), sourceBoardMonth: expectedMonth?.label ?? board.name, itemId: String(item.item.id), itemName: item.item.name, group: item.item.group?.title ?? null, actualReportingDate: item.date, dateSource: item.dateSource, includedInBoardMembershipTotals: true, includedInValidDateTotals: false, action: "review-in-monday" as const }));
   const multiManagerConvertedCount = multiAccountManagers.filter((item) => item.converted).length;
   const allByBoardMembership = aggregate(included);
-  return { board: { id: String(board.id), name: board.name, inferredMonth: expectedMonth }, fetch: { totalItemsFetched: items.length, includedWeeklyItems: included.length, excludedItems: excludedItems.length, deletedItems: "not returned by Monday item queries", inaccessibleItems: "not returned by Monday item queries", subitems: "not requested or included; Monday top-level item query only" }, scopes: { allLeads: { byBoardMembership: allByBoardMembership, byValidDateInTouchMonth: aggregate(validDates) }, salesInboxOnly: { byBoardMembership: aggregate(salesInbox(included)), byValidDateInTouchMonth: aggregate(salesInbox(validDates)) } }, validation: { missingDateCount: missingDates.length, mismatchedDateCount: mismatchedDates.length, validDateInTouchMonthCount: validDates.length, multiManagerItemCount: multiAccountManagers.length, multiManagerConvertedCount, excludedFromMemberMetricsCount: multiAccountManagers.length, blankAccountManagerItemCount: included.filter((item) => !item.people.length).length, blankChannelItemCount: allByBoardMembership.blankChannelCount }, excludedItems, missingDates, mismatchedDates, multiAccountManagers };
+  const dateSourceCounts = { date_in_touch: included.filter((item) => item.dateSource === "date_in_touch").length, created_at_fallback: included.filter((item) => item.dateSource === "created_at_fallback").length };
+  return { board: { id: String(board.id), name: board.name, inferredMonth: expectedMonth }, fetch: { totalItemsFetched: items.length, includedWeeklyItems: included.length, excludedItems: excludedItems.length, deletedItems: "not returned by Monday item queries", inaccessibleItems: "not returned by Monday item queries", subitems: "not requested or included; Monday top-level item query only" }, scopes: { allLeads: { byBoardMembership: allByBoardMembership, byValidDateInTouchMonth: aggregate(validDates) }, salesInboxOnly: { byBoardMembership: aggregate(salesInbox(included)), byValidDateInTouchMonth: aggregate(salesInbox(validDates)) } }, validation: { missingDateCount: missingDates.length, invalidDateInTouchCount: missingDates.filter((item) => item.reason === "invalid_date_in_touch").length, missingDateSourceCount: missingDates.filter((item) => item.reason === "missing_created_at").length, invalidCreatedAtCount: missingDates.filter((item) => item.reason === "invalid_created_at").length, mismatchedDateCount: mismatchedDates.length, validDateInTouchMonthCount: validDates.length, multiManagerItemCount: multiAccountManagers.length, multiManagerConvertedCount, excludedFromMemberMetricsCount: multiAccountManagers.length, blankAccountManagerItemCount: included.filter((item) => !item.people.length).length, blankChannelItemCount: allByBoardMembership.blankChannelCount }, dateSourceCounts, excludedItems, missingDates, mismatchedDates, multiAccountManagers };
 }
 
 export class MondayClient {

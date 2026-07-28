@@ -25,6 +25,18 @@ test("summarizes weekly leads separately from Sales Inbox and validates dates", 
   assert.deepEqual(summary, summarizeMonthlySalesBoard({ id: "1", name: "JULY 2026" }, [item("1", "WEEK 1", " Alice ", " Sales Inbox ", "Yes", "2026-07-02"), item("2", "WEEK 2", "Alice", "Personal", "will order in a while", "2026-07-03"), item("3", "WEEK 3", "", "sales inbox", null, "2026-06-30"), item("4", "Profit Tracking", "Bob", "sales inbox", "Yes", "2026-07-04"), item("5", "WEEK 4", "Bob, Carol", "SALES INBOX", "No", null)]));
 });
 
+test("uses Date In Touch first and only falls back to a valid creation timestamp when it is blank", () => {
+  const item = (id: string, dateInTouch: string | null, createdAt: string | null) => ({ id, name: `Lead ${id}`, created_at: createdAt, group: { id: "week", title: "WEEK 1" }, column_values: [{ id: "people", text: "Alice", value: '{"personsAndTeams":[{"id":7,"kind":"person"}]}' }, { id: "status_16", text: "personal" }, { id: "status", text: "No" }, { id: "date8", text: dateInTouch }] });
+  const summary = summarizeMonthlySalesBoard({ id: "july", name: "JULY 2026" }, [item("direct", "2026-07-02", "2026-08-01T01:00:00Z"), item("fallback", null, "2026-07-28T10:03:38Z"), item("malformed", "not-a-date", "2026-07-28T10:03:38Z"), item("missing", null, null), item("cross-month", "2026-06-30", "2026-07-28T10:03:38Z")]);
+  assert.deepEqual(summary.dateSourceCounts, { date_in_touch: 2, created_at_fallback: 1 });
+  assert.equal(summary.validation.validDateInTouchMonthCount, 2);
+  assert.equal(summary.validation.invalidDateInTouchCount, 1);
+  assert.equal(summary.validation.missingDateSourceCount, 1);
+  assert.equal(summary.validation.mismatchedDateCount, 1);
+  assert.deepEqual(summary.missingDates.map((item) => [item.id, item.reason]), [["malformed", "invalid_date_in_touch"], ["missing", "missing_created_at"]]);
+  assert.deepEqual(summary.mismatchedDates.map((item) => [item.itemId, item.actualReportingDate, item.dateSource]), [["cross-month", "2026-06-30", "date_in_touch"]]);
+});
+
 test("audits Profit Tracking rows by semantic numbers column without counting a footer", () => {
   const board = { id: "profit-board", name: "JUNE 2026", groups: [{ id: "profit", title: "Profit Tracking" }], columns: [{ id: "legacy", title: "Profit", type: "numbers" }] };
   const item = (id: string, name: string, value: string | null) => ({ id, name, group: { id: "profit", title: "Profit Tracking" }, column_values: [{ id: "legacy", text: value, value }] });
@@ -72,6 +84,6 @@ test("accepts consolidated historical weeks and selects the weekly board over a 
 test("keeps Date In Touch mismatches in board totals and emits deterministic review metadata", () => {
   const item = (id: string, date: string) => ({ id, name: `Lead ${id}`, group: { id: "week", title: "WEEK 1" }, column_values: [{ id: "people", text: "Alice", value: '{"personsAndTeams":[{"id":7,"kind":"person"}]}' }, { id: "status_16", text: "sales inbox" }, { id: "status", text: "Yes" }, { id: "date8", text: date }] });
   const summary = summarizeMonthlySalesBoard({ id: "feb", name: "FEBRUARY 2026" }, [item("previous", "2026-01-05"), item("next", "2026-03-01"), item("valid", "2026-02-01")]); const all = summary.scopes.allLeads;
-  assert.deepEqual([all.byBoardMembership.totalLeadItems, all.byBoardMembership.convertedItems], [3, 3]); assert.deepEqual([all.byValidDateInTouchMonth.totalLeadItems, all.byValidDateInTouchMonth.convertedItems], [1, 1]); assert.deepEqual(summary.mismatchedDates, [{ sourceBoardId: "feb", sourceBoardMonth: "FEBRUARY 2026", itemId: "previous", itemName: "Lead previous", group: "WEEK 1", actualDateInTouch: "2026-01-05", includedInBoardMembershipTotals: true, includedInValidDateTotals: false, action: "review-in-monday" }, { sourceBoardId: "feb", sourceBoardMonth: "FEBRUARY 2026", itemId: "next", itemName: "Lead next", group: "WEEK 1", actualDateInTouch: "2026-03-01", includedInBoardMembershipTotals: true, includedInValidDateTotals: false, action: "review-in-monday" }]);
+  assert.deepEqual([all.byBoardMembership.totalLeadItems, all.byBoardMembership.convertedItems], [3, 3]); assert.deepEqual([all.byValidDateInTouchMonth.totalLeadItems, all.byValidDateInTouchMonth.convertedItems], [1, 1]); assert.deepEqual(summary.mismatchedDates, [{ sourceBoardId: "feb", sourceBoardMonth: "FEBRUARY 2026", itemId: "previous", itemName: "Lead previous", group: "WEEK 1", actualReportingDate: "2026-01-05", dateSource: "date_in_touch", includedInBoardMembershipTotals: true, includedInValidDateTotals: false, action: "review-in-monday" }, { sourceBoardId: "feb", sourceBoardMonth: "FEBRUARY 2026", itemId: "next", itemName: "Lead next", group: "WEEK 1", actualReportingDate: "2026-03-01", dateSource: "date_in_touch", includedInBoardMembershipTotals: true, includedInValidDateTotals: false, action: "review-in-monday" }]);
   const annual = aggregateYear([{ month: 2, boardId: "feb", summary }]); assert.deepEqual([annual.company.leads, annual.company.converted], [3, 3]); assert.deepEqual(annual.mismatchedDates, summary.mismatchedDates);
 });

@@ -35,6 +35,30 @@ test("dry-run plans a current-month insert and preserves audit metadata", async 
   assert.deepEqual([outcomes[0].snapshot?.sales_inbox_enquiries, outcomes[0].snapshot?.converted], [1, 1]);
 });
 
+test("July 2026 write payload is quotes/orders and Monday metadata only", async () => {
+  const outcome = (await syncMondaySalesDashboard({ ...base, apply: false }))[0];
+  const payload = mondaySalesWritePayload(outcome.snapshot!);
+  assert.deepEqual([payload.quotes_done, payload.orders_processed], [2, 1]);
+  assert.equal("monthly_profit" in payload, false);
+  assert.equal("monthly_profit_source" in payload, false);
+  assert.equal("sales_inbox_enquiries" in payload, false);
+  assert.equal("converted" in payload, false);
+  assert.equal("data_source" in payload, false);
+  assert.deepEqual(payload.monday_sync_metadata, outcome.snapshot?.monday_sync_metadata);
+});
+
+test("July 2026 payload is idempotent and cannot alter EPCC profit or another month", async () => {
+  const snapshot = (await syncMondaySalesDashboard({ ...base, apply: false }))[0].snapshot!;
+  const payload = mondaySalesWritePayload(snapshot);
+  const july = { year: 2026, month: 7, monthly_profit: 116494.08, monthly_profit_source: "epcc_email", quotes_done: 0, orders_processed: 0 };
+  const august = { year: 2026, month: 8, monthly_profit: 12, monthly_profit_source: "epcc_email", quotes_done: 3, orders_processed: 2 };
+  const apply = () => Object.assign(july, payload);
+  apply(); apply();
+  assert.deepEqual([july.quotes_done, july.orders_processed], [2, 1]);
+  assert.deepEqual([july.monthly_profit, july.monthly_profit_source], [116494.08, "epcc_email"]);
+  assert.deepEqual(august, { year: 2026, month: 8, monthly_profit: 12, monthly_profit_source: "epcc_email", quotes_done: 3, orders_processed: 2 });
+});
+
 test("forced January through June syncs Monday profit without changing lead or conversion fields", async () => {
   const juneBoard = { ...board("JUNE 2026"), groups: [{ id: "week", title: "WEEK 1" }, { id: "profit", title: "Profit Tracking" }], columns: [...board().columns, { id: "profit_value", title: "Profit", type: "numbers" }] };
   const juneItems = [...items, { id: "profit-1", name: "Week 1", group: { id: "profit", title: "Profit Tracking" }, column_values: [{ id: "profit_value", text: "1234.56", value: "1234.56" }] }];
@@ -82,6 +106,24 @@ test("apply refreshes the current month and reports updates", async () => {
   const outcomes = await syncMondaySalesDashboard({ ...base, apply: true, existingMonths: new Set([7]), write: async (snapshot) => { writes.push(snapshot); } });
   assert.equal(outcomes[0].status, "updated");
   assert.equal(writes.length, 1);
+});
+
+test("a missing Date In Touch uses created_at and records the fallback source", async () => {
+  const fallbackItem = { ...items[0], id: "fallback", created_at: "2026-07-28T10:03:38Z", column_values: items[0].column_values.map((column) => column.id === "date8" ? { ...column, text: null } : column) };
+  let writes = 0;
+  const outcome = (await syncMondaySalesDashboard({ ...base, collectItems: async () => ({ items: [fallbackItem] }), apply: true, write: async () => { writes += 1; } }))[0];
+  assert.equal(outcome.status, "inserted");
+  assert.equal(writes, 1);
+  assert.deepEqual(outcome.snapshot?.monday_sync_metadata.dateSourceCounts, { date_in_touch: 0, created_at_fallback: 1 });
+});
+
+test("a malformed Date In Touch never falls back and remains blocked", async () => {
+  const malformedItem = { ...items[0], id: "malformed", created_at: "2026-07-28T10:03:38Z", column_values: items[0].column_values.map((column) => column.id === "date8" ? { ...column, text: "not a date" } : column) };
+  let writes = 0;
+  const outcome = (await syncMondaySalesDashboard({ ...base, collectItems: async () => ({ items: [malformedItem] }), apply: true, write: async () => { writes += 1; } }))[0];
+  assert.equal(outcome.status, "rejected");
+  assert.equal(outcome.audit?.validation.invalidDateInTouchCount, 1);
+  assert.equal(writes, 0);
 });
 
 test("historical periods are protected unless forced", async () => {
@@ -146,14 +188,19 @@ test("unsafe historical data remains previewable but cannot be applied", async (
   const outcome = (await syncMondaySalesDashboard({ ...base, year: 2025, months: [1], boards: [board("JANUARY 2025")], inspectBoard: async () => board("JANUARY 2025"), collectItems: async () => ({ items: unsafeItems }), now: new Date("2026-07-21T00:00:00Z"), force: true, apply: true, write: async () => { writes += 1; } }))[0];
   assert.equal(outcome.status, "rejected");
   assert.equal(outcome.audit?.safety.safe, false);
-  assert.match(outcome.reason ?? "", /Date In Touch/);
+  assert.match(outcome.reason ?? "", /reporting date/);
   assert.equal(writes, 0);
 });
 
-test("historical CLI apply requires the explicit 2025 month and force gate", () => {
+test("CLI apply requires explicit force and a bounded reviewed 2026 month", () => {
   assert.throws(() => parseArgs(["--year", "2025", "--apply"]), /--month/);
   assert.throws(() => parseArgs(["--year", "2025", "--month", "1", "--apply"]), /--force/);
-  assert.throws(() => parseArgs(["--year", "2026", "--month", "1", "--force", "--apply"]), /--year 2025/);
+  assert.throws(() => parseArgs(["--year", "2026", "--month", "7", "--force", "--apply"]), /--reviewed-year/);
+  assert.throws(() => parseArgs(["--year", "2026", "--month", "7", "--reviewed-year", "2026", "--reviewed-month", "6", "--force", "--apply"]), /exactly match/);
+  assert.throws(() => parseArgs(["--year", "2026", "--month", "7", "--month", "8", "--reviewed-year", "2026", "--reviewed-month", "7", "--force", "--apply"]), /multi-month/);
+  assert.throws(() => parseArgs(["--year", "2026", "--month", "7", "--from", "6", "--reviewed-year", "2026", "--reviewed-month", "7", "--force", "--apply"]), /ranges and multi-month/);
+  assert.throws(() => parseArgs(["--year", "2026", "--month", "7", "--reviewed-year", "2026", "--reviewed-month", "7", "--force"]), /only valid/);
+  assert.deepEqual(parseArgs(["--year", "2026", "--month", "7", "--reviewed-year", "2026", "--reviewed-month", "7", "--force", "--apply"]).months, [7]);
   assert.deepEqual(parseArgs(["--year", "2025", "--month", "1", "--force", "--apply"]).months, [1]);
 });
 

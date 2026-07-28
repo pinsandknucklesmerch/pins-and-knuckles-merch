@@ -17,14 +17,30 @@ export type MondaySnapshot = {
     sourceBoardId: string;
     fetchedAt: string;
     validation: Record<string, number>;
+    dateSourceCounts: { date_in_touch: number; created_at_fallback: number };
     mismatchedDates: Array<Record<string, unknown>>;
     scopeA: { leads: number; converted: number; conversionRate: number };
     profitTracking: ProfitTrackingAudit;
   };
 };
 
+export type MondaySalesWritePayload = Pick<MondaySnapshot, "organisation_id" | "year" | "month" | "quotes_done" | "orders_processed" | "monday_sync_metadata"> & Partial<Pick<MondaySnapshot, "sales_inbox_enquiries" | "converted" | "data_source">> & {
+  monthly_profit?: number;
+  monthly_profit_source?: "monday";
+};
+
 /** A patch payload deliberately omits unavailable profit fields so existing values survive. */
-export function mondaySalesWritePayload(snapshot: MondaySnapshot) {
+export function mondaySalesWritePayload(snapshot: MondaySnapshot): MondaySalesWritePayload {
+  if (!shouldWriteMondayProfit(snapshot.year, snapshot.month)) {
+    return {
+      organisation_id: snapshot.organisation_id,
+      year: snapshot.year,
+      month: snapshot.month,
+      quotes_done: snapshot.quotes_done,
+      orders_processed: snapshot.orders_processed,
+      monday_sync_metadata: snapshot.monday_sync_metadata,
+    };
+  }
   const { monthly_profit, monthly_profit_source, ...payload } = snapshot;
   return {
     ...payload,
@@ -44,6 +60,7 @@ export type SyncOutcome = {
     resolvedWeeklyGroups: Array<{ id: string; title: string }>;
     resolvedColumns: Record<string, string>;
     validation: Record<string, number>;
+    dateSourceCounts: { date_in_touch: number; created_at_fallback: number };
     missingDates: Array<Record<string, unknown>>;
     mismatchedDates: Array<Record<string, unknown>>;
     multiAccountManagers: Array<Record<string, unknown>>;
@@ -102,7 +119,7 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
     const summary = summarizeMonthlySalesBoard(entry.board, collected.items, entry.structure?.resolvedColumns);
     const profitTracking = auditProfitTracking(entry.board, collected.items, fetchedAt);
     const safetyReasons: string[] = [];
-    if (summary.validation.missingDateCount) safetyReasons.push(`${summary.validation.missingDateCount} weekly item(s) have no valid Date In Touch.`);
+    if (summary.validation.missingDateCount) safetyReasons.push(`${summary.validation.missingDateCount} weekly item(s) have no valid reporting date.`);
     if (summary.validation.blankAccountManagerItemCount) safetyReasons.push(`${summary.validation.blankAccountManagerItemCount} weekly item(s) have no account manager.`);
     if (summary.validation.blankChannelItemCount) safetyReasons.push(`${summary.validation.blankChannelItemCount} weekly item(s) have no channel.`);
     if (profitTracking.excludedRows.some((row) => row.reason === "invalid-profit")) safetyReasons.push("Profit Tracking contains invalid profit values.");
@@ -110,6 +127,7 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
       resolvedWeeklyGroups: (entry.board.groups ?? []).filter((group) => /^week\s+[1-5]$/i.test(group.title)).map((group) => ({ id: String(group.id), title: group.title })),
       resolvedColumns: entry.structure.resolvedColumns,
       validation: summary.validation,
+      dateSourceCounts: summary.dateSourceCounts,
       missingDates: summary.missingDates,
       mismatchedDates: summary.mismatchedDates,
       multiAccountManagers: summary.multiAccountManagers,
@@ -133,7 +151,7 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
       sales_inbox_enquiries: scopeB.totalLeadItems,
       converted: scopeB.convertedItems,
       data_source: "monday",
-      monday_sync_metadata: { sourceBoardId: String(entry.board.id), fetchedAt, validation: summary.validation, mismatchedDates: summary.mismatchedDates, scopeA: { leads: scopeA.totalLeadItems, converted: scopeA.convertedItems, conversionRate: scopeA.conversionRate }, profitTracking },
+      monday_sync_metadata: { sourceBoardId: String(entry.board.id), fetchedAt, validation: summary.validation, dateSourceCounts: summary.dateSourceCounts, mismatchedDates: summary.mismatchedDates, scopeA: { leads: scopeA.totalLeadItems, converted: scopeA.convertedItems, conversionRate: scopeA.conversionRate }, profitTracking },
     };
     if (willWriteMondayProfit && profitTracking.calculatedMonthlyTotal !== null) {
       snapshot.monthly_profit = profitTracking.calculatedMonthlyTotal;
