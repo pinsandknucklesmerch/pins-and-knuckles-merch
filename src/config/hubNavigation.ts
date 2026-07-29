@@ -3,6 +3,7 @@ import {
   ChartNoAxesColumnIncreasing,
   FileText,
   Landmark,
+  Database,
   type LucideIcon,
 } from "lucide-react";
 
@@ -17,4 +18,5 @@ export const hubFeatureNavigation: HubFeatureNavigationItem[] = [
   { href: "/hub/calculators", label: "Calculators", icon: Calculator },
   { href: "/hub/pk-tax", label: "PK Tax", icon: Landmark },
   { href: "/hub/commercial-invoices", label: "Commercial Invoices", icon: FileText },
+  { href: "/hub/data", label: "Data Management", icon: Database },
 ];
