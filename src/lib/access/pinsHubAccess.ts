@@ -1,5 +1,7 @@
 import { cache } from "react";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/types/database.types";
 
 type OrganisationRole = "owner" | "admin" | "manager" | "staff" | "viewer";
 type PinsHubAccessLevel = "admin" | "write" | "read";
@@ -54,9 +56,11 @@ function createUnauthenticatedResult(): PinsHubAccessResult {
   };
 }
 
-export const getCurrentPinsHubAccess = cache(
-  async function getCurrentPinsHubAccess(): Promise<PinsHubAccessResult> {
-    const supabase = await createClient();
+type PinsHubSupabaseClient = SupabaseClient<Database>;
+
+export async function resolvePinsHubAccess(
+  supabase: PinsHubSupabaseClient,
+): Promise<PinsHubAccessResult> {
 
     const { data: profiles, error: accessQueryError } = await supabase
       .from("profiles")
@@ -128,5 +132,8 @@ export const getCurrentPinsHubAccess = cache(
         access_level: accessRow.access_level as PinsHubAccessLevel,
       },
     };
-  },
-);
+}
+
+export const getCurrentPinsHubAccess = cache(async function getCurrentPinsHubAccess() {
+  return resolvePinsHubAccess(await createClient());
+});

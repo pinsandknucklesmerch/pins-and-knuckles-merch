@@ -14,6 +14,22 @@ function hasSupabaseAuthCookie(request: NextRequest) {
     );
 }
 
+function isNavigationPrefetch(request: NextRequest) {
+  return request.headers.get("next-router-prefetch") === "1"
+    || request.headers.get("purpose") === "prefetch"
+    || request.headers.get("x-middleware-prefetch") === "1";
+}
+
+function isExpectedNavigationCancellation(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+
+  const { name, message } = error as { name?: unknown; message?: unknown };
+  return name === "AbortError"
+    || (name === "AuthRetryableFetchError"
+      && typeof message === "string"
+      && message.toLowerCase().includes("aborted"));
+}
+
 function redirectToLogin(request: NextRequest, reason?: string) {
   const url = request.nextUrl.clone();
   url.pathname = "/login";
@@ -43,6 +59,13 @@ export async function updateSession(request: NextRequest) {
     return pathname === "/" ? supabaseResponse : redirectToLogin(request);
   }
 
+  // Link prefetches are cancelled routinely as the router reprioritizes navigation.
+  // The page still resolves its own RLS-backed access before rendering, while the
+  // foreground navigation below remains responsible for refreshing the session.
+  if (isNavigationPrefetch(request)) {
+    return supabaseResponse;
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
@@ -66,9 +89,18 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  const { data, error } = await supabase.auth.getClaims();
+  let claimsResult;
+  try {
+    claimsResult = await supabase.auth.getClaims();
+  } catch (error) {
+    if (isExpectedNavigationCancellation(error)) return supabaseResponse;
+    throw error;
+  }
+
+  const { data, error } = claimsResult;
 
   if (error) {
+    if (isExpectedNavigationCancellation(error)) return supabaseResponse;
     const errorCode = "code" in error ? String(error.code) : null;
     if (errorCode === "over_request_rate_limit") {
       return redirectToLogin(request, "auth-rate-limit");

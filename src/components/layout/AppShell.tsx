@@ -1,14 +1,15 @@
 import { AccessDenied } from "@/components/layout/AccessDenied";
 import { SidebarNav } from "@/components/layout/SidebarNav";
 import Galaxy from "@/components/backgrounds/Galaxy";
-import { getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
+import { getCurrentPinsHubAccess, type PinsHubAccessResult } from "@/lib/access/pinsHubAccess";
 
 type AppShellProps = {
   children: React.ReactNode;
+  pinsHubAccess?: PinsHubAccessResult;
 };
 
-export async function AppShell({ children }: AppShellProps) {
-  const pinsHubAccess = await getCurrentPinsHubAccess();
+export async function AppShell({ children, pinsHubAccess: suppliedPinsHubAccess }: AppShellProps) {
+  const pinsHubAccess = suppliedPinsHubAccess ?? await getCurrentPinsHubAccess();
 
   if (!pinsHubAccess.access) {
     return <AccessDenied userEmail={pinsHubAccess.user?.email ?? null} />;
