@@ -557,10 +557,10 @@ export type Database = {
       }
       garments: {
         Row: {
-          alt_code: string
-          brand_name: string
+          alt_code: string | null
+          brand_name: string | null
           code: string
-          colour: string
+          colour: string | null
           created_at: string
           eur_base_price: number | null
           extra_size_cost: number | null
@@ -571,14 +571,14 @@ export type Database = {
           name: string
           organisation_id: string | null
           product_type_id: string | null
-          tags: string
+          tags: string | null
           updated_at: string
         }
         Insert: {
-          alt_code?: string
-          brand_name?: string
+          alt_code?: string | null
+          brand_name?: string | null
           code: string
-          colour?: string
+          colour?: string | null
           created_at?: string
           eur_base_price?: number | null
           extra_size_cost?: number | null
@@ -589,14 +589,14 @@ export type Database = {
           name: string
           organisation_id?: string | null
           product_type_id?: string | null
-          tags?: string
+          tags?: string | null
           updated_at?: string
         }
         Update: {
-          alt_code?: string
-          brand_name?: string
+          alt_code?: string | null
+          brand_name?: string | null
           code?: string
-          colour?: string
+          colour?: string | null
           created_at?: string
           eur_base_price?: number | null
           extra_size_cost?: number | null
@@ -607,7 +607,7 @@ export type Database = {
           name?: string
           organisation_id?: string | null
           product_type_id?: string | null
-          tags?: string
+          tags?: string | null
           updated_at?: string
         }
         Relationships: [

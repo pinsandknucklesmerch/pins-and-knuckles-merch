@@ -1,0 +1,62 @@
+source_row,source_identity,existing_garment_id,match_type,planned_action,conflict_reason
+Garments!2,BB610 | Beechfield | 5-panel snapback rapper cap | ,,NO_MATCH,INSERT_NEW,
+Garments!3,W101 | Westford Mill | Bag for life - long handles | White / Natural,f3813772-ae09-4f8a-a4ee-9adc59595b13,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!4,BB653 | Beechfield | Beechfield Low Profile 6 Panel Dad Cap | ,fcaa0dbc-7df2-494a-aa31-2b252e5cb03b,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!5,5054 | AS Colour | Block L/S Tee | ,172db503-7f2c-4171-aa07-dcc4e809e99e,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!6,5050 | AS Colour | Block Tubular Tee | ,e95fb2f4-9a79-4c47-be94-3562c2f45999,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!7,5171 | AS Colour | Box Hood | ,3f2a415c-a67c-4a2e-9c8d-0e7d062b242d,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!8,5031 | AS Colour | Box L/S Tee | ,4e01e483-a396-48eb-a1e3-e5165e94df73,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!9,5030 | AS Colour | Box Tee | ,54f340fb-6ef9-4548-8230-578a17985675,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!10,5071 | AS Colour | Classic L/S Tee | ,7ad97361-d5be-4699-b95f-88c78c1aac0f,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!11,5026 | AS Colour | Classic Tee | ,96d7aa6d-56c6-421d-998c-43427f1cf73c,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!12,JH001 | AWDis | College hoodie | Whites,c8525c8c-10e4-4bdb-910f-16ee3d7448e2,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!13,JH001 | AWDis | College hoodie | colours,13694b06-7d3e-4035-87a8-88118163f32a,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!14,STTU976 | Stanley Stella | Crafter Vintage | colours,,NO_MATCH,INSERT_NEW,
+Garments!15,STTU169 | Stanley/Stella | Creator 2.0 | Black & Colours,,NO_MATCH,INSERT_NEW,
+Garments!16,STTU169 | Stanley/Stella | Creator 2.0 | White,,NO_MATCH,INSERT_NEW,
+Garments!17,JH011 | AWDis | Epic Print Hoodie | ,,NO_MATCH,INSERT_NEW,
+Garments!18,GD56 | Gildan | HEAVY SWEATSHIRT | Colours,a9b4d2f4-933e-42b1-a825-7e586f4cb4fb,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!19,GD56 | Gildan | HEAVY SWEATSHIRT | Whites,5315e418-1b1b-40b4-83e9-80e9e589fd31,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!20,GD21 | Gildan | Hammer Heavyweight T-Shirt | Whites,6b5f40e8-f794-4101-844f-a83d1eff492c,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!21,GD21 | Gildan | Hammer Heavyweight T-Shirt | Colours,c39c3867-a8af-402d-9bb6-9c787015d128,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!22,GD57 | Gildan | Heavy Blend Hooded Sweatshirt | Whites,924eb920-8a93-4f65-81b0-95914c80299a,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!23,GD57 | Gildan | Heavy Blend Hooded Sweatshirt | Colours,90773375-1137-4793-bcd6-07545d3683a4,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!24,GD05 | Gildan | Heavy Cotton T-Shirt | Colours,027d8bb1-b868-4ae5-8f76-870955f6c112,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!25,"GD05 | Gildan | Heavy Cotton T-Shirt | White, Natural",027d8bb1-b868-4ae5-8f76-870955f6c112,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!26,5145 | AS Colour | Heavy Crew | ,0ed13ae5-19dd-433e-8566-f4cca88eb8ad,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!27,5083 | AS Colour | Heavy Faded L/S Tee | ,c9dd78d9-d8fa-4b2e-a9bf-0eb9046f99d0,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!28,5086 | AS Colour | Heavy Faded Minus Tee [-5cm] | ,da959b05-12ea-417a-8296-dee3a4dc0326,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!29,5082 | AS Colour | Heavy Faded Tee | ,48150d61-c4e4-44b1-a891-51ff15c3c6fb,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!30,5146 | AS Colour | Heavy Hood | ,a079e43b-ca73-4d9d-9b9d-15cf7c03a0ec,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!31,5081 | AS Colour | Heavy L/S Tee | ,296758bc-44b4-43d5-ac39-9f2a8a484f5e,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!32,5080 | AS Colour | Heavy Tee | ,d33a1dab-4d15-408a-bbef-9160231ceeb9,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!33,BY102 | Build Your Brand | Heavy oversized tee | ,,NO_MATCH,INSERT_NEW,
+Garments!34,BB655 | Beechfield | Low-profile vintage cap | ,,NO_MATCH,INSERT_NEW,
+Garments!35,W265 | Westford Mill | Organic Premium Cotton Maxi Tote Bag | ,1ac59ee6-2ce0-40fb-949f-5774043d29ac,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!36,B652N | Beechfield | Organic cotton 6-panel dad cap | ,,NO_MATCH,INSERT_NEW,
+Garments!37,BB45 | Beechfield | Original cuffed beanie | ,ea1cd5ec-f39f-4b24-a64c-80fce526a8f0,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!38,W606 | Westford Mills | Oversized heavy duty canvas tote bag | ,,NO_MATCH,INSERT_NEW,
+Garments!39,5165 | AS Colour | Relax Faded Crew | ,cfb1dcf9-2b90-4e0d-8ad8-ce5fe038aa81,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!40,5166 | AS Colour | Relax Faded Hood | ,1420f5e6-19ec-4b5b-ac07-2b4c37fe4e27,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!41,5161 | AS Colour | Relax Hood | ,55d80546-7fc4-4745-b330-aba5f28555f8,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!42,GD01 | Gildan | SoftStyle Adult T-Shirt | Colours,5f960c1b-a108-40ea-af44-871bc4c5149d,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!43,GD01 | Gildan | SoftStyle Adult T-Shirt | Whites,81746720-9afd-43f7-b99c-a6b86a4b06e8,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!44,5111 | AS Colour | Standard Hood | ,f7b06b95-39d2-4583-b3d1-edfffe4ffbba,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!45,5001C | AS Colour | Staple Camo Tee | ,7e158974-4562-428d-afe1-17882ada3128,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!46,5020 | AS Colour | Staple L/S Tee | ,e9b2a6a4-6a35-49ff-a7cd-f07b4fac9070,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!47,5020G | AS Colour | Staple Organic L/S Tee | ,67503260-805c-49cb-9bae-bce3895be342,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!48,5040 | AS Colour | Staple Stone Wash Tee | ,5534cca2-fccf-4ce0-8ee6-ee113a7f3ce7,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!49,5001 | AS Colour | Staple Tee | ,a1ff5c48-30e8-4e18-b3fd-2c4291826ae2,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!50,5102 | AS Colour | Stencil Hood | ,5cf94056-0dba-4cb4-b13b-572c7ed69d13,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!51,5085 | AS Colour | Stone Wash Heavy Tee | ,29b06ae5-8eec-4a25-a91e-03a42ccdbbfa,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!52,GD14 | Gildan | Ultra Cotton Long Sleeve T-Shirt | Colours,229801a9-37e3-4f15-9f89-87c17c81d110,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!53,GD14 | Gildan | Ultra Cotton Long Sleeve T-Shirt | Whites,2bbb6b7e-c791-41d0-a4e3-5e953b18e7e7,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!54,GD02 | Gildan | Ultra Cotton T-Shirt | Whites,eb4d8c63-8816-4a1f-82cd-c2829e0fa226,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!55,GD02 | Gildan | Ultra Cotton T-Shirt | Colours,79e8d638-b41b-40bb-815a-33ea928991b1,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!56,CV3001 | Bella Canvas | Unisex Crew Neck T-Shirt | Colours,7665f526-0d7c-4d70-ad60-a0c0902c88ff,EXACT_IDENTITY,UPDATE_EXISTING,
+Garments!57,CV3001 | Bella Canvas | Unisex Crew Neck T-Shirt | Whites,7665f526-0d7c-4d70-ad60-a0c0902c88ff,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!58,W101 | Westford Mill | Westford Mill Bag For Life - Long Handles | Colours,f3813772-ae09-4f8a-a4ee-9adc59595b13,NEAR_MATCH,MANUAL_REVIEW,Source identity differs from existing active record; do not update without review.
+Garments!59,4062 | AS Colour | Wo's Crop Tee | ,,NO_MATCH,INSERT_NEW,
+Garments!60,4089 | AS Colour | Wo's Heavy Faded Crop Tee | ,,NO_MATCH,INSERT_NEW,
+Garments!61,4064G | AS Colour | Wo's Organic Rib Crop Tank | ,,NO_MATCH,INSERT_NEW,
+Garments!62,JH050 | AWDis | Zoodie | ,,NO_MATCH,INSERT_NEW,

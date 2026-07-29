@@ -1,0 +1,62 @@
+source_row,code,alt_code,brand,name,colour,product_type_name,pricing_category,eur_base_price,gbp_price,extra_size_cost,tags,is_active,mapping_status,notes
+Garments!2,BB610,,Beechfield,5-panel snapback rapper cap,,Baseball cap,OTHER,2.7,2.16,,cap5 panelrapper capsnapback,true,READY,Mapped from cap product name.
+Garments!3,W101,WM101,Westford Mill,Bag for life - long handles,White / Natural,Tote bags,OTHER,1.5,0.99,,W101WM101Tote,true,READY,Mapped from bag/tote product name.
+Garments!4,BB653,BC653,Beechfield,Beechfield Low Profile 6 Panel Dad Cap,,Baseball cap,OTHER,3.2,2.48,,bb653beechfieldcapdad capBC653,true,READY,Mapped from cap product name.
+Garments!5,5054,,AS Colour,Block L/S Tee,,Long sleeve tees,LONGSLEEVE,4.8,4.05,,5054. blocklong sleeve,true,READY,
+Garments!6,5050,,AS Colour,Block Tubular Tee,,Cotton T-shirt/Tank Top,TSHIRT,3.25,2.55,,5050Block Tubular Tee,true,READY,
+Garments!7,5171,,AS Colour,Box Hood,,,HOODIE,19.55,16.15,,5171box hood,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!8,5031,,AS Colour,Box L/S Tee,,Long sleeve tees,LONGSLEEVE,8.95,5.95,,5031. boxlong sleeve,true,READY,Mapped as LONGSLEEVE from product name; workbook Type is TSHIRT.
+Garments!9,5030,,AS Colour,Box Tee,,Cotton T-shirt/Tank Top,TSHIRT,7.15,5.8,,Box TeeAS Colour5030,true,READY,
+Garments!10,5071,,AS Colour,Classic L/S Tee,,Long sleeve tees,LONGSLEEVE,8.4,5.95,,5071Classiclong sleeve,true,READY,
+Garments!11,5026,,AS Colour,Classic Tee,,Cotton T-shirt/Tank Top,TSHIRT,6.5,5.3,,5026AS Colourclassic tee,true,READY,
+Garments!12,JH001,,AWDis,College hoodie,Whites,,HOODIE,9.5,7.24,1.5,AWDishoodiewhitecollegeJH001,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!13,JH001,,AWDis,College hoodie,colours,,HOODIE,9.5,8.24,1.5,AWDisJH001College,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!14,STTU976,SX236,Stanley Stella,Crafter Vintage,colours,Cotton T-shirt/Tank Top,TSHIRT,6.18,3.04,,STTU976SX236teevintage tee,true,READY,
+Garments!15,STTU169,SX701,Stanley/Stella,Creator 2.0,Black & Colours,Cotton T-shirt/Tank Top,TSHIRT,4.45,3.5,0.9,creator iconic t-shirtcreatororganic cotton,true,READY,
+Garments!16,STTU169,SX701,Stanley/Stella,Creator 2.0,White,Cotton T-shirt/Tank Top,TSHIRT,4.13,2.32,1,creator iconic t-shirtcreatororganic cotton,true,READY,
+Garments!17,JH011,,AWDis,Epic Print Hoodie,,,HOODIE,10.5,7.46,1.5,HoodieAWDisepic printJH011,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!18,GD56,18000,Gildan,HEAVY SWEATSHIRT,Colours,,HOODIE,5.9,5.67,0.5,GildansweatshirtblackGD5618000,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!19,GD56,18000,Gildan,HEAVY SWEATSHIRT,Whites,,HOODIE,5.4,5.51,1.65,GildansweatshirtwhiteGD5618000,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!20,GD21,H000,Gildan,Hammer Heavyweight T-Shirt,Whites,Cotton T-shirt/Tank Top,TSHIRT,2.65,2.51,1,GildanteewhiteGD21H000,true,READY,
+Garments!21,GD21,H000,Gildan,Hammer Heavyweight T-Shirt,Colours,Cotton T-shirt/Tank Top,TSHIRT,3.15,2.98,1.2,GildanteeblackHAMMERH000GD21,true,READY,
+Garments!22,GD57,18500,Gildan,Heavy Blend Hooded Sweatshirt,Whites,,HOODIE,8.25,6.88,2,GildanhoodiewhiteGD5718500,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!23,GD57,18500,Gildan,Heavy Blend Hooded Sweatshirt,Colours,,HOODIE,8.25,6.88,2,GD5718500GILDAN HEAVY HOODIEHOODIEHEAVY,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!24,GD05,5000,Gildan,Heavy Cotton T-Shirt,Colours,Cotton T-shirt/Tank Top,TSHIRT,2.4,1.96,0.9,GildanteeblackHEAVYGD055000,true,READY,
+Garments!25,GD05,5000,Gildan,Heavy Cotton T-Shirt,"White, Natural",Cotton T-shirt/Tank Top,TSHIRT,1.95,1.57,0.9,GildanteewhiteGD055000HEAVY,true,READY,
+Garments!26,5145,,AS Colour,Heavy Crew,,,HOODIE,19.8,17.15,,5145sweaterheavy crew,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!27,5083,,AS Colour,Heavy Faded L/S Tee,,Long sleeve tees,LONGSLEEVE,10.2,8.15,,5083Fadedfaded long sleeve,true,READY,
+Garments!28,5086,,AS Colour,Heavy Faded Minus Tee [-5cm],,Cotton T-shirt/Tank Top,TSHIRT,7.7,6.45,,5086Heavy Faded Minus Tee [-5cm]fadedminus,true,READY,
+Garments!29,5082,,AS Colour,Heavy Faded Tee,,Cotton T-shirt/Tank Top,TSHIRT,7.7,6.45,,5082Heavy Faded Teefaded,true,READY,
+Garments!30,5146,,AS Colour,Heavy Hood,,,HOODIE,22.25,18.7,,5146heavy hood,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!31,5081,,AS Colour,Heavy L/S Tee,,Long sleeve tees,LONGSLEEVE,10.2,8.15,,5081long sleeve,true,READY,
+Garments!32,5080,,AS Colour,Heavy Tee,,Cotton T-shirt/Tank Top,TSHIRT,7.7,6.45,,5080Heavy Tee,true,READY,
+Garments!33,BY102,,Build Your Brand,Heavy oversized tee,,Cotton T-shirt/Tank Top,TSHIRT,6.25,6.05,0.5,Oversized tee,true,READY,
+Garments!34,BB655,BC655,Beechfield,Low-profile vintage cap,,Baseball cap,OTHER,3.81,6.83,,B655capvintage cap,true,READY,Mapped from cap product name.
+Garments!35,W265,WM265,Westford Mill,Organic Premium Cotton Maxi Tote Bag,,Tote bags,OTHER,3.6,2.8,,Westford MilltoteW265WM265,true,READY,Mapped from bag/tote product name.
+Garments!36,B652N,,Beechfield,Organic cotton 6-panel dad cap,,Baseball cap,OTHER,4.25,2.98,,Caporganic cap6 paneldad cap,true,READY,Mapped from cap product name.
+Garments!37,BB45,BC45,Beechfield,Original cuffed beanie,,Beanies,OTHER,2,1.56,,BeaniebeechfieldBB45BC45,true,READY,Mapped from beanie product name.
+Garments!38,W606,WM606,Westford Mills,Oversized heavy duty canvas tote bag,,Tote bags,OTHER,7.1,5.65,,Toteoversized toteheavy tote,true,READY,Mapped from bag/tote product name.
+Garments!39,5165,,AS Colour,Relax Faded Crew,,,HOODIE,16.05,13.25,,5165relax faded crewfadedfaded sweater,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!40,5166,,AS Colour,Relax Faded Hood,,,HOODIE,18.05,14.7,,5166relax faded hood,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!41,5161,,AS Colour,Relax Hood,,,HOODIE,16.95,13.95,,5161relax hoodhoodie,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!42,GD01,64000,Gildan,SoftStyle Adult T-Shirt,Colours,Cotton T-shirt/Tank Top,TSHIRT,2.25,1.96,0.7,GD0164000SOFTSOFTSTYLEGILDAN,true,READY,
+Garments!43,GD01,64000,Gildan,SoftStyle Adult T-Shirt,Whites,Cotton T-shirt/Tank Top,TSHIRT,1.85,1.59,0.6,GD0164000GILDAN SOFTSOFTSTYLE,true,READY,
+Garments!44,5111,,AS Colour,Standard Hood,,,HOODIE,12.25,10.15,,5111Standard hoodie,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!45,5001C,,AS Colour,Staple Camo Tee,,Cotton T-shirt/Tank Top,TSHIRT,6.7,5.7,,5001ccamostaple,true,READY,
+Garments!46,5020,,AS Colour,Staple L/S Tee,,Long sleeve tees,LONGSLEEVE,6.65,5.45,,5020staplelong sleeve,true,READY,
+Garments!47,5020G,,AS Colour,Staple Organic L/S Tee,,Long sleeve tees,LONGSLEEVE,6.9,5.6,,5020GStapleorganicorganic long sleevelong sleeve,true,READY,
+Garments!48,5040,,AS Colour,Staple Stone Wash Tee,,Cotton T-shirt/Tank Top,TSHIRT,7.8,6.3,,5040Staple Stone Wash Teewashedstone washed,true,READY,
+Garments!49,5001,,AS Colour,Staple Tee,,Cotton T-shirt/Tank Top,TSHIRT,4.7,3.95,,AS Colour5001Staple,true,READY,
+Garments!50,5102,,AS Colour,Stencil Hood,,,HOODIE,19.55,16.45,,5102stencil hood,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
+Garments!51,5085,,AS Colour,Stone Wash Heavy Tee,,Cotton T-shirt/Tank Top,TSHIRT,8.25,6.7,,5085Stone Wash Heavy Teestone wash,true,READY,
+Garments!52,GD14,2400,Gildan,Ultra Cotton Long Sleeve T-Shirt,Colours,Long sleeve tees,LONGSLEEVE,5.7,4.64,2,Gildanlong sleeveblackGD142400ULTRAGILDAN ULTRA,true,READY,
+Garments!53,GD14,2400,Gildan,Ultra Cotton Long Sleeve T-Shirt,Whites,Long sleeve tees,LONGSLEEVE,4.7,3.71,2,GILDAN ULTRA LONG SLEEVELONG SLEEVEGD14ULTRA2400,true,READY,
+Garments!54,GD02,2000,Gildan,Ultra Cotton T-Shirt,Whites,Cotton T-shirt/Tank Top,TSHIRT,2.35,2.11,1.1,gildan ultraGD022000ultra,true,READY,
+Garments!55,GD02,2000,Gildan,Ultra Cotton T-Shirt,Colours,Cotton T-shirt/Tank Top,TSHIRT,2.8,2.56,1.1,Gildan UltraUltraGD022000,true,READY,
+Garments!56,CV3001,3001,Bella Canvas,Unisex Crew Neck T-Shirt,Colours,Cotton T-shirt/Tank Top,TSHIRT,4.8,3.45,,Bella CanvasteeCV30013001,true,READY,
+Garments!57,CV3001,,Bella Canvas,Unisex Crew Neck T-Shirt,Whites,Cotton T-shirt/Tank Top,TSHIRT,4.8,3.45,,Bella Canvasteewhitesize note: 2XL: 54 / 3XL: 7CV0013001cv3001,true,READY,
+Garments!58,W101,WM101,Westford Mill,Westford Mill Bag For Life - Long Handles,Colours,Tote bags,OTHER,1.5,1.19,,Westford MilltoteW101,true,READY,Mapped from bag/tote product name.
+Garments!59,4062,,AS Colour,Wo's Crop Tee,,Cotton T-shirt/Tank Top,TSHIRT,4.4,3.6,,4062crop tee,true,READY,
+Garments!60,4089,,AS Colour,Wo's Heavy Faded Crop Tee,,Cotton T-shirt/Tank Top,TSHIRT,7.6,,,4089faded crop,true,READY,
+Garments!61,4064G,,AS Colour,Wo's Organic Rib Crop Tank,,Cotton T-shirt/Tank Top,TSHIRT,7.45,6.15,,crop tankladies tankwomens tank,true,READY,
+Garments!62,JH050,,AWDis,Zoodie,,,HOODIE,11.8,10.15,1.5,AWDisJH050Zip HoodieZoodie,true,REVIEW_REQUIRED,Product Type unresolved: workbook does not establish cotton vs poly/cotton.
