@@ -30,9 +30,7 @@ export function EuItemCard({
   onRemove,
 }: EuItemCardProps) {
   return (
-    <Panel
-      className="min-h-[520px] border-border/90 bg-card"
-    >
+    <Panel className="border-border/90 bg-card">
       <div className="grid gap-4">
         <div className="flex items-center justify-between gap-3">
           <input
@@ -111,9 +109,7 @@ export function EuItemCard({
           />
         </div>
 
-        <div className="min-h-24">
-          <CalculatorErrors errors={errors} />
-        </div>
+        <CalculatorErrors errors={errors} />
       </div>
     </Panel>
   );

@@ -234,6 +234,9 @@ Implemented:
 - EU domain engine, validation, price lookup, profile constants, mappers, and tests.
 - EU US Clients route using the shared EU foundation and its seeded profile: garment markups are T-shirt €2, long-sleeve €3, and hoodie €4. Its pure formatter preserves legacy lowercase decoration wording and `+ base` copy.
 - UK Trade route, Supabase reference-data loading, pure tier engine, copy formatter, and tests. Print uses floor tiers through 10,000 with £20 screen setup; embroidery uses 7,000–15,000 stitch tiers, additional 1,000-stitch blocks, £30 setup per position, and the 2,500 tier above 2,500 units.
+- EU Standard and EU US Clients include a collapsed-by-default delivery sales helper backed by Supabase delivery rates. Delivery remains separate from production, Pins totals, VAT, profit, and quote-copy totals; its separate copy output preserves the legacy structure.
+- EU results provide an open detailed Production/Pins breakdown, and UK Trade provides an open detailed cost breakdown. These surfaces read existing result data only; no pricing rules changed.
+- Reference assets: `public/reference-assets/eu-delivery-helper-reference.png`, `public/reference-assets/eu-detailed-breakdown-reference.png`, and `public/reference-assets/uk-trade-breakdown-reference.png`.
 - Calculator state is client-local only; no browser persistence is used and revisiting a route starts fresh.
 
 Not implemented yet:
@@ -338,7 +341,15 @@ npm run build
 - Monday audit/import/sync tooling exists, but production configuration and deployment verification remain required.
 - EPCC Gmail profit ingestion exists, but Gmail OAuth, cron, service-role configuration, and migration deployment require production verification.
 - Admin workflows for calculator data are not implemented.
-- Product Type records and legacy garment-data import remain pending; garment Product Type assignment is staged through nullable `product_type_id`.
+- Product Types and READY garment data are imported from the reviewed datasets. Unresolved hoodie Product Type mappings remain deferred to the future team-management UI, and near-match garment conflicts remain pending manual review. Garment Product Type assignment remains staged through nullable `product_type_id`.
+- Invoice addresses remain deferred.
+
+## Data Management
+
+- Routes: `/hub/data`, `/hub/data/garments`, and `/hub/data/product-types`.
+- Pins Hub read access can view Product Types and garments; write access can add, edit, and deactivate them; admin access can permanently delete garments and unreferenced Product Types.
+- Garments require an active Product Type and at least one EUR or GBP price when active. The selected Product Type controls the synchronized transitional `garment_type` and future calculator pricing category.
+- Unresolved hoodie rows and near-match garment records remain manual-review items; invoice-address management remains deferred.
 - EU Trade remains deferred pending confirmed rules.
 - Garment Directory and Quick Reference have no active routes.
 

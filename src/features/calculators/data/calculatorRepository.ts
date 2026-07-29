@@ -189,8 +189,6 @@ export async function loadCalculatorReferenceData(
         .returns<DeliveryRateRow[]>()
     : { data: [], error: null };
 
-  throwIfError(deliveryResponse.error, "Failed to load delivery rates");
-
   return {
     profile,
     priceSets,
@@ -202,6 +200,9 @@ export async function loadCalculatorReferenceData(
     ),
     fees: (feesResponse.data ?? []).map(mapCalculatorFee),
     deliveryRates: (deliveryResponse.data ?? []).map(mapDeliveryRate),
+    deliveryRatesError: deliveryResponse.error
+      ? `Failed to load delivery rates: ${deliveryResponse.error.message}`
+      : null,
   };
 }
 

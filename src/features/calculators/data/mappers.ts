@@ -174,10 +174,10 @@ export function mapGarment(row: GarmentRow): Garment {
   return {
     id: row.id,
     code: row.code,
-    altCode: row.alt_code,
-    brandName: row.brand_name,
+    altCode: row.alt_code ?? "",
+    brandName: row.brand_name ?? "",
     name: row.name,
-    colour: row.colour,
+    colour: row.colour ?? "",
     garmentType: assertGarmentType(row.garment_type),
     eurBasePrice: toNullableFiniteNumber(row.eur_base_price, "garments.eur_base_price"),
     gbpPrice: toNullableFiniteNumber(row.gbp_price, "garments.gbp_price"),
@@ -185,7 +185,7 @@ export function mapGarment(row: GarmentRow): Garment {
       row.extra_size_cost,
       "garments.extra_size_cost",
     ),
-    tags: row.tags,
+    tags: row.tags ?? "",
   };
 }
 

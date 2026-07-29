@@ -1,8 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
-import { ActionButton } from "@/components/ui/ActionButton";
 import { createDefaultEuCalculatorItem } from "../domain/euCalculatorDefaults.ts";
 import { calculateEuStandardPrice } from "../domain/euPricingEngine.ts";
 import type {
@@ -13,6 +11,8 @@ import type {
 } from "../domain/types.ts";
 import { EuItemCard } from "./EuItemCard";
 import { EuCalculatorResults } from "./EuCalculatorResults";
+import { EuDeliveryHelper } from "./EuDeliveryHelper";
+import { CalculatorToolbar } from "./CalculatorToolbar";
 import type { EuQuoteLine } from "../domain/euQuoteFormatter.ts";
 import { formatEuStandardQuote, formatUsClientQuote } from "../domain/euQuoteFormatter.ts";
 
@@ -91,6 +91,7 @@ export function EuCalculator({ referenceData, profileCode = "EU_STANDARD" }: EuC
   const validItemCount = calculations.filter(
     (calculation) => calculation.totals,
   ).length;
+  const hasValidItems = validItemCount > 0;
 
   const validQuoteLines: EuQuoteLine[] = calculations.flatMap((calculation) => {
     if (!calculation.result) return [];
@@ -129,44 +130,40 @@ export function EuCalculator({ referenceData, profileCode = "EU_STANDARD" }: EuC
   }
 
   return (
-    <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-      <div className="grid min-w-0 gap-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="text-sm text-muted-foreground">
-            {validItemCount} valid / {items.length} total
+    <div className="grid min-w-0 gap-4">
+      <CalculatorToolbar validItemCount={validItemCount} totalItemCount={items.length} onAddItem={addItem} onReset={reset} />
+
+      <div className={hasValidItems ? "grid min-w-0 gap-4 xl:grid-cols-[minmax(0,2.3fr)_minmax(19rem,0.85fr)]" : "grid min-w-0 gap-4"}>
+        <div className="grid min-w-0 content-start gap-4">
+          <div className="grid gap-4">
+            {items.map((item, index) => (
+              <EuItemCard
+                key={item.id}
+                item={item}
+                index={index}
+                garments={referenceData.garments}
+                errors={
+                  calculations.find((calculation) => calculation.itemId === item.id)
+                    ?.errors ?? []
+                }
+                canRemove={items.length > 1}
+                onChange={updateItem}
+                onRemove={() => removeItem(item.id)}
+              />
+            ))}
           </div>
-          <ActionButton onClick={addItem}>
-            <Plus className="mr-2 size-4" />
-            Add item
-          </ActionButton>
         </div>
 
-        <div className="grid gap-4">
-          {items.map((item, index) => (
-            <EuItemCard
-              key={item.id}
-              item={item}
-              index={index}
-              garments={referenceData.garments}
-              errors={
-                calculations.find((calculation) => calculation.itemId === item.id)
-                  ?.errors ?? []
-              }
-              canRemove={items.length > 1}
-              onChange={updateItem}
-              onRemove={() => removeItem(item.id)}
-            />
-          ))}
-        </div>
+        {hasValidItems ? <div className="grid min-w-0 content-start gap-4">
+          <EuCalculatorResults items={validQuoteLines} totals={totals} quoteFormatter={profileCode === "EU_US_CLIENTS" ? formatUsClientQuote : formatEuStandardQuote} showBreakdown={false} showEmptyState={false} />
+        </div> : null}
       </div>
 
-      <div className="grid min-w-0 content-start gap-4">
-        <EuCalculatorResults items={validQuoteLines} totals={totals} onReset={reset} quoteFormatter={profileCode === "EU_US_CLIENTS" ? formatUsClientQuote : formatEuStandardQuote} showBreakdown={false} showEmptyState={false} />
-      </div>
+      <EuDeliveryHelper deliveryRates={referenceData.deliveryRates} deliveryRatesError={referenceData.deliveryRatesError} />
 
-      <div className="col-span-full min-w-0">
+      {hasValidItems ? <div className="min-w-0">
         <EuCalculatorResults items={validQuoteLines} totals={totals} quoteFormatter={profileCode === "EU_US_CLIENTS" ? formatUsClientQuote : formatEuStandardQuote} showSummary={false} />
-      </div>
+      </div> : null}
     </div>
   );
 }

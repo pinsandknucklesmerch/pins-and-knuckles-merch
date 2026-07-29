@@ -130,6 +130,7 @@ export type CalculatorReferenceData = {
   euEmbroideryPricing: EuEmbroideryPrice[];
   fees: CalculatorFee[];
   deliveryRates: DeliveryRate[];
+  deliveryRatesError?: string | null;
 };
 
 export type UkTradePrintPosition = "FRONT" | "BACK" | "LEFT_SLEEVE" | "RIGHT_SLEEVE" | "NECK_PRINT_STANDARD" | "NECK_PRINT_TRANSFER";
@@ -137,7 +138,22 @@ export type UkTradePrintTier = { pricingSetCode: string; positionCode: "STANDARD
 export type UkTradeEmbroideryTier = { pricingSetCode: string; stitchCount: number; isExtra1000Stitches: boolean; quantityTier: number; unitPrice: number };
 export type UkTradeReferenceData = Pick<CalculatorReferenceData, "profile" | "priceSets" | "garments" | "fees"> & { printTiers: UkTradePrintTier[]; embroideryTiers: UkTradeEmbroideryTier[] };
 export type UkTradeItemInput = { id: string; itemLabel?: string; garmentId: string | null; quantity: number; printPositions: Array<{ position: UkTradePrintPosition; colourCount?: number }>; embroideryStitches: Array<number | null> };
-export type UkTradeItemResult = { itemId: string; garmentId: string; quantity: number; garmentCost: number; printCost: number; screenSetupCount: number; screenSetupCost: number; embroideryCost: number; embroiderySetupCost: number; totalCost: number; errors: CalculatorValidationError[] };
+export type UkTradePrintCostBreakdown = {
+  position: UkTradePrintPosition;
+  colourCount: number | null;
+  unitPrice: number;
+  cost: number;
+  screenSetupCount: number;
+};
+
+export type UkTradeEmbroideryCostBreakdown = {
+  stitches: number;
+  unitPrice: number;
+  cost: number;
+  setupCost: number;
+};
+
+export type UkTradeItemResult = { itemId: string; garmentId: string; quantity: number; garmentCost: number; printCost: number; screenSetupCount: number; screenSetupCost: number; embroideryCost: number; embroiderySetupCost: number; totalCost: number; printBreakdowns: UkTradePrintCostBreakdown[]; embroideryBreakdowns: UkTradeEmbroideryCostBreakdown[]; errors: CalculatorValidationError[] };
 
 export type EuPrintSelection = {
   position: EuPrintPosition;

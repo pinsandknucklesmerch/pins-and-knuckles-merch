@@ -3,6 +3,7 @@
 import { Check, Copy } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Panel } from "@/components/ui/Panel";
+import { buildEuBreakdown } from "../domain/calculatorBreakdowns.ts";
 import { formatEuStandardQuote, getEuItemLabel, type EuQuoteLine } from "../domain/euQuoteFormatter.ts";
 import type { EuCalculatorTotals } from "../domain/types.ts";
 
@@ -13,7 +14,6 @@ type EuCalculatorResultsProps = {
   showBreakdown?: boolean;
   showEmptyState?: boolean;
   quoteFormatter?: (items: EuQuoteLine[], totals: EuCalculatorTotals) => string;
-  onReset?: () => void;
 };
 
 const currencyFormatter = new Intl.NumberFormat("en-GB", {
@@ -23,10 +23,6 @@ const currencyFormatter = new Intl.NumberFormat("en-GB", {
 
 function money(value: number) {
   return currencyFormatter.format(value);
-}
-
-function unitValue(total: number, quantity: number) {
-  return total / quantity;
 }
 
 function printLabel(position: string, colourCount: number | null) {
@@ -54,45 +50,45 @@ function ItemHeading({ line, index }: { line: EuQuoteLine; index: number }) {
   );
 }
 
-function ProductionBreakdown({ line, index }: { line: EuQuoteLine; index: number }) {
+function ProductionBreakdown({ line, index, breakdown }: { line: EuQuoteLine; index: number; breakdown: ReturnType<typeof buildEuBreakdown>["productionItems"][number] }) {
   const { result } = line;
   return (
     <div className="min-w-0 rounded-md border border-border/70 bg-background/55 p-3 backdrop-blur-sm">
       <ItemHeading line={line} index={index} />
       <dl className="text-xs">
-        <DetailRow label="Garment base price / unit" value={money(unitValue(result.baseCost, result.quantity))} />
+        <DetailRow label="Garment base price / unit" value={money(breakdown.baseUnitPrice)} />
         {result.printBreakdowns.map((print) => (
           <DetailRow key={`production-${print.position}`} label={printLabel(print.position, print.colourCount)} value={`${money(print.productionUnitPrice)} / unit`} />
         ))}
         {result.embroideryBreakdowns.map((embroidery) => (
           <DetailRow key={`production-${embroidery.size}`} label={`${embroidery.size} embroidery`} value={`${money(embroidery.productionUnitPrice)} / unit`} />
         ))}
-        {result.digitisingProductionCost > 0 ? <DetailRow label="Production digitising fees" value={money(result.digitisingProductionCost)} /> : null}
-        <DetailRow label="Production unit cost excl. VAT" value={money(unitValue(result.productionSubtotalExVat, result.quantity))} />
-        <DetailRow label="Production subtotal excl. VAT" value={money(result.productionSubtotalExVat)} />
+        {result.digitisingProductionCost > 0 ? <DetailRow label="Digitising production cost" value={money(breakdown.digitising)} /> : null}
+        <DetailRow label="Production unit cost excl. VAT" value={money(breakdown.unitCost)} />
+        <DetailRow label="Production item subtotal excl. VAT" value={money(breakdown.subtotal)} />
       </dl>
     </div>
   );
 }
 
-function PinsBreakdown({ line, index }: { line: EuQuoteLine; index: number }) {
+function PinsBreakdown({ line, index, breakdown }: { line: EuQuoteLine; index: number; breakdown: ReturnType<typeof buildEuBreakdown>["pinsItems"][number] }) {
   const { input, result } = line;
   return (
     <div className="min-w-0 rounded-md border border-border/70 bg-background/55 p-3 backdrop-blur-sm">
       <ItemHeading line={line} index={index} />
       <dl className="text-xs">
-        <DetailRow label="Garment base price / unit" value={money(unitValue(result.baseCost, result.quantity))} />
-        <DetailRow label="Garment markup / unit" value={money(unitValue(result.garmentMarkupCost, result.quantity))} />
-        {input.pkMarkupEnabled ? <DetailRow label="PK markup / unit" value={money(unitValue(result.pkMarkupCost, result.quantity))} /> : null}
+        <DetailRow label="Garment base price / unit" value={money(breakdown.baseUnitPrice)} />
+        <DetailRow label="Garment markup / unit" value={money(breakdown.garmentMarkupUnitPrice)} />
+        {input.pkMarkupEnabled && breakdown.pkMarkupUnitPrice !== 0 ? <DetailRow label="PK markup / unit" value={money(breakdown.pkMarkupUnitPrice)} /> : null}
         {result.printBreakdowns.map((print) => (
           <DetailRow key={`customer-${print.position}`} label={printLabel(print.position, print.colourCount)} value={`${money(print.customerUnitPrice)} / unit`} />
         ))}
         {result.embroideryBreakdowns.map((embroidery) => (
           <DetailRow key={`customer-${embroidery.size}`} label={`${embroidery.size} embroidery`} value={`${money(embroidery.customerUnitPrice)} / unit`} />
         ))}
-        {result.digitisingCustomerCost > 0 ? <DetailRow label="Customer digitising fees" value={money(result.digitisingCustomerCost)} /> : null}
-        <DetailRow label="Total unit cost excl. VAT" value={money(unitValue(result.customerSubtotalExVat, result.quantity))} />
-        <DetailRow label="Pins subtotal excl. VAT" value={money(result.customerSubtotalExVat)} />
+        {result.digitisingCustomerCost > 0 ? <DetailRow label="Digitising fee incl. VAT" value={money(breakdown.digitisingInclVat)} /> : null}
+        <DetailRow label="Total unit cost excl. VAT" value={money(breakdown.unitCost)} />
+        <DetailRow label="Pins item subtotal excl. VAT" value={money(breakdown.subtotal)} />
       </dl>
     </div>
   );
@@ -105,10 +101,10 @@ export function EuCalculatorResults({
   showBreakdown = true,
   showEmptyState = true,
   quoteFormatter = formatEuStandardQuote,
-  onReset,
 }: EuCalculatorResultsProps) {
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const copyResetTimeout = useRef<number | null>(null);
+  const breakdown = buildEuBreakdown(items, totals);
 
   useEffect(() => () => {
     if (copyResetTimeout.current !== null) window.clearTimeout(copyResetTimeout.current);
@@ -154,9 +150,7 @@ export function EuCalculatorResults({
         </button>
       </div> : null}
 
-      {showSummary && onReset ? <button type="button" onClick={onReset} className="justify-self-start text-sm text-muted-foreground transition-colors hover:text-foreground">Reset</button> : null}
-
-      {showBreakdown ? <details className="group min-w-0 rounded-lg border border-border/90 bg-card/75 backdrop-blur-sm">
+      {showBreakdown ? <details open className="group min-w-0 rounded-lg border border-border/90 bg-card/75 backdrop-blur-sm">
         <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
           <span className="flex items-center justify-between gap-3">Breakdown <span className="text-muted-foreground transition-transform group-open:rotate-180">⌄</span></span>
         </summary>
@@ -164,11 +158,11 @@ export function EuCalculatorResults({
           <div className="grid min-w-0 gap-4 xl:grid-cols-2">
             <div className="grid min-w-0 content-start gap-3">
               <h2 className="text-sm font-semibold text-foreground">Production Cost Breakdown</h2>
-              {items.map((line, index) => <ProductionBreakdown key={line.result.itemId} line={line} index={index} />)}
+              {items.map((line, index) => <ProductionBreakdown key={line.result.itemId} line={line} index={index} breakdown={breakdown.productionItems[index]} />)}
             </div>
             <div className="grid min-w-0 content-start gap-3">
               <h2 className="text-sm font-semibold text-foreground">Pins Price Breakdown</h2>
-              {items.map((line, index) => <PinsBreakdown key={line.result.itemId} line={line} index={index} />)}
+              {items.map((line, index) => <PinsBreakdown key={line.result.itemId} line={line} index={index} breakdown={breakdown.pinsItems[index]} />)}
             </div>
           </div>
           <div className="border-t border-border pt-3">
