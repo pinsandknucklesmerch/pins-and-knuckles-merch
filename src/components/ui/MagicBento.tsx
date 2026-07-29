@@ -16,7 +16,6 @@ export type MagicBentoItem = {
   status?: string;
   value?: string;
   disabled?: boolean;
-  prefetch?: boolean;
 };
 
 export type MagicBentoProps = {
@@ -288,7 +287,7 @@ export default function MagicBento({
             "data-disabled": item.disabled ? "true" : "false",
           };
 
-          return item.disabled ? <div key={item.id} {...props}>{content}</div> : <Link key={item.id} href={item.href} prefetch={item.prefetch} {...props}>{content}</Link>;
+          return item.disabled ? <div key={item.id} {...props}>{content}</div> : <Link key={item.id} href={item.href} {...props}>{content}</Link>;
         })}
       </div>
     </section>
