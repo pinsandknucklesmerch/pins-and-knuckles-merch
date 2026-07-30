@@ -6,8 +6,8 @@ import { loadDataManagementSummary } from "@/features/data-management/data/catal
 export default async function DataManagementPage() {
   const { access, garmentCount, productTypeCount } = await loadDataManagementSummary();
   const items: MagicBentoItem[] = [
-    { id: "garments", title: "Garments", label: "Directory", value: String(garmentCount), href: "/hub/data/garments" },
-    { id: "product-types", title: "Product Types", label: "Reference data", value: String(productTypeCount), href: "/hub/data/product-types" },
+    { id: "garments", title: "Garments", value: String(garmentCount), href: "/hub/data/garments" },
+    { id: "product-types", title: "Product Types", value: String(productTypeCount), href: "/hub/data/product-types" },
   ];
-  return <AppShell pinsHubAccess={access}><PageHeader title="Data Management" /><MagicBento items={items} enableStars enableSpotlight enableBorderGlow clickEffect glowColor="222, 59, 67" /></AppShell>;
+  return <AppShell pinsHubAccess={access}><PageHeader title="Data Management" /><MagicBento items={items} /></AppShell>;
 }

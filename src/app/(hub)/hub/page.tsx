@@ -21,17 +21,6 @@ export default function HubPage() {
         />
         <MagicBento
           items={items}
-          textAutoHide={true}
-          enableStars
-          enableSpotlight
-          enableBorderGlow
-          enableTilt={false}
-          enableMagnetism={false}
-          clickEffect
-          spotlightRadius={400}
-          particleCount={12}
-          glowColor="222, 59, 67"
-          disableAnimations={false}
         />
       </AppShell>
     </Suspense>

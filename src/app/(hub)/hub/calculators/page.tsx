@@ -8,13 +8,11 @@ const euCalculators: MagicBentoItem[] = [
   {
     id: "eu-standard",
     title: "EU Standard",
-    label: "EU · EUR",
     href: "/hub/calculators/eu/standard",
   },
   {
     id: "eu-us-clients",
     title: "EU US Clients",
-    label: "EU · USD",
     href: "/hub/calculators/eu/us-clients",
   },
 ];
@@ -23,7 +21,6 @@ const ukCalculators: MagicBentoItem[] = [
   {
     id: "uk-trade",
     title: "UK Trade",
-    label: "UK · GBP",
     href: "/hub/calculators/uk/trade",
   },
 ];
@@ -40,13 +37,6 @@ export default function CalculatorsPage() {
             </h2>
             <MagicBento
               items={euCalculators}
-              enableStars
-              enableSpotlight
-              enableBorderGlow
-              enableTilt={false}
-              enableMagnetism={false}
-              clickEffect
-              glowColor="222, 59, 67"
             />
           </section>
           <section aria-labelledby="uk-calculators-heading" className="space-y-2">
@@ -55,13 +45,6 @@ export default function CalculatorsPage() {
             </h2>
             <MagicBento
               items={ukCalculators}
-              enableStars
-              enableSpotlight
-              enableBorderGlow
-              enableTilt={false}
-              enableMagnetism={false}
-              clickEffect
-              glowColor="222, 59, 67"
             />
           </section>
         </div>
