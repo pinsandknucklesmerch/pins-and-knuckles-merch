@@ -3,8 +3,10 @@ import { resolvePinsHubAccess, type PinsHubAccessResult } from "@/lib/access/pin
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database.types";
 import type { GarmentRecord, PricingCategory, ProductTypeRecord } from "../types";
+import { fetchAllGarmentPages } from "../lib/garments";
 
 type CatalogClient = SupabaseClient<Database>;
+export const GARMENT_PAGE_SIZE = 50;
 
 function pricingCategory(value: string): PricingCategory {
   return value as PricingCategory;
@@ -17,17 +19,19 @@ export async function getProductTypes(supabase: CatalogClient): Promise<ProductT
 }
 
 export async function getGarments(supabase: CatalogClient): Promise<GarmentRecord[]> {
-  const { data, error } = await supabase.from("garments").select("id,code,alt_code,brand_name,name,colour,tags,eur_base_price,gbp_price,extra_size_cost,is_active,product_type_id,product_types(name)").order("code");
-  if (error) throw new Error("Garments could not be loaded.");
-  return data.map((row) => {
-    const productType = Array.isArray(row.product_types) ? row.product_types[0] : row.product_types;
-    return {
-      id: row.id, code: row.code, altCode: row.alt_code, brand: row.brand_name, name: row.name,
-      colour: row.colour, tags: row.tags, eurBasePrice: row.eur_base_price, gbpPrice: row.gbp_price,
-      extraSizeCost: row.extra_size_cost, isActive: row.is_active, productTypeId: row.product_type_id,
-      productTypeName: productType?.name ?? null,
-    };
-  });
+  return fetchAllGarmentPages(async (from, to) => {
+    const { data, error } = await supabase.from("garments").select("id,code,alt_code,brand_name,name,colour,tags,eur_base_price,gbp_price,extra_size_cost,is_active,product_type_id,product_types(name)").eq("is_active", true).order("code", { ascending: true }).order("id", { ascending: true }).range(from, to);
+    if (error) throw new Error("Garments could not be loaded.");
+    return data.map((row) => {
+      const productType = Array.isArray(row.product_types) ? row.product_types[0] : row.product_types;
+      return {
+        id: row.id, code: row.code, altCode: row.alt_code, brand: row.brand_name, name: row.name,
+        colour: row.colour, tags: row.tags, eurBasePrice: row.eur_base_price, gbpPrice: row.gbp_price,
+        extraSizeCost: row.extra_size_cost, isActive: row.is_active, productTypeId: row.product_type_id,
+        productTypeName: productType?.name ?? null,
+      };
+    });
+  }, GARMENT_PAGE_SIZE);
 }
 
 export async function loadDataManagementSummary(): Promise<{
