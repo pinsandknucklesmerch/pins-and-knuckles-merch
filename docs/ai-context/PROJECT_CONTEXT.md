@@ -341,7 +341,7 @@ npm run build
 - Monday audit/import/sync tooling exists, but production configuration and deployment verification remain required.
 - EPCC Gmail profit ingestion exists, but Gmail OAuth, cron, service-role configuration, and migration deployment require production verification.
 - Admin workflows for calculator data are not implemented.
-- Product Types and READY garment data are imported from the reviewed datasets. Unresolved hoodie Product Type mappings remain deferred to the future team-management UI, and near-match garment conflicts remain pending manual review. Garment Product Type assignment remains staged through nullable `product_type_id`.
+- Product Types and reviewed garment data are imported from the reviewed datasets. A temporary generic `Hoodies` Product Type maps the 16 hoodie records whose material is not reliably known; it uses the existing `HOODIE` pricing category and must later be replaced with `Hoodies - cotton` or `Hoodies - poly / cotton` when material evidence is available. Near-match garment conflicts outside those safely matched hoodie rows remain pending manual review. Garment Product Type assignment remains staged through nullable `product_type_id`.
 - Invoice addresses remain deferred.
 
 ## Data Management
@@ -349,7 +349,7 @@ npm run build
 - Routes: `/hub/data`, `/hub/data/garments`, and `/hub/data/product-types`.
 - Pins Hub read access can view Product Types and garments; write access can add, edit, and deactivate them; admin access can permanently delete garments and unreferenced Product Types.
 - Garments require an active Product Type and at least one EUR or GBP price when active. The selected Product Type controls the synchronized transitional `garment_type` and future calculator pricing category.
-- Unresolved hoodie rows and near-match garment records remain manual-review items; invoice-address management remains deferred.
+- The generic hoodie fallback preserves legacy classification: EU US Clients uses its existing database-driven €4.00 `HOODIE` garment markup, while EU Standard and UK Trade remain unchanged. Material-specific hoodie mapping and remaining near-match garment records are manual-review items; invoice-address management remains deferred.
 - EU Trade remains deferred pending confirmed rules.
 - Garment Directory and Quick Reference have no active routes.
 

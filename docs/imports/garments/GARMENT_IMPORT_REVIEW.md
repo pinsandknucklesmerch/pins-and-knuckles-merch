@@ -2,46 +2,48 @@
 
 ## Summary
 
-61 workbook garment rows prepared. 45 are READY and 16 are REVIEW_REQUIRED. No database import was performed.
+61 workbook garment rows prepared. 45 are READY and 16 use the temporary generic `Hoodies` fallback. The reviewed import migrations map all 61 rows without guessing hoodie material.
 
 ## Ready Records
 
 45 records have a high-confidence Product Type mapping.
 
-## Hoodie Records Requiring Mapping
+## Generic Hoodie Fallback
 
-- Garments!7: 5171 | AS Colour | Box Hood | (blank colour)
-- Garments!12: JH001 | AWDis | College hoodie | Whites
-- Garments!13: JH001 | AWDis | College hoodie | colours
-- Garments!17: JH011 | AWDis | Epic Print Hoodie | (blank colour)
-- Garments!18: GD56 | Gildan | HEAVY SWEATSHIRT | Colours
-- Garments!19: GD56 | Gildan | HEAVY SWEATSHIRT | Whites
-- Garments!22: GD57 | Gildan | Heavy Blend Hooded Sweatshirt | Whites
-- Garments!23: GD57 | Gildan | Heavy Blend Hooded Sweatshirt | Colours
-- Garments!26: 5145 | AS Colour | Heavy Crew | (blank colour)
-- Garments!30: 5146 | AS Colour | Heavy Hood | (blank colour)
-- Garments!39: 5165 | AS Colour | Relax Faded Crew | (blank colour)
-- Garments!40: 5166 | AS Colour | Relax Faded Hood | (blank colour)
-- Garments!41: 5161 | AS Colour | Relax Hood | (blank colour)
-- Garments!44: 5111 | AS Colour | Standard Hood | (blank colour)
-- Garments!50: 5102 | AS Colour | Stencil Hood | (blank colour)
-- Garments!62: JH050 | AWDis | Zoodie | (blank colour)
+`20260728170000_add_generic_hoodies_product_type.sql` adds the active `Hoodies` Product Type with the `HOODIE` pricing category. It is a temporary non-material-specific fallback; `Hoodies - cotton` and `Hoodies - poly / cotton` remain active and must replace these mappings when reliable material evidence is available.
+
+All 16 previously unresolved hoodie rows now use this fallback:
+
+- Garments!7, !12, !13, !17, !18, !19, !22, !23
+- Garments!26, !30, !39, !40, !41, !44, !50, !62
+
+The fallback synchronizes the transitional `garment_type` to `HOODIE`, so it uses the existing database-driven hoodie markup. EU US Clients remains €4.00 per garment; EU Standard profile data and UK Trade pricing are not changed.
+
+## Hoodie Import Operations
+
+Inserted because no safe existing identity was present:
+
+- Garments!17: JH011 | AWDis | Epic Print Hoodie
+- Garments!62: JH050 | AWDis | Zoodie
+
+Existing rows remapped without changing identity or price fields:
+
+- Exact identity: Garments!7, !26, !30, !39, !40, !41, !44, !50
+- Safe code + brand + colour identity: Garments!12, !13, !18, !19, !22, !23
+
+The latter six retain their pre-existing legacy names. Code, brand, and colour uniquely identify their matching active row, so only `product_type_id` and transitional `garment_type` are updated.
 
 ## Existing Record Conflicts
 
+The hoodie conflicts were reviewed by the forward migration. No hoodie conflict is left unchanged: six legacy-name conflicts are safely remapped by unique code + brand + colour, and two previously excluded rows are inserted. The following non-hoodie conflicts remain manual-review items:
+
 - Garments!3: W101 | Westford Mill | Bag for life - long handles | White / Natural — Source identity differs from existing active record; do not update without review.
-- Garments!4: BB653 | Beechfield | Beechfield Low Profile 6 Panel Dad Cap |  — Source identity differs from existing active record; do not update without review.
-- Garments!12: JH001 | AWDis | College hoodie | Whites — Source identity differs from existing active record; do not update without review.
-- Garments!13: JH001 | AWDis | College hoodie | colours — Source identity differs from existing active record; do not update without review.
-- Garments!18: GD56 | Gildan | HEAVY SWEATSHIRT | Colours — Source identity differs from existing active record; do not update without review.
-- Garments!19: GD56 | Gildan | HEAVY SWEATSHIRT | Whites — Source identity differs from existing active record; do not update without review.
+- Garments!4: BB653 | Beechfield | Beechfield Low Profile 6 Panel Dad Cap | (blank colour) — Source identity differs from existing active record; do not update without review.
 - Garments!20: GD21 | Gildan | Hammer Heavyweight T-Shirt | Whites — Source identity differs from existing active record; do not update without review.
 - Garments!21: GD21 | Gildan | Hammer Heavyweight T-Shirt | Colours — Source identity differs from existing active record; do not update without review.
-- Garments!22: GD57 | Gildan | Heavy Blend Hooded Sweatshirt | Whites — Source identity differs from existing active record; do not update without review.
-- Garments!23: GD57 | Gildan | Heavy Blend Hooded Sweatshirt | Colours — Source identity differs from existing active record; do not update without review.
 - Garments!24: GD05 | Gildan | Heavy Cotton T-Shirt | Colours — Source identity differs from existing active record; do not update without review.
 - Garments!25: GD05 | Gildan | Heavy Cotton T-Shirt | White, Natural — Source identity differs from existing active record; do not update without review.
-- Garments!35: W265 | Westford Mill | Organic Premium Cotton Maxi Tote Bag |  — Source identity differs from existing active record; do not update without review.
+- Garments!35: W265 | Westford Mill | Organic Premium Cotton Maxi Tote Bag | (blank colour) — Source identity differs from existing active record; do not update without review.
 - Garments!42: GD01 | Gildan | SoftStyle Adult T-Shirt | Colours — Source identity differs from existing active record; do not update without review.
 - Garments!43: GD01 | Gildan | SoftStyle Adult T-Shirt | Whites — Source identity differs from existing active record; do not update without review.
 - Garments!52: GD14 | Gildan | Ultra Cotton Long Sleeve T-Shirt | Colours — Source identity differs from existing active record; do not update without review.
@@ -54,14 +56,15 @@
 ## Product Type Coverage
 
 Product Types referenced by READY garments:
+
 - Baseball cap
 - Tote bags
 - Long sleeve tees
 - Cotton T-shirt/Tank Top
 - Beanies
 
-Garments without a valid Product Type: 16 unresolved HOODIE records listed above.
+The 16 hoodie records use the temporary `Hoodies` fallback.
 
 ## Remaining Decisions
 
-Choose either Hoodies - cotton or Hoodies - poly / cotton for each unresolved hoodie record using reliable material evidence.
+Replace each generic `Hoodies` mapping with `Hoodies - cotton` or `Hoodies - poly / cotton` only when reliable material evidence is available. Do not infer the material from the product name.
