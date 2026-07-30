@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Check, Copy, RotateCcw } from "lucide-react";
 import { Panel } from "@/components/ui/Panel";
+import { NumberInput } from "@/components/ui/Input";
 import { copyText } from "@/components/ui/copyText";
 import { ActionMenu } from "@/components/ui/ActionMenu";
 import { Surface } from "@/components/ui/Surface";
@@ -58,7 +59,7 @@ export function PkTaxCalculator() {
           {PK_TAX_PEOPLE.map((person) => (
             <label key={person} className="grid gap-1.5 text-sm font-medium text-foreground">
               {person}
-              <input
+              <NumberInput
                 aria-label={person}
                 type="number"
                 min="0"
@@ -66,7 +67,7 @@ export function PkTaxCalculator() {
                 inputMode="decimal"
                 value={values[person]}
                 onChange={(event) => updateValue(person, event.target.value)}
-                className="h-9 rounded-md border border-input bg-background px-3 text-right tabular-nums text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-ring"
+                className="text-right tabular-nums"
               />
             </label>
           ))}

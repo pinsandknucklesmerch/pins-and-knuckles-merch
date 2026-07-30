@@ -1,5 +1,5 @@
 import { calculateProgress } from "../lib/calculateKpis";
-import { BentoPanel } from "@/components/ui/BentoPanel";
+import { Surface } from "@/components/ui/Surface";
 import type { DashboardKpi } from "../types";
 import { ComparisonValue } from "./ComparisonValue";
 import { KpiMeter } from "./KpiMeter";
@@ -15,7 +15,7 @@ export function KpiCard({ kpi }: KpiCardProps) {
     : kpi.comparison.current.toLocaleString("en-GB");
 
   return (
-    <BentoPanel className="p-4" glow>
+    <Surface variant="metric">
       <div className="flex items-start justify-between gap-3">
         <dt className="text-sm font-medium text-muted-foreground">{kpi.label}</dt>
         {kpi.target !== null ? <span className="text-xs tabular-nums text-muted-foreground">Target {kpi.format === "currency" ? `£${kpi.target.toLocaleString("en-GB")}` : kpi.target.toLocaleString("en-GB")}</span> : null}
@@ -25,6 +25,6 @@ export function KpiCard({ kpi }: KpiCardProps) {
         {progress !== null ? <KpiMeter value={progress} label={`${progress.toFixed(0)}% of target`} /> : null}
         <ComparisonValue comparison={kpi.comparison} format={kpi.format} />
       </div>
-    </BentoPanel>
+    </Surface>
   );
 }

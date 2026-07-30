@@ -1,6 +1,6 @@
 "use client";
 
-import { BentoPanel } from "@/components/ui/BentoPanel";
+import { Surface } from "@/components/ui/Surface";
 import type { MetricResult } from "../domain/types";
 import { MONTHLY_PROFIT_TARGET, previousYearComparisonState, profitProgress, targetState } from "../lib/metricDisplay";
 import { ComparisonBadge } from "./ComparisonBadge";
@@ -18,7 +18,7 @@ export function ProfitShirtKpi({ metric }: { metric: MetricResult }) {
   const comparisonState = previousYearComparisonState(metric.value, metric.previousYear);
 
   return (
-    <BentoPanel className={styles.card} glow>
+    <Surface variant="metric" className={styles.card}>
       <div className={styles.label}>Monthly Profit</div>
       <div className={styles.value}>{currency(metric.value)}</div>
       <div className={styles.progress}>{progress === null ? "—" : `${(progress * 100).toFixed(1)}% of £155,000`}</div>
@@ -27,6 +27,6 @@ export function ProfitShirtKpi({ metric }: { metric: MetricResult }) {
       <div className={styles.comparison}>
         {metric.previousYear === null ? <span>No previous-year comparison</span> : <><span>Last year <strong>{currency(metric.previousYear)}</strong></span><ComparisonBadge percentageChange={metric.percentageChange} state={comparisonState} /></>}
       </div>
-    </BentoPanel>
+    </Surface>
   );
 }

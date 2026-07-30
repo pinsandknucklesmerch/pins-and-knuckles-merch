@@ -1,6 +1,6 @@
 "use client";
 
-import { BentoPanel } from "@/components/ui/BentoPanel";
+import { Surface } from "@/components/ui/Surface";
 import { BulletChart } from "metricui";
 import type { MetricResult } from "../domain/types";
 import { formatPercentagePoints, previousYearComparisonState, targetBullet } from "../lib/metricDisplay";
@@ -68,7 +68,7 @@ function KpiSection({ metric, divided, className }: { metric: MetricResult; divi
 
 export function CombinedKpiCard({ title, first, second, third }: { title?: string; first: MetricResult; second?: MetricResult; third?: MetricResult }) {
   return (
-    <BentoPanel className={styles.card} glow>
+    <Surface variant="metric" className={styles.card}>
       {title ? <h2 className={styles.title}>{title}</h2> : null}
       {third && second ? (
         <div className={`${title ? styles.sections : styles.sectionsWithoutTitle} ${styles.stackedSections}`}>
@@ -84,6 +84,6 @@ export function CombinedKpiCard({ title, first, second, third }: { title?: strin
           {second ? <KpiSection metric={second} divided /> : null}
         </div>
       )}
-    </BentoPanel>
+    </Surface>
   );
 }

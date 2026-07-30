@@ -1,6 +1,6 @@
 "use client";
 
-import { BentoPanel } from "@/components/ui/BentoPanel";
+import { Surface } from "@/components/ui/Surface";
 import type { MetricResult } from "../domain/types";
 import { comparisonArcRatio, formatPercentagePoints, previousYearComparisonState } from "../lib/metricDisplay";
 import { ComparisonArcGauge } from "./ComparisonArcGauge";
@@ -16,7 +16,7 @@ export function SalesInboxKpi({ enquiries, conversionRate }: { enquiries: Metric
   const hasEnquiriesComparison = enquiriesRatio !== null;
 
   return (
-    <BentoPanel className={styles.card} glow>
+    <Surface variant="metric" className={styles.card}>
       <h2 className={styles.heading}>Sales Inbox</h2>
       <section className={styles.enquiries} aria-labelledby="sales-inbox-enquiries">
         <h3 id="sales-inbox-enquiries" className={styles.label}>Enquiries</h3>
@@ -43,6 +43,6 @@ export function SalesInboxKpi({ enquiries, conversionRate }: { enquiries: Metric
           )}
         </div>
       </section>
-    </BentoPanel>
+    </Surface>
   );
 }

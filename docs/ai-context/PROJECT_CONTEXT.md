@@ -55,7 +55,7 @@ Do not add service-role keys, database URLs, Monday tokens, or other secrets to 
 ## Auth And Access
 
 - `/login` uses Supabase email/password auth.
-- `/auth/forgot-password`, `/auth/confirm`, `/auth/update-password`, and `/auth/error` are active auth routes.
+- Auth route files live under `src/app/(auth)/auth/`; `/auth/forgot-password`, `/auth/confirm`, `/auth/update-password`, and `/auth/error` remain their public URLs.
 - `proxy.ts` delegates to `src/lib/supabase/proxy.ts` for Supabase SSR cookie handling and root/protected-route redirects.
 - `src/lib/supabase/server.ts` creates typed server Supabase clients using SSR cookies.
 - `src/lib/access/pinsHubAccess.ts` loads the current profile, organisation membership, and `pins_hub` app access through RLS-backed Supabase table reads.
@@ -300,6 +300,10 @@ Deferred:
 - Keep UI compact, dark, and operational.
 - Do not add marketing pages, hero sections, decorative badges, helper paragraphs, or subtitles unless explicitly requested.
 - Reuse `src/components/ui`, `src/components/layout`, and feature components before adding new patterns.
+- Shared UI primitives are mandatory where they clearly fit; do not duplicate their surface, form-control, state, or clipboard behaviour.
+- Optional labels stay empty unless manually supplied, and empty labels never render. Do not add helper text without explicit approval.
+- Use Magic Bento only for navigation, actionable, KPI/metric, or interaction-benefiting result cards; never for forms, tables, dialogs, loading/error states, or dense breakdowns. Keep motion and glow restrained and preserve reduced-motion and keyboard support.
+- Use `ActionMenu` for grouped related actions. Use whole-card `CopyableCard` interaction only when copying is the primary action.
 - Every data surface should handle loading, empty, and error states.
 - Use server components for initial data loading where practical; keep forms and rich controls as client components.
 

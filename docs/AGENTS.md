@@ -47,9 +47,9 @@ rtk pip list            rtk pnpm install        rtk npm run <script>
 - Do not add helper text, subtitles, explanatory copy, or descriptive labels unless explicitly requested.
 - Optional labels default to empty; never auto-generate or auto-fill them, and do not render empty optional labels.
 - Minimise unnecessary whitespace. Use shared spacing, radius, padding, borders, focus, and disabled treatments.
-- Use one action button with a dropdown menu for grouped actions such as export formats.
-- A card with a copy action should copy from the entire card unless nested interactive controls make that unsafe.
-- Use Magic Bento effects only where they add value to navigation, metrics, result cards, and actionable cards. Do not apply them to dense forms, tables, dialogs, or ordinary content panels without a clear interaction benefit.
+- Use `ActionMenu` for grouped related actions such as export formats; keep destructive actions separate.
+- Use `CopyableCard` for whole-card copy only when copying is the card's primary action; cards with competing actions must not be fully clickable.
+- Use Magic Bento only for navigation, actionable, KPI/metric, or interaction-benefiting result cards. Do not use it for forms, tables, dialogs, loading/error states, or dense breakdowns; keep motion and glow restrained and preserve keyboard and reduced-motion support.
 - Native dropdowns/select controls must use the shared Select component.
 - Do not use direct form `<select>` elements when the shared Select component is suitable. Searchable comboboxes may remain specialised shared components.
 - Editable calculator item names use the shared editable-heading pattern where applicable.
@@ -58,5 +58,5 @@ rtk pip list            rtk pnpm install        rtk npm run <script>
 ## Route Structure
 
 - Hub routes remain under `src/app/(hub)/hub/`.
-- Auth routes will later move under `src/app/(auth)/auth/` in a dedicated batch.
+- Auth routes live under `src/app/(auth)/auth/`; their public URLs remain `/auth/*`.
 - Route groups do not alter public URLs.
