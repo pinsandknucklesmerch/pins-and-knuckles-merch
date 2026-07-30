@@ -13,7 +13,6 @@ export type MagicBentoItem = {
   href: string;
   label?: string;
   icon?: ReactNode;
-  status?: string;
   value?: string;
   disabled?: boolean;
 };
@@ -271,10 +270,9 @@ export default function MagicBento({
             <>
               <div className={styles.cardHeader}>
                 {item.icon ? <span className={styles.cardIcon} aria-hidden="true">{item.icon}</span> : <span />}
-                {item.status ? <span className={styles.cardStatus}>{item.status}</span> : null}
               </div>
               <div className={styles.cardContent}>
-                {item.label ? <span className={styles.cardLabel}>{item.label}</span> : null}
+                {item.label?.trim() ? <span className={styles.cardLabel}>{item.label}</span> : null}
                 <h2 className={styles.cardTitle}>{item.title}</h2>
                 {item.value ? <span className={styles.cardValue}>{item.value}</span> : null}
               </div>

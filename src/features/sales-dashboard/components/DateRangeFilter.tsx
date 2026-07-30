@@ -1,4 +1,5 @@
 import { DASHBOARD_MONTHS, type DashboardMonth, type DateRange } from "../types";
+import { Select } from "@/components/ui/Select";
 
 type DateRangeFilterProps = {
   dateRange: DateRange;
@@ -13,15 +14,15 @@ export function DateRangeFilter({ dateRange, invalid = false, year, month, years
     <form className="flex flex-wrap items-end gap-3" method="get" action="/hub/sales-dashboard" aria-describedby={invalid ? "date-range-error" : undefined}>
       <label className="grid gap-1 text-xs font-medium text-muted-foreground">
         Year
-        <select name="year" defaultValue={year} className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/35">
+        <Select name="year" defaultValue={String(year)}>
           {years.map((option) => <option key={option} value={String(option)}>{option}</option>)}
-        </select>
+        </Select>
       </label>
       <label className="grid gap-1 text-xs font-medium text-muted-foreground">
         Month
-        <select name="month" defaultValue={String(DASHBOARD_MONTHS.indexOf(month) + 1)} className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/35">
+        <Select name="month" defaultValue={String(DASHBOARD_MONTHS.indexOf(month) + 1)}>
           {DASHBOARD_MONTHS.map((option, index) => <option key={option} value={String(index + 1)}>{option}</option>)}
-        </select>
+        </Select>
       </label>
       <label className="grid gap-1 text-xs font-medium text-muted-foreground">
         From

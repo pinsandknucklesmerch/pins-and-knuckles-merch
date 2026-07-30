@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, type FormEvent } from "react";
 import { inviteMember } from "../actions/inviteMember";
 import { initialInviteActionState } from "../types";
+import { Select } from "@/components/ui/Select";
 
 export function InviteMemberForm() {
   const [state, formAction, pending] = useActionState(inviteMember, initialInviteActionState);
@@ -40,15 +41,15 @@ export function InviteMemberForm() {
       </label>
       <label className="grid gap-1 text-sm">
         <span>Organisation role</span>
-        <select name="organisation_role" defaultValue="admin" className="h-9 rounded-md bg-background px-2 text-sm outline-none focus:ring-2 focus:ring-primary">
+        <Select name="organisation_role" defaultValue="admin">
           <option value="owner">owner</option><option value="admin">admin</option><option value="manager">manager</option><option value="staff">staff</option><option value="viewer">viewer</option>
-        </select>
+        </Select>
       </label>
       <label className="grid gap-1 text-sm">
         <span>Pins Hub access</span>
-        <select name="access_level" defaultValue="admin" className="h-9 rounded-md bg-background px-2 text-sm outline-none focus:ring-2 focus:ring-primary">
+        <Select name="access_level" defaultValue="admin">
           <option value="admin">admin</option><option value="write">write</option><option value="read">read</option>
-        </select>
+        </Select>
       </label>
       <div className="flex items-end">
         <button disabled={pending} type="submit" className="h-9 w-full rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">

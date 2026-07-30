@@ -4,6 +4,7 @@ import { Check, Copy } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { calculateEuDelivery, formatEuDeliveryCopy } from "../domain/euDeliveryHelper.ts";
 import type { DeliveryRate } from "../domain/types.ts";
+import { Select } from "@/components/ui/Select";
 
 type EuDeliveryHelperProps = {
   deliveryRates: DeliveryRate[];
@@ -43,7 +44,7 @@ export function EuDeliveryHelper({ deliveryRates, deliveryRatesError }: EuDelive
     <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden"><span className="flex items-center justify-between gap-3">Delivery Costs <span className="text-xs text-primary">Sales helper</span><span className="ml-auto text-muted-foreground transition-transform group-open:rotate-180">⌄</span></span></summary>
     <div className="grid gap-4 border-t border-border p-4 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.9fr)]">
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="grid gap-2 text-xs font-medium text-muted-foreground sm:col-span-2">Delivery area<select value={country ?? ""} onChange={(event) => setCountry(event.target.value || null)} disabled={Boolean(deliveryRatesError) || deliveryRates.length === 0} className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground disabled:opacity-50"><option value="">Select delivery area</option>{deliveryRates.map((rate) => <option key={rate.country} value={rate.country}>{rate.country}</option>)}</select></label>
+        <label className="grid gap-2 text-xs font-medium text-muted-foreground sm:col-span-2">Delivery area<Select value={country ?? ""} placeholder="Select delivery area" onValueChange={(value) => setCountry(value || null)} disabled={Boolean(deliveryRatesError) || deliveryRates.length === 0}>{deliveryRates.map((rate) => <option key={rate.country} value={rate.country}>{rate.country}</option>)}</Select></label>
         <label className="grid gap-2 text-xs font-medium text-muted-foreground">Number of boxes<input type="number" min={1} step={1} value={Number.isFinite(boxCount) ? boxCount : ""} onChange={(event) => setBoxCount(Number(event.target.value))} className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground" /></label>
         <label className="grid gap-2 text-xs font-medium text-muted-foreground">Cost per box<output className="flex h-9 items-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground">{delivery.ok ? `${money(delivery.rate.costPerBox)} excl. VAT` : "—"}</output></label>
         <label className="grid gap-2 text-xs font-medium text-muted-foreground">Delivery time<output className="flex h-9 items-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground">{delivery.ok ? delivery.rate.deliveryTime : "—"}</output></label>

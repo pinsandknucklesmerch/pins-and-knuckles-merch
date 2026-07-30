@@ -2,6 +2,7 @@
 
 import { Plus, Trash2 } from "lucide-react";
 import { Panel } from "@/components/ui/Panel";
+import { Select } from "@/components/ui/Select";
 import {
   calculateLineTotal,
   type validateInvoice,
@@ -121,13 +122,13 @@ export function InvoiceForm({
           <Field label="Box Count"><input type="number" min="0" className={inputClass} value={details.boxCount} onChange={(e) => onDetailsChange("boxCount", e.target.value)} /></Field>
           <Field label="Weight"><input className={inputClass} placeholder="18 kg" value={details.weight} onChange={(e) => onDetailsChange("weight", e.target.value)} /></Field>
           <Field label="Currency">
-            <select className={inputClass} value={details.currency} onChange={(e) => onDetailsChange("currency", e.target.value)}><option>GBP</option><option>EUR</option></select>
+            <Select className={inputClass} value={details.currency} onValueChange={(value) => onDetailsChange("currency", value)}><option>GBP</option><option>EUR</option></Select>
           </Field>
           <Field label="Print Location" error={errors.printLocation}>
-            <select className={inputClass} value={details.printLocation} onChange={(e) => onDetailsChange("printLocation", e.target.value)}><option value="">Select</option><option>United Kingdom</option><option>Hungary</option></select>
+            <Select className={inputClass} value={details.printLocation} placeholder="Select" onValueChange={(value) => onDetailsChange("printLocation", value)}><option>United Kingdom</option><option>Hungary</option></Select>
           </Field>
           <Field label="Duties Payable By" error={errors.dutiesPayableBy}>
-            <select className={inputClass} value={details.dutiesPayableBy} onChange={(e) => onDetailsChange("dutiesPayableBy", e.target.value)}><option value="">Select</option><option>Sender</option><option>Receiver</option></select>
+            <Select className={inputClass} value={details.dutiesPayableBy} placeholder="Select" onValueChange={(value) => onDetailsChange("dutiesPayableBy", value)}><option>Sender</option><option>Receiver</option></Select>
           </Field>
         </div>
       </Panel>
@@ -168,7 +169,7 @@ export function InvoiceForm({
                   <Field label="Commodity Code"><input className={inputClass} value={item.commodityCode} onChange={(e) => onLineChange(item.id, "commodityCode", e.target.value)} /></Field>
                   <Field label="Country of Origin" className="sm:col-span-2 xl:col-span-1">
                     {originRule.mode === "variable" ? (
-                      <><select className={inputClass} value={originRule.countries.includes(item.countryOfOrigin) ? item.countryOfOrigin : "__manual"} onChange={(e) => onLineChange(item.id, "countryOfOrigin", e.target.value === "__manual" ? "" : e.target.value)}><option value="">Select</option>{originRule.countries.map((country) => <option key={country}>{country}</option>)}<option value="__manual">Other / manual</option></select>{!originRule.countries.includes(item.countryOfOrigin) ? <input aria-label="Manual country of origin" className={`${inputClass} mt-2`} value={item.countryOfOrigin} onChange={(e) => onLineChange(item.id, "countryOfOrigin", e.target.value)} /> : null}</>
+                      <><Select className={inputClass} value={originRule.countries.includes(item.countryOfOrigin) ? item.countryOfOrigin : "__manual"} placeholder="Select" onValueChange={(value) => onLineChange(item.id, "countryOfOrigin", value === "__manual" ? "" : value)}>{originRule.countries.map((country) => <option key={country}>{country}</option>)}<option value="__manual">Other / manual</option></Select>{!originRule.countries.includes(item.countryOfOrigin) ? <input aria-label="Manual country of origin" className={`${inputClass} mt-2`} value={item.countryOfOrigin} onChange={(e) => onLineChange(item.id, "countryOfOrigin", e.target.value)} /> : null}</>
                     ) : <input className={inputClass} value={item.countryOfOrigin} onChange={(e) => onLineChange(item.id, "countryOfOrigin", e.target.value)} />}
                   </Field>
                 </div>

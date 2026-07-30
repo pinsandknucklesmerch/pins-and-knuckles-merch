@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { DashboardNav } from "metricui";
 import { Panel } from "@/components/ui/Panel";
+import { Select } from "@/components/ui/Select";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { DASHBOARD_MONTHS } from "../types";
 import type { SalesDashboardData } from "../domain/types";
@@ -15,7 +16,6 @@ import { MetricDashboardProvider } from "./MetricDashboardProvider";
 import { YearComparisonChart } from "./YearComparisonChart";
 import { ExportMetricsButton } from "./ExportMetricsButton";
 import type { DashboardView } from "../lib/dashboardView";
-import styles from "./SalesDashboard.module.css";
 
 const DASHBOARD_TABS = [
   { value: "overview", label: "Overview" },
@@ -39,9 +39,9 @@ export function SalesDashboard({ data, year, month, view, member, isAdmin, initi
   return <MetricDashboardProvider><div className="grid gap-3">
     <Panel><div className="flex flex-wrap items-end gap-3">
       <form data-testid="sales-dashboard-filter-form" className="flex flex-wrap items-end gap-3" method="get" action="/hub/sales-dashboard">
-        <label className="grid gap-1 text-xs font-medium text-muted-foreground">Year<select name="year" defaultValue={String(year)} className={styles.select}>{data.availableYears.map((value) => <option key={value} value={String(value)}>{value}</option>)}</select></label>
-        <label className="grid gap-1 text-xs font-medium text-muted-foreground">Month<select name="month" defaultValue={month} className={styles.select}>{DASHBOARD_MONTHS.map((name, index) => <option key={name} value={index + 1}>{name}</option>)}</select></label>
-        <label className="grid gap-1 text-xs font-medium text-muted-foreground">View<select name="view" defaultValue={view} className={styles.select}><option value="company">Company</option><option value="members">Team Members</option></select></label>
+        <label className="grid gap-1 text-xs font-medium text-muted-foreground">Year<Select name="year" defaultValue={String(year)}>{data.availableYears.map((value) => <option key={value} value={String(value)}>{value}</option>)}</Select></label>
+        <label className="grid gap-1 text-xs font-medium text-muted-foreground">Month<Select name="month" defaultValue={String(month)}>{DASHBOARD_MONTHS.map((name, index) => <option key={name} value={String(index + 1)}>{name}</option>)}</Select></label>
+        <label className="grid gap-1 text-xs font-medium text-muted-foreground">View<Select name="view" defaultValue={view}><option value="company">Company</option><option value="members">Team Members</option></Select></label>
         {member ? <input name="member" type="hidden" value={member} /> : null}
         <input name="dashboardView" type="hidden" value={activeDashboardView} />
         <button className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground" type="submit">Apply</button>

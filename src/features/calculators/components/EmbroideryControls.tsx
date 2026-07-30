@@ -1,6 +1,7 @@
 "use client";
 
 import type { EuEmbroiderySelection, EuEmbroiderySize } from "../domain/types.ts";
+import { Select } from "@/components/ui/Select";
 
 type EmbroideryControlsProps = {
   value: EuEmbroiderySelection[];
@@ -31,11 +32,10 @@ export function EmbroideryControls({ value, onChange }: EmbroideryControlsProps)
       <div className="text-xs font-medium text-muted-foreground">Embroidery</div>
       <div className="grid gap-2 sm:grid-cols-3">
         {[0, 1, 2].map((index) => (
-          <select
+          <Select
             key={index}
-            className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-ring"
             value={value[index]?.size ?? ""}
-            onChange={(event) => setItem(index, event.target.value)}
+            onValueChange={(value) => setItem(index, value)}
           >
             <option value="">None</option>
             {SIZE_OPTIONS.map((option) => (
@@ -43,7 +43,7 @@ export function EmbroideryControls({ value, onChange }: EmbroideryControlsProps)
                 {option.label}
               </option>
             ))}
-          </select>
+          </Select>
         ))}
       </div>
     </div>

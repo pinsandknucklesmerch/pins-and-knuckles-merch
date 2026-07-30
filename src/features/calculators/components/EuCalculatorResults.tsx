@@ -1,8 +1,8 @@
 "use client";
 
 import { Check, Copy } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 import { Panel } from "@/components/ui/Panel";
+import { CopyableCard } from "@/components/ui/CopyableCard";
 import { buildEuBreakdown } from "../domain/calculatorBreakdowns.ts";
 import { formatEuStandardQuote, getEuItemLabel, type EuQuoteLine } from "../domain/euQuoteFormatter.ts";
 import type { EuCalculatorTotals } from "../domain/types.ts";
@@ -102,24 +102,7 @@ export function EuCalculatorResults({
   showEmptyState = true,
   quoteFormatter = formatEuStandardQuote,
 }: EuCalculatorResultsProps) {
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
-  const copyResetTimeout = useRef<number | null>(null);
   const breakdown = buildEuBreakdown(items, totals);
-
-  useEffect(() => () => {
-    if (copyResetTimeout.current !== null) window.clearTimeout(copyResetTimeout.current);
-  }, []);
-
-  async function copyQuote() {
-    try {
-      await navigator.clipboard.writeText(quoteFormatter(items, totals));
-      setCopyState("copied");
-      if (copyResetTimeout.current !== null) window.clearTimeout(copyResetTimeout.current);
-      copyResetTimeout.current = window.setTimeout(() => setCopyState("idle"), 2200);
-    } catch {
-      setCopyState("error");
-    }
-  }
 
   if (items.length === 0) {
     return showEmptyState ? <div className="rounded-md border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">No valid items</div> : null;
@@ -133,13 +116,13 @@ export function EuCalculatorResults({
           <div className="mt-2 text-2xl font-semibold tabular-nums text-foreground">{money(totals.productionSubtotalExVat)}</div>
           <div className="mt-1 text-xs text-muted-foreground">Excl. VAT</div>
         </Panel>
-        <button
-          type="button"
-          onClick={copyQuote}
-          className="rounded-lg border border-accent/60 bg-accent/10 p-4 text-left backdrop-blur-sm transition-colors hover:bg-accent/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        <CopyableCard
+          value={quoteFormatter(items, totals)}
           aria-label="Copy Pins Price quote"
+          actionLabel="Copy Pins Price quote"
+          className="border-accent/60 bg-accent/10 hover:bg-accent/15"
         >
-          <div className="flex items-center justify-between gap-3">
+          {(copyState) => <><div className="flex items-center justify-between gap-3">
             <div className="text-xs font-medium text-accent">Pins Price (incl VAT)</div>
             {copyState === "copied" ? <Check className="size-4 text-accent" aria-hidden="true" /> : <Copy className="size-4 text-accent" aria-hidden="true" />}
           </div>
@@ -147,7 +130,8 @@ export function EuCalculatorResults({
           <div className="mt-1 text-xs text-muted-foreground" aria-live="polite">
             {copyState === "copied" ? "Copied" : copyState === "error" ? "Copy unavailable" : "Click to copy"}
           </div>
-        </button>
+          </>}
+        </CopyableCard>
       </div> : null}
 
       {showBreakdown ? <details open className="group min-w-0 rounded-lg border border-border/90 bg-card/75 backdrop-blur-sm">

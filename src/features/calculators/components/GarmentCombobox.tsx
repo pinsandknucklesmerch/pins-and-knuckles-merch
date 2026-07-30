@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Garment } from "../domain/types.ts";
 
@@ -105,7 +105,8 @@ export function GarmentCombobox({ garments, value, onChange }: GarmentComboboxPr
         <input
           ref={inputRef}
           id={`${listboxId}-input`}
-          className="h-9 w-full rounded-md border border-input bg-background px-3 pr-9 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring"
+          type="text"
+          className="h-9 min-w-0 w-full rounded-[var(--hub-control-radius)] border border-input bg-background px-3 pr-10 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring"
           placeholder="Search garments"
           value={inputValue}
           role="combobox"
@@ -124,7 +125,7 @@ export function GarmentCombobox({ garments, value, onChange }: GarmentComboboxPr
           }}
           onKeyDown={handleKeyDown}
         />
-        <ChevronsUpDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
       </div>
 
       {isOpen ? (

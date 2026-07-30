@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Garment } from "../domain/types.ts";
+import { Select } from "@/components/ui/Select";
 
 type GarmentSelectorProps = {
   garments: Garment[];
@@ -48,19 +49,18 @@ export function GarmentSelector({
         value={query}
         onChange={(event) => setQuery(event.target.value)}
       />
-      <select
-        className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-ring"
+      <Select
         value={value ?? ""}
-        onChange={(event) => onChange(event.target.value || null)}
+        placeholder="Select garment"
+        onValueChange={(value) => onChange(value || null)}
       >
-        <option value="">Select garment</option>
         {filteredGarments.map((garment) => (
           <option key={garment.id} value={garment.id}>
             {garment.code} · {garment.brandName} · {garment.name}
             {garment.colour ? ` · ${garment.colour}` : ""}
           </option>
         ))}
-      </select>
+      </Select>
     </div>
   );
 }

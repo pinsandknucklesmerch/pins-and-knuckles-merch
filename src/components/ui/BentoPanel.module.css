@@ -4,7 +4,7 @@
   isolation: isolate;
   overflow: hidden;
   border: 1px solid hsl(var(--border) / 0.9);
-  border-radius: 0.75rem;
+  border-radius: var(--hub-panel-radius);
   background: hsl(var(--card) / 0.78);
   color: hsl(var(--card-foreground));
   backdrop-filter: blur(12px);

@@ -5,7 +5,7 @@ import { AreaChart, MetricProvider, type FormatOption } from "metricui";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { YearComparisonData, YearComparisonMetric } from "../domain/types";
 import { yearComparisonValue } from "../data/yearComparison";
-import dashboardStyles from "./SalesDashboard.module.css";
+import { Select } from "@/components/ui/Select";
 import styles from "./YearComparisonChart.module.css";
 
 type ChartMetric = { code: YearComparisonMetric; label: string; format: "currency" | "number" | "percent" };
@@ -41,9 +41,9 @@ export function YearComparisonChart({ comparison }: { comparison: YearComparison
       </ul>
       <label className={styles.selectorLabel}>
         <span className="sr-only">Metric</span>
-        <select className={dashboardStyles.select} value={metricCode} onChange={(event) => setMetricCode(event.target.value as YearComparisonMetric)}>
+        <Select value={metricCode} onValueChange={(value) => setMetricCode(value as YearComparisonMetric)}>
           {METRICS.map((item) => <option key={item.code} value={item.code}>{item.label}</option>)}
-        </select>
+        </Select>
       </label>
     </div>
   );

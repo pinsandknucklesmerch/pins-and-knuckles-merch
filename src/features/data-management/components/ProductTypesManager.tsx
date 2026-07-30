@@ -3,6 +3,7 @@
 import { useActionState, useMemo, useState } from "react";
 import { deleteProductType, saveProductType } from "../actions";
 import { initialDataManagementActionState, PRICING_CATEGORIES, type AccessLevel, type ProductTypeRecord } from "../types";
+import { Select } from "@/components/ui/Select";
 
 const inputClass = "h-9 rounded-md border border-input bg-background px-2.5 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring";
 type SortKey = "name" | "commodityCode" | "pricingCategory";
@@ -39,8 +40,8 @@ function ProductTypeForm({ record, accessLevel, onClose }: { record: ProductType
     <input name="id" value={record?.id ?? ""} readOnly hidden />
     <label className="grid gap-1 text-sm"><span>Name</span><input required name="name" defaultValue={record?.name ?? ""} className={inputClass} /></label>
     <label className="grid gap-1 text-sm"><span>Commodity Code</span><input required name="commodity_code" defaultValue={record?.commodityCode ?? ""} className={inputClass} /></label>
-    <label className="grid gap-1 text-sm"><span>Pricing Category</span><select required name="pricing_category" defaultValue={record?.pricingCategory ?? "TSHIRT"} className={inputClass}>{PRICING_CATEGORIES.map((category) => <option key={category}>{category}</option>)}</select></label>
-    <label className="grid gap-1 text-sm"><span>Active</span><select name="is_active" defaultValue={record?.isActive === false ? "false" : "true"} className={inputClass}><option value="true">Active</option><option value="false">Inactive</option></select></label>
+    <label className="grid gap-1 text-sm"><span>Pricing Category</span><Select required name="pricing_category" defaultValue={record?.pricingCategory ?? "TSHIRT"}>{PRICING_CATEGORIES.map((category) => <option key={category}>{category}</option>)}</Select></label>
+    <label className="grid gap-1 text-sm"><span>Active</span><Select name="is_active" defaultValue={record?.isActive === false ? "false" : "true"}><option value="true">Active</option><option value="false">Inactive</option></Select></label>
     {saveState.message ? <p role={saveState.ok ? "status" : "alert"} className={`sm:col-span-2 lg:col-span-4 text-sm ${saveState.ok ? "text-emerald-400" : "text-destructive"}`}>{saveState.message}</p> : null}
     <div className="flex gap-2 sm:col-span-2 lg:col-span-4"><button disabled={pending} className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-50">{pending ? "Saving…" : "Save Product Type"}</button><button type="button" onClick={onClose} className="h-9 rounded-md border border-input px-3 text-sm hover:bg-accent">Close</button></div>
   </form>{record && accessLevel === "admin" ? <div className="mt-3"><DeleteProductType id={record.id} /></div> : null}</div>;

@@ -2,11 +2,11 @@
 
 import { Trash2 } from "lucide-react";
 import { Panel } from "@/components/ui/Panel";
-import { getEuItemLabel } from "../domain/euQuoteFormatter.ts";
 import type { EuCalculatorItemInput, Garment } from "../domain/types.ts";
 import { CalculatorErrors } from "./CalculatorErrors";
 import { EmbroideryControls } from "./EmbroideryControls";
 import { GarmentCombobox } from "./GarmentCombobox";
+import { EditableItemHeading } from "./EditableItemHeading";
 import { PrintPositionControls } from "./PrintPositionControls";
 import type { CalculatorValidationError } from "../domain/types.ts";
 
@@ -33,13 +33,11 @@ export function EuItemCard({
     <Panel className="border-border/90 bg-card">
       <div className="grid gap-4">
         <div className="flex items-center justify-between gap-3">
-          <input
-            aria-label={`Design name for ${getEuItemLabel(item.itemLabel, index)}`}
-            className="min-w-0 max-w-[16rem] rounded-md border border-transparent bg-transparent px-1 py-0.5 text-sm font-semibold text-foreground outline-none transition-colors placeholder:text-foreground focus:border-input focus:bg-background focus:ring-2 focus:ring-ring"
+          <EditableItemHeading
+            index={index}
             value={item.itemLabel ?? ""}
-            placeholder={getEuItemLabel(undefined, index)}
-            onChange={(event) => onChange({ ...item, itemLabel: event.target.value })}
-            onBlur={(event) => onChange({ ...item, itemLabel: event.target.value.trim() })}
+            onChange={(itemLabel) => onChange({ ...item, itemLabel })}
+            onBlur={(itemLabel) => onChange({ ...item, itemLabel })}
           />
           <button
             type="button"
