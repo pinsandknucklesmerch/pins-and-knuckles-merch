@@ -1,39 +1,54 @@
-export const PK_TAX_PEOPLE = [
-  "EPCC",
-  "Johan",
-  "Bux",
-  "Hardus",
-  "Shannon",
-  "Justin",
-  "Snuggle",
-] as const;
+export const PK_TAX_POOL_CONTRIBUTORS = ["Hardus", "Justin", "Bux", "Shannon"] as const;
+export const PK_TAX_RECIPIENTS = ["Hardus", "Justin", "Bux"] as const;
 
-export type PkTaxPerson = (typeof PK_TAX_PEOPLE)[number];
-export type PkTaxInput = Record<PkTaxPerson, number>;
+export type PkTaxPoolContributor = (typeof PK_TAX_POOL_CONTRIBUTORS)[number];
+export type PkTaxRecipient = (typeof PK_TAX_RECIPIENTS)[number];
+export type PkTaxPerformance = {
+  companyProfit: number;
+  snuggleProfit: number;
+  ordersHandled: number;
+};
+
+export type PkTaxInput = {
+  overallTotal: number;
+  totalSnuggleProfit: number;
+  johanPkTax: number;
+  pkTaxBroughtIn: Record<PkTaxPoolContributor, number>;
+  performance: Record<PkTaxRecipient, PkTaxPerformance>;
+};
 
 export type PkTaxContribution = {
-  person: PkTaxPerson;
+  person: PkTaxPoolContributor | "Snuggle";
   rate: number;
   amount: number;
 };
 
+export type PkTaxMetricShares = {
+  companyProfit: number;
+  snuggleProfit: number;
+  pkTax: number;
+  ordersHandled: number;
+};
+
 export type PkTaxRecipientAllocation = {
-  person: "Bux" | "Hardus" | "Justin";
-  amount: number;
+  person: PkTaxRecipient;
+  metricShares: PkTaxMetricShares;
+  weightedScore: number;
+  unroundedAmount: number;
+  amount: number | null;
 };
 
 export type PkTaxResult = {
   inputs: PkTaxInput;
-  totalInput: number;
-  totalPkTaxBase: number;
   epccAllocation: number;
-  johanAllocation: number;
-  contributions: PkTaxContribution[];
-  poolTotal: number;
-  recipientAllocations: PkTaxRecipientAllocation[];
   adminAllocation: number;
   marketingAllocation: number;
   operationsAllocation: number;
-  totalAllocated: number;
-  poolBalance: number;
+  johanAllocation: number;
+  contributions: PkTaxContribution[];
+  salesTeamContribution: number;
+  snuggleContribution: number;
+  poolTotal: number;
+  recipientAllocations: PkTaxRecipientAllocation[];
+  validationError: string | null;
 };

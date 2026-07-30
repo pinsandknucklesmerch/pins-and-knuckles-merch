@@ -153,10 +153,13 @@ Verified 2026-07-28 using read-only/dry-run checks only; no live writes were per
 
 ## PK Tax
 
-- Inputs: EPCC, Johan, Bux, Hardus, Shannon, Justin, and Snuggle.
-- Legacy source-of-truth: the legacy Pins Hub PK Tax implementation; Seth is removed from inputs, calculations, recipients, exports, labels, types, and tests.
+- Source of truth: `docs/planning/PK TAX NEW STRUCTURE - EXPLANATION 1.pdf` and the approved allocation rules. Inputs are overall total, total Snuggle profit, Johan PK Tax, PK Tax brought in by Hardus/Justin/Bux/Shannon, and company profit, Snuggle profit, and orders handled for Hardus/Justin/Bux.
+- Fixed allocations: EPCC 40%, Admin 10%, Marketing 5%, and Ops 5% of overall total; Johan receives 40% of Johan PK Tax.
+- Pool: 40% of PK Tax brought in by Hardus, Justin, Bux, and Shannon, plus 7% of total Snuggle profit. Eligible recipients are exactly Hardus, Justin, and Bux; Shannon contributes but receives no pool allocation. Seth is removed completely.
+- Weighted scores: company profit 40%, Snuggle profit 25%, PK Tax 20%, orders handled 15%. Zero-total metrics add no points; if every weighted metric total is zero, allocations are withheld with a validation error rather than an equal split. Otherwise scores normalize to 100%.
+- Rounding: calculations retain precision internally, display currency rounds to two decimals, and a displayed-cent remainder goes to the highest unrounded allocation; ties resolve Hardus, then Justin, then Bux.
 - Calculation-only: no persistence, saved reports, history, API route, localStorage, or sessionStorage.
-- Export behavior: clipboard text summary matching the legacy export behavior; the legacy implementation does not use a filename.
+- Export behavior: clipboard text summary includes fixed allocations, pool composition, weighted scores, and recipient allocations; it does not use a filename.
 
 There is no active `/test` route.
 
