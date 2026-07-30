@@ -37,6 +37,8 @@ export default function CalculatorsPage() {
             </h2>
             <MagicBento
               items={euCalculators}
+              enableBorderGlow
+              cardSize="index"
             />
           </section>
           <section aria-labelledby="uk-calculators-heading" className="space-y-2">
@@ -45,6 +47,8 @@ export default function CalculatorsPage() {
             </h2>
             <MagicBento
               items={ukCalculators}
+              enableBorderGlow
+              cardSize="index"
             />
           </section>
         </div>

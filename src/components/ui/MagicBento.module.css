@@ -12,10 +12,10 @@
   --glow-intensity: 0;
   --glow-radius: 300px;
   --glow-color: 222, 59, 67;
+  --glow-enabled: 0;
 
   position: relative;
   display: flex;
-  min-height: 0;
   width: 100%;
   flex-direction: column;
   justify-content: space-between;
@@ -31,11 +31,6 @@
   isolation: isolate;
 }
 
-.magicBentoCard:hover {
-  transform: translateY(-2px);
-  border-color: rgba(var(--glow-color), 0.55);
-}
-
 .magicBentoCard:focus-visible {
   outline: 2px solid rgb(var(--glow-color));
   outline-offset: 3px;
@@ -44,32 +39,32 @@
 .magicBentoCard::after {
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   border-radius: inherit;
   background: radial-gradient(
     var(--glow-radius) circle at var(--glow-x) var(--glow-y),
-    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.8)) 0%,
-    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.4)) 30%,
+    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.16)) 0%,
+    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.08)) 30%,
     transparent 60%
   );
   content: "";
-  opacity: 0;
+  opacity: calc(var(--glow-intensity) * var(--glow-enabled));
   pointer-events: none;
   transition: opacity 0.3s ease;
 }
 
 .borderGlow::after {
-  z-index: 1;
-  padding: 1px;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  opacity: 1;
+  --glow-enabled: 1;
 }
 
-.borderGlow:hover {
-  box-shadow: 0 4px 20px rgba(var(--glow-color), 0.18);
+.hubCard { min-height: 7.25rem; }
+.indexCard { min-height: 6.375rem; }
+
+@media (hover: hover) and (pointer: fine) {
+  .magicBentoCard:hover {
+    transform: translateY(-2px);
+    border-color: rgba(var(--glow-color), 0.55);
+  }
 }
 
 .particleContainer {
@@ -153,11 +148,6 @@
   opacity: 0.58;
 }
 
-.staticBorder::after {
-  background: rgba(var(--glow-color), 0.2);
-  opacity: 1;
-}
-
 .spotlight {
   position: fixed;
   z-index: 20;
@@ -189,6 +179,8 @@
     grid-template-columns: 1fr;
   }
 
+  .hubCard { min-height: 6rem; }
+  .indexCard { min-height: 5.625rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

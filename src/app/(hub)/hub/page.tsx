@@ -21,6 +21,8 @@ export default function HubPage() {
         />
         <MagicBento
           items={items}
+          enableBorderGlow
+          cardSize="hub"
         />
       </AppShell>
     </Suspense>

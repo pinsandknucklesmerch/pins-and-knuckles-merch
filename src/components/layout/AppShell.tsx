@@ -20,13 +20,13 @@ export async function AppShell({ children, pinsHubAccess: suppliedPinsHubAccess 
       <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
         <Galaxy mouseRepulsion={false} mouseInteraction={false} density={0.7} glowIntensity={0.16} saturation={0} hueShift={140} twinkleIntensity={0.15} rotationSpeed={0.03} starSpeed={0.2} speed={0.4} transparent />
       </div>
-      <div className="relative z-10 flex min-h-screen">
+      <div className="relative z-10 flex min-h-screen flex-col md:flex-row">
         <SidebarNav
           accessLevel={pinsHubAccess.access.access_level}
           organisationRole={pinsHubAccess.membership?.role ?? null}
           userEmail={pinsHubAccess.user?.email ?? null}
         />
-        <main className="min-w-0 flex-1 px-4 py-4 sm:px-6 lg:px-8">
+        <main className="min-w-0 flex-1 px-4 py-4 pt-[4.25rem] sm:px-6 md:pt-4 lg:px-8">
           <div className="mx-auto flex max-w-6xl flex-col gap-4">
             {children}
           </div>

@@ -9,5 +9,5 @@ export default async function DataManagementPage() {
     { id: "garments", title: "Garments", value: String(garmentCount), href: "/hub/data/garments" },
     { id: "product-types", title: "Product Types", value: String(productTypeCount), href: "/hub/data/product-types" },
   ];
-  return <AppShell pinsHubAccess={access}><PageHeader title="Data Management" /><MagicBento items={items} /></AppShell>;
+  return <AppShell pinsHubAccess={access}><PageHeader title="Data Management" /><MagicBento items={items} enableBorderGlow cardSize="index" /></AppShell>;
 }

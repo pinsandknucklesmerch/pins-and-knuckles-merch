@@ -30,12 +30,12 @@ export type MagicBentoProps = {
   particleCount?: number;
   glowColor?: string;
   disableAnimations?: boolean;
+  cardSize?: "hub" | "index";
 };
 
 const DEFAULT_PARTICLE_COUNT = 12;
 const DEFAULT_SPOTLIGHT_RADIUS = 300;
 const DEFAULT_GLOW_COLOR = "222, 59, 67";
-const MOBILE_BREAKPOINT = 768;
 
 const clearDynamicNodes = (root: HTMLElement) => {
   root.querySelectorAll<HTMLElement>("[data-magic-bento-dynamic]").forEach((node) => node.remove());
@@ -54,30 +54,31 @@ export default function MagicBento({
   particleCount = DEFAULT_PARTICLE_COUNT,
   glowColor = DEFAULT_GLOW_COLOR,
   disableAnimations = false,
+  cardSize = "hub",
 }: MagicBentoProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [supportsHover, setSupportsHover] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const mobileQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
+    const hoverQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
     const update = () => {
       setPrefersReducedMotion(motionQuery.matches);
-      setIsMobile(mobileQuery.matches);
+      setSupportsHover(hoverQuery.matches);
     };
 
     update();
     motionQuery.addEventListener("change", update);
-    mobileQuery.addEventListener("change", update);
+    hoverQuery.addEventListener("change", update);
     return () => {
       motionQuery.removeEventListener("change", update);
-      mobileQuery.removeEventListener("change", update);
+      hoverQuery.removeEventListener("change", update);
     };
   }, []);
 
-  const shouldDisableAnimations = disableAnimations || isMobile || prefersReducedMotion;
+  const shouldDisableAnimations = disableAnimations || !supportsHover || prefersReducedMotion;
 
   useEffect(() => {
     const grid = gridRef.current;
@@ -258,7 +259,7 @@ export default function MagicBento({
     styles.magicBentoCard,
     textAutoHide ? styles.textAutoHide : "",
     enableBorderGlow ? styles.borderGlow : "",
-    shouldDisableAnimations ? styles.staticBorder : "",
+    cardSize === "hub" ? styles.hubCard : styles.indexCard,
     item.disabled ? styles.disabled : "",
   ].filter(Boolean).join(" ");
 
