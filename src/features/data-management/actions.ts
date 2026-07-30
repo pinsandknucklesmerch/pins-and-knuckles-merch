@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { resolvePinsHubAccess } from "@/lib/access/pinsHubAccess";
 import { createClient } from "@/lib/supabase/server";
 import { PRICING_CATEGORIES, type DataManagementActionState } from "./types";
+import { canDeactivateGarment, deactivateGarmentRecord } from "./lib/deactivateGarment";
 
 const PATHS = ["/hub/data", "/hub/data/garments", "/hub/data/product-types", "/hub/calculators", "/hub/calculators/eu/standard", "/hub/calculators/eu/us-clients", "/hub/calculators/uk/trade"];
 const normalise = (value: string | null | undefined) => (value ?? "").trim().replace(/\s+/g, " ").toLowerCase();
@@ -77,7 +78,7 @@ export async function saveGarment(_: DataManagementActionState, formData: FormDa
   const eur = numberValue(formData.get("eur_base_price"), "EUR price");
   const gbp = numberValue(formData.get("gbp_price"), "GBP price");
   const extra = numberValue(formData.get("extra_size_cost"), "Extra size cost");
-  const isActive = formData.get("is_active") === "true";
+  const isActive = true;
   if (!code || !name || !productTypeId) return state(false, "Code, name, and Product Type are required.");
   if (eur.error || gbp.error || extra.error) return state(false, eur.error ?? gbp.error ?? extra.error ?? "Invalid price.");
   if (isActive && eur.value === null && gbp.value === null) return state(false, "An active garment needs a EUR or GBP price.");
@@ -93,19 +94,26 @@ export async function saveGarment(_: DataManagementActionState, formData: FormDa
     tags: nullable(formData.get("tags")), eur_base_price: eur.value, gbp_price: gbp.value,
     extra_size_cost: extra.value, is_active: isActive,
   };
-  const result = id ? await supabase.from("garments").update(payload).eq("id", id) : await supabase.from("garments").insert({ ...payload, organisation_id: null });
-  if (result.error) return state(false, "Garment could not be saved.");
+  if (id) {
+    const { data, error } = await supabase.from("garments").update(payload).eq("id", id).eq("is_active", true).select("id").maybeSingle();
+    if (error || !data) return state(false, "Garment could not be saved.");
+  } else {
+    const { error } = await supabase.from("garments").insert({ ...payload, organisation_id: null });
+    if (error) return state(false, "Garment could not be saved.");
+  }
   revalidateDataManagement();
   return state(true, id ? "Garment saved." : "Garment added.");
 }
 
-export async function deleteGarment(_: DataManagementActionState, formData: FormData): Promise<DataManagementActionState> {
+export async function deactivateGarment(_: DataManagementActionState, formData: FormData): Promise<DataManagementActionState> {
   const { supabase, accessLevel } = await actionContext();
-  if (accessLevel !== "admin") return state(false, "You do not have permission to delete garments.");
+  if (!canDeactivateGarment(accessLevel)) return state(false, "Only administrators can deactivate garments.");
   const id = nullable(formData.get("id"));
-  if (!id) return state(false, "Garment is required.");
-  const { error } = await supabase.from("garments").delete().eq("id", id);
-  if (error) return state(false, "Garment could not be deleted.");
+  if (!id) return state(false, "Garment could not be found.");
+  const result = await deactivateGarmentRecord(supabase, id);
+  if (result === "not_found") return state(false, "Garment could not be found.");
+  if (result === "already_inactive") return state(false, "Garment is already inactive.");
+  if (result === "database_error") return state(false, "Garment could not be deactivated.");
   revalidateDataManagement();
-  return state(true, "Garment deleted.");
+  return state(true, "Garment deactivated.");
 }

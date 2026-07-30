@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { canDeactivateGarment, deactivateGarmentRecord } from "../lib/deactivateGarment.ts";
 import { fetchAllGarmentPages, formatGarmentCurrency, garmentAriaSort, nextGarmentSort, sortGarments } from "../lib/garments.ts";
 import type { GarmentRecord } from "../types.ts";
 
@@ -30,4 +33,51 @@ test("sort state and accessibility values represent neutral, ascending, and desc
   assert.equal(garmentAriaSort(true, "desc"), "descending");
   assert.deepEqual(sortGarments([garment("1", "B", 10, null), garment("2", "A", 20, null)], "code", "asc").map((item) => item.code), ["A", "B"]);
   assert.deepEqual(sortGarments([garment("1", "B", 10, null), garment("2", "A", 20, null)], "code", "desc").map((item) => item.code), ["B", "A"]);
+});
+
+function deactivationClient(row: { id: string; is_active: boolean } | null, readError = false, updateError = false) {
+  const updates: unknown[] = [];
+  const client = {
+    from: () => ({
+      select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: row, error: readError ? { message: "read" } : null }) }) }),
+      update: (payload: unknown) => ({ eq: async () => { updates.push(payload); return { error: updateError ? { message: "update" } : null }; } }),
+    }),
+  } as unknown as SupabaseClient;
+  return { client, updates };
+}
+
+test("deactivation updates only is_active and never performs a hard delete", async () => {
+  const { client, updates } = deactivationClient({ id: "garment-1", is_active: true });
+  assert.equal(await deactivateGarmentRecord(client as never, "garment-1"), "deactivated");
+  assert.deepEqual(updates, [{ is_active: false }]);
+});
+
+test("deactivation reports missing, inactive, and database failure states", async () => {
+  assert.equal(await deactivateGarmentRecord(deactivationClient(null).client as never, "missing"), "not_found");
+  assert.equal(await deactivateGarmentRecord(deactivationClient({ id: "inactive", is_active: false }).client as never, "inactive"), "already_inactive");
+  assert.equal(await deactivateGarmentRecord(deactivationClient({ id: "broken", is_active: true }, false, true).client as never, "broken"), "database_error");
+});
+
+test("only administrators can deactivate garments", () => {
+  assert.equal(canDeactivateGarment("admin"), true);
+  assert.equal(canDeactivateGarment("write"), false);
+  assert.equal(canDeactivateGarment("read"), false);
+  assert.equal(canDeactivateGarment(null), false);
+});
+
+test("active table uses the in-app deactivation dialog without a Status column", () => {
+  const component = readFileSync("src/features/data-management/components/GarmentsManager.tsx", "utf8");
+  assert.doesNotMatch(component, /window\.confirm|>Status<|label="Status"|Delete/);
+  assert.match(component, /<dialog|Deactivate garment|This garment will no longer appear in calculators or the active garment list\./);
+  assert.match(component, /aria-sort=|ArrowDownUp|ArrowUp|ArrowDown/);
+  assert.match(component, /\[&>option\]:bg-card/);
+});
+
+test("garment actions deactivate without deletion and the catalog requests active rows only", () => {
+  const actions = readFileSync("src/features/data-management/actions.ts", "utf8");
+  const deactivateAction = actions.slice(actions.indexOf("export async function deactivateGarment"));
+  const catalog = readFileSync("src/features/data-management/data/catalog.ts", "utf8");
+  assert.doesNotMatch(deactivateAction, /\.delete\(/);
+  assert.match(deactivateAction, /canDeactivateGarment\(accessLevel\)/);
+  assert.match(catalog, /\.eq\("is_active", true\)/);
 });

@@ -1,6 +1,6 @@
 import type { GarmentRecord } from "../types";
 
-export type GarmentSortKey = "code" | "brand" | "name" | "productTypeName" | "eurBasePrice" | "gbpPrice" | "isActive";
+export type GarmentSortKey = "code" | "altCode" | "brand" | "name" | "productTypeName" | "eurBasePrice" | "gbpPrice" | "extraSizeCost";
 export type SortDirection = "asc" | "desc";
 
 export async function fetchAllGarmentPages<T>(fetchPage: (from: number, to: number) => Promise<T[]>, pageSize: number) {
