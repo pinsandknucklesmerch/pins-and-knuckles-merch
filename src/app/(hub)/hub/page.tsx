@@ -10,7 +10,6 @@ const items: MagicBentoItem[] = hubFeatureNavigation.map((item) => ({
   title: item.label,
   href: item.href,
   icon: <item.icon size={20} strokeWidth={1.8} />,
-  status: "",
 }));
 
 export default function HubPage() {

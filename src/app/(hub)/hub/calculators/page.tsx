@@ -10,14 +10,12 @@ const euCalculators: MagicBentoItem[] = [
     title: "EU Standard",
     label: "EU · EUR",
     href: "/hub/calculators/eu/standard",
-    status: "Available",
   },
   {
     id: "eu-us-clients",
     title: "EU US Clients",
     label: "EU · USD",
     href: "/hub/calculators/eu/us-clients",
-    status: "Available",
   },
 ];
 
@@ -27,7 +25,6 @@ const ukCalculators: MagicBentoItem[] = [
     title: "UK Trade",
     label: "UK · GBP",
     href: "/hub/calculators/uk/trade",
-    status: "Available",
   },
 ];
 
