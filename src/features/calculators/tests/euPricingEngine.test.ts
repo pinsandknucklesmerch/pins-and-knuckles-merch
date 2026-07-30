@@ -218,6 +218,11 @@ function createReferenceData(): CalculatorReferenceData {
         garmentType: "TSHIRT",
         markupValue: 3,
       },
+      {
+        calculatorProfileId: PROFILE_ID,
+        garmentType: "LONGSLEEVE",
+        markupValue: 3.5,
+      },
     ],
     euPrintTiers: buildEuPrintTiers(),
     euEmbroideryPricing: [
@@ -344,7 +349,16 @@ test("calculates 50 qty hoodie with 1-colour front", () => {
   assert.equal(result.totals.profitExVat, 257);
 });
 
-test("US Clients uses the seeded T-shirt, long-sleeve, and hoodie markups", () => {
+test("EU Standard resolves the exact independent legacy markup matrix", () => {
+  const reference = createReferenceData();
+  for (const [garmentId, expected] of [[TSHIRT_ID, 150], [LONGSLEEVE_ID, 175], [GARMENT_ID, 250]] as const) {
+    const result = calculateEuStandardPrice(createInput({ garmentId }), reference);
+    assert.equal(result.ok, true, result.ok ? "" : JSON.stringify(result.errors));
+    if (result.ok) assert.equal(result.items[0].garmentMarkupCost, expected);
+  }
+});
+
+test("EU US Clients resolves the exact independent legacy markup matrix", () => {
   const reference = createReferenceData();
   reference.profile = { ...reference.profile, id: "profile-us", code: "EU_US_CLIENTS", name: "EU US Clients" };
   reference.priceSets = reference.priceSets.map((set) => ({ ...set, calculatorProfileId: "profile-us" }));

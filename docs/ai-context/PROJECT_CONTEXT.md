@@ -349,7 +349,7 @@ npm run build
 - Routes: `/hub/data`, `/hub/data/garments`, and `/hub/data/product-types`.
 - Pins Hub read access can view Product Types and garments; write access can add, edit, and deactivate them; admin access can permanently delete garments and unreferenced Product Types.
 - Garments require an active Product Type and at least one EUR or GBP price when active. The selected Product Type controls the synchronized transitional `garment_type` and future calculator pricing category.
-- The generic hoodie fallback preserves legacy classification: EU US Clients uses its existing database-driven €4.00 `HOODIE` garment markup, while EU Standard and UK Trade remain unchanged. Material-specific hoodie mapping and remaining near-match garment records are manual-review items; invoice-address management remains deferred.
+- Calculator garment markups are profile-specific legacy data, not an EU/US offset rule: EU Standard is TSHIRT €3.00, LONGSLEEVE €3.50, HOODIE €5.00; EU US Clients is TSHIRT €2.00, LONGSLEEVE €3.00, HOODIE €4.00. The generic `Hoodies` fallback and both material-specific hoodie Product Types resolve through `HOODIE`; UK Trade remains unchanged. Material-specific hoodie mapping and remaining near-match garment records are manual-review items; invoice-address management remains deferred.
 - EU Trade remains deferred pending confirmed rules.
 - Garment Directory and Quick Reference have no active routes.
 
