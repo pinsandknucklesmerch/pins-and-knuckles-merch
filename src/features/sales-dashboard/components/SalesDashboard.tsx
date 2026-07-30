@@ -39,9 +39,9 @@ export function SalesDashboard({ data, year, month, view, member, isAdmin, initi
   return <MetricDashboardProvider><div className="grid gap-3">
     <Panel><div className="flex flex-wrap items-end gap-3">
       <form data-testid="sales-dashboard-filter-form" className="flex flex-wrap items-end gap-3" method="get" action="/hub/sales-dashboard">
-        <label className="grid gap-1 text-xs font-medium text-muted-foreground">Year<Select name="year" defaultValue={String(year)}>{data.availableYears.map((value) => <option key={value} value={String(value)}>{value}</option>)}</Select></label>
-        <label className="grid gap-1 text-xs font-medium text-muted-foreground">Month<Select name="month" defaultValue={String(month)}>{DASHBOARD_MONTHS.map((name, index) => <option key={name} value={String(index + 1)}>{name}</option>)}</Select></label>
-        <label className="grid gap-1 text-xs font-medium text-muted-foreground">View<Select name="view" defaultValue={view}><option value="company">Company</option><option value="members">Team Members</option></Select></label>
+        <label className="grid min-w-[5.5rem] gap-1 text-xs font-medium text-muted-foreground">Year<Select className="min-w-[5.5rem]" name="year" defaultValue={String(year)}>{data.availableYears.map((value) => <option key={value} value={String(value)}>{value}</option>)}</Select></label>
+        <label className="grid min-w-[8rem] gap-1 text-xs font-medium text-muted-foreground">Month<Select className="min-w-[8rem]" name="month" defaultValue={String(month)}>{DASHBOARD_MONTHS.map((name, index) => <option key={name} value={String(index + 1)}>{name}</option>)}</Select></label>
+        <label className="grid min-w-[9rem] gap-1 text-xs font-medium text-muted-foreground">View<Select className="min-w-[9rem]" name="view" defaultValue={view}><option value="company">Company</option><option value="members">Team Members</option></Select></label>
         {member ? <input name="member" type="hidden" value={member} /> : null}
         <input name="dashboardView" type="hidden" value={activeDashboardView} />
         <button className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground" type="submit">Apply</button>

@@ -12,15 +12,15 @@ type DateRangeFilterProps = {
 export function DateRangeFilter({ dateRange, invalid = false, year, month, years }: DateRangeFilterProps) {
   return (
     <form className="flex flex-wrap items-end gap-3" method="get" action="/hub/sales-dashboard" aria-describedby={invalid ? "date-range-error" : undefined}>
-      <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+      <label className="grid min-w-[5.5rem] gap-1 text-xs font-medium text-muted-foreground">
         Year
-        <Select name="year" defaultValue={String(year)}>
+        <Select className="min-w-[5.5rem]" name="year" defaultValue={String(year)}>
           {years.map((option) => <option key={option} value={String(option)}>{option}</option>)}
         </Select>
       </label>
-      <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+      <label className="grid min-w-[8rem] gap-1 text-xs font-medium text-muted-foreground">
         Month
-        <Select name="month" defaultValue={String(DASHBOARD_MONTHS.indexOf(month) + 1)}>
+        <Select className="min-w-[8rem]" name="month" defaultValue={String(DASHBOARD_MONTHS.indexOf(month) + 1)}>
           {DASHBOARD_MONTHS.map((option, index) => <option key={option} value={String(index + 1)}>{option}</option>)}
         </Select>
       </label>

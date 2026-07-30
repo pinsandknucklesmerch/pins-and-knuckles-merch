@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { BentoPanel } from "@/components/ui/BentoPanel";
+import { Surface } from "@/components/ui/Surface";
 
 type PanelProps = {
   children: React.ReactNode;
@@ -9,11 +9,11 @@ type PanelProps = {
 
 export function Panel({ children, className, title }: PanelProps) {
   return (
-    <BentoPanel className={cn("p-4", className)}>
+    <Surface className={cn("", className)}>
       {title ? (
         <h2 className="mb-3 text-sm font-semibold text-foreground">{title}</h2>
       ) : null}
       {children}
-    </BentoPanel>
+    </Surface>
   );
 }

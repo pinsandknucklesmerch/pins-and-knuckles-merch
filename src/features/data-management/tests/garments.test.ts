@@ -70,7 +70,7 @@ test("active table uses the in-app deactivation dialog without a Status column",
   assert.doesNotMatch(component, /window\.confirm|>Status<|label="Status"|Delete/);
   assert.match(component, /<dialog|Deactivate garment|This garment will no longer appear in calculators or the active garment list\./);
   assert.match(component, /aria-sort=|ArrowDownUp|ArrowUp|ArrowDown/);
-  assert.match(component, /\[&>option\]:bg-card/);
+  assert.match(component, /<Select/);
 });
 
 test("garment actions deactivate without deletion and the catalog requests active rows only", () => {

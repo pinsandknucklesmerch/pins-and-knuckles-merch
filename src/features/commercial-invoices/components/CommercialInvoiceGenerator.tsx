@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Download, FileSpreadsheet, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
+import { ActionMenu } from "@/components/ui/ActionMenu";
+import { Surface } from "@/components/ui/Surface";
 import { InvoiceForm } from "./InvoiceForm";
 import { InvoicePreview } from "./InvoicePreview";
 import {
@@ -70,13 +72,11 @@ export function CommercialInvoiceGenerator() {
     }));
   }
 
-  const buttonClass = "inline-flex h-9 items-center justify-center gap-2 rounded-md px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-wait disabled:opacity-50";
   return (
-    <div className="grid min-w-0 gap-6">
+    <div className="grid min-w-0 gap-4">
       <div className="no-print flex flex-wrap gap-2">
-        <button type="button" onClick={() => runExport("xlsx")} disabled={Boolean(exporting)} className={`${buttonClass} bg-primary text-primary-foreground hover:bg-primary/90`}><FileSpreadsheet className="size-4" />{exporting === "xlsx" ? "Exporting…" : "Export Excel"}</button>
-        <button type="button" onClick={() => runExport("pdf")} disabled={Boolean(exporting)} className={`${buttonClass} bg-secondary text-secondary-foreground hover:bg-secondary/80`}><Download className="size-4" />{exporting === "pdf" ? "Exporting…" : "Export PDF"}</button>
-        <button type="button" onClick={reset} className={`${buttonClass} border border-border bg-background text-foreground hover:bg-secondary`}><RotateCcw className="size-4" />Reset</button>
+        <ActionMenu label="Export" pending={Boolean(exporting)} items={[{ label: "Export Excel", onSelect: () => void runExport("xlsx") }, { label: "Export PDF", onSelect: () => void runExport("pdf") }]} />
+        <button type="button" onClick={reset} className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><RotateCcw className="size-4" />Reset</button>
       </div>
 
       <InvoiceForm
@@ -91,7 +91,7 @@ export function CommercialInvoiceGenerator() {
 
       <section className="grid gap-3">
         <h2 className="text-sm font-semibold">Preview</h2>
-        <div className="overflow-x-auto rounded-lg bg-muted p-3 sm:p-5"><InvoicePreview invoice={calculated} /></div>
+        <Surface className="overflow-x-auto bg-muted p-[var(--hub-compact-card-padding)] sm:p-[var(--hub-card-padding)]"><InvoicePreview invoice={calculated} /></Surface>
       </section>
     </div>
   );

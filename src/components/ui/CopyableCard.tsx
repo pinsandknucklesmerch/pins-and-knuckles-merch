@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { surfaceStyles } from "./styles";
+import { copyText } from "./copyText";
 
 type CopyableCardProps = Omit<HTMLAttributes<HTMLDivElement>, "onCopy" | "children"> & { value: string; actionLabel: string; children: ReactNode | ((state: "idle" | "copied" | "error") => ReactNode); onCopySuccess?: () => void; onCopyError?: () => void };
 const interactiveSelector = "a,button,input,textarea,select,[role='button'],[contenteditable='true']";
@@ -12,7 +13,10 @@ export function CopyableCard({ value, actionLabel, children, className, onClick,
   const reset = useRef<number | null>(null);
   useEffect(() => () => { if (reset.current) window.clearTimeout(reset.current); }, []);
   async function copy() {
-    try { await navigator.clipboard.writeText(value); setCopyState("copied"); onCopySuccess?.(); }
+    try {
+      await copyText(value);
+      setCopyState("copied"); onCopySuccess?.();
+    }
     catch { setCopyState("error"); onCopyError?.(); }
     if (reset.current) window.clearTimeout(reset.current);
     reset.current = window.setTimeout(() => setCopyState("idle"), 2200);

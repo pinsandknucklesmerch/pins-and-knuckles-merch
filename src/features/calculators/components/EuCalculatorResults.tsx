@@ -3,6 +3,7 @@
 import { Check, Copy } from "lucide-react";
 import { Panel } from "@/components/ui/Panel";
 import { CopyableCard } from "@/components/ui/CopyableCard";
+import { CollapsibleSurface, Surface } from "@/components/ui/Surface";
 import { buildEuBreakdown } from "../domain/calculatorBreakdowns.ts";
 import { formatEuStandardQuote, getEuItemLabel, type EuQuoteLine } from "../domain/euQuoteFormatter.ts";
 import type { EuCalculatorTotals } from "../domain/types.ts";
@@ -53,7 +54,7 @@ function ItemHeading({ line, index }: { line: EuQuoteLine; index: number }) {
 function ProductionBreakdown({ line, index, breakdown }: { line: EuQuoteLine; index: number; breakdown: ReturnType<typeof buildEuBreakdown>["productionItems"][number] }) {
   const { result } = line;
   return (
-    <div className="min-w-0 rounded-md border border-border/70 bg-background/55 p-3 backdrop-blur-sm">
+    <Surface variant="compact" className="bg-background/55">
       <ItemHeading line={line} index={index} />
       <dl className="text-xs">
         <DetailRow label="Garment base price / unit" value={money(breakdown.baseUnitPrice)} />
@@ -67,14 +68,14 @@ function ProductionBreakdown({ line, index, breakdown }: { line: EuQuoteLine; in
         <DetailRow label="Production unit cost excl. VAT" value={money(breakdown.unitCost)} />
         <DetailRow label="Production item subtotal excl. VAT" value={money(breakdown.subtotal)} />
       </dl>
-    </div>
+    </Surface>
   );
 }
 
 function PinsBreakdown({ line, index, breakdown }: { line: EuQuoteLine; index: number; breakdown: ReturnType<typeof buildEuBreakdown>["pinsItems"][number] }) {
   const { input, result } = line;
   return (
-    <div className="min-w-0 rounded-md border border-border/70 bg-background/55 p-3 backdrop-blur-sm">
+    <Surface variant="compact" className="bg-background/55">
       <ItemHeading line={line} index={index} />
       <dl className="text-xs">
         <DetailRow label="Garment base price / unit" value={money(breakdown.baseUnitPrice)} />
@@ -90,7 +91,7 @@ function PinsBreakdown({ line, index, breakdown }: { line: EuQuoteLine; index: n
         <DetailRow label="Total unit cost excl. VAT" value={money(breakdown.unitCost)} />
         <DetailRow label="Pins item subtotal excl. VAT" value={money(breakdown.subtotal)} />
       </dl>
-    </div>
+    </Surface>
   );
 }
 
@@ -134,11 +135,8 @@ export function EuCalculatorResults({
         </CopyableCard>
       </div> : null}
 
-      {showBreakdown ? <details open className="group min-w-0 rounded-lg border border-border/90 bg-card/75 backdrop-blur-sm">
-        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
-          <span className="flex items-center justify-between gap-3">Breakdown <span className="text-muted-foreground transition-transform group-open:rotate-180">⌄</span></span>
-        </summary>
-        <div className="grid gap-4 border-t border-border p-4">
+      {showBreakdown ? <CollapsibleSurface open className="min-w-0" summary={<span className="flex items-center justify-between gap-3">Breakdown <span className="text-muted-foreground transition-transform group-open:rotate-180">⌄</span></span>}>
+        <div className="grid gap-4">
           <div className="grid min-w-0 gap-4 xl:grid-cols-2">
             <div className="grid min-w-0 content-start gap-3">
               <h2 className="text-sm font-semibold text-foreground">Production Cost Breakdown</h2>
@@ -159,7 +157,7 @@ export function EuCalculatorResults({
             </dl>
           </div>
         </div>
-      </details> : null}
+      </CollapsibleSurface> : null}
     </div>
   );
 }

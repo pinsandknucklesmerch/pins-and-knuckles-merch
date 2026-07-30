@@ -43,7 +43,7 @@ rtk pip list            rtk pnpm install        rtk npm run <script>
 
 ## Shared Hub UI
 
-- Reuse existing shared UI components before creating feature-specific equivalents.
+- Reuse existing shared UI components before creating feature-specific equivalents; use shared Surface variants before feature-specific cards.
 - Do not add helper text, subtitles, explanatory copy, or descriptive labels unless explicitly requested.
 - Optional labels default to empty; never auto-generate or auto-fill them, and do not render empty optional labels.
 - Minimise unnecessary whitespace. Use shared spacing, radius, padding, borders, focus, and disabled treatments.

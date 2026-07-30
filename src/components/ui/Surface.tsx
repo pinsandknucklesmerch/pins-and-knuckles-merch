@@ -11,5 +11,5 @@ export function Surface({ className, variant = "panel", magic = false, ...props 
 type CollapsibleSurfaceProps = DetailsHTMLAttributes<HTMLDetailsElement> & { summary: ReactNode };
 
 export function CollapsibleSurface({ summary, children, className, ...props }: CollapsibleSurfaceProps) {
-  return <details className={cn(surfaceStyles.base, surfaceStyles.collapsible, className)} {...props}><summary className="cursor-pointer list-none px-[var(--hub-card-padding)] py-3 text-sm font-semibold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">{summary}</summary><div className="border-t border-border p-[var(--hub-card-padding)]">{children}</div></details>;
+  return <details className={cn(surfaceStyles.base, surfaceStyles.collapsible, "group", className)} {...props}><summary className="cursor-pointer list-none px-[var(--hub-card-padding)] py-3 text-sm font-semibold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">{summary}</summary><div className="border-t border-border p-[var(--hub-card-padding)]">{children}</div></details>;
 }

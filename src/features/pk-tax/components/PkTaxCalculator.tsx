@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Copy, RotateCcw } from "lucide-react";
-import { ActionButton } from "@/components/ui/ActionButton";
+import { Check, Copy, RotateCcw } from "lucide-react";
 import { Panel } from "@/components/ui/Panel";
+import { copyText } from "@/components/ui/copyText";
+import { ActionMenu } from "@/components/ui/ActionMenu";
+import { Surface } from "@/components/ui/Surface";
 import { calculatePkTax, createDefaultPkTaxInput } from "../domain/calculatePkTax.ts";
 import { formatPkTaxExport } from "../domain/exportPkTax.ts";
 import { PK_TAX_PEOPLE, type PkTaxPerson } from "../domain/types.ts";
@@ -25,26 +27,11 @@ function parseValue(value: string) {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
 }
 
-async function copyText(value: string) {
-  if (navigator.clipboard && window.isSecureContext) {
-    await navigator.clipboard.writeText(value);
-    return;
-  }
-  const textarea = document.createElement("textarea");
-  textarea.value = value;
-  textarea.setAttribute("readonly", "true");
-  textarea.style.position = "fixed";
-  textarea.style.opacity = "0";
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  textarea.remove();
-}
-
 export function PkTaxCalculator() {
   const [values, setValues] = useState<Record<PkTaxPerson, string>>(() =>
     Object.fromEntries(PK_TAX_PEOPLE.map((person) => [person, ""])) as Record<PkTaxPerson, string>,
   );
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const result = useMemo(
     () => calculatePkTax(Object.fromEntries(PK_TAX_PEOPLE.map((person) => [person, parseValue(values[person])])) as ReturnType<typeof createDefaultPkTaxInput>),
     [values],
@@ -56,6 +43,12 @@ export function PkTaxCalculator() {
 
   function reset() {
     setValues(Object.fromEntries(PK_TAX_PEOPLE.map((person) => [person, ""])) as Record<PkTaxPerson, string>);
+  }
+
+  async function copyResults() {
+    try { await copyText(formatPkTaxExport(result)); setCopyState("copied"); }
+    catch { setCopyState("error"); }
+    window.setTimeout(() => setCopyState("idle"), 2200);
   }
 
   return (
@@ -79,10 +72,6 @@ export function PkTaxCalculator() {
           ))}
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
-          <ActionButton onClick={() => void copyText(formatPkTaxExport(result))}>
-            <Copy className="mr-2 size-4" aria-hidden="true" />
-            Export summary
-          </ActionButton>
           <button type="button" onClick={reset} className="inline-flex h-9 items-center justify-center rounded-md border border-border px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <RotateCcw className="mr-2 size-4" aria-hidden="true" />
             Reset
@@ -90,7 +79,7 @@ export function PkTaxCalculator() {
         </div>
       </Panel>
 
-      <Panel title="Calculated results">
+      <Panel className="bg-card"><div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-sm font-semibold text-foreground">Calculated results</h2><ActionMenu label="Export" icon={copyState === "copied" ? <Check className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />} items={[{ label: "Copy results", onSelect: () => void copyResults() }]} /></div>
         <div className="grid gap-4">
           <div className="grid gap-2 sm:grid-cols-3">
             {[
@@ -98,10 +87,10 @@ export function PkTaxCalculator() {
               ["Total allocated", result.totalAllocated],
               ["Pool balance / difference", result.poolBalance],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-md border border-border/70 bg-background/55 p-3 backdrop-blur-sm">
+              <Surface key={label} variant="compact" magic className="bg-background/55">
                 <div className="text-xs text-muted-foreground">{label}</div>
                 <div className="mt-1 text-lg font-semibold tabular-nums text-foreground">{display(value as number)}</div>
-              </div>
+              </Surface>
             ))}
           </div>
 
@@ -120,15 +109,14 @@ export function PkTaxCalculator() {
           </div>
 
           <Breakdown title="Pool recipients" rows={result.recipientAllocations.map((allocation) => [allocation.person, allocation.amount])} />
-        </div>
-      </Panel>
+        </div></Panel>
     </div>
   );
 }
 
 function Breakdown({ title, rows }: { title: string; rows: [string, number][] }) {
   return (
-    <div className="rounded-md border border-border/70 bg-background/55 p-3 backdrop-blur-sm">
+    <Surface variant="compact" className="bg-background/55">
       <h3 className="text-sm font-semibold text-foreground">{title}</h3>
       <dl className="mt-2 divide-y divide-border text-sm">
         {rows.map(([label, value]) => (
@@ -138,6 +126,6 @@ function Breakdown({ title, rows }: { title: string; rows: [string, number][] })
           </div>
         ))}
       </dl>
-    </div>
+    </Surface>
   );
 }

@@ -41,7 +41,7 @@ export function YearComparisonChart({ comparison }: { comparison: YearComparison
       </ul>
       <label className={styles.selectorLabel}>
         <span className="sr-only">Metric</span>
-        <Select value={metricCode} onValueChange={(value) => setMetricCode(value as YearComparisonMetric)}>
+        <Select className="min-w-[12rem]" value={metricCode} onValueChange={(value) => setMetricCode(value as YearComparisonMetric)}>
           {METRICS.map((item) => <option key={item.code} value={item.code}>{item.label}</option>)}
         </Select>
       </label>
