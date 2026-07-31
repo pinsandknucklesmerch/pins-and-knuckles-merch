@@ -190,11 +190,20 @@ There is no active `/test` route.
 ### Scheduled Operations / Deliberately Deferred
 
 - The repository Vercel configuration schedules EPCC/Gmail independently at `10:00` daily through `/api/cron/epcc-profit`, then Monday 15 minutes later at `10:15` through `/api/cron/monday-sales-sync`. Both routes require constant-time Bearer `CRON_SECRET` authentication and fail independently.
-- The Monday cron is restricted to the UTC current month and the Pins & Knuckles organisation. It uses a database-backed per-organisation/month lock, validates the selected board, writes no member KPI rows, and cannot accept query-string period overrides. Its temporary daily cadence remains in place only until the Vercel plan supports a more frequent approved schedule.
+- The Monday cron is restricted to the UTC current month and the Pins & Knuckles organisation. It uses a database-backed per-organisation/month lock, validates the selected board, writes source-isolated member quote/order patches, and cannot accept query-string period overrides. Its temporary daily cadence remains in place only until the Vercel plan supports a more frequent approved schedule.
 - Monday owns `quotes_done` and `orders_processed`; it owns profit only through June 2026. From July 2026 onward the Monday payload omits both profit fields, leaving EPCC/NetSuite as the sole profit source.
 - The manual Monday CLI remains dry-run by default. A 2025 apply requires one month and `--force`; a 2026 apply additionally requires the explicit matching reviewed scope (`--reviewed-year` and `--reviewed-month`). This is bounded one-month-only support, not a historical/range sync path.
-- EPCC/Gmail ingestion CLI remains dry-run by default while its authenticated cron applies valid reports through the service-role-only RPC. July 2026 ingestion and duplicate handling were verified after resolving an untracked historical KPI value.
-- Quotes Done and Orders Processed remain separate metrics. Their actual source and attribution/completion semantics are not confirmed, so they must not be inferred from Monday lead/conversion data.
+- EPCC/Gmail ingestion CLI remains dry-run by default while its authenticated cron applies valid reports through a service-role-only transactional RPC. Person subtotal profit and PK Tax rows are written only when they reconcile to the report grand totals within £0.01.
+- Quotes Done means every included top-level WEEK 1–WEEK 5 Monday item; Orders Processed means `Converted = Yes` under the approved monthly-board rules.
+
+### Member KPI Ownership and Visibility
+
+- Monday exclusively owns member `quotes_done`, `orders_processed`, and `monday_source_metadata`. EPCC exclusively owns member `profit`, `pk_tax`, and `epcc_source_metadata`. Source writes are partial and must never overwrite fields owned by the other source.
+- `snuggle_profit` is reserved as nullable storage only. No source currently establishes a reliable Snuggle-profit value, so ingestion leaves it unchanged.
+- Stable member identities are `hardus`, `justin`, `bux`, `shannon`, `johan`, and `other_non_dashboard`. Monday uses known person IDs before normalized-name fallback; EPCC uses normalized salesperson names.
+- Normal account-manager members are Hardus, Justin, and Bux. Shannon and Johan are stored as `admin_hidden`. The `other_non_dashboard` reconciliation identity is administrator/internal-only.
+- Seth maps only to `other_non_dashboard`. His source name may appear in protected source metadata for reconciliation, but he is never a canonical member identity or PK Tax recipient.
+- EPCC member ingestion is gated on the sum of all salesperson subtotals matching both report profit and PK Tax grand totals. Customer and order details are never stored in member source metadata.
 
 ### Confirmed Monday Reporting Rules
 

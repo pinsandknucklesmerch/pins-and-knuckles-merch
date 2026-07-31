@@ -1,4 +1,5 @@
 export type SalesKpiDataSource = "manual" | "historical_fixture" | "monday" | "epcc_email";
+export type SalesKpiMemberClassification = "dashboard_account_manager" | "admin_hidden" | "other_non_dashboard";
 export type SalesMetricCode = "MONTHLY_PROFIT" | "QUOTES_DONE" | "ORDERS_PROCESSED" | "CONVERSION_RATE";
 
 export type CompanyKpiMonth = {
@@ -25,6 +26,11 @@ export type TeamMemberKpiMonth = {
   salesInboxEnquiries: number | null;
   converted: number | null;
   profit: number | null;
+  pkTax: number | null;
+  snuggleProfit: number | null;
+  memberClassification: SalesKpiMemberClassification;
+  mondaySourceMetadata: Record<string, unknown> | null;
+  epccSourceMetadata: Record<string, unknown> | null;
   source: SalesKpiDataSource;
 };
 

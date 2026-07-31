@@ -2,12 +2,13 @@ import type { Database } from "@/types/database.types";
 import type { HistoricalSalesDashboardFixture } from "../types.ts";
 import { DASHBOARD_MONTHS } from "../types.ts";
 import { calculateConversionRate } from "../domain/calculateDashboardKpis.ts";
-import { findPreviousMember, normaliseTeamMemberKey, normaliseTeamMemberName, sortMemberDashboardRows } from "../domain/normaliseTeamMember.ts";
+import { findPreviousMember, normaliseTeamMemberKey, sortMemberDashboardRows } from "../domain/normaliseTeamMember.ts";
+import { mapMondayMember } from "../domain/memberIdentity.ts";
 import { DEFAULT_SALES_KPI_TARGETS, type CompanyKpiMonth, type MemberDashboardRow, type SalesDashboardData, type SalesKpiTargets, type TeamMemberKpiMonth } from "../domain/types.ts";
 import { buildYearComparison } from "./yearComparison.ts";
 
 type CompanyRow = Pick<Database["public"]["Tables"]["sales_kpi_months"]["Row"], "year" | "month" | "monthly_profit" | "monthly_profit_source" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "monday_sync_metadata" | "notes" | "data_source">;
-type MemberRow = Pick<Database["public"]["Tables"]["sales_kpi_member_months"]["Row"], "year" | "month" | "team_member_key" | "team_member_name" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "profit" | "data_source">;
+type MemberRow = Pick<Database["public"]["Tables"]["sales_kpi_member_months"]["Row"], "year" | "month" | "team_member_key" | "team_member_name" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "profit" | "pk_tax" | "snuggle_profit" | "member_classification" | "monday_source_metadata" | "epcc_source_metadata" | "data_source">;
 type TargetRow = Pick<Database["public"]["Tables"]["sales_kpi_targets"]["Row"], "organisation_id" | "metric_code" | "target_value" | "effective_from" | "effective_to" | "is_active">;
 
 export function mapCompanyRow(row: CompanyRow): CompanyKpiMonth {
@@ -18,7 +19,7 @@ export function mapCompanyRow(row: CompanyRow): CompanyKpiMonth {
 }
 
 export function mapMemberRow(row: MemberRow): TeamMemberKpiMonth {
-  return { year: row.year, month: row.month, teamMemberKey: row.team_member_key, teamMemberName: row.team_member_name, quotesDone: row.quotes_done, ordersProcessed: row.orders_processed, salesInboxEnquiries: row.sales_inbox_enquiries, converted: row.converted, profit: row.profit, source: row.data_source as TeamMemberKpiMonth["source"] };
+  return { year: row.year, month: row.month, teamMemberKey: row.team_member_key, teamMemberName: row.team_member_name, quotesDone: row.quotes_done, ordersProcessed: row.orders_processed, salesInboxEnquiries: row.sales_inbox_enquiries, converted: row.converted, profit: row.profit, pkTax: row.pk_tax, snuggleProfit: row.snuggle_profit, memberClassification: row.member_classification as TeamMemberKpiMonth["memberClassification"], mondaySourceMetadata: row.monday_source_metadata as Record<string, unknown> | null, epccSourceMetadata: row.epcc_source_metadata as Record<string, unknown> | null, source: row.data_source as TeamMemberKpiMonth["source"] };
 }
 
 export function getFixtureCompanyMonth(fixture: HistoricalSalesDashboardFixture, year: number, month: number): CompanyKpiMonth {
@@ -31,7 +32,10 @@ export function getFixtureCompanyMonth(fixture: HistoricalSalesDashboardFixture,
 export function getFixtureMembers(fixture: HistoricalSalesDashboardFixture, year: number, month: number): TeamMemberKpiMonth[] {
   const monthName = DASHBOARD_MONTHS[month - 1];
   const rows = fixture.salespersonYears.find((item) => item.year === year)?.months[monthName] ?? [];
-  return rows.map((row) => ({ year, month, teamMemberKey: normaliseTeamMemberKey(row.salespersonName), teamMemberName: normaliseTeamMemberName(row.salespersonName), quotesDone: null, ordersProcessed: null, salesInboxEnquiries: row.enquiries, converted: row.conversions, profit: row.totalProfit, source: "historical_fixture" }));
+  return rows.map((row) => {
+    const member = mapMondayMember({ name: row.salespersonName });
+    return { year, month, teamMemberKey: member.key, teamMemberName: member.displayName, quotesDone: null, ordersProcessed: null, salesInboxEnquiries: row.enquiries, converted: row.conversions, profit: row.totalProfit, pkTax: null, snuggleProfit: null, memberClassification: member.classification, mondaySourceMetadata: null, epccSourceMetadata: null, source: "historical_fixture" };
+  });
 }
 
 export function mergeCompanyMonth(database: CompanyKpiMonth | null, fixture: CompanyKpiMonth): CompanyKpiMonth {

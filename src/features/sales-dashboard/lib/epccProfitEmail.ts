@@ -15,7 +15,16 @@ export type EpccProfitEmailReport = {
   totalSales: number;
   monthlyProfit: number;
   totalPkTax: number;
+  memberSubtotals: EpccMemberSubtotal[];
   sourceHash: string;
+};
+
+export type EpccMemberSubtotal = {
+  sourceName: string;
+  totalSales: number;
+  profit: number;
+  pkTax: number;
+  sourceRowCount: number;
 };
 
 const MONTHS = new Map([
@@ -109,6 +118,18 @@ function finalTotal(text: string) {
   return { totalSales: parseCurrency(match[1]), monthlyProfit: parseCurrency(match[2]), totalPkTax: parseCurrency(match[3]) };
 }
 
+function memberSubtotals(text: string): EpccMemberSubtotal[] {
+  const lines = text.split(/\r?\n/).map((line) => line.replace(/\s+/g, " ").trim()).filter(Boolean);
+  const subtotalRows = lines.map((line, index) => ({ line, index, match: line.match(/^Total\s+-\s*(.*?)\s+£(-?[\d,]+\.\d{2})\s+£?(-?[\d,]+\.\d{2})\s+£?(-?[\d,]+\.\d{2})$/) })).filter((row): row is { line: string; index: number; match: RegExpMatchArray } => Boolean(row.match));
+  return subtotalRows.map((row, subtotalIndex) => {
+    const start = subtotalIndex === 0 ? 0 : subtotalRows[subtotalIndex - 1].index + 1;
+    const sourceRowCount = lines.slice(start, row.index).filter((line) => /^(Invoice|Credit Memo)\s+/i.test(line)).length;
+    return {
+      sourceName: row.match[1].trim(), totalSales: parseCurrency(row.match[2]), profit: parseCurrency(row.match[3]), pkTax: parseCurrency(row.match[4]), sourceRowCount,
+    };
+  });
+}
+
 export function isEpccAuthoritativePeriod(year: number, month: number) {
   return year > 2026 || (year === 2026 && month >= 7);
 }
@@ -133,7 +154,7 @@ export function parseEpccProfitEmail(eml: string, receivedAtOverride?: string, m
   if (Number.isNaN(receivedAt.valueOf())) throw new Error("Email received date is invalid.");
   return {
     messageId, subject, sender, receivedAt: receivedAt.toISOString(), reportStart: start.iso, reportEnd: end.iso,
-    reportPeriod: { year: start.year, month: start.month }, ...finalTotal(text),
+    reportPeriod: { year: start.year, month: start.month }, ...finalTotal(text), memberSubtotals: memberSubtotals(text),
     sourceHash: createHash("sha256").update(eml).digest("hex"),
   };
 }

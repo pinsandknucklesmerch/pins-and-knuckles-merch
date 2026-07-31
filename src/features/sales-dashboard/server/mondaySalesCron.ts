@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.types";
 import { MondayClient } from "../../../../scripts/lib/monday/salesHistoryAudit.ts";
-import { mondaySalesWritePayload, syncMondaySalesDashboard, type MondaySnapshot } from "../../../../scripts/lib/monday/salesDashboardSync.ts";
+import { mondayMemberWritePayload, mondaySalesWritePayload, syncMondaySalesDashboard, type MondayMemberSnapshot, type MondaySnapshot } from "../../../../scripts/lib/monday/salesDashboardSync.ts";
 
 export const MONDAY_SYNC_ORGANISATION_ID = "5df4d50f-959e-4438-a026-df75d54fbbc2";
 
@@ -19,6 +19,7 @@ export type MondayCronStore = {
   releaseLock(period: ReportingPeriod, token: string): Promise<void>;
   readMonth(period: ReportingPeriod): Promise<ExistingMonth>;
   write(snapshot: MondaySnapshot, exists: boolean): Promise<void>;
+  writeMembers(snapshots: MondayMemberSnapshot[]): Promise<void>;
 };
 
 function serviceDatabase() {
@@ -52,6 +53,22 @@ export function createMondayCronStore(database: SupabaseClient<Database> = servi
       const { error } = await query;
       if (error) throw new Error(`Could not write current Monday KPI snapshot: ${error.message}`);
     },
+    async writeMembers(snapshots) {
+      for (const snapshot of snapshots) {
+        const key = { organisation_id: MONDAY_SYNC_ORGANISATION_ID, year: snapshot.year, month: snapshot.month, team_member_key: snapshot.team_member_key };
+        const { error: insertError } = await database.from("sales_kpi_member_months").upsert({
+          ...key,
+          team_member_name: snapshot.team_member_name,
+          member_classification: snapshot.member_classification,
+          data_source: "monday",
+        } as never, { onConflict: "organisation_id,year,month,team_member_key", ignoreDuplicates: true });
+        if (insertError) throw new Error(`Could not prepare Monday member KPI row: ${insertError.message}`);
+        const { error: updateError } = await database.from("sales_kpi_member_months")
+          .update(mondayMemberWritePayload(snapshot) as never)
+          .match(key);
+        if (updateError) throw new Error(`Could not write Monday member KPI row: ${updateError.message}`);
+      }
+    },
   };
 }
 
@@ -66,7 +83,7 @@ export async function runMondaySalesCron(
   try {
     const monday = dependencies.monday ?? new MondayClient(process.env.MONDAY_API_TOKEN ?? "");
     const existing = await store.readMonth(period);
-    const outcomes = await syncMondaySalesDashboard({ year: period.year, months: [period.month], organisationId: MONDAY_SYNC_ORGANISATION_ID, boards: await monday.listAllBoards(), inspectBoard: (boardId) => monday.inspectBoard(boardId), collectItems: (boardId) => monday.collectItems(boardId), existingMonths: new Set(existing ? [period.month] : []), now, force: false, apply: true, trigger: "cron", write: (snapshot, exists) => store.write(snapshot, exists) });
+    const outcomes = await syncMondaySalesDashboard({ year: period.year, months: [period.month], organisationId: MONDAY_SYNC_ORGANISATION_ID, boards: await monday.listAllBoards(), inspectBoard: (boardId) => monday.inspectBoard(boardId), collectItems: (boardId) => monday.collectItems(boardId), existingMonths: new Set(existing ? [period.month] : []), now, force: false, apply: true, trigger: "cron", write: (snapshot, exists) => store.write(snapshot, exists), writeMembers: (snapshots) => store.writeMembers(snapshots) });
     const outcome = outcomes[0];
     const snapshot = outcome.snapshot;
     if (!snapshot || (outcome.status !== "updated" && outcome.status !== "inserted")) return { outcome: "rejected", year: period.year, month: period.month, quotesDone: snapshot?.quotes_done ?? null, ordersProcessed: snapshot?.orders_processed ?? null, changed: false };

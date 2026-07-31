@@ -1,3 +1,5 @@
+import { isRecognisedMondayMember, mapMondayMember, type MemberClassification } from "../../../src/features/sales-dashboard/domain/memberIdentity.ts";
+
 export type MondayColumn = { id: string; title: string; type: string; settings_str?: string | null };
 export type MondayItem = { id: string; name: string; created_at?: string | null; updated_at?: string | null; group?: { id: string; title: string } | null; column_values?: Array<{ id: string; text?: string | null; value?: string | null; type?: string | null }> };
 export type MondayBoard = { id: string; name: string; state?: string | null; board_kind?: string | null; workspace?: { id: string; name: string } | null; groups?: Array<{ id: string; title: string }> | null; columns?: MondayColumn[] | null; items_page?: { cursor?: string | null; items?: MondayItem[] } | null };
@@ -33,6 +35,20 @@ type DateSource = "date_in_touch" | "created_at_fallback";
 type DateIssue = "invalid_date_in_touch" | "missing_created_at" | "invalid_created_at";
 type SummaryItem = { item: MondayItem; people: Person[]; channel: string | null; channelNormalized: string; converted: boolean; date: string | null; dateSource: DateSource | null; dateIssue: DateIssue | null; dateMatchesBoardMonth: boolean };
 type Month = { year: number; month: number; label: string };
+export type MondayMemberKpi = {
+  teamMemberKey: string;
+  teamMemberName: string;
+  memberClassification: MemberClassification;
+  quotesDone: number;
+  ordersProcessed: number;
+  includedItemCount: number;
+  dateInTouchCount: number;
+  createdAtFallbackCount: number;
+  multiAssigneeItemCount: number;
+  unassignedItemCount: number;
+  unmappedItemCount: number;
+  sourcePeople: Array<{ id: string | null; name: string }>;
+};
 
 function column(item: MondayItem, id: string) { return item.column_values?.find((value) => value.id === id); }
 function dateResolution(item: MondayItem, dateInTouchColumnId: string) {
@@ -69,6 +85,39 @@ function aggregate(items: SummaryItem[]) {
   const channelRows = [...channels.values()].map((channel) => ({ ...channel, conversionRate: rate(channel.converted, channel.leads) })).sort((a, b) => a.displayLabel.localeCompare(b.displayLabel)); const converted = items.filter((item) => item.converted).length;
   return { totalLeadItems: items.length, convertedItems: converted, conversionRate: rate(converted, items.length), byAccountManager: memberRows, byChannel: channelRows, blankChannelCount, blankAccountManagerCount };
 }
+function memberKpis(items: SummaryItem[]): MondayMemberKpi[] {
+  const members = new Map<string, MondayMemberKpi & { sources: Map<string, { id: string | null; name: string }> }>();
+  const add = (key: string, name: string, classification: MemberClassification, entry: SummaryItem, sourcePeople: Person[], flags: { multi?: boolean; unassigned?: boolean; unmapped?: boolean } = {}) => {
+    const current = members.get(key) ?? {
+      teamMemberKey: key, teamMemberName: name, memberClassification: classification,
+      quotesDone: 0, ordersProcessed: 0, includedItemCount: 0, dateInTouchCount: 0, createdAtFallbackCount: 0,
+      multiAssigneeItemCount: 0, unassignedItemCount: 0, unmappedItemCount: 0, sourcePeople: [], sources: new Map(),
+    };
+    current.quotesDone += 1; current.includedItemCount += 1;
+    if (entry.converted) current.ordersProcessed += 1;
+    if (entry.dateSource === "date_in_touch") current.dateInTouchCount += 1;
+    if (entry.dateSource === "created_at_fallback") current.createdAtFallbackCount += 1;
+    if (flags.multi) current.multiAssigneeItemCount += 1;
+    if (flags.unassigned) current.unassignedItemCount += 1;
+    if (flags.unmapped) current.unmappedItemCount += 1;
+    for (const person of sourcePeople) current.sources.set(`${person.id ?? ""}:${person.normalizedName}`, { id: person.id, name: person.name });
+    members.set(key, current);
+  };
+  for (const entry of items) {
+    if (entry.people.length !== 1) {
+      add("other_non_dashboard", "Other / reconciliation", "other_non_dashboard", entry, entry.people, {
+        multi: entry.people.length > 1,
+        unassigned: entry.people.length === 0,
+      });
+      continue;
+    }
+    const person = entry.people[0]; const member = mapMondayMember(person);
+    add(member.key, member.displayName, member.classification, entry, [person], {
+      unmapped: !isRecognisedMondayMember(person),
+    });
+  }
+  return [...members.values()].map(({ sources, ...member }) => ({ ...member, sourcePeople: [...sources.values()].sort((a, b) => a.name.localeCompare(b.name)) })).sort((a, b) => a.teamMemberKey.localeCompare(b.teamMemberKey));
+}
 export function summarizeMonthlySalesBoard(board: Pick<MondayBoard, "id" | "name">, items: MondayItem[], resolvedColumns: Partial<typeof MONTHLY_SALES_COLUMNS> = {}) {
   const columns = { ...MONTHLY_SALES_COLUMNS, ...resolvedColumns };
   const expectedMonth = boardMonth(board.name); const excludedItems: Array<{ id: string; name: string; group: string | null; reason: string }> = []; const included: SummaryItem[] = [];
@@ -81,8 +130,9 @@ export function summarizeMonthlySalesBoard(board: Pick<MondayBoard, "id" | "name
   const missingDates = included.filter((item) => !item.date).map((item) => ({ id: String(item.item.id), name: item.item.name, group: item.item.group?.title ?? null, reason: item.dateIssue })); const mismatchedDates = included.filter((item) => item.date && !item.dateMatchesBoardMonth).map((item) => ({ sourceBoardId: String(board.id), sourceBoardMonth: expectedMonth?.label ?? board.name, itemId: String(item.item.id), itemName: item.item.name, group: item.item.group?.title ?? null, actualReportingDate: item.date, dateSource: item.dateSource, includedInBoardMembershipTotals: true, includedInValidDateTotals: false, action: "review-in-monday" as const }));
   const multiManagerConvertedCount = multiAccountManagers.filter((item) => item.converted).length;
   const allByBoardMembership = aggregate(included);
+  const memberKpiRows = memberKpis(included);
   const dateSourceCounts = { date_in_touch: included.filter((item) => item.dateSource === "date_in_touch").length, created_at_fallback: included.filter((item) => item.dateSource === "created_at_fallback").length };
-  return { board: { id: String(board.id), name: board.name, inferredMonth: expectedMonth }, fetch: { totalItemsFetched: items.length, includedWeeklyItems: included.length, excludedItems: excludedItems.length, deletedItems: "not returned by Monday item queries", inaccessibleItems: "not returned by Monday item queries", subitems: "not requested or included; Monday top-level item query only" }, scopes: { allLeads: { byBoardMembership: allByBoardMembership, byValidDateInTouchMonth: aggregate(validDates) }, salesInboxOnly: { byBoardMembership: aggregate(salesInbox(included)), byValidDateInTouchMonth: aggregate(salesInbox(validDates)) } }, validation: { missingDateCount: missingDates.length, invalidDateInTouchCount: missingDates.filter((item) => item.reason === "invalid_date_in_touch").length, missingDateSourceCount: missingDates.filter((item) => item.reason === "missing_created_at").length, invalidCreatedAtCount: missingDates.filter((item) => item.reason === "invalid_created_at").length, mismatchedDateCount: mismatchedDates.length, validDateInTouchMonthCount: validDates.length, multiManagerItemCount: multiAccountManagers.length, multiManagerConvertedCount, excludedFromMemberMetricsCount: multiAccountManagers.length, blankAccountManagerItemCount: included.filter((item) => !item.people.length).length, blankChannelItemCount: allByBoardMembership.blankChannelCount }, dateSourceCounts, excludedItems, missingDates, mismatchedDates, multiAccountManagers };
+  return { board: { id: String(board.id), name: board.name, inferredMonth: expectedMonth }, fetch: { totalItemsFetched: items.length, includedWeeklyItems: included.length, excludedItems: excludedItems.length, deletedItems: "not returned by Monday item queries", inaccessibleItems: "not returned by Monday item queries", subitems: "not requested or included; Monday top-level item query only" }, scopes: { allLeads: { byBoardMembership: allByBoardMembership, byValidDateInTouchMonth: aggregate(validDates) }, salesInboxOnly: { byBoardMembership: aggregate(salesInbox(included)), byValidDateInTouchMonth: aggregate(salesInbox(validDates)) } }, memberKpiRows, validation: { missingDateCount: missingDates.length, invalidDateInTouchCount: missingDates.filter((item) => item.reason === "invalid_date_in_touch").length, missingDateSourceCount: missingDates.filter((item) => item.reason === "missing_created_at").length, invalidCreatedAtCount: missingDates.filter((item) => item.reason === "invalid_created_at").length, mismatchedDateCount: mismatchedDates.length, validDateInTouchMonthCount: validDates.length, multiManagerItemCount: multiAccountManagers.length, multiManagerConvertedCount, excludedFromMemberMetricsCount: multiAccountManagers.length, blankAccountManagerItemCount: included.filter((item) => !item.people.length).length, blankChannelItemCount: allByBoardMembership.blankChannelCount }, dateSourceCounts, excludedItems, missingDates, mismatchedDates, multiAccountManagers };
 }
 
 export class MondayClient {

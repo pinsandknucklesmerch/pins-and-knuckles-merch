@@ -24,6 +24,7 @@ function dependencies(existing: { quotes_done: number | null; orders_processed: 
     releaseLock: async () => {},
     readMonth: async () => existing,
     write: async (snapshot) => { writes.push(snapshot); },
+    writeMembers: async () => {},
   };
   return { store, writes, monday: { listAllBoards: async () => [board], inspectBoard: async () => board, collectItems: async () => ({ items, cursor: null, truncated: false }) } };
 }

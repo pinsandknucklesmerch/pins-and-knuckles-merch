@@ -752,13 +752,18 @@ export type Database = {
           converted: number | null
           created_at: string
           data_source: string
+          epcc_source_metadata: Json | null
           id: string
+          member_classification: string
           month: number
+          monday_source_metadata: Json | null
           orders_processed: number | null
           organisation_id: string | null
+          pk_tax: number | null
           profit: number | null
           quotes_done: number | null
           sales_inbox_enquiries: number | null
+          snuggle_profit: number | null
           team_member_key: string
           team_member_name: string
           updated_at: string
@@ -769,13 +774,18 @@ export type Database = {
           converted?: number | null
           created_at?: string
           data_source?: string
+          epcc_source_metadata?: Json | null
           id?: string
+          member_classification?: string
           month: number
+          monday_source_metadata?: Json | null
           orders_processed?: number | null
           organisation_id?: string | null
+          pk_tax?: number | null
           profit?: number | null
           quotes_done?: number | null
           sales_inbox_enquiries?: number | null
+          snuggle_profit?: number | null
           team_member_key: string
           team_member_name: string
           updated_at?: string
@@ -786,13 +796,18 @@ export type Database = {
           converted?: number | null
           created_at?: string
           data_source?: string
+          epcc_source_metadata?: Json | null
           id?: string
+          member_classification?: string
           month?: number
+          monday_source_metadata?: Json | null
           orders_processed?: number | null
           organisation_id?: string | null
+          pk_tax?: number | null
           profit?: number | null
           quotes_done?: number | null
           sales_inbox_enquiries?: number | null
+          snuggle_profit?: number | null
           team_member_key?: string
           team_member_name?: string
           updated_at?: string
@@ -1280,6 +1295,25 @@ export type Database = {
             }
             Returns: boolean
           }
+      ingest_epcc_monthly_profit_and_members: {
+        Args: {
+          p_member_rows: Json
+          p_message_id: string
+          p_month: number
+          p_organisation_id: string
+          p_received_at: string
+          p_report_end: string
+          p_report_start: string
+          p_sender: string
+          p_source_hash: string
+          p_subject: string
+          p_total_pk_tax: number
+          p_total_profit: number
+          p_total_sales: number
+          p_year: number
+        }
+        Returns: string
+      }
       is_organisation_member: {
         Args: { target_organisation_id: string }
         Returns: boolean

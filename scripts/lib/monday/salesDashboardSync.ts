@@ -1,6 +1,41 @@
 import { classifyBoardPeriod, discoverMonthlyBoards } from "./monthlyBoardAudit.ts";
 import { auditProfitTracking, shouldWriteMondayProfit, type ProfitTrackingAudit } from "./profitTracking.ts";
 import { summarizeMonthlySalesBoard, type MondayBoard, type MondayItem } from "./salesHistoryAudit.ts";
+import type { MemberClassification } from "../../../src/features/sales-dashboard/domain/memberIdentity.ts";
+
+export type MondayMemberSnapshot = {
+  organisation_id: string | null;
+  year: number;
+  month: number;
+  team_member_key: string;
+  team_member_name: string;
+  member_classification: MemberClassification;
+  quotes_done: number;
+  orders_processed: number;
+  monday_source_metadata: {
+    sourceBoardId: string;
+    reportingPeriod: { year: number; month: number };
+    includedItemCount: number;
+    dateInTouchCount: number;
+    createdAtFallbackCount: number;
+    excludedItemCount: number;
+    multiAssigneeItemCount: number;
+    unassignedItemCount: number;
+    unmappedItemCount: number;
+    sourcePeople: Array<{ id: string | null; name: string }>;
+  };
+};
+
+export type MondayMemberWritePayload = Pick<MondayMemberSnapshot, "quotes_done" | "orders_processed" | "monday_source_metadata">;
+
+/** This patch deliberately excludes every EPCC-owned member field. */
+export function mondayMemberWritePayload(snapshot: MondayMemberSnapshot): MondayMemberWritePayload {
+  return {
+    quotes_done: snapshot.quotes_done,
+    orders_processed: snapshot.orders_processed,
+    monday_source_metadata: snapshot.monday_source_metadata,
+  };
+}
 
 export type MondaySnapshot = {
   organisation_id: string | null;
@@ -12,6 +47,7 @@ export type MondaySnapshot = {
   converted: number;
   monthly_profit?: number;
   monthly_profit_source?: "monday";
+  memberSnapshots: MondayMemberSnapshot[];
   data_source: "monday";
   monday_sync_metadata: {
     sourceBoardId: string;
@@ -86,6 +122,7 @@ type SyncInput = {
   trigger?: "cron";
   fetchedAt?: string;
   write?: (snapshot: MondaySnapshot, exists: boolean) => Promise<void>;
+  writeMembers?: (snapshots: MondayMemberSnapshot[]) => Promise<void>;
 };
 
 export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOutcome[]> {
@@ -147,6 +184,23 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
     };
     const scopeA = summary.scopes.allLeads.byBoardMembership;
     const scopeB = summary.scopes.salesInboxOnly.byBoardMembership;
+    const memberSnapshots = summary.memberKpiRows.map((member) => ({
+      organisation_id: input.organisationId,
+      year: input.year,
+      month,
+      team_member_key: member.teamMemberKey,
+      team_member_name: member.teamMemberName,
+      member_classification: member.memberClassification,
+      quotes_done: member.quotesDone,
+      orders_processed: member.ordersProcessed,
+      monday_source_metadata: {
+        sourceBoardId: String(entry.board.id), reportingPeriod: { year: input.year, month },
+        includedItemCount: member.includedItemCount, dateInTouchCount: member.dateInTouchCount,
+        createdAtFallbackCount: member.createdAtFallbackCount, excludedItemCount: summary.fetch.excludedItems,
+        multiAssigneeItemCount: member.multiAssigneeItemCount, unassignedItemCount: member.unassignedItemCount,
+        unmappedItemCount: member.unmappedItemCount, sourcePeople: member.sourcePeople,
+      },
+    }));
     const snapshot: MondaySnapshot = {
       organisation_id: input.organisationId,
       year: input.year,
@@ -156,6 +210,7 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
       sales_inbox_enquiries: scopeB.totalLeadItems,
       converted: scopeB.convertedItems,
       data_source: "monday",
+      memberSnapshots,
       monday_sync_metadata: { sourceBoardId: String(entry.board.id), fetchedAt, validation: summary.validation, dateSourceCounts: summary.dateSourceCounts, mismatchedDates: summary.mismatchedDates, scopeA: { leads: scopeA.totalLeadItems, converted: scopeA.convertedItems, conversionRate: scopeA.conversionRate }, profitTracking, ...(input.trigger === "cron" ? { reportingPeriod: { year: input.year, month }, quotesDone: scopeA.totalLeadItems, ordersProcessed: scopeA.convertedItems, trigger: "cron" as const } : {}) },
     };
     if (willWriteMondayProfit && profitTracking.calculatedMonthlyTotal !== null) {
@@ -173,6 +228,7 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
     }
     try {
       await input.write?.(snapshot, exists);
+      await input.writeMembers?.(snapshot.memberSnapshots);
       outcomes.push({ month, status: exists ? "updated" : "inserted", snapshot, boardSelection, profitPreview, audit });
     } catch {
       outcomes.push({ month, status: "rejected", reason: "Supabase write failed." });

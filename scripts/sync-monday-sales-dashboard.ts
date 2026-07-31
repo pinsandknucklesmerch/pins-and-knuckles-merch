@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { pathToFileURL } from "node:url";
 import { MondayClient } from "./lib/monday/salesHistoryAudit.ts";
-import { mondaySalesWritePayload, syncMondaySalesDashboard, type MondaySnapshot } from "./lib/monday/salesDashboardSync.ts";
+import { mondayMemberWritePayload, mondaySalesWritePayload, syncMondaySalesDashboard, type MondayMemberSnapshot, type MondaySnapshot } from "./lib/monday/salesDashboardSync.ts";
 
 function option(args: string[], name: string) { const index = args.indexOf(name); return index === -1 ? undefined : args[index + 1]; }
 function optionCount(args: string[], name: string) { return args.filter((arg) => arg === name).length; }
@@ -66,6 +66,20 @@ export async function runMondaySalesDashboardSync(args = process.argv.slice(2)) 
         ? await query.is("organisation_id", null)
         : await query.eq("organisation_id", options.organisationId);
       if (error) throw error;
+    },
+    writeMembers: async (snapshots: MondayMemberSnapshot[]) => {
+      for (const snapshot of snapshots) {
+        const key = { organisation_id: options.organisationId, year: snapshot.year, month: snapshot.month, team_member_key: snapshot.team_member_key };
+        const { error: insertError } = await database.from("sales_kpi_member_months").upsert({
+          ...key, team_member_name: snapshot.team_member_name, member_classification: snapshot.member_classification, data_source: "monday",
+        } as never, { onConflict: "organisation_id,year,month,team_member_key", ignoreDuplicates: true });
+        if (insertError) throw insertError;
+        const memberUpdate = database.from("sales_kpi_member_months").update(mondayMemberWritePayload(snapshot) as never).eq("year", snapshot.year).eq("month", snapshot.month).eq("team_member_key", snapshot.team_member_key);
+        const { error: updateError } = options.organisationId === null
+          ? await memberUpdate.is("organisation_id", null)
+          : await memberUpdate.eq("organisation_id", options.organisationId);
+        if (updateError) throw updateError;
+      }
     },
   });
   const counts = outcomes.reduce<Record<string, number>>((result, outcome) => ({ ...result, [outcome.status]: (result[outcome.status] ?? 0) + 1 }), {});
