@@ -128,9 +128,7 @@ export function EuCalculatorResults({
             {copyState === "copied" ? <Check className="size-4 text-accent" aria-hidden="true" /> : <Copy className="size-4 text-accent" aria-hidden="true" />}
           </div>
           <div className="mt-2 text-2xl font-semibold tabular-nums text-foreground">{money(totals.customerTotalIncVat)}</div>
-          <div className="mt-1 text-xs text-muted-foreground" aria-live="polite">
-            {copyState === "copied" ? "Copied" : copyState === "error" ? "Copy unavailable" : "Click to copy"}
-          </div>
+          <div className="mt-1 text-xs text-muted-foreground">Click to copy</div>
           </>}
         </CopyableCard>
       </div> : null}

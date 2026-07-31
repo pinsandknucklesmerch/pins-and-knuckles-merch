@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, Trash2 } from "lucide-react";
+import { Copy, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Panel } from "@/components/ui/Panel";
 import { calculateUkTradeItem } from "../domain/ukTradePricingEngine.ts";
@@ -18,7 +18,7 @@ const emptyItem = (index: number): UkTradeItemInput => ({ id: `item-${index}`, i
 const money = (value: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(value);
 
 export function UkTradeCalculator({ referenceData }: { referenceData: UkTradeReferenceData }) {
-  const [items, setItems] = useState<UkTradeItemInput[]>([emptyItem(1)]); const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [items, setItems] = useState<UkTradeItemInput[]>([emptyItem(1)]);
   const results = useMemo(() => items.map((item) => calculateUkTradeItem(item, referenceData)), [items, referenceData]);
   const validResults = results.filter((result) => result.errors.length === 0);
   const totals = validResults.reduce((sum, result) => sum + result.totalCost, 0);
@@ -29,9 +29,7 @@ export function UkTradeCalculator({ referenceData }: { referenceData: UkTradeRef
   async function copyQuote() {
     const text = formatUkTradeQuote(items, results, referenceData.garments);
     if (!text) return;
-    try { await copyText(text); setCopyState("copied"); }
-    catch { setCopyState("error"); }
-    window.setTimeout(() => setCopyState("idle"), 2200);
+    await copyText(text);
   }
   const addItem = () => setItems((current) => [...current, emptyItem(current.length + 1)]);
   const reset = () => setItems([emptyItem(1)]);
@@ -45,7 +43,7 @@ export function UkTradeCalculator({ referenceData }: { referenceData: UkTradeRef
       <div className="grid gap-2"><span className="text-xs font-medium text-muted-foreground">Embroidery stitch count</span><div className="grid gap-2 sm:grid-cols-3">{item.embroideryStitches.map((value, slot) => <input key={slot} type="number" min={7000} step={1} placeholder="None" value={value ?? ""} onChange={(event) => { const next = [...item.embroideryStitches]; next[slot] = event.target.value === "" ? null : Number(event.target.value); update({ ...item, embroideryStitches: next }); }} className="h-9 rounded-md border border-input bg-background px-3 text-sm" />)}</div></div>
       <CalculatorErrors errors={results[index].errors} />
     </Panel>)}</div>
-    {hasValidItems ? <div className="grid min-w-0 content-start gap-4"><div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1"><Panel className="p-4"><div className="text-xs text-muted-foreground">Garment Cost</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(garmentCost)}</div></Panel><Panel className="p-4"><div className="text-xs text-muted-foreground">Total Cost</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(totals)}</div><button type="button" onClick={() => void copyQuote()} className="mt-4 inline-flex items-center gap-2 text-sm text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><>{copyState === "copied" ? <Check className="size-4" /> : <Copy className="size-4" />}</> {copyState === "copied" ? "Copied" : copyState === "error" ? "Copy unavailable" : "Copy quote"}</button></Panel></div></div> : null}
+    {hasValidItems ? <div className="grid min-w-0 content-start gap-4"><div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1"><Panel className="p-4"><div className="text-xs text-muted-foreground">Garment Cost</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(garmentCost)}</div></Panel><Panel className="p-4"><div className="text-xs text-muted-foreground">Total Cost</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(totals)}</div><button type="button" onClick={() => void copyQuote()} className="mt-4 inline-flex items-center gap-2 text-sm text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Copy className="size-4" />Copy quote</button></Panel></div></div> : null}
     </div>
     {hasValidItems ? <UkTradeBreakdown items={items} results={results} screenSetupUnitPrice={screenSetupUnitPrice} /> : null}
   </div>;

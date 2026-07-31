@@ -28,7 +28,8 @@ test("success only resets fields and never submits again", async () => {
   assert.match(source, /formRef\.current\?\.reset\(\)/);
   assert.match(source, /state\.status !== "success"/);
   assert.doesNotMatch(source, /router\.refresh|requestSubmit|\.submit\(/);
-  assert.match(source, /\{state\.message \? <p role="status"/);
+  assert.match(source, /feedback\.success\(state\.message\)/);
+  assert.doesNotMatch(source, /\{state\.message \? <p role="status"/);
 });
 
 test("empty FormData is rejected before any Auth or provisioning work", async () => {

@@ -13,11 +13,8 @@ export function CopyableCard({ value, actionLabel, children, className, onClick,
   const reset = useRef<number | null>(null);
   useEffect(() => () => { if (reset.current) window.clearTimeout(reset.current); }, []);
   async function copy() {
-    try {
-      await copyText(value);
-      setCopyState("copied"); onCopySuccess?.();
-    }
-    catch { setCopyState("error"); onCopyError?.(); }
+    if (await copyText(value)) { setCopyState("copied"); onCopySuccess?.(); }
+    else { setCopyState("error"); onCopyError?.(); }
     if (reset.current) window.clearTimeout(reset.current);
     reset.current = window.setTimeout(() => setCopyState("idle"), 2200);
   }

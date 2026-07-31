@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, Copy, RotateCcw } from "lucide-react";
+import { Copy, RotateCcw } from "lucide-react";
 import { ActionMenu } from "@/components/ui/ActionMenu";
 import { FormField } from "@/components/ui/FormField";
 import { NumberInput } from "@/components/ui/Input";
@@ -43,7 +43,6 @@ function valuesToInput(values: Record<string, unknown>): PkTaxInput {
 
 export function PkTaxCalculator() {
   const [values, setValues] = useState<Record<string, unknown>>(blankValues);
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const result = useMemo(() => calculatePkTax(valuesToInput(values)), [values]);
   const setValue = (path: string[], value: string) => setValues((current) => {
     const next = structuredClone(current) as Record<string, unknown>;
@@ -53,9 +52,7 @@ export function PkTaxCalculator() {
     return next;
   });
   async function copyResults() {
-    try { await copyText(formatPkTaxExport(result)); setCopyState("copied"); }
-    catch { setCopyState("error"); }
-    window.setTimeout(() => setCopyState("idle"), 2200);
+    await copyText(formatPkTaxExport(result));
   }
 
   return (
@@ -79,7 +76,7 @@ export function PkTaxCalculator() {
         <button type="button" onClick={() => setValues(blankValues())} className="inline-flex h-9 w-fit items-center justify-center gap-2 rounded-md border border-border px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><RotateCcw className="size-4" aria-hidden="true" />Reset</button>
       </div>
 
-      <Panel><div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-sm font-semibold text-foreground">Results</h2><ActionMenu label="Export" icon={copyState === "copied" ? <Check className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />} items={[{ label: "Copy results", onSelect: () => void copyResults() }]} /></div>
+      <Panel><div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-sm font-semibold text-foreground">Results</h2><ActionMenu label="Export" icon={<Copy className="size-4" aria-hidden="true" />} items={[{ label: "Copy results", onSelect: () => void copyResults() }]} /></div>
         <div className="grid gap-3">
           <Breakdown title="Fixed allocations" rows={[["EPCC", result.epccAllocation], ["Admin", result.adminAllocation], ["Marketing", result.marketingAllocation], ["Ops", result.operationsAllocation], ["Johan", result.johanAllocation]]} />
           <Breakdown title="PK pool" rows={[["Sales-team PK Tax contribution", result.salesTeamContribution], ["Snuggle contribution", result.snuggleContribution], ["Total PK pool", result.poolTotal]]} />

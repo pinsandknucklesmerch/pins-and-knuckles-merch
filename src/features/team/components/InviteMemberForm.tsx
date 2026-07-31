@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, type FormEvent } from "react";
 import { inviteMember } from "../actions/inviteMember";
 import { initialInviteActionState } from "../types";
 import { Select } from "@/components/ui/Select";
+import { feedback, isInlineValidation } from "@/components/ui/feedback";
 
 export function InviteMemberForm() {
   const [state, formAction, pending] = useActionState(inviteMember, initialInviteActionState);
@@ -28,6 +29,11 @@ export function InviteMemberForm() {
     formRef.current?.reset();
     resetSuccessRef.current = state.message;
   }, [state.message, state.status]);
+  useEffect(() => {
+    if (!state.message) return;
+    if (state.status === "success") feedback.success(state.message);
+    else if (!isInlineValidation(state.message)) feedback.error(state.message);
+  }, [state]);
 
   return (
     <form ref={formRef} action={formAction} onSubmit={handleSubmit} onChange={unlockForChangedInvite} className="grid gap-3 rounded-lg border border-border bg-card/70 p-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -56,7 +62,7 @@ export function InviteMemberForm() {
           {pending ? "Sending…" : "Send invite"}
         </button>
       </div>
-      {state.message ? <p role="status" className={`sm:col-span-2 lg:col-span-5 text-sm ${state.status === "rate-limit" ? "text-amber-300" : state.status === "success" ? "text-emerald-300" : "text-destructive"}`}>{state.message}</p> : null}
+      {state.message && state.status !== "success" && isInlineValidation(state.message) ? <p role="alert" className="sm:col-span-2 lg:col-span-5 text-sm text-destructive">{state.message}</p> : null}
     </form>
   );
 }

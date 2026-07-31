@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { saveSalesKpiTargets, type TargetActionState } from "../actions";
 import type { SalesKpiTargets, SalesMetricCode } from "../domain/types";
+import { feedback, isInlineValidation } from "@/components/ui/feedback";
 
 const initialState: TargetActionState = { ok: false, message: "" };
 const inputClass = "h-9 rounded-md border border-input bg-background px-2.5 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring";
@@ -31,6 +32,7 @@ function ManualKpiForm({ year, month, targets, onClose }: { year: number; month:
   const [state, formAction, pending] = useActionState(action, initialState);
   const configuredFields = fields.filter((field) => targets[field.code] !== undefined);
   const effectiveMonth = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(year, month - 1, 1)));
+  useEffect(() => { if (!state.message) return; if (state.ok) feedback.success("Targets updated"); else if (!isInlineValidation(state.message)) feedback.error(state.message); }, [state]);
 
   return createPortal(
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/65 p-4" role="dialog" aria-modal="true" aria-labelledby="edit-targets-title">
@@ -51,7 +53,7 @@ function ManualKpiForm({ year, month, targets, onClose }: { year: number; month:
                 </label>
               ))}
             </div>
-            {state.message ? <p role={state.ok ? "status" : "alert"} className={`text-sm ${state.ok ? "text-emerald-400" : "text-destructive"}`}>{state.message}</p> : null}
+            {state.message && !state.ok && isInlineValidation(state.message) ? <p role="alert" className="text-sm text-destructive">{state.message}</p> : null}
             <button disabled={pending} className="h-9 justify-self-start rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-50" type="submit">{pending ? "Saving…" : "Save Targets"}</button>
           </form>
         </div>

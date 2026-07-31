@@ -60,3 +60,11 @@ rtk pip list            rtk pnpm install        rtk npm run <script>
 - Hub routes remain under `src/app/(hub)/hub/`.
 - Auth routes live under `src/app/(auth)/auth/`; their public URLs remain `/auth/*`.
 - Route groups do not alter public URLs.
+## Feedback Rules
+
+- Operational action feedback uses the shared toast helpers.
+- Field and calculation validation remains inline.
+- All clipboard actions use the shared clipboard helper and standard copy toasts.
+- Successful mutations and exports receive concise success toasts.
+- Never show raw internal errors to users.
+- Do not duplicate inline and toast feedback for the same operational event.

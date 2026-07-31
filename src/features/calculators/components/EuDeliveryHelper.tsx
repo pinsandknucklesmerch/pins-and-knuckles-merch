@@ -1,11 +1,12 @@
 "use client";
 
-import { Check, Copy } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Copy } from "lucide-react";
+import { useMemo, useState } from "react";
 import { calculateEuDelivery, formatEuDeliveryCopy } from "../domain/euDeliveryHelper.ts";
 import type { DeliveryRate } from "../domain/types.ts";
 import { Select } from "@/components/ui/Select";
 import { CollapsibleSurface, Surface } from "@/components/ui/Surface";
+import { copyText } from "@/components/ui/copyText";
 
 type EuDeliveryHelperProps = {
   deliveryRates: DeliveryRate[];
@@ -23,22 +24,11 @@ export function EuDeliveryHelper({ deliveryRates, deliveryRatesError }: EuDelive
   const [boxCount, setBoxCount] = useState(1);
   const [markupEnabled, setMarkupEnabled] = useState(false);
   const [markupPerBox, setMarkupPerBox] = useState(0);
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
-  const resetTimeout = useRef<number | null>(null);
   const delivery = useMemo(() => calculateEuDelivery({ country, boxCount, markupEnabled, markupPerBox }, deliveryRates, deliveryRatesError), [boxCount, country, deliveryRates, deliveryRatesError, markupEnabled, markupPerBox]);
-
-  useEffect(() => () => { if (resetTimeout.current !== null) window.clearTimeout(resetTimeout.current); }, []);
 
   async function copyDelivery() {
     if (!delivery.ok) return;
-    try {
-      await navigator.clipboard.writeText(formatEuDeliveryCopy(delivery));
-      setCopyState("copied");
-      if (resetTimeout.current !== null) window.clearTimeout(resetTimeout.current);
-      resetTimeout.current = window.setTimeout(() => setCopyState("idle"), 2200);
-    } catch {
-      setCopyState("error");
-    }
+    await copyText(formatEuDeliveryCopy(delivery));
   }
 
   return <CollapsibleSurface aria-label="Delivery helper" summary={<span className="flex items-center justify-between gap-3">Delivery Costs <span className="ml-auto text-muted-foreground transition-transform group-open:rotate-180">⌄</span></span>}>
@@ -51,7 +41,7 @@ export function EuDeliveryHelper({ deliveryRates, deliveryRatesError }: EuDelive
         <div className="grid gap-2"><label className="flex h-5 items-center gap-2 text-xs text-muted-foreground"><input type="checkbox" checked={markupEnabled} onChange={(event) => setMarkupEnabled(event.target.checked)} className="size-3.5 accent-primary" />Delivery markup</label>{markupEnabled ? <input aria-label="Delivery markup per box" type="number" step="0.01" value={Number.isFinite(markupPerBox) ? markupPerBox : ""} onChange={(event) => setMarkupPerBox(Number(event.target.value))} className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground" /> : <output className="flex h-9 items-center rounded-md border border-input bg-background px-3 text-xs text-muted-foreground">No delivery markup applied</output>}</div>
       </div>
       <Surface variant="compact" className="bg-background/55" aria-label="Delivery summary">
-        <div className="mb-3 flex min-w-0 items-start justify-between gap-3"><h2 className="min-w-0 text-sm font-semibold text-foreground">Delivery Summary</h2><button type="button" onClick={copyDelivery} disabled={!delivery.ok} className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-primary/60 px-2 py-1 text-xs text-primary transition-colors hover:bg-primary/10 disabled:opacity-50"><>{copyState === "copied" ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}</>{copyState === "copied" ? "Copied" : copyState === "error" ? "Copy unavailable" : "Copy Delivery Info"}</button></div>
+        <div className="mb-3 flex min-w-0 items-start justify-between gap-3"><h2 className="min-w-0 text-sm font-semibold text-foreground">Delivery Summary</h2><button type="button" onClick={copyDelivery} disabled={!delivery.ok} className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-primary/60 px-2 py-1 text-xs text-primary transition-colors hover:bg-primary/10 disabled:opacity-50"><Copy className="size-3.5" />Copy Delivery Info</button></div>
         {delivery.ok ? <dl><Row label="Selected country" value={delivery.rate.country} /><Row label="Delivery time" value={delivery.rate.deliveryTime} /><Row label="Cost per box excl. VAT" value={money(delivery.rate.costPerBox)} /><Row label="Number of boxes" value={String(delivery.boxCount)} /><Row label="Delivery subtotal excl. VAT" value={money(delivery.deliverySubtotalExclVat)} /><Row label={`VAT (${delivery.rate.vatRate}%)`} value={money(delivery.deliveryVatAmount)} /><Row label="Total delivery cost incl. VAT" value={money(delivery.deliveryTotalInclVat)} strong /></dl> : <p role="alert" className="text-sm text-destructive">{delivery.error}</p>}
       </Surface>
     </div>

@@ -365,3 +365,6 @@ npm run build
 1. Verify the Monday sync and EPCC Gmail ingestion in production configuration before operational use.
 2. Replace or explicitly bound the sales-dashboard fixture fallback as persistent historical KPI coverage is confirmed.
 3. Design admin-only calculator reference-data editing after read-only calculator flows are stable.
+# Feedback standardisation
+
+Operational mutations, exports, and clipboard actions use shared Sonner feedback; field, calculator, invoice, access, and route-level validation remains inline.

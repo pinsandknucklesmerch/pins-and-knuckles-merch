@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { RotateCcw } from "lucide-react";
 import { ActionMenu } from "@/components/ui/ActionMenu";
 import { Surface } from "@/components/ui/Surface";
+import { feedback } from "@/components/ui/feedback";
 import { InvoiceForm } from "./InvoiceForm";
 import { InvoicePreview } from "./InvoicePreview";
 import {
@@ -56,6 +57,9 @@ export function CommercialInvoiceGenerator() {
     try {
       if (format === "pdf") await exportInvoicePdf(calculated);
       else await exportInvoiceXlsx(calculated);
+      feedback.exportCreated();
+    } catch {
+      feedback.exportFailed();
     } finally {
       setExporting(null);
     }
