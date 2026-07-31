@@ -172,6 +172,8 @@ There is no active `/test` route.
 
 ## Sales Dashboard Status
 
+- Year to Date uses January through the selected dashboard month. Actual profit is summed only from persisted `sales_kpi_months.monthly_profit` rows, regardless of approved source; missing or null rows are never treated as zero. Monthly targets resolve by effective month where supported, annual target sums all twelve resolved monthly targets, and projection annualises the average of authoritative included months.
+
 ### Complete
 
 - The Phase 1 Supabase KPI schema is implemented: `sales_kpi_months`, `sales_kpi_member_months`, and `sales_kpi_targets` with RLS.

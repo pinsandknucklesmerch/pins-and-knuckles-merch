@@ -1,0 +1,4 @@
+.metricGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.625rem; }
+.ahead { color: var(--mu-color-positive); }
+.behind { color: var(--mu-color-negative); }
+.chart { min-height: 0; overflow: visible; }

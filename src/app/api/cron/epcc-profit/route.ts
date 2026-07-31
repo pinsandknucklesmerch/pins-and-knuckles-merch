@@ -9,8 +9,15 @@ export async function GET(request: Request) {
   try {
     const result = await runEpccProfitIngestion({ apply: true });
     return NextResponse.json({ outcome: result.outcome, messageId: result.report.messageId, period: result.report.reportPeriod, monthlyProfit: result.report.monthlyProfit });
-  } catch {
-    console.error("EPCC Gmail profit cron failed");
-    return NextResponse.json({ error: "EPCC profit ingestion failed" }, { status: 500 });
-  }
+ } catch (error) {
+  console.error("EPCC Gmail profit cron failed", error);
+
+  return NextResponse.json(
+    {
+      error: "EPCC profit ingestion failed",
+      reason: error instanceof Error ? error.message : "Unknown error",
+    },
+    { status: 500 },
+  );
+}
 }

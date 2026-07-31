@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database.types";
 import { historicalSalesDashboardFixture } from "./workbookFixture";
-import { buildDashboardData, getFixtureCompanyMonth, mapCompanyRow, mapMemberRow, mapTargets } from "./mappers";
+import { buildDashboardData, getFixtureCompanyMonth, mapCompanyRow, mapMemberRow, mapMonthlyProfitTargets, mapTargets } from "./mappers";
 import type { SalesDashboardData, SalesKpiTargets } from "../domain/types";
 import { getSalesDashboardQueryPlan, type DashboardView } from "../lib/queryPlan";
 
@@ -60,17 +60,23 @@ export async function loadSalesDashboard(
     const row = chooseTrendCompany(selectedYear, selectedMonth);
     return row ? mapCompanyRow(row) : getFixtureCompanyMonth(historicalSalesDashboardFixture, selectedYear, selectedMonth);
   });
+  const authoritativeYear = Array.from({ length: 12 }, (_, index) => {
+    const row = chooseTrendCompany(year, index + 1);
+    return row ? mapCompanyRow(row) : null;
+  });
   const fixtureYears = historicalSalesDashboardFixture.years.map((row) => row.year);
   const databaseYears = (yearResult.data ?? []).map((row) => row.year);
   const company = chooseCompany(year);
   const previousCompany = chooseCompany(year - 1);
+  const targetRows = targetResult.data ?? [];
   return buildDashboardData({
     companyRow: company ? mapCompanyRow(company) : null,
     previousCompanyRow: previousCompany ? mapCompanyRow(previousCompany) : null,
     trendCurrent: trendYear(year), trendPrevious: trendYear(year - 1),
     memberRows: chooseMembers(year), previousMemberRows: chooseMembers(year - 1),
     fixture: historicalSalesDashboardFixture, year, month,
-    targets: mapTargets(targetResult.data ?? [], organisationId, new Date(Date.UTC(year, month - 1, 1))),
+    targets: mapTargets(targetRows, organisationId, new Date(Date.UTC(year, month - 1, 1))),
+    authoritativeCompanyYear: authoritativeYear, monthlyProfitTargets: mapMonthlyProfitTargets(targetRows, organisationId, year),
     availableYears: Array.from(new Set([...fixtureYears, ...databaseYears, year])).sort((a, b) => b - a),
     setupIssue: errors.length ? "Persistent KPI data is unavailable. Historical data is shown." : null,
   });

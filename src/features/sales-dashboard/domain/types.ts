@@ -58,6 +58,22 @@ export type YearComparisonData = {
   previous: YearComparisonPoint[];
 };
 
+export type YearToDateData = {
+  selectedYear: number;
+  cutoffMonth: number;
+  includedMonths: number[];
+  missingMonths: number[];
+  isComplete: boolean;
+  ytdActual: number | null;
+  ytdTarget: number | null;
+  variance: number | null;
+  achievementRate: number | null;
+  annualTarget: number | null;
+  projectedYearEnd: number | null;
+  cumulativeActualByMonth: Array<number | null>;
+  cumulativeTargetByMonth: Array<number | null>;
+};
+
 export const DEFAULT_SALES_KPI_TARGETS: SalesKpiTargets = {
   MONTHLY_PROFIT: 155_000,
   QUOTES_DONE: 300,
@@ -89,6 +105,7 @@ export type SalesDashboardData = {
   previousCompany: CompanyKpiMonth | null;
   members: MemberDashboardRow[];
   targets: SalesKpiTargets;
+  yearToDate: YearToDateData;
   yearComparison: YearComparisonData;
   availableYears: number[];
   setupIssue: string | null;

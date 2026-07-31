@@ -14,6 +14,7 @@ import { TeamMemberKpiView } from "./TeamMemberKpiView";
 import { ManualKpiEntry } from "./ManualKpiEntry";
 import { MetricDashboardProvider } from "./MetricDashboardProvider";
 import { YearComparisonChart } from "./YearComparisonChart";
+import { YearToDateView } from "./YearToDateView";
 import { ExportMetricsButton } from "./ExportMetricsButton";
 import type { DashboardView } from "../lib/dashboardView";
 
@@ -56,7 +57,7 @@ export function SalesDashboard({ data, year, month, view, member, isAdmin, initi
       {view === "company" ? <>
         <DashboardNav tabs={DASHBOARD_TABS} value={activeDashboardView} onChange={changeDashboardView} mode="tabs" />
         {activeDashboardView === "overview"
-          ? <CompanyKpiView current={data.company} previous={data.previousCompany} targets={data.targets} />
+          ? <><CompanyKpiView current={data.company} previous={data.previousCompany} targets={data.targets} /><YearToDateView data={data.yearToDate} /></>
           : <YearComparisonChart comparison={data.yearComparison} />}
       </> : data.members.length ? <TeamMemberKpiView rows={data.members} selectedKey={member} query={{ year, month }} /> : <EmptyState title="No team member data" />}
     </div>
