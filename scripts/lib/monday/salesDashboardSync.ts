@@ -2,6 +2,7 @@ import { classifyBoardPeriod, discoverMonthlyBoards } from "./monthlyBoardAudit.
 import { auditProfitTracking, shouldWriteMondayProfit, type ProfitTrackingAudit } from "./profitTracking.ts";
 import { summarizeMonthlySalesBoard, type MondayBoard, type MondayItem } from "./salesHistoryAudit.ts";
 import type { MemberClassification } from "../../../src/features/sales-dashboard/domain/memberIdentity.ts";
+import { canonicalMemberIdentities } from "../../../src/features/sales-dashboard/domain/memberIdentity.ts";
 
 export type MondayMemberSnapshot = {
   organisation_id: string | null;
@@ -68,6 +69,32 @@ export type MondaySalesWritePayload = Pick<MondaySnapshot, "organisation_id" | "
   monthly_profit?: number;
   monthly_profit_source?: "monday";
 };
+
+function completeMondayMemberSnapshots(snapshots: MondayMemberSnapshot[], organisationId: string | null, year: number, month: number, sourceBoardId: string): MondayMemberSnapshot[] {
+  const byKey = new Map(snapshots.map((snapshot) => [snapshot.team_member_key, snapshot]));
+  return canonicalMemberIdentities().map((member) => byKey.get(member.key) ?? {
+    organisation_id: organisationId,
+    year,
+    month,
+    team_member_key: member.key,
+    team_member_name: member.displayName,
+    member_classification: member.classification,
+    quotes_done: 0,
+    orders_processed: 0,
+    monday_source_metadata: {
+      sourceBoardId,
+      reportingPeriod: { year, month },
+      includedItemCount: 0,
+      dateInTouchCount: 0,
+      createdAtFallbackCount: 0,
+      excludedItemCount: 0,
+      multiAssigneeItemCount: 0,
+      unassignedItemCount: 0,
+      unmappedItemCount: 0,
+      sourcePeople: [],
+    },
+  });
+}
 
 /** A patch payload deliberately omits unavailable profit fields so existing values survive. */
 export function mondaySalesWritePayload(snapshot: MondaySnapshot): MondaySalesWritePayload {
@@ -145,7 +172,7 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
       continue;
     }
     const boardSelection = { selectedBoardId: String(entry.board.id), rejectedBoardIds: (entry.rejectedCandidates ?? []).map((candidate) => String(candidate.board.id)) };
-    if (input.apply && period !== "current active month" && !input.force) {
+    if (input.apply && period !== "current active month" && !input.force && input.trigger !== "cron") {
       outcomes.push({ month, status: "skipped", reason: "Historical month protected; use --force after review." });
       continue;
     }
@@ -184,7 +211,7 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
     };
     const scopeA = summary.scopes.allLeads.byBoardMembership;
     const scopeB = summary.scopes.salesInboxOnly.byBoardMembership;
-    const memberSnapshots = summary.memberKpiRows.map((member) => ({
+    const observedMemberSnapshots = summary.memberKpiRows.map((member) => ({
       organisation_id: input.organisationId,
       year: input.year,
       month,
@@ -201,6 +228,7 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
         unmappedItemCount: member.unmappedItemCount, sourcePeople: member.sourcePeople,
       },
     }));
+    const memberSnapshots = completeMondayMemberSnapshots(observedMemberSnapshots, input.organisationId, input.year, month, String(entry.board.id));
     const snapshot: MondaySnapshot = {
       organisation_id: input.organisationId,
       year: input.year,
@@ -228,10 +256,15 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
     }
     try {
       await input.write?.(snapshot, exists);
+    } catch {
+      outcomes.push({ month, status: "rejected", reason: "Supabase company KPI write failed." });
+      continue;
+    }
+    try {
       await input.writeMembers?.(snapshot.memberSnapshots);
       outcomes.push({ month, status: exists ? "updated" : "inserted", snapshot, boardSelection, profitPreview, audit });
     } catch {
-      outcomes.push({ month, status: "rejected", reason: "Supabase write failed." });
+      outcomes.push({ month, status: "rejected", reason: "Supabase member KPI write failed." });
     }
   }
   return outcomes;

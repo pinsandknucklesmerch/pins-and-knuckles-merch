@@ -24,9 +24,10 @@ export type EpccMemberSnapshot = {
   };
 };
 export type EpccMemberReconciliation = { ok: boolean; differences: { profit: number; pkTax: number }; calculatedTotals: { profit: number; pkTax: number } };
-export type EpccIngestionResult = { mode: "dry-run" | "apply"; outcome: "dry-run" | "applied" | "duplicate" | "older"; report: EpccProfitEmailReport; memberSnapshots: EpccMemberSnapshot[]; memberReconciliation: EpccMemberReconciliation; memberOutcome: "dry-run" | "applied" | "skipped" | "rejected" };
+export type EpccIngestionOutcome = "applied" | "duplicate" | "older" | "duplicate_member_backfill_applied" | "duplicate_member_backfill_not_needed" | "duplicate_member_backfill_rejected";
+export type EpccIngestionResult = { mode: "dry-run" | "apply"; outcome: "dry-run" | EpccIngestionOutcome; report: EpccProfitEmailReport; memberSnapshots: EpccMemberSnapshot[]; memberReconciliation: EpccMemberReconciliation; memberOutcome: "dry-run" | "applied" | "skipped" | "rejected" | "duplicate_member_backfill_applied" | "duplicate_member_backfill_not_needed" | "duplicate_member_backfill_rejected" };
 
-export type EpccProfitStore = { ingest(report: EpccProfitEmailReport, memberSnapshots: EpccMemberSnapshot[]): Promise<"applied" | "duplicate" | "older"> };
+export type EpccProfitStore = { ingest(report: EpccProfitEmailReport, memberSnapshots: EpccMemberSnapshot[]): Promise<EpccIngestionOutcome> };
 
 export const EPCC_CURRENCY_TOLERANCE = 0.01;
 
@@ -105,7 +106,7 @@ export function createEpccProfitStore(database: SupabaseClient<Database> = servi
         p_member_rows: memberSnapshots,
       });
       if (error) throw new Error(`Could not ingest EPCC profit report: ${error.message}`);
-      if (data !== "applied" && data !== "duplicate" && data !== "older") throw new Error(`Unexpected EPCC ingestion result: ${String(data)}.`);
+      if (data !== "applied" && data !== "duplicate" && data !== "older" && data !== "duplicate_member_backfill_applied" && data !== "duplicate_member_backfill_not_needed" && data !== "duplicate_member_backfill_rejected") throw new Error(`Unexpected EPCC ingestion result: ${String(data)}.`);
       return data;
     },
   };
@@ -138,5 +139,12 @@ export async function runEpccProfitIngestion(
   const memberSnapshots = buildEpccMemberSnapshots(report, memberReconciliation);
   if (!options.apply) return { mode: "dry-run", outcome: "dry-run", report, memberSnapshots, memberReconciliation, memberOutcome: memberReconciliation.ok ? "dry-run" : "rejected" };
   const outcome = await (dependencies.store ?? createEpccProfitStore()).ingest(report, memberReconciliation.ok ? memberSnapshots : []);
-  return { mode: "apply", outcome, report, memberSnapshots, memberReconciliation, memberOutcome: !memberReconciliation.ok ? "rejected" : outcome === "applied" ? "applied" : "skipped" };
+  const memberOutcome = !memberReconciliation.ok
+    ? "rejected"
+    : outcome === "applied"
+      ? "applied"
+      : outcome === "duplicate_member_backfill_applied" || outcome === "duplicate_member_backfill_not_needed" || outcome === "duplicate_member_backfill_rejected"
+        ? outcome
+        : "skipped";
+  return { mode: "apply", outcome, report, memberSnapshots, memberReconciliation, memberOutcome };
 }

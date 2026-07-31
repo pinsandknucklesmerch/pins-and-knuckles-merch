@@ -117,6 +117,66 @@ test("an EPCC reconciliation mismatch blocks member rows while retaining company
   assert.equal(writtenRows, 0);
 });
 
+test("a duplicate EPCC report backfills only missing source-isolated member fields and is idempotent", async () => {
+  const raw = await epccFixture();
+  const company = { monthlyProfit: 136730.12, ingestions: 1 };
+  const members = new Map<string, Record<string, unknown>>([
+    ["hardus", { quotes_done: 37, orders_processed: 23, snuggle_profit: 99 }],
+  ]);
+  const store = {
+    async ingest(_report: unknown, snapshots: ReturnType<typeof buildEpccMemberSnapshots>) {
+      if (!snapshots.length) return "duplicate_member_backfill_rejected" as const;
+      const required = snapshots.some((snapshot) => !members.get(snapshot.team_member_key)?.epcc_source_metadata);
+      if (!required) return "duplicate_member_backfill_not_needed" as const;
+      for (const snapshot of snapshots) {
+        const current = members.get(snapshot.team_member_key) ?? {};
+        if (!current.epcc_source_metadata) {
+          Object.assign(current, epccMemberWritePayload(snapshot));
+          members.set(snapshot.team_member_key, current);
+        }
+      }
+      return "duplicate_member_backfill_applied" as const;
+    },
+  };
+  const dependencies = {
+    gmail: { findMessages: async () => [{ id: "duplicate-member-backfill", receivedAt: "2026-07-31T08:00:00.000Z", raw }] },
+    store,
+  };
+
+  const first = await runEpccProfitIngestion({ apply: true }, dependencies);
+  const second = await runEpccProfitIngestion({ apply: true }, dependencies);
+  const hardus = members.get("hardus")!;
+
+  assert.equal(first.outcome, "duplicate_member_backfill_applied");
+  assert.equal(second.outcome, "duplicate_member_backfill_not_needed");
+  assert.equal(company.ingestions, 1);
+  assert.equal(company.monthlyProfit, 136730.12);
+  assert.deepEqual([hardus.quotes_done, hardus.orders_processed, hardus.snuggle_profit], [37, 23, 99]);
+  assert.equal((hardus.epcc_source_metadata as { sourceHash: string }).sourceHash, first.report.sourceHash);
+});
+
+test("a duplicate EPCC reconciliation mismatch remains rejected before any member backfill", async () => {
+  const raw = (await epccFixture()).replace("136,730.12 4,935.30", "136,000.00 4,935.30");
+  let rowsPassed = -1;
+  const result = await runEpccProfitIngestion({ apply: true }, {
+    gmail: { findMessages: async () => [{ id: "duplicate-mismatch", receivedAt: "2026-07-31T08:00:00.000Z", raw }] },
+    store: { ingest: async (_report, rows) => { rowsPassed = rows.length; return "duplicate_member_backfill_rejected"; } },
+  });
+  assert.equal(result.outcome, "duplicate_member_backfill_rejected");
+  assert.equal(result.memberOutcome, "rejected");
+  assert.equal(rowsPassed, 0);
+});
+
+test("the EPCC duplicate migration only patches missing matching-source member rows", async () => {
+  const migration = await readFile("supabase/migrations/20260731110000_backfill_epcc_members_and_grant_monday_member_sync.sql", "utf8");
+  assert.match(migration, /duplicate_member_backfill_applied/);
+  assert.match(migration, /duplicate_member_backfill_not_needed/);
+  assert.match(migration, /duplicate_member_backfill_rejected/);
+  assert.match(migration, /duplicate_source_hash <> p_source_hash/);
+  assert.match(migration, /coalesce\(public\.sales_kpi_member_months\.epcc_source_metadata->>'sourceHash', ''\) <> p_source_hash/);
+  assert.doesNotMatch(migration.slice(migration.indexOf("if ingestion_id is null"), migration.indexOf("select max(received_at)")), /sales_kpi_months \(organisation_id/);
+});
+
 test("visibility helpers expose exactly the approved normal and administrative sets", () => {
   const rows = [
     { teamMemberKey: "hardus", memberClassification: "dashboard_account_manager" as const },

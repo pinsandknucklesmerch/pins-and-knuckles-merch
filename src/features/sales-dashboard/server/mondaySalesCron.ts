@@ -7,7 +7,7 @@ import { mondayMemberWritePayload, mondaySalesWritePayload, syncMondaySalesDashb
 export const MONDAY_SYNC_ORGANISATION_ID = "5df4d50f-959e-4438-a026-df75d54fbbc2";
 
 export type ReportingPeriod = { year: number; month: number };
-export type MondayCronResult = { outcome: "updated" | "inserted" | "unchanged" | "already-running" | "rejected"; year: number; month: number; quotesDone: number | null; ordersProcessed: number | null; changed: boolean };
+export type MondayCronResult = { outcome: "updated" | "inserted" | "unchanged" | "already-running" | "rejected"; year: number; month: number; quotesDone: number | null; ordersProcessed: number | null; changed: boolean; reason?: string };
 
 export function currentMondayReportingPeriod(now = new Date()): ReportingPeriod {
   return { year: now.getUTCFullYear(), month: now.getUTCMonth() + 1 };
@@ -86,7 +86,9 @@ export async function runMondaySalesCron(
     const outcomes = await syncMondaySalesDashboard({ year: period.year, months: [period.month], organisationId: MONDAY_SYNC_ORGANISATION_ID, boards: await monday.listAllBoards(), inspectBoard: (boardId) => monday.inspectBoard(boardId), collectItems: (boardId) => monday.collectItems(boardId), existingMonths: new Set(existing ? [period.month] : []), now, force: false, apply: true, trigger: "cron", write: (snapshot, exists) => store.write(snapshot, exists), writeMembers: (snapshots) => store.writeMembers(snapshots) });
     const outcome = outcomes[0];
     const snapshot = outcome.snapshot;
-    if (!snapshot || (outcome.status !== "updated" && outcome.status !== "inserted")) return { outcome: "rejected", year: period.year, month: period.month, quotesDone: snapshot?.quotes_done ?? null, ordersProcessed: snapshot?.orders_processed ?? null, changed: false };
+    if (!snapshot || (outcome.status !== "updated" && outcome.status !== "inserted")) {
+      return { outcome: "rejected", year: period.year, month: period.month, quotesDone: snapshot?.quotes_done ?? null, ordersProcessed: snapshot?.orders_processed ?? null, changed: false, reason: outcome.reason ?? "Monday sync did not produce a writable snapshot." };
+    }
     const changed = !existing || existing.quotes_done !== snapshot.quotes_done || existing.orders_processed !== snapshot.orders_processed;
     return { outcome: changed ? outcome.status : "unchanged", year: period.year, month: period.month, quotesDone: snapshot.quotes_done, ordersProcessed: snapshot.orders_processed, changed };
   } finally {

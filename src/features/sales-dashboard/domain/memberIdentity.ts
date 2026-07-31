@@ -27,6 +27,11 @@ const MEMBERS: Record<CanonicalMemberKey, CanonicalMemberIdentity> = {
   other_non_dashboard: { key: "other_non_dashboard", displayName: "Other / reconciliation", classification: "other_non_dashboard" },
 };
 
+/** The KPI grid always includes these canonical rows, including zero-activity members. */
+export function canonicalMemberIdentities(): CanonicalMemberIdentity[] {
+  return Object.values(MEMBERS);
+}
+
 const MONDAY_IDS: Record<string, CanonicalMemberKey> = {
   "29869326": "hardus",
   "69507598": "justin",
