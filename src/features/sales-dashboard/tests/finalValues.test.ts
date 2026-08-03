@@ -26,7 +26,22 @@ test("clearing a final returns the KPI to calculated value", () => {
   assert.equal(effectiveCompanyKpiValue({ ...current, finalValues: {} }, "PK_TAX"), 12.5);
 });
 
-test("final value validation accepts decimals for currency and rejects fractional counts", () => {
+test("final value validation accepts formatted monetary values", () => {
+  assert.deepEqual(validateSalesKpiMonthFinalValue("MONTHLY_PROFIT", "165942.07"), { metricCode: "MONTHLY_PROFIT", value: 165942.07 });
+  assert.deepEqual(validateSalesKpiMonthFinalValue("MONTHLY_PROFIT", "165,942.07"), { metricCode: "MONTHLY_PROFIT", value: 165942.07 });
+  assert.deepEqual(validateSalesKpiMonthFinalValue("MONTHLY_PROFIT", "£165,942.07"), { metricCode: "MONTHLY_PROFIT", value: 165942.07 });
+  assert.deepEqual(validateSalesKpiMonthFinalValue("PK_TAX", "  £0  "), { metricCode: "PK_TAX", value: 0 });
+});
+
+test("final value validation rejects malformed or invalid values", () => {
+  assert.equal(validateSalesKpiMonthFinalValue("MONTHLY_PROFIT", "165,94.07"), null);
+  assert.equal(validateSalesKpiMonthFinalValue("MONTHLY_PROFIT", "££165,942.07"), null);
+  assert.equal(validateSalesKpiMonthFinalValue("MONTHLY_PROFIT", "not a number"), null);
+  assert.equal(validateSalesKpiMonthFinalValue("MONTHLY_PROFIT", "-1"), null);
+  assert.equal(validateSalesKpiMonthFinalValue("MONTHLY_PROFIT", ""), null);
+});
+
+test("final value validation accepts currency decimals and rejects fractional counts", () => {
   assert.deepEqual(validateSalesKpiMonthFinalValue("MONTHLY_PROFIT", "10.25"), { metricCode: "MONTHLY_PROFIT", value: 10.25 });
   assert.deepEqual(validateSalesKpiMonthFinalValue("PK_TAX", "0"), { metricCode: "PK_TAX", value: 0 });
   assert.equal(validateSalesKpiMonthFinalValue("QUOTES_DONE", "2.5"), null);
