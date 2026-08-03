@@ -1,7 +1,8 @@
 "use client";
 
 import { ExportButton } from "metricui";
-import type { RefObject } from "react";
+import { useState, type RefObject } from "react";
+import { feedback } from "@/components/ui/feedback";
 import type { MetricExportRow } from "../lib/metricsExport";
 import styles from "./ExportMetricsButton.module.css";
 
@@ -10,7 +11,7 @@ type ExportMetricsButtonProps = {
   targetRef: RefObject<HTMLElement | null>;
   profitTargetRef: RefObject<HTMLElement | null>;
   title: string;
-  profitTitle: string;
+  profitFilename: string;
 };
 
 export function ExportMetricsButton({
@@ -18,83 +19,62 @@ export function ExportMetricsButton({
   targetRef,
   profitTargetRef,
   title,
-  profitTitle,
+  profitFilename,
 }: ExportMetricsButtonProps) {
-  const printProfitReport = () => {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const downloadProfitReport = async () => {
+    if (isExporting) return;
     const report = profitTargetRef.current;
-
     if (!report) {
+      feedback.error("Could not export the profit PDF.");
+      return;
+    }
+    const sections = Array.from(report.querySelectorAll<HTMLElement>("[data-profit-pdf-page]"));
+    if (!sections.length) {
+      feedback.error("Could not find the profit report sections.");
       return;
     }
 
-    const printWindow = window.open("", "_blank", "width=1200,height=900");
+    setIsExporting(true);
+    try {
+      const { default: html2canvas } = await import("html2canvas");
+      const { jsPDF } = await import("jspdf");
+      const margin = 8;
+      const pageWidth = 297;
+      const pageHeight = 210;
+      const printableWidth = pageWidth - margin * 2;
+      const printableHeight = pageHeight - margin * 2;
+      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
 
-    if (!printWindow) {
-      return;
+      for (const [index, section] of sections.entries()) {
+        const canvas = await html2canvas(section, {
+          scale: 1,
+          useCORS: true,
+          backgroundColor: "#111114",
+          logging: false,
+          removeContainer: true,
+        });
+        const scale = Math.min(printableWidth / canvas.width, printableHeight / canvas.height);
+        const imageWidth = canvas.width * scale;
+        const imageHeight = canvas.height * scale;
+        const imageX = (pageWidth - imageWidth) / 2;
+        const imageY = (pageHeight - imageHeight) / 2;
+        if (index > 0) pdf.addPage();
+        pdf.addImage(canvas.toDataURL("image/png"), "PNG", imageX, imageY, imageWidth, imageHeight);
+        canvas.width = 0;
+        canvas.height = 0;
+        await new Promise<void>((resolve) => window.setTimeout(resolve, 0));
+      }
+
+      pdf.save(profitFilename);
+      feedback.success("PDF downloaded");
+    } catch (error) {
+      console.error("Profit PDF export failed", error instanceof Error ? error.message : "unknown error");
+      feedback.error("Could not download the profit PDF.");
+    } finally {
+      setIsExporting(false);
     }
-
-    const stylesheets = Array.from(
-      document.querySelectorAll('link[rel="stylesheet"], style'),
-    )
-      .map((element) => element.outerHTML)
-      .join("\n");
-
-    printWindow.document.open();
-    printWindow.document.write(`
-      <!doctype html>
-      <html lang="en">
-        <head>
-          <meta charset="utf-8" />
-          <title>${profitTitle}</title>
-          ${stylesheets}
-          <style>
-            @page {
-              size: A4 landscape;
-              margin: 10mm;
-            }
-
-            html,
-            body {
-              margin: 0;
-              background: #111114;
-              color: #f5f5f5;
-            }
-
-            body {
-              padding: 16px;
-            }
-
-            .profit-report-page {
-              break-after: page;
-              page-break-after: always;
-            }
-
-            .profit-report-page:last-child {
-              break-after: auto;
-              page-break-after: auto;
-            }
-
-            @media print {
-              body {
-                print-color-adjust: exact;
-                -webkit-print-color-adjust: exact;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          ${report.innerHTML}
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-
-    printWindow.onload = () => {
-      window.setTimeout(() => {
-        printWindow.focus();
-        printWindow.print();
-      }, 500);
-    };
   };
 
   return (
@@ -115,10 +95,11 @@ export function ExportMetricsButton({
         <button
           type="button"
           className={styles.profitButton}
-          onClick={printProfitReport}
+          onClick={downloadProfitReport}
+          disabled={isExporting}
         >
-          <span aria-hidden="true">⇩</span>
-          Export Profit PDF
+          <span aria-hidden="true">{isExporting ? "…" : "⇩"}</span>
+          {isExporting ? "Exporting…" : "EPCC Profit Report"}
         </button>
       </div>
     </div>

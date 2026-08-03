@@ -97,3 +97,8 @@
   outline: 2px solid hsl(var(--ring));
   outline-offset: 2px;
 }
+
+.profitButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}

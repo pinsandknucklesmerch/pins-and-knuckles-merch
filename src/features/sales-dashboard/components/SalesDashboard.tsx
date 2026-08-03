@@ -70,7 +70,7 @@ export function SalesDashboard({ data, year, month, view, member, isAdmin, initi
           targetRef={dashboardMetricsRef}
           profitTargetRef={profitReportRef}
           title={exportTitle}
-          profitTitle={`Pins Profit Report — ${DASHBOARD_MONTHS[month - 1]} ${year}`}
+          profitFilename={`pins-profit-report-${DASHBOARD_MONTHS[month - 1].toLowerCase()}-${year}.pdf`}
         />
 
       </div>
