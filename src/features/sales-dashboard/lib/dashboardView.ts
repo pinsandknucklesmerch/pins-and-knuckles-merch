@@ -1,5 +1,7 @@
-export type DashboardView = "overview" | "year-comparison";
+export type DashboardView = "overview" | "ytd" | "year-comparison";
 
 export function parseDashboardView(value: string | undefined): DashboardView {
-  return value === "year-comparison" ? "year-comparison" : "overview";
+  if (value === "year-comparison") return "year-comparison";
+  if (value === "ytd") return "ytd";
+  return "overview";
 }

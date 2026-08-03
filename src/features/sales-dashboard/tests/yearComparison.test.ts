@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { getFixtureCompanyMonth } from "../data/mappers.ts";
 import { buildYearComparison, formatYearComparisonValue, yearComparisonValue } from "../data/yearComparison.ts";
@@ -39,4 +40,10 @@ test("trend values format as GBP, integers, and percentage points", () => {
   assert.equal(formatYearComparisonValue(91571.84, "MONTHLY_PROFIT"), "£91,572");
   assert.equal(formatYearComparisonValue(44, "SALES_INBOX_ENQUIRIES"), "44");
   assert.equal(formatYearComparisonValue(25, "SALES_INBOX_CONVERSION_RATE"), "25.0%");
+});
+
+test("Leads is excluded from the chart selector and legacy selections fall back", () => {
+  const chart = readFileSync(new URL("../components/YearComparisonChart.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(chart, /\{ code: "LEADS", label: "Leads"/);
+  assert.match(chart, /METRICS\.find\(\(item\) => item\.code === value\)\?\.code \?\? "MONTHLY_PROFIT"/);
 });

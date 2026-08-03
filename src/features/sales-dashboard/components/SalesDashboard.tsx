@@ -16,26 +16,29 @@ import { MetricDashboardProvider } from "./MetricDashboardProvider";
 import { YearComparisonChart } from "./YearComparisonChart";
 import { YearToDateView } from "./YearToDateView";
 import { ExportMetricsButton } from "./ExportMetricsButton";
+import { MonthlyKpiFinals } from "./MonthlyKpiFinals";
 import type { DashboardView } from "../lib/dashboardView";
 
 const DASHBOARD_TABS = [
   { value: "overview", label: "Overview" },
+  { value: "ytd", label: "YTD" },
   { value: "year-comparison", label: "Year Comparison" },
 ];
 
 export function SalesDashboard({ data, year, month, view, member, isAdmin, initialDashboardView }: { data: SalesDashboardData; year: number; month: number; view: "company" | "members"; member?: string; isAdmin: boolean; initialDashboardView: DashboardView }) {
   const [activeDashboardView, setActiveDashboardView] = useState<DashboardView>(initialDashboardView);
   const dashboardMetricsRef = useRef<HTMLDivElement>(null);
+  const companyMetrics = useMemo(() => calculateCompanyMetrics(data.company, data.previousCompany, data.targets), [data.company, data.previousCompany, data.targets]);
   const exportRows = useMemo(() => buildMetricExportRows(
     data.company,
-    calculateCompanyMetrics(data.company, data.previousCompany, data.targets),
+    companyMetrics,
     { year, month, view, member },
-  ), [data.company, data.previousCompany, data.targets, year, month, view, member]);
+  ), [data.company, companyMetrics, year, month, view, member]);
   const changeDashboardView = useCallback((value: string) => {
-    const nextView = value === "year-comparison" ? "year-comparison" : "overview";
+    const nextView: DashboardView = value === "year-comparison" ? "year-comparison" : value === "ytd" ? "ytd" : "overview";
     setActiveDashboardView((currentView) => currentView === nextView ? currentView : nextView);
   }, []);
-  const exportTitle = `Pins Sales Metrics — ${DASHBOARD_MONTHS[month - 1]} ${year} — ${activeDashboardView === "year-comparison" ? "Year Comparison" : "Overview"}`;
+  const exportTitle = `Pins Sales Metrics — ${DASHBOARD_MONTHS[month - 1]} ${year} — ${activeDashboardView === "year-comparison" ? "Year Comparison" : activeDashboardView === "ytd" ? "YTD" : "Overview"}`;
 
   return <MetricDashboardProvider><div className="grid gap-3">
     <Panel><div className="flex flex-wrap items-end gap-3">
@@ -47,8 +50,9 @@ export function SalesDashboard({ data, year, month, view, member, isAdmin, initi
         <input name="dashboardView" type="hidden" value={activeDashboardView} />
         <button className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground" type="submit">Apply</button>
       </form>
-      <div data-testid="sales-dashboard-actions" className="flex items-center gap-3">
+      <div data-testid="sales-dashboard-actions" className="flex flex-wrap items-center gap-3">
         {isAdmin ? <ManualKpiEntry year={year} month={month} targets={data.targets} /> : null}
+        {view === "company" && isAdmin ? <MonthlyKpiFinals metrics={companyMetrics} year={year} month={month} isAdmin={isAdmin} /> : null}
         <ExportMetricsButton rows={exportRows} targetRef={dashboardMetricsRef} title={exportTitle} />
       </div>
     </div></Panel>
@@ -56,9 +60,7 @@ export function SalesDashboard({ data, year, month, view, member, isAdmin, initi
       {data.setupIssue ? <p role="alert" className="text-sm text-destructive">{data.setupIssue}</p> : null}
       {view === "company" ? <>
         <DashboardNav tabs={DASHBOARD_TABS} value={activeDashboardView} onChange={changeDashboardView} mode="tabs" />
-        {activeDashboardView === "overview"
-          ? <><CompanyKpiView current={data.company} previous={data.previousCompany} targets={data.targets} isAdmin={isAdmin} /><YearToDateView data={data.yearToDate} /></>
-          : <YearComparisonChart comparison={data.yearComparison} />}
+        {activeDashboardView === "overview" ? <CompanyKpiView current={data.company} metrics={companyMetrics} /> : activeDashboardView === "ytd" ? <YearToDateView data={data.yearToDate} /> : <YearComparisonChart comparison={data.yearComparison} />}
       </> : data.members.length ? <TeamMemberKpiView rows={data.members} selectedKey={member} query={{ year, month }} /> : <EmptyState title="No team member data" />}
     </div>
   </div></MetricDashboardProvider>;

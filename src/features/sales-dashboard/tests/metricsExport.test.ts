@@ -27,12 +27,13 @@ function rows(current = month()) {
   return buildMetricExportRows(current, metrics, { year: 2025, month: 7, view: "company", member: "selected-member" }, new Date("2026-07-24T00:00:00Z"));
 }
 
-test("dashboard export includes all six dashboard KPIs", () => {
+test("dashboard export includes all seven dashboard KPIs", () => {
   const output = rows();
   assert.deepEqual(output.map((row) => row.metric_name), [
     "Monthly Profit",
     "Quotes Done",
     "Orders Processed",
+    "PK Tax",
     "Sales Inbox Enquiries",
     "Conversion Rate",
     "Sales Inbox Conversion Rate",

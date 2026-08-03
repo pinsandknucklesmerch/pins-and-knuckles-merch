@@ -5,6 +5,7 @@ import { parseDashboardView } from "../lib/dashboardView.ts";
 
 test("dashboard view query parsing is stable", () => {
   assert.equal(parseDashboardView("year-comparison"), "year-comparison");
+  assert.equal(parseDashboardView("ytd"), "ytd");
   assert.equal(parseDashboardView("overview"), "overview");
   assert.equal(parseDashboardView(undefined), "overview");
   assert.equal(parseDashboardView("invalid"), "overview");
@@ -27,4 +28,18 @@ test("server query state initializes the dashboard without a mount reconciliatio
   const page = readFileSync(new URL("../../../app/(hub)/hub/sales-dashboard/page.tsx", import.meta.url), "utf8");
   assert.match(page, /parseDashboardView\(first\(params\.dashboardView\)\)/);
   assert.match(page, /initialDashboardView=\{dashboardView\}/);
+});
+
+test("company dashboard keeps monthly content separate from year to date", () => {
+  const dashboard = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
+  const company = readFileSync(new URL("../components/CompanyKpiView.tsx", import.meta.url), "utf8");
+
+  assert.match(dashboard, /\{ value: "overview", label: "Overview" \}/);
+  assert.match(dashboard, /\{ value: "ytd", label: "YTD" \}/);
+  assert.match(dashboard, /\{ value: "year-comparison", label: "Year Comparison" \}/);
+  assert.match(dashboard, /useState<DashboardView>\(initialDashboardView\)/);
+  assert.match(dashboard, /activeDashboardView === "overview"[\s\S]*<CompanyKpiView[\s\S]*activeDashboardView === "ytd"[\s\S]*<YearToDateView[\s\S]*<YearComparisonChart/);
+  assert.match(dashboard, /sales-dashboard-actions" className="flex flex-wrap/);
+  assert.match(dashboard, /view === "company" && isAdmin \? <MonthlyKpiFinals/);
+  assert.doesNotMatch(company, /MonthlyKpiFinals/);
 });

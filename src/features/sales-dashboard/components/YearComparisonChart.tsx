@@ -8,13 +8,12 @@ import { yearComparisonValue } from "../data/yearComparison";
 import { Select } from "@/components/ui/Select";
 import styles from "./YearComparisonChart.module.css";
 
-type ChartMetric = { code: YearComparisonMetric; label: string; format: "currency" | "number" | "percent" };
+type ChartMetric = { code: Exclude<YearComparisonMetric, "LEADS">; label: string; format: "currency" | "number" | "percent" };
 
 const METRICS: ChartMetric[] = [
   { code: "MONTHLY_PROFIT", label: "Monthly Profit", format: "currency" },
   { code: "QUOTES_DONE", label: "Quotes Done", format: "number" },
   { code: "ORDERS_PROCESSED", label: "Orders Processed", format: "number" },
-  { code: "LEADS", label: "Leads", format: "number" },
   { code: "CONVERTED", label: "Converted", format: "number" },
   { code: "CONVERSION_RATE", label: "Conversion Rate", format: "percent" },
   { code: "SALES_INBOX_ENQUIRIES", label: "Sales Inbox Enquiries", format: "number" },
@@ -22,7 +21,7 @@ const METRICS: ChartMetric[] = [
 ];
 
 export function YearComparisonChart({ comparison }: { comparison: YearComparisonData }) {
-  const [metricCode, setMetricCode] = useState<YearComparisonMetric>("MONTHLY_PROFIT");
+  const [metricCode, setMetricCode] = useState<ChartMetric["code"]>("MONTHLY_PROFIT");
   const metric = METRICS.find((item) => item.code === metricCode) ?? METRICS[0];
   const currentPeriod = [{ id: metric.label, data: comparison.selected.map((point) => ({ x: point.label, y: yearComparisonValue(point, metric.code) })) }];
   const previousPeriod = [{ id: metric.label, data: comparison.previous.map((point) => ({ x: point.label, y: yearComparisonValue(point, metric.code) })) }];
@@ -41,7 +40,7 @@ export function YearComparisonChart({ comparison }: { comparison: YearComparison
       </ul>
       <label className={styles.selectorLabel}>
         <span className="sr-only">Metric</span>
-        <Select className="min-w-[12rem]" value={metricCode} onValueChange={(value) => setMetricCode(value as YearComparisonMetric)}>
+        <Select className="min-w-[12rem]" value={metric.code} onValueChange={(value) => setMetricCode(METRICS.find((item) => item.code === value)?.code ?? "MONTHLY_PROFIT")}>
           {METRICS.map((item) => <option key={item.code} value={item.code}>{item.label}</option>)}
         </Select>
       </label>
