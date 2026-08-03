@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useState } from "react";
 import { AreaChart, MetricProvider, type FormatOption } from "metricui";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -20,7 +21,7 @@ const METRICS: ChartMetric[] = [
   { code: "SALES_INBOX_CONVERSION_RATE", label: "Sales Inbox Conversion Rate", format: "percent" },
 ];
 
-export function YearComparisonChart({ comparison, showControls = true }: { comparison: YearComparisonData; showControls?: boolean }) {
+export function YearComparisonChart({ comparison, showControls = true, tvMode = false }: { comparison: YearComparisonData; showControls?: boolean; tvMode?: boolean }) {
   const [metricCode, setMetricCode] = useState<ChartMetric["code"]>("MONTHLY_PROFIT");
   const metric = METRICS.find((item) => item.code === metricCode) ?? METRICS[0];
   const currentPeriod = [{ id: metric.label, data: comparison.selected.map((point) => ({ x: point.label, y: yearComparisonValue(point, metric.code) })) }];
@@ -48,9 +49,9 @@ export function YearComparisonChart({ comparison, showControls = true }: { compa
   );
 
   return (
-    hasData ? <div className={styles.chartContainer}>
-      <div className={styles.chartControls}>{controls}</div>
-      <div className={styles.chartArea}>
+    hasData ? <div className={styles.chartContainer} data-tv-view={tvMode ? "year-comparison" : undefined}>
+      <div className={styles.chartControls} data-tv-group={tvMode ? "comparison-summary" : undefined} style={tvMode ? { "--tv-enter-index": 0 } as CSSProperties : undefined}>{controls}</div>
+      <div className={styles.chartArea} data-tv-group={tvMode ? "comparison-chart" : undefined} style={tvMode ? { "--tv-enter-index": 1 } as CSSProperties : undefined}>
         <MetricProvider dense={false}>
           <AreaChart
             data={currentPeriod}

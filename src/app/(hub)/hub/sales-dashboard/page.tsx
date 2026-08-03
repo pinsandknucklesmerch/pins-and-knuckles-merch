@@ -6,6 +6,7 @@ import { getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
 import { SalesDashboard } from "@/features/sales-dashboard/components/SalesDashboard";
 import { loadSalesDashboard } from "@/features/sales-dashboard/data/salesDashboardRepository";
 import { parseDashboardView } from "@/features/sales-dashboard/lib/dashboardView";
+import { isTvMode } from "@/features/sales-dashboard/lib/tvMode";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 function first(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
@@ -24,7 +25,8 @@ async function SalesDashboardPageContent({ searchParams }: Props) {
   const view = first(params.view) === "members" ? "members" : "company";
   const member = first(params.member);
   const dashboardView = parseDashboardView(first(params.dashboardView));
+  const tvMode = isTvMode(params.tv);
   const isAdmin = access.access?.access_level === "admin";
   const data = await loadSalesDashboard(year, month, access.membership?.organisation_id ?? null, view, isAdmin);
-  return <AppShell><PageHeader title="Sales Dashboard" /><SalesDashboard data={data} year={year} month={month} view={view} member={member} isAdmin={isAdmin} initialDashboardView={dashboardView} /></AppShell>;
+  return <AppShell tvMode={tvMode}>{tvMode ? null : <PageHeader title="Sales Dashboard" />}<SalesDashboard data={data} year={year} month={month} view={view} member={member} isAdmin={isAdmin} initialDashboardView={dashboardView} tvMode={tvMode} /></AppShell>;
 }

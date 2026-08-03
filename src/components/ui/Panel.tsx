@@ -5,11 +5,12 @@ type PanelProps = {
   children: React.ReactNode;
   className?: string;
   title?: string;
+  tvGroup?: string;
 };
 
-export function Panel({ children, className, title }: PanelProps) {
+export function Panel({ children, className, title, tvGroup }: PanelProps) {
   return (
-    <Surface className={cn("", className)}>
+    <Surface className={cn("", className)} data-tv-group={tvGroup}>
       {title ? (
         <h2 className="mb-3 text-sm font-semibold text-foreground">{title}</h2>
       ) : null}

@@ -6,9 +6,10 @@ import { getCurrentPinsHubAccess, type PinsHubAccessResult } from "@/lib/access/
 type AppShellProps = {
   children: React.ReactNode;
   pinsHubAccess?: PinsHubAccessResult;
+  tvMode?: boolean;
 };
 
-export async function AppShell({ children, pinsHubAccess: suppliedPinsHubAccess }: AppShellProps) {
+export async function AppShell({ children, pinsHubAccess: suppliedPinsHubAccess, tvMode = false }: AppShellProps) {
   const pinsHubAccess = suppliedPinsHubAccess ?? await getCurrentPinsHubAccess();
 
   if (!pinsHubAccess.access) {
@@ -20,14 +21,14 @@ export async function AppShell({ children, pinsHubAccess: suppliedPinsHubAccess 
       <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
         <Galaxy mouseRepulsion={false} mouseInteraction={false} density={0.7} glowIntensity={0.16} saturation={0} hueShift={140} twinkleIntensity={0.15} rotationSpeed={0.03} starSpeed={0.2} speed={0.4} transparent />
       </div>
-      <div className="relative z-10 flex min-h-screen flex-col md:flex-row">
-        <SidebarNav
+      <div className={`relative z-10 flex min-h-screen flex-col ${tvMode ? "" : "md:flex-row"}`}>
+        {!tvMode ? <SidebarNav
           accessLevel={pinsHubAccess.access.access_level}
           organisationRole={pinsHubAccess.membership?.role ?? null}
           userEmail={pinsHubAccess.user?.email ?? null}
-        />
-        <main className="min-w-0 flex-1 px-4 py-4 pt-[4.25rem] sm:px-6 md:pt-4 lg:px-8">
-          <div className="mx-auto flex max-w-6xl flex-col gap-4">
+        /> : null}
+        <main className={`min-w-0 flex-1 ${tvMode ? "h-screen overflow-hidden px-4 py-4 sm:px-6" : "px-4 py-4 pt-[4.25rem] sm:px-6 md:pt-4 lg:px-8"}`}>
+          <div className={`mx-auto flex h-full flex-col gap-4 ${tvMode ? "max-w-none" : "max-w-6xl"}`}>
             {children}
           </div>
         </main>

@@ -14,6 +14,8 @@
   overflow: visible;
 }
 
+.gauge[data-tv="true"] .svg { width: min(100%, 16rem); }
+
 .arcTrack,
 .arcZoneDanger,
 .arcZoneWarning,

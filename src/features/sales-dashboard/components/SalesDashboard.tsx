@@ -20,6 +20,7 @@ import { MonthlyKpiFinals } from "./MonthlyKpiFinals";
 import type { DashboardView } from "../lib/dashboardView";
 import { SnuggleView } from "./SnuggleView";
 import { ProfitPdfReport } from "./ProfitPdfReport";
+import { SalesDashboardTvView } from "./SalesDashboardTvView";
 
 
 const DASHBOARD_TABS = [
@@ -29,7 +30,7 @@ const DASHBOARD_TABS = [
   { value: "snuggle", label: "Snuggle" },
 ];
 
-export function SalesDashboard({ data, year, month, view, member, isAdmin, initialDashboardView }: { data: SalesDashboardData; year: number; month: number; view: "company" | "members"; member?: string; isAdmin: boolean; initialDashboardView: DashboardView }) {
+export function SalesDashboard({ data, year, month, view, member, isAdmin, initialDashboardView, tvMode = false }: { data: SalesDashboardData; year: number; month: number; view: "company" | "members"; member?: string; isAdmin: boolean; initialDashboardView: DashboardView; tvMode?: boolean }) {
   const [activeDashboardView, setActiveDashboardView] = useState<DashboardView>(initialDashboardView);
   const dashboardMetricsRef = useRef<HTMLDivElement>(null);
   const profitReportRef = useRef<HTMLDivElement>(null);
@@ -56,6 +57,8 @@ if (!conversionRateMetric) {
     setActiveDashboardView((currentView) => currentView === nextView ? currentView : nextView);
   }, []);
   const exportTitle = `Pins Sales Metrics — ${DASHBOARD_MONTHS[month - 1]} ${year} — ${activeDashboardView === "year-comparison" ? "Year Comparison" : activeDashboardView === "ytd" ? "YTD" : "Overview"}`;
+
+  if (tvMode) return <MetricDashboardProvider><SalesDashboardTvView data={data} year={year} month={month} view={view} member={member} companyMetrics={companyMetrics} monthlyProfitMetric={monthlyProfitMetric} /></MetricDashboardProvider>;
 
   return <MetricDashboardProvider><div className="grid gap-3">
     <Panel><div className="flex flex-wrap items-end gap-3">

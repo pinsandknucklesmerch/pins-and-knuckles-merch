@@ -12,6 +12,9 @@ type RevGaugeProps = {
   format: "currency" | "number" | "percent";
   label?: string;
   interactive?: boolean;
+  animationKey?: string | number;
+  animationDelayMs?: number;
+  tvMode?: boolean;
 };
 
 const START_ANGLE = -120;
@@ -82,14 +85,16 @@ function usePrefersReducedMotion() {
   return prefersReducedMotion;
 }
 
-export function RevGauge({ value, target, max, progress, format, label, interactive = true }: RevGaugeProps) {
+export function RevGauge({ value, target, max, progress, format, label, interactive = true, animationKey, animationDelayMs = 0, tvMode = false }: RevGaugeProps) {
   const valueRatio = clampRatio(value / max);
   const targetRatio = clampRatio(target / max);
   const needleAngle = START_ANGLE + valueRatio * (END_ANGLE - START_ANGLE);
   const prefersReducedMotion = usePrefersReducedMotion();
-  const [renderedAngle, setRenderedAngle] = useState(interactive ? START_ANGLE : needleAngle);
-  const renderedAngleRef = useRef(START_ANGLE);
+  const [renderedAngle, setRenderedAngle] = useState(interactive || animationKey !== undefined ? START_ANGLE : needleAngle);
+  const renderedAngleRef = useRef(interactive || animationKey !== undefined ? START_ANGLE : needleAngle);
   const animationFrameRef = useRef<number | null>(null);
+  const animationTimerRef = useRef<number | null>(null);
+  const previousAnimationKeyRef = useRef(animationKey);
   const targetAngle = START_ANGLE + targetRatio * (END_ANGLE - START_ANGLE);
   const targetInner = pointAt(targetAngle, ARC_RADIUS - 6);
   const targetOuter = pointAt(targetAngle, ARC_RADIUS + 9);
@@ -100,8 +105,9 @@ export function RevGauge({ value, target, max, progress, format, label, interact
 
   const startNeedleAnimation = useCallback((fromAngle: number, destinationAngle: number) => {
     if (animationFrameRef.current !== null) cancelAnimationFrame(animationFrameRef.current);
+    if (animationTimerRef.current !== null) window.clearTimeout(animationTimerRef.current);
 
-    if (!interactive || prefersReducedMotion) {
+    if ((!interactive && animationKey === undefined) || prefersReducedMotion) {
       renderedAngleRef.current = destinationAngle;
       setRenderedAngle(destinationAngle);
       animationFrameRef.current = null;
@@ -133,16 +139,30 @@ export function RevGauge({ value, target, max, progress, format, label, interact
       }
     };
 
-    animationFrameRef.current = requestAnimationFrame(animate);
+    const startFrame = () => {
+      animationFrameRef.current = requestAnimationFrame(animate);
+      animationTimerRef.current = null;
+    };
+    if (animationDelayMs > 0) animationTimerRef.current = window.setTimeout(startFrame, animationDelayMs);
+    else startFrame();
     return () => {
       if (animationFrameRef.current !== null) cancelAnimationFrame(animationFrameRef.current);
+      if (animationTimerRef.current !== null) window.clearTimeout(animationTimerRef.current);
       animationFrameRef.current = null;
+      animationTimerRef.current = null;
     };
-  }, [interactive, prefersReducedMotion]);
+  }, [animationDelayMs, animationKey, interactive, prefersReducedMotion]);
 
   useEffect(() => {
+    const shouldReplay = animationKey !== undefined && previousAnimationKeyRef.current !== animationKey;
+    previousAnimationKeyRef.current = animationKey;
+    if (shouldReplay) {
+      renderedAngleRef.current = START_ANGLE;
+      setRenderedAngle(START_ANGLE);
+      return startNeedleAnimation(START_ANGLE, needleAngle);
+    }
     return startNeedleAnimation(renderedAngleRef.current, needleAngle);
-  }, [max, needleAngle, startNeedleAnimation, value]);
+  }, [animationKey, max, needleAngle, startNeedleAnimation, value]);
 
   const replayNeedle = useCallback(() => {
     if (!interactive || prefersReducedMotion) return;
@@ -156,6 +176,7 @@ export function RevGauge({ value, target, max, progress, format, label, interact
       className={styles.gauge}
       data-status={status}
       data-interactive={interactive ? "true" : "false"}
+      data-tv={tvMode ? "true" : "false"}
       role="img"
       tabIndex={interactive ? 0 : undefined}
       onPointerEnter={interactive && !prefersReducedMotion ? replayNeedle : undefined}

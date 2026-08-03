@@ -4,6 +4,8 @@
   padding: var(--sales-kpi-card-padding);
 }
 
+.tvCard { min-height: 25rem; }
+
 .title,
 .metricLabel {
   color: hsl(var(--muted-foreground));
