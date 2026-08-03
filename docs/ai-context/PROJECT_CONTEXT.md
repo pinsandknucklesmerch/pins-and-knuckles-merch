@@ -105,6 +105,12 @@ Repository migrations:
   - Forward-only restoration of the missing EPCC ingestion table and service-role-only RPC.
 - `20260728130000_add_epcc_profit_ingestion_audit_reader.sql`
   - Service-role-only metadata audit RPC for EPCC ingestion reconciliation; it returns no message, sender, subject, or source-hash values.
+- `20260731100000_add_member_kpi_source_isolation.sql`
+  - Adds source-isolated member KPI fields, classifications, and the EPCC member-ingestion RPC.
+- `20260731110000_backfill_epcc_members_and_grant_monday_member_sync.sql`
+  - Safely backfills missing EPCC member fields for an accepted duplicate report and grants the direct member-table rights required by the Monday service-role sync.
+- `20260803100000_add_sales_kpi_month_final_values.sql`
+  - Adds independent admin-only month-end final values for Profit, PK Tax, Quotes Done, and Orders Processed. Final values are stored separately from source-owned calculated fields with the last editor and timestamp; no calculated values are backfilled or overwritten.
 
 Generated database types are present at `src/types/database.types.ts`.
 
@@ -119,7 +125,8 @@ Verified 2026-07-28 against the linked Supabase project:
 - Regenerated remote types still differ from `src/types/database.types.ts` because the remote has an additional `sales_kpi_profit_email_sources` table not represented in repository migrations. Repository types were intentionally not replaced pending separate review of that unrelated drift.
 - `sales_kpi_profit_email_sources` is unused by current application code, scripts, RPCs, and documentation, but contains one historical source-metadata row. It is retained temporarily because ownership and retention requirements are unconfirmed; no reconciliation migration was applied and generated types remain deferred.
 - Sales KPI tables, Monday snapshot/profit-source fields, and admin-gated RLS policies were confirmed remotely.
-- Vercel production verification on 2026-07-28 found the intended project linked and a current active deployment Ready. All required Production variable names are present, including Gmail OAuth, report-address, service-role, Monday, public Supabase, and cron-secret variables. The deployed cron route and `0 10 * * *` schedule are present, and unauthenticated probes return 401 before apply mode. The deployment follows the EPCC hardening/audit-reader revision; no authenticated cron execution was manually triggered.
+- Vercel production verification on 2026-07-28 found the intended project linked and a current active deployment Ready. All required Production variable names were present, including Gmail OAuth, report-address, service-role, Monday, public Supabase, and cron-secret variables. This evidence predates the 2026-07-31 member-KPI migrations and must not be treated as confirmation that the latest revision is deployed.
+- Release verification on 2026-08-03 confirmed remote migration history includes `20260731100000` and `20260731110000`. The latest Ready production deployment was created 2026-07-31 at 15:28 SAST, immediately after commit `709afa1`, and its inspected build contains both cron routes with the repository's `08:05 UTC` EPCC and `08:15 UTC` Monday schedules. Vercel inspection did not expose a Git SHA, so the exact deployed revision is not cryptographically confirmed.
 
 ## Production Integration Verification
 
@@ -127,8 +134,9 @@ Verified 2026-07-28 using read-only/dry-run checks only; no live writes were per
 
 - Monday: required local server-side configuration is present. The API is reachable and the July 2026 dry-run resolved an accessible monthly board, its expected columns and weekly groups, and a safe planned snapshot with no writes. Monday's sync command is dry-run by default; writes require explicit `--apply`, a single month, `--year 2025`, and `--force`, so it cannot currently write 2026 snapshots.
 - EPCC Gmail: Gmail OAuth and parsing succeeded for the bounded July 2026 report. The existing conflicting KPI value had no tracked ingestion record; after metadata-only audit verification, one approved report was applied and a duplicate rerun was a no-op. July profit is now EPCC-sourced, while Monday quote/order fields were preserved. The audit reader is service-role-only and returns no message, sender, subject, or source-hash values.
-- Cron and service role: `vercel.json` schedules `GET /api/cron/epcc-profit` daily at `0 10 * * *`; the current production deployment includes the route and schedule, has all required Production variable names, and unauthenticated probes return 401. The authenticated route has not been manually invoked.
-- Remaining action: monitor the first scheduled cron result and its EPCC ingestion audit outcome; do not manually trigger it solely for verification.
+- Cron and service role: the 2026-07-28 deployment check confirmed the EPCC route and unauthenticated `401` behaviour. The 2026-08-03 authorised route validation is recorded below.
+- Remaining action: monitor the first normally scheduled cron result and its EPCC ingestion audit outcome; no further manual trigger is needed solely for verification.
+- Authorised live validation on 2026-08-03 invoked EPCC first and Monday second. EPCC returned `duplicate_member_backfill_not_needed` for August; Monday returned `updated` with `quotesDone=4` and `ordersProcessed=1`. The resulting August company row retained EPCC-owned `monthly_profit=358.80` and `monthly_profit_source=epcc_email`, while Monday wrote its own snapshot metadata and quote/order fields. A bounded July EPCC rerun was also `duplicate_member_backfill_not_needed`, with zero reconciliation differences and no change to July's Monday-owned fields.
 
 ## Current Routes
 
@@ -191,7 +199,7 @@ There is no active `/test` route.
 
 ### Scheduled Operations / Deliberately Deferred
 
-- The repository Vercel configuration schedules EPCC/Gmail independently at `10:00` daily through `/api/cron/epcc-profit`, then Monday 15 minutes later at `10:15` through `/api/cron/monday-sales-sync`. Both routes require constant-time Bearer `CRON_SECRET` authentication and fail independently.
+- Current repository `vercel.json` schedules EPCC/Gmail at `08:05 UTC` daily through `/api/cron/epcc-profit`, then Monday at `08:15 UTC` through `/api/cron/monday-sales-sync`. Both routes require constant-time Bearer `CRON_SECRET` authentication and fail independently. Confirm this schedule is deployed; earlier context recorded a different production schedule.
 - The Monday cron is restricted to the UTC current month and the Pins & Knuckles organisation. It uses a database-backed per-organisation/month lock, validates the selected board, writes source-isolated member quote/order patches, and cannot accept query-string period overrides. Its temporary daily cadence remains in place only until the Vercel plan supports a more frequent approved schedule.
 - Monday owns `quotes_done` and `orders_processed`; it owns profit only through June 2026. From July 2026 onward the Monday payload omits both profit fields, leaving EPCC/NetSuite as the sole profit source.
 - The manual Monday CLI remains dry-run by default. A 2025 apply requires one month and `--force`; a 2026 apply additionally requires the explicit matching reviewed scope (`--reviewed-year` and `--reviewed-month`). This is bounded one-month-only support, not a historical/range sync path.
@@ -206,6 +214,12 @@ There is no active `/test` route.
 - Normal account-manager members are Hardus, Justin, and Bux. Shannon and Johan are stored as `admin_hidden`. The `other_non_dashboard` reconciliation identity is administrator/internal-only.
 - Seth maps only to `other_non_dashboard`. His source name may appear in protected source metadata for reconciliation, but he is never a canonical member identity or PK Tax recipient.
 - EPCC member ingestion is gated on the sum of all salesperson subtotals matching both report profit and PK Tax grand totals. Customer and order details are never stored in member source metadata.
+
+### Month-End Final Values
+
+- Company KPI final values are optional, independent rows keyed by organisation, year, month, and KPI code. A final value is effective for dashboard metrics, comparisons, progress, and YTD only while present; clearing it immediately restores the calculated source value.
+- Calculated Profit and PK Tax remain EPCC-owned; calculated Quotes Done and Orders Processed remain Monday-owned. Their ingestion payloads do not reference the final-value table and cannot overwrite final values.
+- Only Pins Hub administrators can set, edit, or clear a final value. The row records `updated_by` and `updated_at`; zero is valid, while Quotes Done and Orders Processed must be whole numbers.
 
 ### Confirmed Monday Reporting Rules
 
@@ -230,12 +244,21 @@ The committed read-only audit was generated 2026-07-21 and covers January–July
 - From July 2026 onward, Monday's database payload contains only the row identity, `quotes_done`, `orders_processed`, and `monday_sync_metadata`. It omits `monthly_profit`, `monthly_profit_source`, Scope B metric fields, and `data_source`, so EPCC profit provenance is preserved on updates.
 - Reporting-date audit metadata records `dateSourceCounts` for `date_in_touch` and `created_at_fallback` so fallback use is visible on each Monday snapshot.
 - Week 3 Batch 4 dry-run and bounded apply (2026-07-28): the canonical July board was `18420001220`; the organisation-owned July KPI row was selected and updated with `quotes_done=249` and `orders_processed=141`. The reviewed run had no missing, malformed, or cross-month reporting dates; its current source count was `249` Date In Touch and `0` creation fallbacks. Its existing profit remained `116494.08` with source `epcc_email`, outside the Monday payload.
-- The exact bounded July apply was rerun once. Quotes/orders and EPCC profit fields remained stable; only intended Monday snapshot metadata was refreshed. The sync does not write member KPI rows or other company months.
-- The temporary daily cadence is configured pending deployment; historical reconciliation, board rollover handling, failure alerts, retained audits, and a future approved higher-frequency cadence remain outstanding.
+- The exact bounded July apply was rerun once. Quotes/orders and EPCC profit fields remained stable; only intended Monday snapshot metadata was refreshed. This predated the 2026-07-31 member-KPI change; the 2026-08-03 August validation confirmed the current Monday cron writes source-isolated member quote/order patches.
+- The temporary daily cadence is active on the latest inspected deployment; historical reconciliation, board rollover handling, failure alerts, retained audits, and a future approved higher-frequency cadence remain outstanding.
+
+### Week Ending 2026-08-02 Audit
+
+- Committed work on 2026-07-30 and 2026-07-31 completed the weighted PK Tax allocation/export rules, source-isolated member KPI ingestion, source-safe duplicate EPCC backfill, Monday member sync permissions, YTD dashboard reporting, responsive navigation, and shared toast feedback.
+- The calculator, delivery-helper, UK Trade, invoice, garment, and Product Type changes in this period were UI/action-feedback standardisation only; calculator pricing formulas were not changed.
+- The working tree was clean at audit time. Local verification passed: `npm run lint`, `npx tsc --noEmit`, `npm run build`, and 28 targeted Node tests.
+- The 2026-07-31 migrations and current cron routes were not yet confirmed in production at the time of this audit; the 2026-08-03 release validation below supersedes that status.
+- The 2026-08-03 authorised release validation confirmed the migrations, configured schedules, required encrypted Production variable names, and both cron routes. The exact Vercel Git SHA remains unavailable from deployment inspection.
+- A bounded July 2026 Monday dry-run now proposes `quotes_done=302` and `orders_processed=181`, versus persisted `301` and `178`. Do not apply it until the changed source data has been reviewed; it is not an idempotent rerun.
 
 ### Next Recommended Step
 
-Verify production deployment/configuration for the Monday sync and EPCC Gmail ingestion, then validate the persisted KPI output before operational use.
+Review the changed July Monday source data before any bounded July apply: the latest dry-run proposes 302 quotes and 181 orders, not the persisted 301 and 178. Continue monitoring the first normally scheduled EPCC/Monday cycle and add failure-alert/retained-audit operations.
 
 ## Calculator Status
 
@@ -373,9 +396,11 @@ npm run build
 
 ## Next Recommended Work
 
-1. Verify the Monday sync and EPCC Gmail ingestion in production configuration before operational use.
-2. Replace or explicitly bound the sales-dashboard fixture fallback as persistent historical KPI coverage is confirmed.
-3. Design admin-only calculator reference-data editing after read-only calculator flows are stable.
+1. Deploy and validate the 2026-07-31 member-KPI migrations and scheduled EPCC/Monday release; confirm source ownership is preserved on persisted rows.
+2. Reconcile `vercel.json`, deployed cron schedules, and operational documentation; current repository schedules are `08:05 UTC` EPCC and `08:15 UTC` Monday.
+3. Replace or explicitly bound the sales-dashboard fixture fallback as persistent historical KPI coverage is confirmed.
+4. Run approved real-world calculator and commercial-invoice export parity cases before changing pricing/reference data.
+5. Design admin-only calculator reference-data editing after read-only calculator flows are stable.
 # Feedback standardisation
 
 Operational mutations, exports, and clipboard actions use shared Sonner feedback; field, calculator, invoice, access, and route-level validation remains inline.

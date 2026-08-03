@@ -1,12 +1,13 @@
-import type { CompanyKpiMonth, YearToDateData } from "./types.ts";
+import { effectiveCompanyKpiValue, type CompanyKpiMonth, type YearToDateData } from "./types.ts";
 
 const roundCurrency = (value: number) => Math.round((value + Number.EPSILON) * 100) / 100;
 
 export function calculateYearToDate(year: number, cutoffMonth: number, rows: Array<CompanyKpiMonth | null>, monthlyTargets: Array<number | null>): YearToDateData {
   const includedMonths = Array.from({ length: cutoffMonth }, (_, index) => index + 1);
   const byMonth = new Map(rows.filter((row): row is CompanyKpiMonth => Boolean(row)).map((row) => [row.month, row]));
-  const missingMonths = includedMonths.filter((month) => byMonth.get(month)?.monthlyProfit === null || !byMonth.has(month));
-  const actuals = includedMonths.map((month) => byMonth.get(month)?.monthlyProfit ?? null);
+  const monthlyProfit = (month: number) => { const row = byMonth.get(month); return row ? effectiveCompanyKpiValue(row, "MONTHLY_PROFIT") : null; };
+  const missingMonths = includedMonths.filter((month) => monthlyProfit(month) === null);
+  const actuals = includedMonths.map(monthlyProfit);
   const availableActuals = actuals.filter((value): value is number => value !== null);
   const targets = Array.from({ length: 12 }, (_, index) => monthlyTargets[index] ?? null);
   const ytdTargets = targets.slice(0, cutoffMonth);

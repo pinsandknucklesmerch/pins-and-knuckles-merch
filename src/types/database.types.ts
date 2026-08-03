@@ -755,8 +755,8 @@ export type Database = {
           epcc_source_metadata: Json | null
           id: string
           member_classification: string
-          month: number
           monday_source_metadata: Json | null
+          month: number
           orders_processed: number | null
           organisation_id: string | null
           pk_tax: number | null
@@ -777,8 +777,8 @@ export type Database = {
           epcc_source_metadata?: Json | null
           id?: string
           member_classification?: string
-          month: number
           monday_source_metadata?: Json | null
+          month: number
           orders_processed?: number | null
           organisation_id?: string | null
           pk_tax?: number | null
@@ -799,8 +799,8 @@ export type Database = {
           epcc_source_metadata?: Json | null
           id?: string
           member_classification?: string
-          month?: number
           monday_source_metadata?: Json | null
+          month?: number
           orders_processed?: number | null
           organisation_id?: string | null
           pk_tax?: number | null
@@ -862,6 +862,54 @@ export type Database = {
             columns: ["organisation_id"]
             isOneToOne: false
             referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_kpi_month_final_values: {
+        Row: {
+          final_value: number
+          id: string
+          metric_code: string
+          month: number
+          organisation_id: string | null
+          updated_at: string
+          updated_by: string | null
+          year: number
+        }
+        Insert: {
+          final_value: number
+          id?: string
+          metric_code: string
+          month: number
+          organisation_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          year: number
+        }
+        Update: {
+          final_value?: number
+          id?: string
+          metric_code?: string
+          month?: number
+          organisation_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_kpi_month_final_values_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_kpi_month_final_values_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

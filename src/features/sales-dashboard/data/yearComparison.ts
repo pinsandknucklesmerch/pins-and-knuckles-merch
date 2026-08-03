@@ -1,5 +1,5 @@
 import { calculateConversionRate } from "../domain/calculateDashboardKpis.ts";
-import type { CompanyKpiMonth, YearComparisonData, YearComparisonMetric, YearComparisonPoint } from "../domain/types.ts";
+import { effectiveCompanyKpiValue, type CompanyKpiMonth, type YearComparisonData, type YearComparisonMetric, type YearComparisonPoint } from "../domain/types.ts";
 
 const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
 
@@ -7,13 +7,13 @@ function point(month: CompanyKpiMonth): YearComparisonPoint {
   return {
     month: month.month,
     label: MONTH_LABELS[month.month - 1],
-    monthlyProfit: month.monthlyProfit,
-    quotesDone: month.quotesDone,
-    ordersProcessed: month.ordersProcessed,
+    monthlyProfit: effectiveCompanyKpiValue(month, "MONTHLY_PROFIT"),
+    quotesDone: effectiveCompanyKpiValue(month, "QUOTES_DONE"),
+    ordersProcessed: effectiveCompanyKpiValue(month, "ORDERS_PROCESSED"),
     // No distinct company-level Leads field exists in the canonical dashboard model.
     leads: null,
     converted: month.converted,
-    conversionRate: calculateConversionRate(month.ordersProcessed, month.quotesDone),
+    conversionRate: calculateConversionRate(effectiveCompanyKpiValue(month, "ORDERS_PROCESSED"), effectiveCompanyKpiValue(month, "QUOTES_DONE")),
     salesInboxEnquiries: month.salesInboxEnquiries,
     salesInboxConversionRate: calculateConversionRate(month.converted, month.salesInboxEnquiries),
   };

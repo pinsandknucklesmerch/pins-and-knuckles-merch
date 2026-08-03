@@ -1,15 +1,18 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database.types";
 import { historicalSalesDashboardFixture } from "./workbookFixture";
-import { buildDashboardData, getFixtureCompanyMonth, mapCompanyRow, mapMemberRow, mapMonthlyProfitTargets, mapTargets } from "./mappers";
-import type { SalesDashboardData, SalesKpiTargets } from "../domain/types";
+import { buildDashboardData, getFixtureCompanyMonth, mapCompanyRow, mapFinalValues, mapMemberRow, mapMonthlyProfitTargets, mapTargets } from "./mappers";
+import type { FinalisableSalesKpiCode, SalesDashboardData, SalesKpiTargets } from "../domain/types";
 import { getSalesDashboardQueryPlan, type DashboardView } from "../lib/queryPlan";
+import { calculateYearToDate } from "../domain/calculateYearToDate";
+import { buildYearComparison } from "./yearComparison";
 
 type TargetInsert = Database["public"]["Tables"]["sales_kpi_targets"]["Insert"];
 const QUERY_TIMEOUT_MS = 10_000;
 const COMPANY_COLUMNS = "organisation_id,year,month,monthly_profit,monthly_profit_source,quotes_done,orders_processed,sales_inbox_enquiries,converted,monday_sync_metadata,notes,data_source";
 const MEMBER_COLUMNS = "organisation_id,year,month,team_member_key,team_member_name,member_classification,quotes_done,orders_processed,sales_inbox_enquiries,converted,profit,pk_tax,snuggle_profit,monday_source_metadata,epcc_source_metadata,data_source";
 const TARGET_COLUMNS = "organisation_id,metric_code,target_value,effective_from,effective_to,is_active";
+const FINAL_COLUMNS = "organisation_id,year,month,metric_code,final_value,updated_at,updated_by";
 
 function organisationFilter(organisationId: string | null) {
   return organisationId ? `organisation_id.is.null,organisation_id.eq.${organisationId}` : "organisation_id.is.null";
@@ -28,7 +31,7 @@ export async function loadSalesDashboard(
   const companyPromise = plan.fetchCompany
     ? supabase.from("sales_kpi_months").select(COMPANY_COLUMNS).or(scope).in("year", plan.companyYears).eq("month", month).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS))
     : Promise.resolve({ data: [], error: null });
-  const memberPromise = plan.fetchMembers
+  const memberPromise = (plan.fetchMembers || view === "company")
     ? supabase.from("sales_kpi_member_months").select(MEMBER_COLUMNS).or(scope).in("year", [year, year - 1]).eq("month", month).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS))
     : Promise.resolve({ data: [], error: null });
   const trendPromise = view === "company"
@@ -37,14 +40,16 @@ export async function loadSalesDashboard(
   const targetPromise = plan.fetchTargets
     ? supabase.from("sales_kpi_targets").select(TARGET_COLUMNS).or(scope).eq("is_active", true).lte("effective_from", `${year}-12-31`).or(`effective_to.is.null,effective_to.gte.${year}-01-01`).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS))
     : Promise.resolve({ data: [], error: null });
-  const [companyResult, memberResult, trendResult, targetResult, yearResult] = await Promise.all([
+  const finalPromise = supabase.from("sales_kpi_month_final_values").select(FINAL_COLUMNS).or(scope).in("year", [year, year - 1]).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
+  const [companyResult, memberResult, trendResult, targetResult, yearResult, finalResult] = await Promise.all([
     companyPromise,
     memberPromise,
     trendPromise,
     targetPromise,
     supabase.from("sales_kpi_months").select("year").or(scope).limit(1000).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS)),
+    finalPromise,
   ]);
-  const errors = [companyResult.error, memberResult.error, trendResult.error, targetResult.error, yearResult.error].filter(Boolean);
+  const errors = [companyResult.error, memberResult.error, trendResult.error, targetResult.error, yearResult.error, finalResult.error].filter(Boolean);
   const companyRows = companyResult.data ?? [];
   const memberRows = memberResult.data ?? [];
   const trendRows = trendResult.data ?? [];
@@ -69,7 +74,7 @@ export async function loadSalesDashboard(
   const company = chooseCompany(year);
   const previousCompany = chooseCompany(year - 1);
   const targetRows = targetResult.data ?? [];
-  return buildDashboardData({
+  const result = buildDashboardData({
     companyRow: company ? mapCompanyRow(company) : null,
     previousCompanyRow: previousCompany ? mapCompanyRow(previousCompany) : null,
     trendCurrent: trendYear(year), trendPrevious: trendYear(year - 1),
@@ -80,6 +85,37 @@ export async function loadSalesDashboard(
     availableYears: Array.from(new Set([...fixtureYears, ...databaseYears, year])).sort((a, b) => b - a),
     setupIssue: errors.length ? "Persistent KPI data is unavailable. Historical data is shown." : null,
   });
+  const finalsFor = (selectedYear: number, selectedMonth: number) => {
+    const rows = (finalResult.data ?? []).filter((row) => row.year === selectedYear && row.month === selectedMonth);
+    const own = rows.filter((row) => row.organisation_id === organisationId);
+    return mapFinalValues(own.length ? own : rows.filter((row) => row.organisation_id === null));
+  };
+  const sumPkTax = (rows: ReturnType<typeof chooseMembers>) => {
+    const values = rows.map((row) => row.pkTax).filter((value): value is number => value !== null);
+    return values.length ? values.reduce((total, value) => total + value, 0) : null;
+  };
+  const companyYear = result.companyYear.map((row) => ({ ...row, finalValues: finalsFor(row.year, row.month) }));
+  const previousCompanyYear = trendYear(year - 1).map((row) => ({ ...row, finalValues: finalsFor(row.year, row.month) }));
+  const currentCompany = { ...result.company, monthlyPkTax: sumPkTax(chooseMembers(year)), finalValues: finalsFor(year, month) };
+  const priorCompany = result.previousCompany ? { ...result.previousCompany, monthlyPkTax: sumPkTax(chooseMembers(year - 1)), finalValues: finalsFor(year - 1, month) } : null;
+  return {
+    ...result,
+    company: currentCompany,
+    previousCompany: priorCompany,
+    companyYear,
+    yearComparison: buildYearComparison(year, companyYear, previousCompanyYear),
+    yearToDate: calculateYearToDate(year, month, companyYear, mapMonthlyProfitTargets(targetRows, organisationId, year)),
+  };
+}
+
+export async function saveSalesKpiMonthFinalValue(input: { organisationId: string; userId: string; year: number; month: number; metricCode: FinalisableSalesKpiCode; value: number }) {
+  const supabase = await createClient();
+  return supabase.from("sales_kpi_month_final_values").upsert({ organisation_id: input.organisationId, updated_by: input.userId, year: input.year, month: input.month, metric_code: input.metricCode, final_value: input.value }, { onConflict: "organisation_id,year,month,metric_code" });
+}
+
+export async function clearSalesKpiMonthFinalValue(input: { organisationId: string; year: number; month: number; metricCode: FinalisableSalesKpiCode }) {
+  const supabase = await createClient();
+  return supabase.from("sales_kpi_month_final_values").delete().eq("organisation_id", input.organisationId).eq("year", input.year).eq("month", input.month).eq("metric_code", input.metricCode);
 }
 
 export async function upsertSalesKpiTargets(targets: Required<SalesKpiTargets>, organisationId: string, effectiveFrom: string) {
