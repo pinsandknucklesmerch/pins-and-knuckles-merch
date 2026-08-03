@@ -18,11 +18,13 @@ import { YearToDateView } from "./YearToDateView";
 import { ExportMetricsButton } from "./ExportMetricsButton";
 import { MonthlyKpiFinals } from "./MonthlyKpiFinals";
 import type { DashboardView } from "../lib/dashboardView";
+import { SnuggleView } from "./SnuggleView";
 
 const DASHBOARD_TABS = [
   { value: "overview", label: "Overview" },
   { value: "ytd", label: "YTD" },
   { value: "year-comparison", label: "Year Comparison" },
+  { value: "snuggle", label: "Snuggle" },
 ];
 
 export function SalesDashboard({ data, year, month, view, member, isAdmin, initialDashboardView }: { data: SalesDashboardData; year: number; month: number; view: "company" | "members"; member?: string; isAdmin: boolean; initialDashboardView: DashboardView }) {
@@ -35,7 +37,7 @@ export function SalesDashboard({ data, year, month, view, member, isAdmin, initi
     { year, month, view, member },
   ), [data.company, companyMetrics, year, month, view, member]);
   const changeDashboardView = useCallback((value: string) => {
-    const nextView: DashboardView = value === "year-comparison" ? "year-comparison" : value === "ytd" ? "ytd" : "overview";
+    const nextView: DashboardView = value === "year-comparison" ? "year-comparison" : value === "ytd" ? "ytd" : value === "snuggle" ? "snuggle" : "overview";
     setActiveDashboardView((currentView) => currentView === nextView ? currentView : nextView);
   }, []);
   const exportTitle = `Pins Sales Metrics — ${DASHBOARD_MONTHS[month - 1]} ${year} — ${activeDashboardView === "year-comparison" ? "Year Comparison" : activeDashboardView === "ytd" ? "YTD" : "Overview"}`;
@@ -58,10 +60,8 @@ export function SalesDashboard({ data, year, month, view, member, isAdmin, initi
     </div></Panel>
     <div ref={dashboardMetricsRef} data-testid="sales-dashboard-export-content" className="grid gap-3">
       {data.setupIssue ? <p role="alert" className="text-sm text-destructive">{data.setupIssue}</p> : null}
-      {view === "company" ? <>
-        <DashboardNav tabs={DASHBOARD_TABS} value={activeDashboardView} onChange={changeDashboardView} mode="tabs" />
-        {activeDashboardView === "overview" ? <CompanyKpiView current={data.company} metrics={companyMetrics} /> : activeDashboardView === "ytd" ? <YearToDateView data={data.yearToDate} /> : <YearComparisonChart comparison={data.yearComparison} />}
-      </> : data.members.length ? <TeamMemberKpiView rows={data.members} selectedKey={member} query={{ year, month }} /> : <EmptyState title="No team member data" />}
+      <DashboardNav tabs={DASHBOARD_TABS} value={activeDashboardView} onChange={changeDashboardView} mode="tabs" />
+      {activeDashboardView === "snuggle" ? <SnuggleView data={data.snuggle} year={year} month={month} view={view} member={member} /> : view === "company" ? <>{activeDashboardView === "overview" ? <CompanyKpiView current={data.company} metrics={companyMetrics} /> : activeDashboardView === "ytd" ? <YearToDateView data={data.yearToDate} /> : <YearComparisonChart comparison={data.yearComparison} />}</> : data.members.length ? <TeamMemberKpiView rows={data.members} selectedKey={member} query={{ year, month }} /> : <EmptyState title="No team member data" />}
     </div>
   </div></MetricDashboardProvider>;
 }

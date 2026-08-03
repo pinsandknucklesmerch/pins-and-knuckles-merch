@@ -6,6 +6,7 @@ import type { FinalisableSalesKpiCode, SalesDashboardData, SalesKpiTargets } fro
 import { getSalesDashboardQueryPlan, type DashboardView } from "../lib/queryPlan";
 import { calculateYearToDate } from "../domain/calculateYearToDate";
 import { buildYearComparison } from "./yearComparison";
+import { getSnuggleProfit } from "../server/snuggleProfit";
 
 type TargetInsert = Database["public"]["Tables"]["sales_kpi_targets"]["Insert"];
 const QUERY_TIMEOUT_MS = 10_000;
@@ -41,6 +42,7 @@ export async function loadSalesDashboard(
     ? supabase.from("sales_kpi_targets").select(TARGET_COLUMNS).or(scope).eq("is_active", true).lte("effective_from", `${year}-12-31`).or(`effective_to.is.null,effective_to.gte.${year}-01-01`).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS))
     : Promise.resolve({ data: [], error: null });
   const finalPromise = supabase.from("sales_kpi_month_final_values").select(FINAL_COLUMNS).or(scope).in("year", [year, year - 1]).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
+  const snugglePromise = getSnuggleProfit();
   const [companyResult, memberResult, trendResult, targetResult, yearResult, finalResult] = await Promise.all([
     companyPromise,
     memberPromise,
@@ -84,6 +86,7 @@ export async function loadSalesDashboard(
     authoritativeCompanyYear: authoritativeYear, monthlyProfitTargets: mapMonthlyProfitTargets(targetRows, organisationId, year),
     availableYears: Array.from(new Set([...fixtureYears, ...databaseYears, year])).sort((a, b) => b - a),
     setupIssue: errors.length ? "Persistent KPI data is unavailable. Historical data is shown." : null,
+    snuggle: await snugglePromise,
   });
   const finalsFor = (selectedYear: number, selectedMonth: number) => {
     const rows = (finalResult.data ?? []).filter((row) => row.year === selectedYear && row.month === selectedMonth);

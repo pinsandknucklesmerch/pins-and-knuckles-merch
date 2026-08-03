@@ -7,6 +7,7 @@ import { mapMondayMember } from "../domain/memberIdentity.ts";
 import { DEFAULT_SALES_KPI_TARGETS, type CompanyKpiMonth, type FinalisableSalesKpiCode, type MemberDashboardRow, type SalesDashboardData, type SalesKpiMonthFinalValue, type SalesKpiTargets, type TeamMemberKpiMonth } from "../domain/types.ts";
 import { buildYearComparison } from "./yearComparison.ts";
 import { calculateYearToDate } from "../domain/calculateYearToDate.ts";
+import type { SnuggleProfitData } from "../server/snuggleProfit.ts";
 
 type CompanyRow = Pick<Database["public"]["Tables"]["sales_kpi_months"]["Row"], "year" | "month" | "monthly_profit" | "monthly_profit_source" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "monday_sync_metadata" | "notes" | "data_source">;
 type MemberRow = Pick<Database["public"]["Tables"]["sales_kpi_member_months"]["Row"], "year" | "month" | "team_member_key" | "team_member_name" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "profit" | "pk_tax" | "snuggle_profit" | "member_classification" | "monday_source_metadata" | "epcc_source_metadata" | "data_source">;
@@ -79,10 +80,11 @@ export function buildDashboardData(args: {
   fixture: HistoricalSalesDashboardFixture; year: number; month: number; targets: SalesKpiTargets;
   authoritativeCompanyYear?: Array<CompanyKpiMonth | null>; monthlyProfitTargets?: Array<number | null>;
   availableYears: number[]; setupIssue?: string | null;
+  snuggle?: SnuggleProfitData;
 }): SalesDashboardData {
   const fixtureCompany = getFixtureCompanyMonth(args.fixture, args.year, args.month);
   const previousFixture = getFixtureCompanyMonth(args.fixture, args.year - 1, args.month);
   const currentMembers = mergeMemberMonths(args.memberRows, getFixtureMembers(args.fixture, args.year, args.month));
   const previousMembers = mergeMemberMonths(args.previousMemberRows, getFixtureMembers(args.fixture, args.year - 1, args.month));
-  return { company: mergeCompanyMonth(args.companyRow, fixtureCompany), companyYear: args.trendCurrent, previousCompany: mergeCompanyMonth(args.previousCompanyRow, previousFixture), members: buildMemberRows(currentMembers, previousMembers), targets: args.targets, yearToDate: calculateYearToDate(args.year, args.month, args.authoritativeCompanyYear ?? [], args.monthlyProfitTargets ?? Array(12).fill(args.targets.MONTHLY_PROFIT ?? null)), yearComparison: buildYearComparison(args.year, args.trendCurrent, args.trendPrevious), availableYears: args.availableYears, setupIssue: args.setupIssue ?? null };
+  return { company: mergeCompanyMonth(args.companyRow, fixtureCompany), companyYear: args.trendCurrent, previousCompany: mergeCompanyMonth(args.previousCompanyRow, previousFixture), members: buildMemberRows(currentMembers, previousMembers), targets: args.targets, yearToDate: calculateYearToDate(args.year, args.month, args.authoritativeCompanyYear ?? [], args.monthlyProfitTargets ?? Array(12).fill(args.targets.MONTHLY_PROFIT ?? null)), yearComparison: buildYearComparison(args.year, args.trendCurrent, args.trendPrevious), availableYears: args.availableYears, setupIssue: args.setupIssue ?? null, snuggle: args.snuggle ?? { months: [], members: [], warnings: [], error: "Snuggle profit is currently unavailable." } };
 }

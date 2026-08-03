@@ -127,4 +127,5 @@ export type SalesDashboardData = {
   yearComparison: YearComparisonData;
   availableYears: number[];
   setupIssue: string | null;
+  snuggle: import("../server/snuggleProfit").SnuggleProfitData;
 };
