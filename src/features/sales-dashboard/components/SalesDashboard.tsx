@@ -19,6 +19,8 @@ import { ExportMetricsButton } from "./ExportMetricsButton";
 import { MonthlyKpiFinals } from "./MonthlyKpiFinals";
 import type { DashboardView } from "../lib/dashboardView";
 import { SnuggleView } from "./SnuggleView";
+import { ProfitPdfReport } from "./ProfitPdfReport";
+
 
 const DASHBOARD_TABS = [
   { value: "overview", label: "Overview" },
@@ -30,12 +32,19 @@ const DASHBOARD_TABS = [
 export function SalesDashboard({ data, year, month, view, member, isAdmin, initialDashboardView }: { data: SalesDashboardData; year: number; month: number; view: "company" | "members"; member?: string; isAdmin: boolean; initialDashboardView: DashboardView }) {
   const [activeDashboardView, setActiveDashboardView] = useState<DashboardView>(initialDashboardView);
   const dashboardMetricsRef = useRef<HTMLDivElement>(null);
+  const profitReportRef = useRef<HTMLDivElement>(null);
   const companyMetrics = useMemo(() => calculateCompanyMetrics(data.company, data.previousCompany, data.targets), [data.company, data.previousCompany, data.targets]);
-  const exportRows = useMemo(() => buildMetricExportRows(
-    data.company,
-    companyMetrics,
-    { year, month, view, member },
-  ), [data.company, companyMetrics, year, month, view, member]);
+  const monthlyProfitMetric = companyMetrics.find(
+  (metric) => metric.code === "MONTHLY_PROFIT",);
+      if (!monthlyProfitMetric) {
+        throw new Error("Monthly Profit metric is unavailable.");
+      }
+        const exportRows = useMemo(() => buildMetricExportRows(
+          data.company,
+          companyMetrics,
+          { year, month, view, member },
+        ), [data.company, companyMetrics, year, month, view, member]);
+
   const changeDashboardView = useCallback((value: string) => {
     const nextView: DashboardView = value === "year-comparison" ? "year-comparison" : value === "ytd" ? "ytd" : value === "snuggle" ? "snuggle" : "overview";
     setActiveDashboardView((currentView) => currentView === nextView ? currentView : nextView);
@@ -55,7 +64,15 @@ export function SalesDashboard({ data, year, month, view, member, isAdmin, initi
       <div data-testid="sales-dashboard-actions" className="flex flex-wrap items-center gap-3">
         {isAdmin ? <ManualKpiEntry year={year} month={month} targets={data.targets} /> : null}
         {view === "company" && isAdmin ? <MonthlyKpiFinals metrics={companyMetrics} year={year} month={month} isAdmin={isAdmin} /> : null}
-        <ExportMetricsButton rows={exportRows} targetRef={dashboardMetricsRef} title={exportTitle} />
+
+        <ExportMetricsButton
+          rows={exportRows}
+          targetRef={dashboardMetricsRef}
+          profitTargetRef={profitReportRef}
+          title={exportTitle}
+          profitTitle={`Pins Profit Report — ${DASHBOARD_MONTHS[month - 1]} ${year}`}
+        />
+
       </div>
     </div></Panel>
     <div ref={dashboardMetricsRef} data-testid="sales-dashboard-export-content" className="grid gap-3">
@@ -63,5 +80,20 @@ export function SalesDashboard({ data, year, month, view, member, isAdmin, initi
       <DashboardNav tabs={DASHBOARD_TABS} value={activeDashboardView} onChange={changeDashboardView} mode="tabs" />
       {activeDashboardView === "snuggle" ? <SnuggleView data={data.snuggle} year={year} month={month} view={view} member={member} /> : view === "company" ? <>{activeDashboardView === "overview" ? <CompanyKpiView current={data.company} metrics={companyMetrics} /> : activeDashboardView === "ytd" ? <YearToDateView data={data.yearToDate} /> : <YearComparisonChart comparison={data.yearComparison} />}</> : data.members.length ? <TeamMemberKpiView rows={data.members} selectedKey={member} query={{ year, month }} /> : <EmptyState title="No team member data" />}
     </div>
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed left-[-12000px] top-0 w-[1100px]"
+    >
+      <div ref={profitReportRef}>
+        <ProfitPdfReport
+          year={year}
+          month={month}
+          monthlyProfitMetric={monthlyProfitMetric}
+          yearToDate={data.yearToDate}
+          yearComparison={data.yearComparison}
+        />
+      </div>
+    </div>
+    
   </div></MetricDashboardProvider>;
 }
