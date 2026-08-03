@@ -1,10 +1,10 @@
 "use client";
 
 import { Surface } from "@/components/ui/Surface";
-import { BulletChart } from "metricui";
 import type { MetricResult } from "../domain/types";
 import { formatPercentagePoints, previousYearComparisonState, targetBullet } from "../lib/metricDisplay";
 import { ComparisonBadge } from "./ComparisonBadge";
+import { RevGauge } from "./RevGauge";
 import styles from "./CombinedKpiCard.module.css";
 
 function value(metric: MetricResult) {
@@ -31,26 +31,13 @@ function KpiSection({ metric, divided, className }: { metric: MetricResult; divi
       {metricTarget ? (
         <div className={styles.target}>
           <div className={styles.targetRow}><span>Target {metricTarget.display}</span><span>{metric.targetProgress?.toFixed(1)}%</span></div>
-          <BulletChart
-            data={[{
-              id: metric.code,
-              title: null,
-              ranges: [metricTarget.bullet.max],
-              measures: [metricTarget.bullet.value],
-              markers: [metricTarget.bullet.target],
-            }]}
-            format={metric.format === "percent" ? { style: "percent", precision: 1 } : { style: "number", compact: false, precision: 0 }}
-            height={28}
-            layout="horizontal"
-            spacing={0}
-            rangeColors={["hsl(var(--border))"]}
-            measureColors={[metricTarget.bullet.measureColor]}
-            markerColors={["hsl(var(--foreground))"]}
-            measureSize={0.5}
-            markerSize={0.85}
-            showAxis={false}
-            animate
-            className={styles.bullet}
+          <RevGauge
+            value={metricTarget.bullet.value}
+            target={metricTarget.bullet.target}
+            max={metricTarget.bullet.max}
+            progress={metricTarget.progress}
+            format={metric.format}
+            label={metric.label}
           />
         </div>
       ) : null}

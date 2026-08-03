@@ -1,0 +1,87 @@
+.gauge {
+  --gauge-danger: #d9474b;
+  --gauge-warning: #d59b3d;
+  --gauge-success: #6fc49a;
+  display: grid;
+  justify-items: center;
+  min-width: 0;
+  padding: 0.125rem 0 0;
+}
+
+.svg {
+  display: block;
+  width: min(100%, 13rem);
+  overflow: visible;
+}
+
+.arcTrack,
+.arcZoneDanger,
+.arcZoneWarning,
+.arcZoneSuccess {
+  fill: none;
+  stroke-width: 10;
+}
+
+.arcTrack { stroke: hsl(var(--border) / 0.8); }
+.arcZoneDanger { stroke: var(--gauge-danger); }
+.arcZoneWarning { stroke: var(--gauge-warning); }
+.arcZoneSuccess { stroke: var(--gauge-success); }
+
+.tick line {
+  stroke: hsl(var(--foreground) / 0.7);
+  stroke-linecap: round;
+  stroke-width: 1.5;
+}
+
+.tickLabel {
+  fill: hsl(var(--muted-foreground));
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.targetMarker {
+  stroke: #facc15;
+  stroke-linecap: round;
+  stroke-width: 3.5;
+}
+
+.targetLabel {
+  fill: #facc15;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.needle {
+  transform-origin: 120px 118px;
+  transform: rotate(var(--needle-angle));
+  stroke: hsl(var(--foreground));
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+.gauge[data-status="danger"] .needle { stroke: var(--gauge-danger); }
+.gauge[data-status="warning"] .needle { stroke: var(--gauge-warning); }
+.gauge[data-status="success"] .needle { stroke: var(--gauge-success); }
+
+.gauge[data-interactive="true"]:is(:hover, :focus-visible) .arcTrack,
+.gauge[data-interactive="true"]:is(:hover, :focus-visible) .arcZoneDanger,
+.gauge[data-interactive="true"]:is(:hover, :focus-visible) .arcZoneWarning,
+.gauge[data-interactive="true"]:is(:hover, :focus-visible) .arcZoneSuccess,
+.gauge[data-interactive="true"]:is(:hover, :focus-visible) .tick line {
+  opacity: 0.92;
+}
+
+.gauge[data-interactive="true"]:focus-visible {
+  outline: 1px solid hsl(var(--foreground) / 0.45);
+  outline-offset: 2px;
+}
+
+.hubOuter { fill: hsl(var(--foreground)); }
+.hubInner { fill: hsl(var(--background)); }
+
+.progress {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  text-align: center;
+}

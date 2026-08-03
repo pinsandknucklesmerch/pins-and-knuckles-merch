@@ -86,8 +86,6 @@
   line-height: 1rem;
 }
 
-.bullet { margin-top: 0; }
-
 .comparison,
 .reference { margin-top: calc(var(--sales-kpi-footer-gap) - var(--sales-kpi-layer-gap)); }
 
