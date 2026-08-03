@@ -109,7 +109,7 @@ export function RevGauge({ value, target, max, progress, format, label, interact
     }
 
     const angleDelta = destinationAngle - fromAngle;
-    const duration = 800;
+    const duration = 1200;
     const startTime = performance.now();
 
     if (Math.abs(angleDelta) < 0.01) {
