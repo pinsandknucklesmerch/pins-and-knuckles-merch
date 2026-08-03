@@ -35,7 +35,11 @@ export function ProfitPdfReport({
     <div className="grid gap-8 bg-[#111114] text-foreground">
       <section data-profit-pdf-page="true" className={reportPageClass}>
         <ReportPageHeader month={month} year={year} title="Monthly Profit" />
-        <ProfitShirtKpi metric={monthlyProfitMetric} />
+          <div className="flex flex-1 items-start justify-center pt-6">
+            <div className="w-[760px]">
+              <ProfitShirtKpi metric={monthlyProfitMetric} />
+            </div>
+          </div>
       </section>
 
       <section data-profit-pdf-page="true" className={`${reportPageClass} profit-report-page`}>
