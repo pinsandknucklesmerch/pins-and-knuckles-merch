@@ -3,11 +3,13 @@ import type { MetricResult, YearComparisonData, YearToDateData } from "../domain
 import { ProfitShirtKpi } from "./ProfitShirtKpi";
 import { YearComparisonChart } from "./YearComparisonChart";
 import { YearToDateView } from "./YearToDateView";
+import { MetricKpiCard } from "./MetricKpiCard";
 
 type ProfitPdfReportProps = {
   year: number;
   month: number;
   monthlyProfitMetric: MetricResult;
+  conversionRateMetric: MetricResult;
   yearToDate: YearToDateData;
   yearComparison: YearComparisonData;
 };
@@ -28,6 +30,7 @@ export function ProfitPdfReport({
   year,
   month,
   monthlyProfitMetric,
+  conversionRateMetric,
   yearToDate,
   yearComparison,
 }: ProfitPdfReportProps) {
@@ -35,11 +38,20 @@ export function ProfitPdfReport({
     <div className="grid gap-8 bg-[#111114] text-foreground">
       <section data-profit-pdf-page="true" className={reportPageClass}>
         <ReportPageHeader month={month} year={year} title="Monthly Profit" />
-          <div className="flex flex-1 items-start justify-center pt-6">
+          {/* <div className="flex flex-1 items-start justify-center pt-6">
             <div className="w-[760px]">
               <ProfitShirtKpi metric={monthlyProfitMetric} />
             </div>
-          </div>
+          </div> */}
+          <div className="flex flex-1 flex-col items-center gap-6 pt-6">
+  <div className="w-[760px]">
+    <ProfitShirtKpi metric={monthlyProfitMetric} />
+  </div>
+
+  <div className="w-[760px]">
+    <MetricKpiCard metric={conversionRateMetric} />
+  </div>
+</div>
       </section>
 
       <section data-profit-pdf-page="true" className={`${reportPageClass} profit-report-page`}>

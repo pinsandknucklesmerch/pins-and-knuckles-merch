@@ -44,7 +44,13 @@ export function SalesDashboard({ data, year, month, view, member, isAdmin, initi
           companyMetrics,
           { year, month, view, member },
         ), [data.company, companyMetrics, year, month, view, member]);
+const conversionRateMetric = companyMetrics.find(
+  (metric) => metric.code === "CONVERSION_RATE",
+);
 
+if (!conversionRateMetric) {
+  throw new Error("Conversion Rate metric is unavailable.");
+}
   const changeDashboardView = useCallback((value: string) => {
     const nextView: DashboardView = value === "year-comparison" ? "year-comparison" : value === "ytd" ? "ytd" : value === "snuggle" ? "snuggle" : "overview";
     setActiveDashboardView((currentView) => currentView === nextView ? currentView : nextView);
@@ -89,6 +95,7 @@ export function SalesDashboard({ data, year, month, view, member, isAdmin, initi
           year={year}
           month={month}
           monthlyProfitMetric={monthlyProfitMetric}
+          conversionRateMetric={conversionRateMetric}
           yearToDate={data.yearToDate}
           yearComparison={data.yearComparison}
         />
