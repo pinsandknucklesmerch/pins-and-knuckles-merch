@@ -16,7 +16,34 @@ The legacy Hub is reference-only. Use it only to confirm business behaviour and 
 - Prefer explicit, typed domain engines over configurable formulas stored in data.
 - Keep Supabase Auth, SSR cookie handling, RLS, migrations, and `pins_hub` access checks intact.
 
+## Current Status Snapshot (2026-08-03)
+
+The repository's current committed revision is `5b2747c` (`Updated Sales Dashbaord layout`). The working tree also contains one uncommitted two-line presentation-only edit in `src/features/sales-dashboard/components/YearToDateView.tsx` (the variance card label changes from `Ahead / Behind` to `Status`); it is not treated as committed project status here.
+
+### Complete and deployed or production-confirmed
+
+- The Next.js App Router rebuild, Supabase Auth/access control, calculator routes and engines, PK Tax calculator, commercial invoice generator, data-management routes, Sales Dashboard data layer, source-isolated ingestion migrations, cron routes, and month-end final-value schema are implemented.
+- Production evidence confirms the Supabase migrations through the member-KPI and final-value migrations, the EPCC/Monday cron routes, their `08:05 UTC` / `08:15 UTC` schedules, and the required encrypted production variable names.
+- Confirmed company final Profit values are July 2026: **£165,942.07** and December 2025: **£153,931.76**. These are month-end final values; calculated/source-owned profit remains separate.
+
+### Implemented; latest UI revision awaits separate production verification
+
+- The latest committed Sales Dashboard UI has one Overview/YTD/Year Comparison tab row, an admin-only outlined Manage final values action beside Edit Targets, wrapped action controls, source-effective KPI cards, and Leads removed from the comparison selector with a Monthly Profit fallback.
+- The formatted monetary final-value editor accepts grouped and currency-prefixed input while retaining server-side validation.
+
+### Planned or outstanding
+
+- Monitor scheduled EPCC/Monday runs and add failure alerts.
+- Retain operational audit history for scheduled ingestion outcomes.
+- Review the deferred July Monday source delta before any bounded apply; do not apply it automatically.
+- Complete final rollout/parity checks before general team release.
+- Keep the seven-KPI export expectation current; older local test copies may still expect six KPIs.
+
+Referrals remain explicitly excluded from this rebuild. Prisma and Neon are obsolete-implementation references only, not current stack components.
+
 ## Current Tech Stack
+
+- Package manager: npm, with the committed `package-lock.json`.
 
 Installed versions from `package-lock.json`:
 
@@ -36,6 +63,7 @@ Other active UI/helper packages include Radix checkbox/dropdown/label/slot, `luc
 - `npm run dev` runs `next dev --webpack`.
 - Webpack is required for local development because Turbopack HMR caused repeated reload/request loops.
 - `next.config.ts` currently enables `cacheComponents: true`.
+- Verification commands are `npm run lint`, `npx tsc --noEmit`, `npm run build`, focused Node tests via `node --experimental-strip-types --test <test-files>`, and `git diff --check`.
 
 ## Environment Variables
 
@@ -62,6 +90,14 @@ Do not add service-role keys, database URLs, Monday tokens, or other secrets to 
 - `AppShell` protects hub pages and renders `AccessDenied` when the authenticated user lacks `pins_hub` access.
 
 ## Supabase Schema State
+
+### Organisation Ownership Rule (remote audit 2026-08-03)
+
+- The canonical Pins organisation is the single `organisations.slug = 'pins-knuckles'` row. Its ID is resolved from that slug at runtime/migration time; do not hardcode it in new migrations.
+- `organisation_id IS NULL` is intentional global/default configuration for `calculator_profiles`, `calculator_fees`, `calculator_garment_markups`, `delivery_rates`, `eu_embroidery_pricing`, `eu_print_price_tiers`, `garments`, `uk_trade_embroidery_pricing`, and `uk_trade_print_price_tiers`. Each has a `*_global_only_chk` constraint and matching RLS write policy, so these rows must remain global.
+- The four NULL `sales_kpi_targets` rows are the seeded global defaults. Target resolution deliberately applies global targets first and Pins-specific targets second; changing them would remove fallback behaviour. The 2026-08-03 audit found no current same-key collision with Pins-specific target rows, but that does not make the intentional global defaults eligible for backfill.
+- Current Pins-owned KPI, member, final-value, ingestion, membership, and lock rows already have the Pins organisation ID. No organisation backfill migration is required as of this audit. Nullable KPI columns remain nullable because the repository still supports scoped/global fallback reads; do not add `NOT NULL` without a separate schema decision.
+- `sales_kpi_profit_email_sources` exists remotely but is not represented by a repository migration. It has no NULL organisation rows, but its ownership/retention remains an unrelated schema-drift review item.
 
 Repository migrations:
 
@@ -105,6 +141,16 @@ Repository migrations:
   - Forward-only restoration of the missing EPCC ingestion table and service-role-only RPC.
 - `20260728130000_add_epcc_profit_ingestion_audit_reader.sql`
   - Service-role-only metadata audit RPC for EPCC ingestion reconciliation; it returns no message, sender, subject, or source-hash values.
+- `20260728140000_add_monday_sales_sync_lock.sql`
+  - Database-backed per-organisation/month lock for scheduled Monday synchronization.
+- `20260728150000_add_product_types_and_other_category.sql`
+  - Product Types foundation and staged `OTHER` calculator category support.
+- `20260728160000_import_product_types_and_ready_garments.sql`
+  - Product Type and ready-garment reference data import.
+- `20260728170000_add_generic_hoodies_product_type.sql`
+  - Generic Hoodies Product Type reference data.
+- `20260728180000_normalize_eu_calculator_garment_markups.sql`
+  - Normalized EU calculator garment markup data.
 - `20260731100000_add_member_kpi_source_isolation.sql`
   - Adds source-isolated member KPI fields, classifications, and the EPCC member-ingestion RPC.
 - `20260731110000_backfill_epcc_members_and_grant_monday_member_sync.sql`
@@ -132,8 +178,8 @@ Verified 2026-07-28 against the linked Supabase project:
 
 Verified 2026-07-28 using read-only/dry-run checks only; no live writes were performed.
 
-- Monday: required local server-side configuration is present. The API is reachable and the July 2026 dry-run resolved an accessible monthly board, its expected columns and weekly groups, and a safe planned snapshot with no writes. Monday's sync command is dry-run by default; writes require explicit `--apply`, a single month, `--year 2025`, and `--force`, so it cannot currently write 2026 snapshots.
-- EPCC Gmail: Gmail OAuth and parsing succeeded for the bounded July 2026 report. The existing conflicting KPI value had no tracked ingestion record; after metadata-only audit verification, one approved report was applied and a duplicate rerun was a no-op. July profit is now EPCC-sourced, while Monday quote/order fields were preserved. The audit reader is service-role-only and returns no message, sender, subject, or source-hash values.
+- Monday: required local server-side configuration is present. The API is reachable and the July 2026 dry-run resolved an accessible monthly board, its expected columns and weekly groups, and a safe planned snapshot with no writes. The manual Monday sync command is dry-run by default; historical writes require explicit bounded review/apply flags. The scheduled cron writes only the UTC current month under its database lock.
+- EPCC/NetSuite Gmail: Gmail OAuth and parsing succeeded for the bounded July 2026 report. The existing conflicting KPI value had no tracked ingestion record; after metadata-only audit verification, one approved report was applied and a duplicate rerun was a no-op. July profit is EPCC-sourced, while Monday quote/order fields were preserved. The audit reader is service-role-only and returns no message, sender, subject, or source-hash values.
 - Cron and service role: the 2026-07-28 deployment check confirmed the EPCC route and unauthenticated `401` behaviour. The 2026-08-03 authorised route validation is recorded below.
 - Remaining action: monitor the first normally scheduled cron result and its EPCC ingestion audit outcome; no further manual trigger is needed solely for verification.
 - Authorised live validation on 2026-08-03 invoked EPCC first and Monday second. EPCC returned `duplicate_member_backfill_not_needed` for August; Monday returned `updated` with `quotesDone=4` and `ordersProcessed=1`. The resulting August company row retained EPCC-owned `monthly_profit=358.80` and `monthly_profit_source=epcc_email`, while Monday wrote its own snapshot metadata and quote/order fields. A bounded July EPCC rerun was also `duplicate_member_backfill_not_needed`, with zero reconciliation differences and no change to July's Monday-owned fields.
@@ -148,6 +194,7 @@ Verified 2026-07-28 using read-only/dry-run checks only; no live writes were per
 | `/auth/confirm` | Implemented route handler |
 | `/auth/update-password` | Implemented |
 | `/auth/error` | Implemented |
+| `/auth/invite` | Implemented invite acceptance flow |
 | `/hub` | Protected dashboard shell |
 | `/hub/sales-dashboard` | Protected Supabase-first sales dashboard with historical fixture fallback |
 | `/hub/calculators` | Protected calculator region menu |
@@ -155,8 +202,11 @@ Verified 2026-07-28 using read-only/dry-run checks only; no live writes were per
 | `/hub/calculators/eu/standard` | Protected initial EU Standard calculator |
 | `/hub/calculators/eu/us-clients` | Protected EU US Clients calculator |
 | `/hub/calculators/uk/trade` | Protected UK Trade calculator |
-| `/hub/garments` | No active route |
-| `/hub/quick-reference` | No active route |
+| `/hub/commercial-invoices` | Protected Commercial Invoice Generator |
+| `/hub/data` | Protected Data Management summary |
+| `/hub/data/garments` | Protected Garment Directory; admin data management |
+| `/hub/data/product-types` | Protected Product Types manager; admin data management |
+| `/hub/team` | Admin-only team invitation/member management |
 | `/hub/pk-tax` | Protected calculation-only PK Tax allocation calculator |
 
 ## PK Tax
@@ -188,6 +238,10 @@ There is no active `/test` route.
 - The dashboard repository reads production KPI/target data from Supabase using the SSR client; no Monday API call occurs during page rendering.
 - Admin-only manual company/member KPI entry writes to Supabase. Supabase rows take precedence, with the normalized workbook fixture filling only missing periods/members as `historical_fixture`.
 - The dashboard UI has company/member views, prior-year comparison, targets, filters, member detail, loading/error fallback, and explicit blank values rather than invented zeroes.
+- The committed dashboard UI has one Overview, YTD, and Year Comparison tab row. Overview contains the monthly KPI cards; YTD contains its summary cards and graph; Year Comparison excludes Leads from its selector and falls back to Monthly Profit for invalid legacy selections.
+- Admins can manage independent final values for Profit, PK Tax, Quotes Done, and Orders Processed from the top action area. Monetary input accepts grouped/currency-prefixed values; final values remain separate from calculated fields.
+- Per-person KPI reporting is implemented with source-isolated Monday quote/order fields and EPCC profit/PK Tax fields, member classifications, protected source metadata, and company/member views.
+- Targets are admin-editable and metric exports include seven dashboard KPIs, including PK Tax.
 - Monday audit tooling exists in `scripts/audit-monday-sales-history.ts` and `scripts/lib/monday/`. It is server-only, read-only, paginated, rejects GraphQL mutations, and writes local audit artifacts under `docs/imports/monday-sales-history/`.
 - The historical workbook importer is local-only. It validates input and generates conflict-safe SQL; its default policy is `skip-existing`, so historical imports do not overwrite existing data accidentally.
 
@@ -220,6 +274,7 @@ There is no active `/test` route.
 - Company KPI final values are optional, independent rows keyed by organisation, year, month, and KPI code. A final value is effective for dashboard metrics, comparisons, progress, and YTD only while present; clearing it immediately restores the calculated source value.
 - Calculated Profit and PK Tax remain EPCC-owned; calculated Quotes Done and Orders Processed remain Monday-owned. Their ingestion payloads do not reference the final-value table and cannot overwrite final values.
 - Only Pins Hub administrators can set, edit, or clear a final value. The row records `updated_by` and `updated_at`; zero is valid, while Quotes Done and Orders Processed must be whole numbers.
+- Confirmed final Profit values: July 2026 `£165,942.07`; December 2025 `£153,931.76`. These do not replace or alter the calculated Profit values.
 
 ### Confirmed Monday Reporting Rules
 
@@ -254,7 +309,7 @@ The committed read-only audit was generated 2026-07-21 and covers January–July
 - The working tree was clean at audit time. Local verification passed: `npm run lint`, `npx tsc --noEmit`, `npm run build`, and 28 targeted Node tests.
 - The 2026-07-31 migrations and current cron routes were not yet confirmed in production at the time of this audit; the 2026-08-03 release validation below supersedes that status.
 - The 2026-08-03 authorised release validation confirmed the migrations, configured schedules, required encrypted Production variable names, and both cron routes. The exact Vercel Git SHA remains unavailable from deployment inspection.
-- A bounded July 2026 Monday dry-run now proposes `quotes_done=302` and `orders_processed=181`, versus persisted `301` and `178`. Do not apply it until the changed source data has been reviewed; it is not an idempotent rerun.
+- A bounded July 2026 Monday dry-run proposes `quotes_done=302` and `orders_processed=181`, versus persisted `301` and `178`. This deferred source delta must be reviewed before any apply; it is not an idempotent rerun.
 
 ### Next Recommended Step
 
@@ -324,6 +379,10 @@ Deferred:
 - `src/components/layout`: Protected shell, sidebar, page header, access denied state.
 - `src/components/ui`: Shared UI primitives and state components.
 - `src/features/calculators`: Calculator data access, mapping, domain logic, UI, and tests.
+- `src/features/data-management`: Garment and Product Type catalog managers.
+- `src/features/commercial-invoices`: Commercial invoice form and XLSX/PDF export.
+- `src/features/pk-tax`: Calculation-only PK Tax domain and UI.
+- `src/features/team`: Admin invite and team-member management.
 - `src/features/sales-dashboard`: Supabase-first KPI repository, domain calculations, UI, manual admin writes, fixture fallback, and tests.
 - `scripts/lib/monday`, `scripts/audit-monday-sales-history.ts`, and `scripts/sync-monday-sales-dashboard.ts`: server-only Monday audit/aggregation and explicit CLI sync tooling; no browser/API route access to Monday credentials.
 - `src/lib/access`: Pins Hub access helpers.
