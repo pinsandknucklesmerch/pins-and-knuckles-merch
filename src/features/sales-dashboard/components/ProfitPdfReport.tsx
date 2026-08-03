@@ -12,6 +12,18 @@ type ProfitPdfReportProps = {
   yearComparison: YearComparisonData;
 };
 
+const reportPageClass = "box-border flex min-h-[793px] w-[1120px] flex-col gap-6 overflow-hidden bg-[#111114] p-10 text-foreground";
+
+function ReportPageHeader({ month, year, title }: { month: number; year: number; title: string }) {
+  return <header className="flex shrink-0 items-end justify-between border-b border-white/10 pb-4">
+    <div className="grid gap-1">
+      <p className="text-base font-semibold">Pins & Knuckles Profit Report</p>
+      <p className="text-sm text-muted-foreground">{DASHBOARD_MONTHS[month - 1]} {year}</p>
+    </div>
+    <h1 className="text-lg font-semibold">{title}</h1>
+  </header>;
+}
+
 export function ProfitPdfReport({
   year,
   month,
@@ -20,29 +32,20 @@ export function ProfitPdfReport({
   yearComparison,
 }: ProfitPdfReportProps) {
   return (
-    <div className="grid gap-8 bg-background p-6 text-foreground">
-      <section data-profit-pdf-page className="grid gap-3">
-        <header>
-          <h1 className="text-xl font-semibold">
-            Pins & Knuckles Profit Report
-          </h1>
-
-          <p className="text-sm text-muted-foreground">
-            {DASHBOARD_MONTHS[month - 1]} {year}
-          </p>
-        </header>
-        <h2 className="text-sm font-semibold">Monthly Profit</h2>
+    <div className="grid gap-8 bg-[#111114] text-foreground">
+      <section data-profit-pdf-page="true" className={reportPageClass}>
+        <ReportPageHeader month={month} year={year} title="Monthly Profit" />
         <ProfitShirtKpi metric={monthlyProfitMetric} />
       </section>
 
-      <section data-profit-pdf-page className="profit-report-page grid gap-3">
-        <h2 className="text-sm font-semibold">Year to Date</h2>
-        <YearToDateView data={yearToDate} />
+      <section data-profit-pdf-page="true" className={`${reportPageClass} profit-report-page`}>
+        <ReportPageHeader month={month} year={year} title="Year to Date" />
+        <YearToDateView data={yearToDate} showHeading={false} />
       </section>
 
-      <section data-profit-pdf-page className="profit-report-page grid gap-3">
-        <h2 className="text-sm font-semibold">Year Comparison</h2>
-        <YearComparisonChart comparison={yearComparison} />
+      <section data-profit-pdf-page="true" className={`${reportPageClass} profit-report-page`}>
+        <ReportPageHeader month={month} year={year} title="Year Comparison" />
+        <YearComparisonChart comparison={yearComparison} showControls={false} />
       </section>
     </div>
   );

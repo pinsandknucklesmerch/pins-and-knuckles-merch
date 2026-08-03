@@ -20,7 +20,7 @@ const METRICS: ChartMetric[] = [
   { code: "SALES_INBOX_CONVERSION_RATE", label: "Sales Inbox Conversion Rate", format: "percent" },
 ];
 
-export function YearComparisonChart({ comparison }: { comparison: YearComparisonData }) {
+export function YearComparisonChart({ comparison, showControls = true }: { comparison: YearComparisonData; showControls?: boolean }) {
   const [metricCode, setMetricCode] = useState<ChartMetric["code"]>("MONTHLY_PROFIT");
   const metric = METRICS.find((item) => item.code === metricCode) ?? METRICS[0];
   const currentPeriod = [{ id: metric.label, data: comparison.selected.map((point) => ({ x: point.label, y: yearComparisonValue(point, metric.code) })) }];
@@ -38,12 +38,12 @@ export function YearComparisonChart({ comparison }: { comparison: YearComparison
         <li><span className={styles.currentSwatch} aria-hidden="true" />{comparison.selectedYear}</li>
         <li><span className={styles.previousSwatch} aria-hidden="true" />{comparison.previousYear}</li>
       </ul>
-      <label className={styles.selectorLabel}>
+      {showControls ? <label className={styles.selectorLabel}>
         <span className="sr-only">Metric</span>
         <Select className="min-w-[12rem]" value={metric.code} onValueChange={(value) => setMetricCode(METRICS.find((item) => item.code === value)?.code ?? "MONTHLY_PROFIT")}>
           {METRICS.map((item) => <option key={item.code} value={item.code}>{item.label}</option>)}
         </Select>
-      </label>
+      </label> : null}
     </div>
   );
 

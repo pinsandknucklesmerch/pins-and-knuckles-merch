@@ -61,6 +61,8 @@ export function ExportMetricsButton({
         const imageX = (pageWidth - imageWidth) / 2;
         const imageY = (pageHeight - imageHeight) / 2;
         if (index > 0) pdf.addPage();
+        pdf.setFillColor(17, 17, 20);
+        pdf.rect(0, 0, pageWidth, pageHeight, "F");
         pdf.addImage(canvas.toDataURL("image/png"), "PNG", imageX, imageY, imageWidth, imageHeight);
         canvas.width = 0;
         canvas.height = 0;
