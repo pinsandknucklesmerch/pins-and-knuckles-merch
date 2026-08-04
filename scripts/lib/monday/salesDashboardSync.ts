@@ -65,7 +65,7 @@ export type MondaySnapshot = {
   };
 };
 
-export type MondaySalesWritePayload = Pick<MondaySnapshot, "organisation_id" | "year" | "month" | "quotes_done" | "orders_processed" | "monday_sync_metadata"> & Partial<Pick<MondaySnapshot, "sales_inbox_enquiries" | "converted" | "data_source">> & {
+export type MondaySalesWritePayload = Pick<MondaySnapshot, "organisation_id" | "year" | "month" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "monday_sync_metadata"> & {
   monthly_profit?: number;
   monthly_profit_source?: "monday";
 };
@@ -98,21 +98,23 @@ function completeMondayMemberSnapshots(snapshots: MondayMemberSnapshot[], organi
 
 /** A patch payload deliberately omits unavailable profit fields so existing values survive. */
 export function mondaySalesWritePayload(snapshot: MondaySnapshot): MondaySalesWritePayload {
+  const payload: MondaySalesWritePayload = {
+    organisation_id: snapshot.organisation_id,
+    year: snapshot.year,
+    month: snapshot.month,
+    quotes_done: snapshot.quotes_done,
+    orders_processed: snapshot.orders_processed,
+    sales_inbox_enquiries: snapshot.sales_inbox_enquiries,
+    converted: snapshot.converted,
+    monday_sync_metadata: snapshot.monday_sync_metadata,
+  };
   if (!shouldWriteMondayProfit(snapshot.year, snapshot.month)) {
-    return {
-      organisation_id: snapshot.organisation_id,
-      year: snapshot.year,
-      month: snapshot.month,
-      quotes_done: snapshot.quotes_done,
-      orders_processed: snapshot.orders_processed,
-      monday_sync_metadata: snapshot.monday_sync_metadata,
-    };
+    return payload;
   }
-  const { monthly_profit, monthly_profit_source, ...payload } = snapshot;
   return {
     ...payload,
-    ...(monthly_profit === undefined ? {} : { monthly_profit }),
-    ...(monthly_profit_source === undefined ? {} : { monthly_profit_source }),
+    ...(snapshot.monthly_profit === undefined ? {} : { monthly_profit: snapshot.monthly_profit }),
+    ...(snapshot.monthly_profit_source === undefined ? {} : { monthly_profit_source: snapshot.monthly_profit_source }),
   };
 }
 

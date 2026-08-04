@@ -13,7 +13,7 @@ export function currentMondayReportingPeriod(now = new Date()): ReportingPeriod 
   return { year: now.getUTCFullYear(), month: now.getUTCMonth() + 1 };
 }
 
-type ExistingMonth = { quotes_done: number | null; orders_processed: number | null } | null;
+type ExistingMonth = { quotes_done: number | null; orders_processed: number | null; sales_inbox_enquiries?: number | null; converted?: number | null } | null;
 export type MondayCronStore = {
   acquireLock(period: ReportingPeriod, token: string): Promise<boolean>;
   releaseLock(period: ReportingPeriod, token: string): Promise<void>;
@@ -41,7 +41,7 @@ export function createMondayCronStore(database: SupabaseClient<Database> = servi
       if (error) throw new Error(`Could not release Monday sync lock: ${error.message}`);
     },
     async readMonth(period) {
-      const { data, error } = await database.from("sales_kpi_months").select("quotes_done,orders_processed").eq("organisation_id", MONDAY_SYNC_ORGANISATION_ID).eq("year", period.year).eq("month", period.month).maybeSingle();
+      const { data, error } = await database.from("sales_kpi_months").select("quotes_done,orders_processed,sales_inbox_enquiries,converted").eq("organisation_id", MONDAY_SYNC_ORGANISATION_ID).eq("year", period.year).eq("month", period.month).maybeSingle();
       if (error) throw new Error(`Could not read current Monday KPI snapshot: ${error.message}`);
       return data;
     },
@@ -89,7 +89,7 @@ export async function runMondaySalesCron(
     if (!snapshot || (outcome.status !== "updated" && outcome.status !== "inserted")) {
       return { outcome: "rejected", year: period.year, month: period.month, quotesDone: snapshot?.quotes_done ?? null, ordersProcessed: snapshot?.orders_processed ?? null, changed: false, reason: outcome.reason ?? "Monday sync did not produce a writable snapshot." };
     }
-    const changed = !existing || existing.quotes_done !== snapshot.quotes_done || existing.orders_processed !== snapshot.orders_processed;
+    const changed = !existing || existing.quotes_done !== snapshot.quotes_done || existing.orders_processed !== snapshot.orders_processed || existing.sales_inbox_enquiries !== snapshot.sales_inbox_enquiries || existing.converted !== snapshot.converted;
     return { outcome: changed ? outcome.status : "unchanged", year: period.year, month: period.month, quotesDone: snapshot.quotes_done, ordersProcessed: snapshot.orders_processed, changed };
   } finally {
     await store.releaseLock(period, token);

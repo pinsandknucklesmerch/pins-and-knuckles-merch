@@ -35,27 +35,27 @@ test("dry-run plans a current-month insert and preserves audit metadata", async 
   assert.deepEqual([outcomes[0].snapshot?.sales_inbox_enquiries, outcomes[0].snapshot?.converted], [1, 1]);
 });
 
-test("July 2026 write payload is quotes/orders and Monday metadata only", async () => {
+test("July 2026 write payload includes Scope A and Scope B metrics with Monday metadata only", async () => {
   const outcome = (await syncMondaySalesDashboard({ ...base, apply: false }))[0];
   const payload = mondaySalesWritePayload(outcome.snapshot!);
-  assert.deepEqual([payload.quotes_done, payload.orders_processed], [2, 1]);
+  assert.deepEqual([payload.quotes_done, payload.orders_processed, payload.sales_inbox_enquiries, payload.converted], [2, 1, 1, 1]);
   assert.equal("monthly_profit" in payload, false);
   assert.equal("monthly_profit_source" in payload, false);
-  assert.equal("sales_inbox_enquiries" in payload, false);
-  assert.equal("converted" in payload, false);
   assert.equal("data_source" in payload, false);
+  assert.equal("memberSnapshots" in payload, false);
   assert.deepEqual(payload.monday_sync_metadata, outcome.snapshot?.monday_sync_metadata);
 });
 
 test("July 2026 payload is idempotent and cannot alter EPCC profit or another month", async () => {
   const snapshot = (await syncMondaySalesDashboard({ ...base, apply: false }))[0].snapshot!;
   const payload = mondaySalesWritePayload(snapshot);
-  const july = { year: 2026, month: 7, monthly_profit: 116494.08, monthly_profit_source: "epcc_email", quotes_done: 0, orders_processed: 0 };
+  const july = { year: 2026, month: 7, monthly_profit: 116494.08, monthly_profit_source: "epcc_email", pk_tax: 972, snuggle_profit: 99, epcc_source_metadata: { sourceHash: "epcc" }, final_values: { MONTHLY_PROFIT: 116494.08 }, quotes_done: 0, orders_processed: 0, sales_inbox_enquiries: null, converted: null };
   const august = { year: 2026, month: 8, monthly_profit: 12, monthly_profit_source: "epcc_email", quotes_done: 3, orders_processed: 2 };
   const apply = () => Object.assign(july, payload);
   apply(); apply();
   assert.deepEqual([july.quotes_done, july.orders_processed], [2, 1]);
   assert.deepEqual([july.monthly_profit, july.monthly_profit_source], [116494.08, "epcc_email"]);
+  assert.deepEqual([july.pk_tax, july.snuggle_profit, july.epcc_source_metadata, july.final_values], [972, 99, { sourceHash: "epcc" }, { MONTHLY_PROFIT: 116494.08 }]);
   assert.deepEqual(august, { year: 2026, month: 8, monthly_profit: 12, monthly_profit_source: "epcc_email", quotes_done: 3, orders_processed: 2 });
 });
 
@@ -75,6 +75,14 @@ test("missing Profit Tracking creates a metrics patch that preserves existing pr
   assert.equal("monthly_profit" in payload, false);
   assert.equal("monthly_profit_source" in payload, false);
   assert.deepEqual([payload.quotes_done, payload.orders_processed, payload.sales_inbox_enquiries, payload.converted], [2, 1, 1, 1]);
+});
+
+test("Scope B zeroes remain explicit in the company payload", async () => {
+  const nonInboxItems = items.map((entry) => ({ ...entry, column_values: entry.column_values.map((column) => column.id === "status_16" ? { ...column, text: "Referral" } : column) }));
+  const outcome = (await syncMondaySalesDashboard({ ...base, collectItems: async () => ({ items: nonInboxItems }), apply: false }))[0];
+  const payload = mondaySalesWritePayload(outcome.snapshot!);
+  assert.deepEqual([outcome.snapshot?.sales_inbox_enquiries, outcome.snapshot?.converted], [0, 0]);
+  assert.deepEqual([payload.sales_inbox_enquiries, payload.converted], [0, 0]);
 });
 
 test("valid Profit Tracking includes both profit fields in the metrics patch", async () => {

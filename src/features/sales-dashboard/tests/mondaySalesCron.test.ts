@@ -24,7 +24,7 @@ function memberItems(name: string, id: number, count: number, converted: number,
   }));
 }
 
-function dependencies(existing: { quotes_done: number | null; orders_processed: number | null } | null = null, acquire = true, items = [item()]) {
+function dependencies(existing: { quotes_done: number | null; orders_processed: number | null; sales_inbox_enquiries?: number | null; converted?: number | null } | null = null, acquire = true, items = [item()]) {
   const writes: unknown[] = [];
   const store: MondayCronStore = {
     acquireLock: async () => acquire,
@@ -63,7 +63,7 @@ test("July cron payload isolates EPCC profit and unchanged reruns are idempotent
   assert.deepEqual((deps.writes[0] as { monday_sync_metadata: { reportingPeriod: unknown; quotesDone: unknown; ordersProcessed: unknown; trigger: unknown } }).monday_sync_metadata.reportingPeriod, { year: 2026, month: 7 });
   assert.deepEqual([(deps.writes[0] as { monday_sync_metadata: { quotesDone: unknown; ordersProcessed: unknown } }).monday_sync_metadata.quotesDone, (deps.writes[0] as { monday_sync_metadata: { quotesDone: unknown; ordersProcessed: unknown } }).monday_sync_metadata.ordersProcessed], [1, 1]);
   assert.equal((deps.writes[0] as { monday_sync_metadata: { trigger: unknown } }).monday_sync_metadata.trigger, "cron");
-  const unchanged = dependencies({ quotes_done: 1, orders_processed: 1 });
+  const unchanged = dependencies({ quotes_done: 1, orders_processed: 1, sales_inbox_enquiries: 1, converted: 1 });
   const second = await runMondaySalesCron({ ...unchanged, now: new Date("2026-07-28T10:15:00Z") });
   assert.deepEqual(second, { outcome: "unchanged", year: 2026, month: 7, quotesDone: 1, ordersProcessed: 1, changed: false });
   assert.equal(unchanged.writes.length, 1);
