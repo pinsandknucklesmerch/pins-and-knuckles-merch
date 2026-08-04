@@ -66,18 +66,12 @@
 }
 
 .overviewProfit,
-.overviewStack { min-width: 0; }
-
-.overviewProfit { display: flex; }
-.overviewProfit > * { width: 100%; }
-
-.overviewStack {
-  display: grid;
-  grid-template-rows: repeat(2, minmax(0, auto));
-  gap: 1.25rem;
+.overviewInbox {
+  display: flex;
+  min-width: 0;
 }
-
-.overviewStack > * { min-width: 0; }
+.overviewProfit > *,
+.overviewInbox > * { width: 100%; }
 
 .activitySlide > [data-tv-group="activity-card"] {
   width: 100%;

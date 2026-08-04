@@ -148,24 +148,21 @@ export function SalesDashboardTvView({ data, year, month, view, member, companyM
     if (activeView === "overview") {
       const inbox = metricByCode(companyMetrics, "SALES_INBOX_ENQUIRIES");
       const inboxConversion = metricByCode(companyMetrics, "SALES_INBOX_CONVERSION_RATE");
-      const conversion = metricByCode(companyMetrics, "CONVERSION_RATE");
       return <section className={styles.overviewSlide} data-tv-view="overview">
       <div className={styles.slideHeading} data-tv-group="profit-heading" style={{ "--tv-enter-index": 0 } as CSSProperties}><h2>{VIEW_LABELS[activeView]}</h2><span>{monthLabel} {year}</span></div>
       <div className={styles.overviewGrid}>
         <div className={styles.overviewProfit} data-tv-group="profit-card" style={{ "--tv-enter-index": 1 } as CSSProperties}><ProfitShirtKpi metric={monthlyProfitMetric} animationKey={cycleKey} animationDelayMs={160} /></div>
-        <div className={styles.overviewStack}>
-          <div data-tv-group="inbox-card" style={{ "--tv-enter-index": 2 } as CSSProperties}><SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} animationKey={cycleKey} animationDelayMs={240} /></div>
-          <CombinedKpiCard first={conversion} gaugeAnimationKey={cycleKey} gaugeAnimationDelayMs={320} gaugeInteractive={false} tvCompact tvMode tvEnterIndex={3} />
-        </div>
+        <div className={styles.overviewInbox} data-tv-group="inbox-card" style={{ "--tv-enter-index": 2 } as CSSProperties}><SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} animationKey={cycleKey} animationDelayMs={240} /></div>
       </div>
     </section>;
     }
     if (activeView === "sales-activity") {
       const quotes = metricByCode(companyMetrics, "QUOTES_DONE");
       const orders = metricByCode(companyMetrics, "ORDERS_PROCESSED");
+      const conversion = metricByCode(companyMetrics, "CONVERSION_RATE");
       return <section className={styles.activitySlide} data-tv-view="sales-activity">
         <div className={styles.slideHeading} data-tv-group="activity-heading" style={{ "--tv-enter-index": 0 } as CSSProperties}><h2>{VIEW_LABELS[activeView]}</h2><span>{monthLabel} {year}</span></div>
-        <div data-tv-group="activity-card" style={{ "--tv-enter-index": 1 } as CSSProperties}><CombinedKpiCard first={quotes} second={orders} gaugeAnimationKey={cycleKey} gaugeAnimationDelayMs={120} gaugeInteractive={false} tvMode /></div>
+        <div data-tv-group="activity-card" style={{ "--tv-enter-index": 1 } as CSSProperties}><CombinedKpiCard first={quotes} second={orders} third={conversion} gaugeAnimationKey={cycleKey} gaugeAnimationDelayMs={120} gaugeInteractive={false} tvMode /></div>
       </section>;
     }
     if (activeView === "snuggle") return <SnuggleView data={data.snuggle} year={year} month={month} view={view} member={member} tvMode />;

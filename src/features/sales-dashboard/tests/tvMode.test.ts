@@ -64,16 +64,19 @@ test("TV controller pauses on pointer, focus, and hidden-document state", () => 
   assert.match(styles, /animation-delay: calc\(var\(--tv-enter-index/);
 });
 
-test("TV slides place Overview KPIs and keep Conversion Rate out of Sales Activity", () => {
+test("TV slides place Overview KPIs and all RevGauges in Sales Activity", () => {
   const component = readFileSync(new URL("../components/SalesDashboardTvView.tsx", import.meta.url), "utf8");
   const overview = component.slice(component.indexOf('activeView === "overview"'), component.indexOf('activeView === "sales-activity"'));
   const activity = component.slice(component.indexOf('activeView === "sales-activity"'), component.indexOf('activeView === "snuggle"'));
   assert.match(overview, /ProfitShirtKpi/);
   assert.match(overview, /SalesInboxKpi/);
-  assert.match(overview, /CombinedKpiCard first=\{conversion\}/);
+  assert.doesNotMatch(overview, /CombinedKpiCard/);
+  assert.doesNotMatch(overview, /metricByCode\(companyMetrics, "CONVERSION_RATE"\)/);
   assert.match(overview, /animationKey=\{cycleKey\}/);
-  assert.match(activity, /CombinedKpiCard first=\{quotes\} second=\{orders\}/);
-  assert.doesNotMatch(activity, /third=\{conversion\}/);
-  assert.match(component, /gaugeAnimationDelayMs=\{320\}/);
+  assert.match(overview, /animationDelayMs=\{160\}/);
+  assert.match(overview, /animationDelayMs=\{240\}/);
+  assert.match(activity, /CombinedKpiCard first=\{quotes\} second=\{orders\} third=\{conversion\}/);
+  assert.match(activity, /gaugeAnimationKey=\{cycleKey\}/);
+  assert.match(activity, /gaugeAnimationDelayMs=\{120\}/);
   assert.match(component, /data-tv-view="overview"/);
 });
