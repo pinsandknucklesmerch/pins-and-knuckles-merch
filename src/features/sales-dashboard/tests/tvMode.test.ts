@@ -12,10 +12,10 @@ test("TV mode activates only for tv=1", () => {
 });
 
 test("TV slide order wraps in both directions", () => {
-  assert.deepEqual(TV_VIEWS, ["profit-overview", "sales-activity", "ytd", "year-comparison", "snuggle"]);
-  assert.equal(nextTvView("snuggle"), "profit-overview");
-  assert.equal(previousTvView("profit-overview"), "snuggle");
-  assert.equal(nextTvView("profit-overview"), "sales-activity");
+  assert.deepEqual(TV_VIEWS, ["overview", "sales-activity", "ytd", "year-comparison", "snuggle"]);
+  assert.equal(nextTvView("snuggle"), "overview");
+  assert.equal(previousTvView("overview"), "snuggle");
+  assert.equal(nextTvView("overview"), "sales-activity");
   assert.equal(previousTvView("year-comparison"), "ytd");
 });
 
@@ -62,4 +62,18 @@ test("TV controller pauses on pointer, focus, and hidden-document state", () => 
   assert.match(styles, /prefers-reduced-motion/);
   assert.match(styles, /tv-enter-item/);
   assert.match(styles, /animation-delay: calc\(var\(--tv-enter-index/);
+});
+
+test("TV slides place Overview KPIs and keep Conversion Rate out of Sales Activity", () => {
+  const component = readFileSync(new URL("../components/SalesDashboardTvView.tsx", import.meta.url), "utf8");
+  const overview = component.slice(component.indexOf('activeView === "overview"'), component.indexOf('activeView === "sales-activity"'));
+  const activity = component.slice(component.indexOf('activeView === "sales-activity"'), component.indexOf('activeView === "snuggle"'));
+  assert.match(overview, /ProfitShirtKpi/);
+  assert.match(overview, /SalesInboxKpi/);
+  assert.match(overview, /CombinedKpiCard first=\{conversion\}/);
+  assert.match(overview, /animationKey=\{cycleKey\}/);
+  assert.match(activity, /CombinedKpiCard first=\{quotes\} second=\{orders\}/);
+  assert.doesNotMatch(activity, /third=\{conversion\}/);
+  assert.match(component, /gaugeAnimationDelayMs=\{320\}/);
+  assert.match(component, /data-tv-view="overview"/);
 });

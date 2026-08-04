@@ -23,6 +23,7 @@
 
 .animated {
   animation: inbox-arc 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--arc-animation-delay, 0ms);
 }
 
 @keyframes inbox-arc {

@@ -11,7 +11,7 @@ function number(value: number | null) {
   return value === null ? "—" : value.toLocaleString("en-GB");
 }
 
-export function SalesInboxKpi({ enquiries, conversionRate, animationKey }: { enquiries: MetricResult; conversionRate: MetricResult; animationKey?: string | number }) {
+export function SalesInboxKpi({ enquiries, conversionRate, animationKey, animationDelayMs = 0 }: { enquiries: MetricResult; conversionRate: MetricResult; animationKey?: string | number; animationDelayMs?: number }) {
   const enquiriesRatio = comparisonArcRatio(enquiries.value, enquiries.previousYear);
   const hasEnquiriesComparison = enquiriesRatio !== null;
 
@@ -22,7 +22,7 @@ export function SalesInboxKpi({ enquiries, conversionRate, animationKey }: { enq
         <h3 id="sales-inbox-enquiries" className={styles.label}>Enquiries</h3>
         <div className={styles.enquiriesValue}>{number(enquiries.value)}</div>
         <div className={styles.arc}>
-          <ComparisonArcGauge current={enquiries.value} previousYear={enquiries.previousYear} animationKey={animationKey} />
+          <ComparisonArcGauge current={enquiries.value} previousYear={enquiries.previousYear} animationKey={animationKey} animationDelayMs={animationDelayMs} />
         </div>
         <div className={styles.comparison}>
           {hasEnquiriesComparison ? <div className={styles.reference}>Last year {number(enquiries.previousYear)}</div> : <div className={styles.reference}>No previous-year comparison</div>}

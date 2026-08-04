@@ -46,7 +46,7 @@
   outline: none;
 }
 
-.profitSlide,
+.overviewSlide,
 .activitySlide {
   display: grid;
   align-content: center;
@@ -56,10 +56,28 @@
   margin: 0 auto;
 }
 
-.profitCard {
-  width: min(100%, 42rem);
+.overviewGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 1.25rem;
+  width: min(100%, 78rem);
   margin: 0 auto;
 }
+
+.overviewProfit,
+.overviewStack { min-width: 0; }
+
+.overviewProfit { display: flex; }
+.overviewProfit > * { width: 100%; }
+
+.overviewStack {
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, auto));
+  gap: 1.25rem;
+}
+
+.overviewStack > * { min-width: 0; }
 
 .activitySlide > [data-tv-group="activity-card"] {
   width: 100%;
@@ -245,6 +263,10 @@
   .durationControl { flex: 1; justify-content: space-between; }
   .buttonGroup { width: 100%; }
   .controlButton { flex: 1; }
-  .profitSlide,
+  .overviewSlide,
   .activitySlide { gap: 0.75rem; }
+}
+
+@media (max-width: 899px) {
+  .overviewGrid { grid-template-columns: minmax(0, 1fr); }
 }

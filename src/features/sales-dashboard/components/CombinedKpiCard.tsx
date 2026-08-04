@@ -58,11 +58,11 @@ function KpiSection({ metric, divided, className, gaugeAnimationKey, gaugeAnimat
   );
 }
 
-export function CombinedKpiCard({ title, first, second, third, gaugeAnimationKey, gaugeAnimationDelayMs, gaugeInteractive = true, tvMode = false }: { title?: string; first: MetricResult; second?: MetricResult; third?: MetricResult; gaugeAnimationKey?: string | number; gaugeAnimationDelayMs?: number; gaugeInteractive?: boolean; tvMode?: boolean }) {
+export function CombinedKpiCard({ title, first, second, third, gaugeAnimationKey, gaugeAnimationDelayMs, gaugeInteractive = true, tvMode = false, tvEnterIndex = 1, tvCompact = false }: { title?: string; first: MetricResult; second?: MetricResult; third?: MetricResult; gaugeAnimationKey?: string | number; gaugeAnimationDelayMs?: number; gaugeInteractive?: boolean; tvMode?: boolean; tvEnterIndex?: number; tvCompact?: boolean }) {
   const metricCountClass = third && second ? styles.triple : second ? styles.double : styles.single;
 
   return (
-    <Surface variant="metric" className={`${styles.card} ${tvMode ? styles.tvCard : ""}`} data-tv-group={gaugeAnimationKey !== undefined ? "overview-performance" : undefined} style={gaugeAnimationKey !== undefined ? { "--tv-enter-index": 1 } as CSSProperties : undefined}>
+    <Surface variant="metric" className={`${styles.card} ${tvMode ? styles.tvCard : ""} ${tvCompact ? styles.tvCompact : ""}`} data-tv-group={gaugeAnimationKey !== undefined ? "overview-performance" : undefined} style={gaugeAnimationKey !== undefined ? { "--tv-enter-index": tvEnterIndex } as CSSProperties : undefined}>
       {title ? <h2 className={styles.title}>{title}</h2> : null}
       <div className={`${title ? styles.sections : styles.sectionsWithoutTitle} ${metricCountClass}`}>
         <KpiSection metric={first} gaugeAnimationKey={gaugeAnimationKey} gaugeAnimationDelayMs={gaugeAnimationDelayMs} gaugeInteractive={gaugeInteractive} gaugeTvMode={tvMode} tvEnterIndex={0} />

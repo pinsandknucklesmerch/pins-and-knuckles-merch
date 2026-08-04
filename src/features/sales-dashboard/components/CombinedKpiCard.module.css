@@ -5,6 +5,7 @@
 }
 
 .tvCard { min-height: 25rem; }
+.tvCompact { min-height: 0; }
 
 .title,
 .metricLabel {

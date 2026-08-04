@@ -7,9 +7,10 @@ type ProfitShirtMeterProps = {
   target: number;
   targetState: TargetState;
   animationKey?: string | number;
+  animationDelayMs?: number;
 };
 
-export function ProfitShirtMeter({ value, target, targetState, animationKey }: ProfitShirtMeterProps) {
+export function ProfitShirtMeter({ value, target, targetState, animationKey, animationDelayMs = 0 }: ProfitShirtMeterProps) {
   const clipId = `profit-shirt-fill-${useId().replace(/:/g, "")}`;
   const fillPercent = shirtFillPercent(value, target);
   const label = value === null ? "Monthly profit is unavailable." : `Monthly profit is ${fillPercent.toFixed(1)}% of target.`;
@@ -25,7 +26,7 @@ export function ProfitShirtMeter({ value, target, targetState, animationKey }: P
         </clipPath>
       </defs>
       <path className={styles.shirtBase} d="M55 28 75 18c8 8 22 8 30 0l20 10 33 26-18 28-16-12v85H56V70L40 82 22 54l33-26Z" />
-      <rect key={animationKey} className={fillClassName} x="18" y="18" width="144" height={fillHeight} clipPath={`url(#${clipId})`} style={{ "--shirt-fill-scale": fillPercent / 100 } as CSSProperties} />
+      <rect key={animationKey} className={fillClassName} x="18" y="18" width="144" height={fillHeight} clipPath={`url(#${clipId})`} style={{ "--shirt-fill-scale": fillPercent / 100, "--shirt-fill-delay": `${animationDelayMs}ms` } as CSSProperties} />
       <path className={styles.outline} d="M55 28 75 18c8 8 22 8 30 0l20 10 33 26-18 28-16-12v85H56V70L40 82 22 54l33-26Z" />
       <path className={styles.collar} d="M75 18c8 8 22 8 30 0" />
     </svg>

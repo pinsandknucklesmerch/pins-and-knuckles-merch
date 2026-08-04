@@ -1,8 +1,8 @@
 export const TV_DURATION_OPTIONS_SECONDS = [10, 20, 30, 45, 60] as const;
 export const DEFAULT_TV_DURATION_SECONDS = 20;
 export const TV_DATA_REFRESH_INTERVAL_MS = 5 * 60_000;
-export type TvSlide = "profit-overview" | "sales-activity" | "ytd" | "year-comparison" | "snuggle";
-export const TV_VIEWS = ["profit-overview", "sales-activity", "ytd", "year-comparison", "snuggle"] as const satisfies readonly TvSlide[];
+export type TvSlide = "overview" | "sales-activity" | "ytd" | "year-comparison" | "snuggle";
+export const TV_VIEWS = ["overview", "sales-activity", "ytd", "year-comparison", "snuggle"] as const satisfies readonly TvSlide[];
 
 export function parseTvDuration(value: string | string[] | undefined) {
   const candidate = Number(Array.isArray(value) ? value[0] : value);

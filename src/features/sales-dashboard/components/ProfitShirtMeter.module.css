@@ -12,6 +12,7 @@
   transform-box: fill-box;
   transform-origin: center bottom;
   animation: shirt-fill 1000ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--shirt-fill-delay, 0ms);
 }
 .outline { fill: none; stroke: hsl(55 39% 81% / 0.82); stroke-linejoin: round; stroke-width: 3; }
 .collar { fill: none; stroke: hsl(55 39% 81% / 0.45); stroke-linecap: round; stroke-width: 2.5; }
