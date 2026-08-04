@@ -25,10 +25,10 @@ export function ProfitShirtMeter({ value, target, targetState, animationKey, ani
           <path d="M55 28 75 18c8 8 22 8 30 0l20 10 33 26-18 28-16-12v85H56V70L40 82 22 54l33-26Z" />
         </clipPath>
       </defs>
-      <path className={styles.shirtBase} d="M55 28 75 18c8 8 22 8 30 0l20 10 33 26-18 28-16-12v85H56V70L40 82 22 54l33-26Z" />
-      <rect key={animationKey} className={fillClassName} x="18" y="18" width="144" height={fillHeight} clipPath={`url(#${clipId})`} style={{ "--shirt-fill-scale": fillPercent / 100, "--shirt-fill-delay": `${animationDelayMs}ms` } as CSSProperties} />
-      <path className={styles.outline} d="M55 28 75 18c8 8 22 8 30 0l20 10 33 26-18 28-16-12v85H56V70L40 82 22 54l33-26Z" />
-      <path className={styles.collar} d="M75 18c8 8 22 8 30 0" />
+      <path data-export-svg-role="shirt-base" className={styles.shirtBase} d="M55 28 75 18c8 8 22 8 30 0l20 10 33 26-18 28-16-12v85H56V70L40 82 22 54l33-26Z" />
+      <rect data-export-svg-role="shirt-progress" data-export-fill-scale={String(fillPercent / 100)} data-export-fill-color={targetState === "target-met" ? "#6fc49a" : "#de3b43"} key={animationKey} className={fillClassName} x="18" y="18" width="144" height={fillHeight} clipPath={`url(#${clipId})`} style={{ "--shirt-fill-scale": fillPercent / 100, "--shirt-fill-delay": `${animationDelayMs}ms` } as CSSProperties} />
+      <path data-export-svg-role="shirt-outline" className={styles.outline} d="M55 28 75 18c8 8 22 8 30 0l20 10 33 26-18 28-16-12v85H56V70L40 82 22 54l33-26Z" />
+      <path data-export-svg-role="shirt-collar" className={styles.collar} d="M75 18c8 8 22 8 30 0" />
     </svg>
   );
 }

@@ -48,7 +48,11 @@ export function calculateInvoice(invoice: CommercialInvoice): CalculatedInvoice 
 
 export function hasLineContent(item: InvoiceLineItem): boolean {
   return Object.entries(item).some(
-    ([key, value]) => key !== "id" && value.trim().length > 0,
+    ([key, value]) =>
+      key !== "id" &&
+      key !== "productTypeId" &&
+      typeof value === "string" &&
+      value.trim().length > 0,
   );
 }
 
@@ -85,6 +89,7 @@ export function validateInvoice(invoice: CommercialInvoice): InvoiceValidationEr
 export function createLineItem(id: string): InvoiceLineItem {
   return {
     id,
+    productTypeId: null,
     product: "",
     designName: "",
     type: "",

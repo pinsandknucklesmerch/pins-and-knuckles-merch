@@ -29,7 +29,13 @@ test("defines one level of child routes for grouped navigation", () => {
   assert.deepEqual(data?.children?.map(({ label, href }) => ({ label, href })), [
     { label: "Garments", href: "/hub/data/garments" },
     { label: "Product Types", href: "/hub/data/product-types" },
+    { label: "Invoice Companies", href: "/hub/data/invoice-companies" },
   ]);
+});
+
+test("does not expose the retired Invoice Products route", () => {
+  const data = hubFeatureNavigation.find((item) => item.href === "/hub/data");
+  assert.equal(data?.children?.some((item) => item.href === "/hub/data/invoice-products"), false);
 });
 
 test("does not expose Dashboard as a feature card or duplicate routes", () => {

@@ -5,6 +5,7 @@ import { resolvePinsHubAccess } from "@/lib/access/pinsHubAccess";
 import { createClient } from "@/lib/supabase/server";
 import { PRICING_CATEGORIES, type DataManagementActionState } from "./types";
 import { canDeactivateGarment, deactivateGarmentRecord } from "./lib/deactivateGarment";
+import { validateProductTypeInvoiceFields } from "./lib/productTypeValidation";
 
 const PATHS = ["/hub/data", "/hub/data/garments", "/hub/data/product-types", "/hub/calculators", "/hub/calculators/eu/standard", "/hub/calculators/eu/us-clients", "/hub/calculators/uk/trade"];
 const normalise = (value: string | null | undefined) => (value ?? "").trim().replace(/\s+/g, " ").toLowerCase();
@@ -20,7 +21,7 @@ const numberValue = (value: FormDataEntryValue | null, label: string) => {
   return { value: number };
 };
 
-function state(ok: boolean, message: string): DataManagementActionState { return { ok, message }; }
+function state(ok: boolean, message: string, fieldErrors?: Record<string, string>): DataManagementActionState { return { ok, message, ...(fieldErrors && Object.keys(fieldErrors).length ? { fieldErrors } : {}) }; }
 function revalidateDataManagement() { PATHS.forEach((path) => revalidatePath(path)); }
 async function actionContext() {
   const supabase = await createClient();
@@ -34,9 +35,17 @@ export async function saveProductType(_: DataManagementActionState, formData: Fo
   const id = nullable(formData.get("id"));
   const name = nullable(formData.get("name"));
   const commodityCode = nullable(formData.get("commodity_code"));
+  const invoiceFields = validateProductTypeInvoiceFields({
+    commodityCode: commodityCode ?? "",
+    countryOfOrigin: String(formData.get("country_of_origin") ?? "").trim(),
+    invoiceDescription: String(formData.get("invoice_description") ?? "").trim(),
+    defaultInvoiceCost: String(formData.get("default_invoice_cost") ?? ""),
+    invoiceCurrencyCode: String(formData.get("invoice_currency_code") ?? ""),
+  });
   const pricingCategory = nullable(formData.get("pricing_category"));
   const isActive = formData.get("is_active") === "true";
-  if (!name || !commodityCode || !pricingCategory || !PRICING_CATEGORIES.includes(pricingCategory as typeof PRICING_CATEGORIES[number])) return state(false, "Name, commodity code, and a valid pricing category are required.");
+  if (!name || !pricingCategory || !PRICING_CATEGORIES.includes(pricingCategory as typeof PRICING_CATEGORIES[number])) return state(false, "Name and a valid pricing category are required.");
+  if (!invoiceFields.values) return state(false, "Please correct the invoice fields.", invoiceFields.errors);
   const { data: activeTypes, error: loadError } = await supabase.from("product_types").select("id,name").eq("is_active", true);
   if (loadError) return state(false, "Product Type validation could not be completed.");
   if (isActive && activeTypes.some((row) => row.id !== id && normalise(row.name) === normalise(name))) return state(false, "An active Product Type already uses this name.");
@@ -45,7 +54,7 @@ export async function saveProductType(_: DataManagementActionState, formData: Fo
     if (error) return state(false, "Product Type dependencies could not be checked.");
     if ((count ?? 0) > 0) return state(false, `Cannot deactivate: ${count} active garment${count === 1 ? "" : "s"} still reference this Product Type.`);
   }
-  const payload = { name, commodity_code: commodityCode, pricing_category: pricingCategory, is_active: isActive };
+  const payload = { name, commodity_code: commodityCode ?? "", country_of_origin: invoiceFields.values.countryOfOrigin, invoice_description: invoiceFields.values.invoiceDescription, default_invoice_cost: invoiceFields.values.defaultInvoiceCost, invoice_currency_code: invoiceFields.values.invoiceCurrencyCode, pricing_category: pricingCategory, is_active: isActive };
   const result = id ? await supabase.from("product_types").update(payload).eq("id", id) : await supabase.from("product_types").insert(payload);
   if (result.error) return state(false, "Product Type could not be saved.");
   revalidateDataManagement();

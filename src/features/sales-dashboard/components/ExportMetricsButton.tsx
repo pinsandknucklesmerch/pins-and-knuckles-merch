@@ -4,6 +4,7 @@ import { ExportButton } from "metricui";
 import { useState, type RefObject } from "react";
 import { feedback } from "@/components/ui/feedback";
 import type { MetricExportRow } from "../lib/metricsExport";
+import { findUnsupportedExportColors, normalizeExportColors } from "../lib/exportSafeColors";
 import styles from "./ExportMetricsButton.module.css";
 
 type ExportMetricsButtonProps = {
@@ -54,6 +55,9 @@ export function ExportMetricsButton({
           backgroundColor: "#111114",
           logging: false,
           removeContainer: true,
+          onclone: (clonedDocument, clonedElement) => {
+            normalizeExportColors(clonedElement ?? clonedDocument.body);
+          },
         });
         const scale = Math.min(printableWidth / canvas.width, printableHeight / canvas.height);
         const imageWidth = canvas.width * scale;
@@ -72,7 +76,12 @@ export function ExportMetricsButton({
       pdf.save(profitFilename);
       feedback.success("PDF downloaded");
     } catch (error) {
-      console.error("Profit PDF export failed", error instanceof Error ? error.message : "unknown error");
+      if (process.env.NODE_ENV !== "production") {
+        console.error("Profit PDF export failed", {
+          error: error instanceof Error ? error.message : "unknown error",
+          unsupportedStyles: findUnsupportedExportColors(report),
+        });
+      }
       feedback.error("Could not download the profit PDF.");
     } finally {
       setIsExporting(false);

@@ -4,6 +4,7 @@ import test from "node:test";
 import { calculateCompanyMetrics } from "../domain/calculateDashboardKpis.ts";
 import type { CompanyKpiMonth } from "../domain/types.ts";
 import { buildMetricExportRows } from "../lib/metricsExport.ts";
+import { normalizeExportColors, shirtExportScale, shirtExportTransform } from "../lib/exportSafeColors.ts";
 
 function month(overrides: Partial<CompanyKpiMonth> = {}): CompanyKpiMonth {
   return {
@@ -189,4 +190,65 @@ test("SalesDashboard memoizes the single export payload without navigation effec
 
   const manualEntry = readFileSync(new URL("../components/ManualKpiEntry.tsx", import.meta.url), "utf8");
   assert.doesNotMatch(manualEntry, /router\.refresh|useRouter/);
+});
+
+test("EPCC PDF export normalizes modern MetricUI colors only in html2canvas clones", () => {
+  const button = readFileSync(new URL("../components/ExportMetricsButton.tsx", import.meta.url), "utf8");
+  const colors = readFileSync(new URL("../lib/exportSafeColors.ts", import.meta.url), "utf8");
+  const report = readFileSync(new URL("../components/ProfitPdfReport.tsx", import.meta.url), "utf8");
+
+  assert.match(button, /onclone:\s*\(clonedDocument, clonedElement\)/);
+  assert.match(button, /normalizeExportColors\(clonedElement \?\? clonedDocument\.body\)/);
+  assert.match(button, /removeContainer:\s*true/);
+  assert.match(colors, /oklab\|oklch/);
+  for (const token of ["#de3b43", "#e1ddba", "#333333", "#3c7aa3"]) assert.match(colors, new RegExp(token.replace("#", "\\#")));
+  for (const property of ["color", "background-color", "border-color", "box-shadow", "text-shadow", "outline-color", "fill", "stroke"]) assert.match(colors, new RegExp(property));
+  assert.match(report, /data-export-subtree="epcc-profit"/);
+});
+
+test("EPCC PDF export cleans up after success or failure and emits a non-empty image", () => {
+  const button = readFileSync(new URL("../components/ExportMetricsButton.tsx", import.meta.url), "utf8");
+  assert.match(button, /finally\s*\{[\s\S]*setIsExporting\(false\)/);
+  assert.match(button, /canvas\.toDataURL\("image\/png"\)/);
+  assert.match(button, /pdf\.save\(profitFilename\)/);
+  assert.match(button, /feedback\.error\("Could not download the profit PDF\."\)/);
+});
+
+test("export color normalization removes oklab/oklch values and applies the safe palette", () => {
+  const values: Record<string, string> = {
+    color: "color-mix(in oklab, white 70%, transparent)",
+    "background-color": "oklch(20% 0 0)",
+    "border-color": "color-mix(in oklab, red 20%, transparent)",
+    "box-shadow": "0 0 8px oklab(50% 0 0)",
+  };
+  const normalized: Record<string, string> = {};
+  const element = {
+    tagName: "DIV",
+    className: "report-card",
+    getAttribute: () => null,
+    querySelectorAll: () => [],
+    ownerDocument: {
+      defaultView: { getComputedStyle: () => ({ getPropertyValue: (property: string) => values[property] ?? "" }) },
+    },
+    style: { setProperty: (property: string, value: string) => { normalized[property] = value; values[property] = value; } },
+  } as unknown as Element;
+
+  normalizeExportColors(element);
+  assert.doesNotMatch(Object.values(normalized).join(" "), /oklab|oklch/);
+  assert.equal(normalized.color, "#e1ddba");
+  assert.equal(normalized["background-color"], "#333333");
+  assert.equal(normalized["border-color"], "rgba(225, 221, 186, 0.2)");
+  assert.equal(normalized["box-shadow"], "none");
+});
+
+test("shirt export preserves 0%, 1.6%, 50%, and 100% progress geometry", () => {
+  assert.equal(shirtExportScale(0), 0);
+  assert.equal(shirtExportTransform(0), "scaleY(0)");
+  assert.equal(shirtExportScale(0.016), 0.016);
+  assert.equal(shirtExportTransform(0.016), "scaleY(0.016)");
+  assert.equal(shirtExportScale(0.5), 0.5);
+  assert.equal(shirtExportTransform(0.5), "scaleY(0.5)");
+  assert.equal(shirtExportScale(1), 1);
+  assert.equal(shirtExportTransform(1), "scaleY(1)");
+  assert.equal(shirtExportScale(2), 1);
 });

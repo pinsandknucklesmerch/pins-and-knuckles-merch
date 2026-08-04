@@ -15,10 +15,17 @@ import {
   validateInvoice,
 } from "../domain/calculateInvoice";
 import { applyOriginRule } from "../domain/countryOfOrigin";
+import {
+  manuallyEditInvoiceCompanyName,
+  manuallyEditInvoiceName,
+  selectInvoiceCompany,
+  selectProductType,
+} from "../domain/invoiceDirectorySelection";
 import { exportInvoicePdf, exportInvoiceXlsx } from "../domain/exportInvoice";
+import type { InvoiceCompany, ProductTypeInvoiceOption } from "../domain/directoryTypes";
 import type { CommercialInvoice, InvoiceAddress, InvoiceLineItem } from "../domain/types";
 
-const EMPTY_ADDRESS: InvoiceAddress = { companyName: "", contactName: "", address: "", country: "", eori: "", vat: "", ein: "", telephone: "", email: "", notes: "" };
+const EMPTY_ADDRESS: InvoiceAddress = { companyId: null, companyName: "", contactName: "", address: "", country: "", eori: "", vat: "", ein: "", telephone: "", email: "", notes: "" };
 
 function createId() {
   return typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
@@ -34,7 +41,13 @@ function createDefaultInvoice(): CommercialInvoice {
   };
 }
 
-export function CommercialInvoiceGenerator() {
+export function CommercialInvoiceGenerator({
+  companies,
+  products,
+}: {
+  companies: InvoiceCompany[];
+  products: ProductTypeInvoiceOption[];
+}) {
   const [invoice, setInvoice] = useState(createDefaultInvoice);
   const [errors, setErrors] = useState<ReturnType<typeof validateInvoice>>({});
   const [exporting, setExporting] = useState<"pdf" | "xlsx" | null>(null);
@@ -70,8 +83,45 @@ export function CommercialInvoiceGenerator() {
       ...current,
       lineItems: current.lineItems.map((item) => {
         if (item.id !== id) return item;
-        const next = { ...item, [field]: value };
+        const next = {
+          ...item,
+          ...(field === "product"
+            ? manuallyEditInvoiceName(item, value)
+            : { [field]: value }),
+        };
         return field === "product" || field === "type" || field === "description" ? applyOriginRule(next) : next;
+      }),
+    }));
+  }
+
+  function selectCompany(target: "sender" | "receiver", company: InvoiceCompany) {
+    setInvoice((current) => ({
+      ...current,
+      [target]: selectInvoiceCompany(current[target], company),
+    }));
+  }
+
+  function updateCompanyName(target: "sender" | "receiver", value: string) {
+    setInvoice((current) => ({
+      ...current,
+      [target]: manuallyEditInvoiceCompanyName(current[target], value),
+    }));
+  }
+
+  function clearCompany(target: "sender" | "receiver") {
+    updateCompanyName(target, "");
+  }
+
+  function selectProduct(id: string, product: ProductTypeInvoiceOption) {
+    setInvoice((current) => ({
+      ...current,
+      lineItems: current.lineItems.map((item) => {
+        if (item.id !== id) return item;
+        // A saved product wins for a nonblank origin. If it is blank, the
+        // existing W101 rule may fill China; manual nonblank origins remain untouched.
+        return applyOriginRule(
+          selectProductType(item, product, current.details.currency),
+        );
       }),
     }));
   }
@@ -86,9 +136,15 @@ export function CommercialInvoiceGenerator() {
       <InvoiceForm
         invoice={invoice}
         errors={errors}
+        companies={companies}
+        products={products}
         onDetailsChange={(field, value) => setInvoice((current) => ({ ...current, details: { ...current.details, [field]: value } }))}
         onAddressChange={(target, field, value) => setInvoice((current) => ({ ...current, [target]: { ...current[target], [field]: value } }))}
+        onCompanySelect={selectCompany}
+        onCompanyNameChange={updateCompanyName}
+        onCompanyClear={clearCompany}
         onLineChange={updateLine}
+        onProductSelect={selectProduct}
         onAddLine={() => setInvoice((current) => ({ ...current, lineItems: addLineItem(current.lineItems, createId()) }))}
         onRemoveLine={(id) => setInvoice((current) => ({ ...current, lineItems: removeLineItem(current.lineItems, id) }))}
       />

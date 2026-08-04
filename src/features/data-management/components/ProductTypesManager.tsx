@@ -15,11 +15,11 @@ export function ProductTypesManager({ productTypes, accessLevel }: { productType
   const [sort, setSort] = useState<SortKey>("name");
   const [selected, setSelected] = useState<ProductTypeRecord | null>(null);
   const canWrite = accessLevel !== "read";
-  const visible = useMemo(() => productTypes.filter((item) => [item.name, item.commodityCode, item.pricingCategory].join(" ").toLowerCase().includes(query.toLowerCase())).sort((left, right) => left[sort].localeCompare(right[sort])), [productTypes, query, sort]);
+  const visible = useMemo(() => productTypes.filter((item) => [item.name, item.commodityCode, item.countryOfOrigin, item.invoiceDescription, item.pricingCategory].join(" ").toLowerCase().includes(query.toLowerCase())).sort((left, right) => left[sort].localeCompare(right[sort])), [productTypes, query, sort]);
   return <div className="space-y-4">
     <div className="flex flex-wrap items-center justify-between gap-3">
       <input aria-label="Search Product Types" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search Product Types" className={`${inputClass} w-full sm:w-72`} />
-      {canWrite ? <button type="button" onClick={() => setSelected({ id: "", name: "", commodityCode: "", pricingCategory: "TSHIRT", isActive: true })} className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Add Product Type</button> : null}
+      {canWrite ? <button type="button" onClick={() => setSelected({ id: "", name: "", commodityCode: "", countryOfOrigin: "", invoiceDescription: "", defaultInvoiceCost: null, invoiceCurrencyCode: null, pricingCategory: "TSHIRT", isActive: true })} className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Add Product Type</button> : null}
     </div>
     {selected ? <ProductTypeForm record={selected.id ? selected : null} accessLevel={accessLevel} onClose={() => setSelected(null)} /> : null}
     <Surface className="overflow-x-auto bg-card/70 p-0">
@@ -27,8 +27,8 @@ export function ProductTypesManager({ productTypes, accessLevel }: { productType
         <Header label="Name" active={sort === "name"} onClick={() => setSort("name")} />
         <Header label="Commodity Code" active={sort === "commodityCode"} onClick={() => setSort("commodityCode")} />
         <Header label="Pricing Category" active={sort === "pricingCategory"} onClick={() => setSort("pricingCategory")} />
-        <th className="px-4 py-3 font-medium">Status</th><th className="px-4 py-3 font-medium">Edit</th>
-      </tr></thead><tbody>{visible.length ? visible.map((item) => <tr key={item.id} className="border-t border-border/70"><td className="px-4 py-3 font-medium">{item.name}</td><td className="px-4 py-3 font-mono text-xs">{item.commodityCode}</td><td className="px-4 py-3">{item.pricingCategory}</td><td className="px-4 py-3">{item.isActive ? "Active" : "Inactive"}</td><td className="px-4 py-3">{canWrite ? <button type="button" onClick={() => setSelected(item)} className="text-primary hover:underline">Edit</button> : "—"}</td></tr>) : <tr><td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">No Product Types.</td></tr>}</tbody></table>
+        <th className="px-4 py-3 font-medium">Invoice Details</th><th className="px-4 py-3 font-medium">Status</th><th className="px-4 py-3 font-medium">Edit</th>
+      </tr></thead><tbody>{visible.length ? visible.map((item) => <tr key={item.id} className="border-t border-border/70"><td className="px-4 py-3 font-medium">{item.name}</td><td className="px-4 py-3 font-mono text-xs">{item.commodityCode || "—"}</td><td className="px-4 py-3">{item.pricingCategory}</td><td className="px-4 py-3">{[item.countryOfOrigin, item.invoiceDescription].filter(Boolean).join(" · ") || "—"}</td><td className="px-4 py-3">{item.isActive ? "Active" : "Inactive"}</td><td className="px-4 py-3">{canWrite ? <button type="button" onClick={() => setSelected(item)} className="text-primary hover:underline">Edit</button> : "—"}</td></tr>) : <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">No Product Types.</td></tr>}</tbody></table>
     </Surface>
   </div>;
 }
@@ -42,7 +42,11 @@ function ProductTypeForm({ record, accessLevel, onClose }: { record: ProductType
   return <Surface className="bg-card/80"><form id={formId} action={saveAction} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
     <input name="id" value={record?.id ?? ""} readOnly hidden />
     <label className="grid gap-1 text-sm"><span>Name</span><input required name="name" defaultValue={record?.name ?? ""} className={inputClass} /></label>
-    <label className="grid gap-1 text-sm"><span>Commodity Code</span><input required name="commodity_code" defaultValue={record?.commodityCode ?? ""} className={inputClass} /></label>
+    <label className="grid gap-1 text-sm"><span>Commodity Code</span><input name="commodity_code" defaultValue={record?.commodityCode ?? ""} className={inputClass} /></label>
+    <label className="grid gap-1 text-sm"><span>Country of Origin</span><input name="country_of_origin" defaultValue={record?.countryOfOrigin ?? ""} className={inputClass} /></label>
+    <label className="grid gap-1 text-sm"><span>Invoice Description</span><input name="invoice_description" defaultValue={record?.invoiceDescription ?? ""} className={inputClass} /></label>
+    <label className="grid gap-1 text-sm"><span>Default Invoice Cost</span><input inputMode="decimal" name="default_invoice_cost" defaultValue={record?.defaultInvoiceCost ?? ""} className={inputClass} /></label>
+    <label className="grid gap-1 text-sm"><span>Invoice Currency</span><Select name="invoice_currency_code" defaultValue={record?.invoiceCurrencyCode ?? ""}><option value="">—</option><option value="GBP">GBP</option><option value="EUR">EUR</option></Select></label>
     <label className="grid gap-1 text-sm"><span>Pricing Category</span><Select required name="pricing_category" defaultValue={record?.pricingCategory ?? "TSHIRT"}>{PRICING_CATEGORIES.map((category) => <option key={category}>{category}</option>)}</Select></label>
     <label className="grid gap-1 text-sm"><span>Active</span><Select name="is_active" defaultValue={record?.isActive === false ? "false" : "true"}><option value="true">Active</option><option value="false">Inactive</option></Select></label>
     {saveState.message && !saveState.ok && isInlineValidation(saveState.message) ? <p role="alert" className="sm:col-span-2 lg:col-span-4 text-sm text-destructive">{saveState.message}</p> : null}

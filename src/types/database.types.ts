@@ -627,6 +627,142 @@ export type Database = {
           },
         ]
       }
+      invoice_companies: {
+        Row: {
+          address_line_1: string
+          address_line_2: string
+          city: string
+          company_name: string
+          contact_name: string
+          country: string
+          created_at: string
+          email: string
+          eori: string
+          id: string
+          is_active: boolean
+          label: string
+          notes: string
+          organisation_id: string
+          postal_code: string
+          region: string
+          tax_id: string
+          telephone: string
+          updated_at: string
+          vat_number: string
+        }
+        Insert: {
+          address_line_1?: string
+          address_line_2?: string
+          city?: string
+          company_name: string
+          contact_name?: string
+          country?: string
+          created_at?: string
+          email?: string
+          eori?: string
+          id?: string
+          is_active?: boolean
+          label: string
+          notes?: string
+          organisation_id: string
+          postal_code?: string
+          region?: string
+          tax_id?: string
+          telephone?: string
+          updated_at?: string
+          vat_number?: string
+        }
+        Update: {
+          address_line_1?: string
+          address_line_2?: string
+          city?: string
+          company_name?: string
+          contact_name?: string
+          country?: string
+          created_at?: string
+          email?: string
+          eori?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          notes?: string
+          organisation_id?: string
+          postal_code?: string
+          region?: string
+          tax_id?: string
+          telephone?: string
+          updated_at?: string
+          vat_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_companies_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_products: {
+        Row: {
+          commodity_code: string
+          country_of_origin: string
+          created_at: string
+          currency_code: string | null
+          default_cost: number | null
+          description: string
+          id: string
+          is_active: boolean
+          notes: string
+          organisation_id: string
+          product_code: string
+          product_name: string
+          type_material: string
+          updated_at: string
+        }
+        Insert: {
+          commodity_code: string
+          country_of_origin?: string
+          created_at?: string
+          currency_code?: string | null
+          default_cost?: number | null
+          description?: string
+          id?: string
+          is_active?: boolean
+          notes?: string
+          organisation_id: string
+          product_code: string
+          product_name: string
+          type_material?: string
+          updated_at?: string
+        }
+        Update: {
+          commodity_code?: string
+          country_of_origin?: string
+          created_at?: string
+          currency_code?: string | null
+          default_cost?: number | null
+          description?: string
+          id?: string
+          is_active?: boolean
+          notes?: string
+          organisation_id?: string
+          product_code?: string
+          product_name?: string
+          type_material?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_products_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organisation_members: {
         Row: {
           created_at: string | null
@@ -693,8 +829,12 @@ export type Database = {
       product_types: {
         Row: {
           commodity_code: string
+          country_of_origin: string
           created_at: string
+          default_invoice_cost: number | null
           id: string
+          invoice_currency_code: string | null
+          invoice_description: string
           is_active: boolean
           name: string
           pricing_category: string
@@ -702,8 +842,12 @@ export type Database = {
         }
         Insert: {
           commodity_code: string
+          country_of_origin?: string
           created_at?: string
+          default_invoice_cost?: number | null
           id?: string
+          invoice_currency_code?: string | null
+          invoice_description?: string
           is_active?: boolean
           name: string
           pricing_category: string
@@ -711,8 +855,12 @@ export type Database = {
         }
         Update: {
           commodity_code?: string
+          country_of_origin?: string
           created_at?: string
+          default_invoice_cost?: number | null
           id?: string
+          invoice_currency_code?: string | null
+          invoice_description?: string
           is_active?: boolean
           name?: string
           pricing_category?: string
@@ -1410,6 +1558,10 @@ export type Database = {
           p_year: number
         }
         Returns: string
+      }
+      is_canonical_pins_knuckles_organisation: {
+        Args: { target_organisation_id: string }
+        Returns: boolean
       }
       is_organisation_member: {
         Args: { target_organisation_id: string }

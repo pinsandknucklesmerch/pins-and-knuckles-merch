@@ -2,6 +2,7 @@
 
 import { Plus, Trash2 } from "lucide-react";
 import { Panel } from "@/components/ui/Panel";
+import { SearchableCombobox } from "@/components/ui/SearchableCombobox";
 import { Select } from "@/components/ui/Select";
 import {
   calculateLineTotal,
@@ -15,13 +16,20 @@ import type {
   InvoiceLineItem,
   InvoiceValidationErrors,
 } from "../domain/types";
+import type { InvoiceCompany, ProductTypeInvoiceOption } from "../domain/directoryTypes";
 
 type Props = {
   invoice: CommercialInvoice;
   errors: ReturnType<typeof validateInvoice>;
+  companies: InvoiceCompany[];
+  products: ProductTypeInvoiceOption[];
   onDetailsChange: (field: keyof CommercialInvoice["details"], value: string) => void;
   onAddressChange: (target: "sender" | "receiver", field: keyof InvoiceAddress, value: string) => void;
+  onCompanySelect: (target: "sender" | "receiver", company: InvoiceCompany) => void;
+  onCompanyNameChange: (target: "sender" | "receiver", value: string) => void;
+  onCompanyClear: (target: "sender" | "receiver") => void;
   onLineChange: (id: string, field: keyof InvoiceLineItem, value: string) => void;
+  onProductSelect: (id: string, product: ProductTypeInvoiceOption) => void;
   onAddLine: () => void;
   onRemoveLine: (id: string) => void;
 };
@@ -57,15 +65,23 @@ function AddressFields({
   prefix,
   value,
   errors,
+  companies,
   onChange,
+  onCompanySelect,
+  onCompanyNameChange,
+  onCompanyClear,
 }: {
   title: string;
   prefix: "sender" | "receiver";
   value: InvoiceAddress;
   errors: InvoiceValidationErrors;
+  companies: InvoiceCompany[];
   onChange: (field: keyof InvoiceAddress, value: string) => void;
+  onCompanySelect: (company: InvoiceCompany) => void;
+  onCompanyNameChange: (value: string) => void;
+  onCompanyClear: () => void;
 }) {
-  const fields: [keyof InvoiceAddress, string][] = [
+  const fields: [Exclude<keyof InvoiceAddress, "companyId">, string][] = [
     ["companyName", "Company Name"],
     ["contactName", "Contact Name"],
     ["country", "Country"],
@@ -78,9 +94,25 @@ function AddressFields({
   return (
     <Panel title={title} className="min-w-0">
       <div className="grid gap-3 sm:grid-cols-2">
-        {fields.slice(0, 4).map(([field, label]) => (
+        <Field label="Company Name" error={errors[`${prefix}.companyName`]}>
+          <SearchableCombobox
+            items={companies}
+            value={value.companyName}
+            selectedKey={value.companyId ?? undefined}
+            getKey={(company) => company.id}
+            getSearchText={(company) => [company.label, company.companyName, company.country, company.email, company.eori, company.vatNumber].join(" ")}
+            renderOption={(company) => <><span className="block truncate font-medium text-foreground">{company.label} · {company.companyName}</span><span className="block truncate text-xs text-muted-foreground">{[company.country, company.email, company.eori, company.vatNumber].filter(Boolean).join(" · ") || "No additional details"}</span></>}
+            onSelect={onCompanySelect}
+            onValueChange={onCompanyNameChange}
+            onClear={onCompanyClear}
+            placeholder="Search companies or enter manually"
+            emptyMessage="No invoice companies found"
+            ariaLabel={`${title} Company Name`}
+          />
+        </Field>
+        {fields.slice(1, 4).map(([field, label]) => (
           <Field key={field} label={label} error={errors[`${prefix}.${field}`]}>
-            <input className={inputClass} value={value[field]} onChange={(event) => onChange(field, event.target.value)} />
+            <input className={inputClass} value={value[field] ?? ""} onChange={(event) => onChange(field, event.target.value)} />
           </Field>
         ))}
         <Field label="Address" error={errors[`${prefix}.address`]} className="sm:col-span-2">
@@ -88,7 +120,7 @@ function AddressFields({
         </Field>
         {fields.slice(4).map(([field, label]) => (
           <Field key={field} label={label} error={errors[`${prefix}.${field}`]}>
-            <input className={inputClass} value={value[field]} onChange={(event) => onChange(field, event.target.value)} />
+            <input className={inputClass} value={value[field] ?? ""} onChange={(event) => onChange(field, event.target.value)} />
           </Field>
         ))}
         <Field label="Notes" className="sm:col-span-2">
@@ -102,9 +134,15 @@ function AddressFields({
 export function InvoiceForm({
   invoice,
   errors,
+  companies,
+  products,
   onDetailsChange,
   onAddressChange,
+  onCompanySelect,
+  onCompanyNameChange,
+  onCompanyClear,
   onLineChange,
+  onProductSelect,
   onAddLine,
   onRemoveLine,
 }: Props) {
@@ -134,8 +172,8 @@ export function InvoiceForm({
       </Panel>
 
       <div className="grid min-w-0 gap-4 2xl:grid-cols-2">
-        <AddressFields title="Sender" prefix="sender" value={invoice.sender} errors={errors} onChange={(field, value) => onAddressChange("sender", field, value)} />
-        <AddressFields title="Receiver" prefix="receiver" value={invoice.receiver} errors={errors} onChange={(field, value) => onAddressChange("receiver", field, value)} />
+        <AddressFields title="Sender" prefix="sender" value={invoice.sender} errors={errors} companies={companies} onChange={(field, value) => onAddressChange("sender", field, value)} onCompanySelect={onCompanySelect.bind(null, "sender")} onCompanyNameChange={onCompanyNameChange.bind(null, "sender")} onCompanyClear={onCompanyClear.bind(null, "sender")} />
+        <AddressFields title="Receiver" prefix="receiver" value={invoice.receiver} errors={errors} companies={companies} onChange={(field, value) => onAddressChange("receiver", field, value)} onCompanySelect={onCompanySelect.bind(null, "receiver")} onCompanyNameChange={onCompanyNameChange.bind(null, "receiver")} onCompanyClear={onCompanyClear.bind(null, "receiver")} />
       </div>
 
       <Panel className="min-w-0">
@@ -159,7 +197,7 @@ export function InvoiceForm({
                   </button>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                  <Field label="Product" error={errors[`${item.id}.product`]}><input className={inputClass} value={item.product} onChange={(e) => onLineChange(item.id, "product", e.target.value)} /></Field>
+                  <Field label="Product" error={errors[`${item.id}.product`]}><SearchableCombobox<ProductTypeInvoiceOption> items={products} value={item.product} selectedKey={item.productTypeId ?? undefined} getKey={(product) => product.id} getSearchText={(product) => [product.name, product.commodityCode, product.countryOfOrigin, product.invoiceDescription, product.pricingCategory].join(" ")} renderOption={(product) => <><span className="block truncate font-medium text-foreground">{product.name} · {product.commodityCode || "No commodity code"}</span><span className="block truncate text-xs text-muted-foreground">{[product.pricingCategory, product.countryOfOrigin, product.invoiceDescription].filter(Boolean).join(" · ") || "No invoice details"}</span></>} onSelect={(product) => onProductSelect(item.id, product)} onValueChange={(value) => onLineChange(item.id, "product", value)} onClear={() => onLineChange(item.id, "product", "")} placeholder="Search Product Types or enter manually" emptyMessage="No Product Types found" ariaLabel={`Line ${index + 1} Product`} /></Field>
                   <Field label="Design Name"><input className={inputClass} value={item.designName} onChange={(e) => onLineChange(item.id, "designName", e.target.value)} /></Field>
                   <Field label="Type / Material"><input className={inputClass} value={item.type} onChange={(e) => onLineChange(item.id, "type", e.target.value)} /></Field>
                   <Field label="Description"><input className={inputClass} value={item.description} onChange={(e) => onLineChange(item.id, "description", e.target.value)} /></Field>

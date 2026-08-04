@@ -25,7 +25,7 @@ function invoice(lines: InvoiceLineItem[]): CommercialInvoice {
   };
 }
 
-test("calculates one line item total", () => assert.equal(calculateLineTotal(line("1", "12.50", "4")), 50));
+ test("calculates one line item total without using source IDs", () => assert.equal(calculateLineTotal({ ...line("1", "12.50", "4"), productTypeId: "product-1" }), 50));
 test("calculates multiple line-item subtotal", () => assert.equal(calculateInvoice(invoice([line("1", "3", "2"), line("2", "4.5", "3")])).totals.subtotal, 19.5));
 test("legacy invoice adds no freight or shipping charge", () => { const result = calculateInvoice(invoice([line("1", "10", "2")])); assert.equal(result.totals.grandTotal, result.totals.subtotal); });
 test("legacy invoice applies no VAT or tax calculation", () => { const result = calculateInvoice(invoice([line("1", "10", "2")])); assert.equal(result.totals.grandTotal, 20); });

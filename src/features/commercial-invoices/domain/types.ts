@@ -15,6 +15,7 @@ export type InvoiceDetails = {
 };
 
 export type InvoiceAddress = {
+  companyId?: string | null;
   companyName: string;
   contactName: string;
   address: string;
@@ -29,6 +30,7 @@ export type InvoiceAddress = {
 
 export type InvoiceLineItem = {
   id: string;
+  productTypeId?: string | null;
   product: string;
   designName: string;
   type: string;

@@ -35,7 +35,7 @@ export function ProfitPdfReport({
   yearComparison,
 }: ProfitPdfReportProps) {
   return (
-    <div className="grid gap-8 bg-[#111114] text-foreground">
+    <div data-export-subtree="epcc-profit" className="grid gap-8 bg-[#111114] text-foreground">
       <section data-profit-pdf-page="true" className={reportPageClass}>
         <ReportPageHeader month={month} year={year} title="Monthly Profit" />
           {/* <div className="flex flex-1 items-start justify-center pt-6">

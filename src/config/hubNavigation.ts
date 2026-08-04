@@ -31,6 +31,7 @@ export const hubFeatureNavigation: HubFeatureNavigationItem[] = [
     children: [
       { label: "Garments", href: "/hub/data/garments" },
       { label: "Product Types", href: "/hub/data/product-types" },
+      { label: "Invoice Companies", href: "/hub/data/invoice-companies" },
     ],
   },
 ];
