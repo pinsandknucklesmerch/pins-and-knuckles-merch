@@ -18,7 +18,7 @@ test("Sales Dashboard does not automatically navigate or rewrite its URL", () =>
   const manualEntry = readFileSync(new URL("../components/ManualKpiEntry.tsx", import.meta.url), "utf8");
   const sources = [dashboard, provider, manualEntry].join("\n");
 
-  assert.doesNotMatch(dashboard, /syncUrl=|window\.location|useEffect/);
+  assert.doesNotMatch(dashboard, /syncUrl=|window\.location|useEffect|name="view"|name="member"/);
   assert.doesNotMatch(sources, /router\.(?:refresh|replace)\(|history\.(?:replaceState|pushState)\(|requestSubmit\(|\.submit\(|setInterval\(/);
   assert.match(dashboard, /currentView === nextView \? currentView : nextView/);
   assert.match(manualEntry, /open \? <ManualKpiForm/);
@@ -31,6 +31,13 @@ test("server query state initializes the dashboard without a mount reconciliatio
   assert.match(page, /initialDashboardView=\{dashboardView\}/);
 });
 
+test("Sales Dashboard no longer carries the redundant Company/Team Member selector state", () => {
+  const page = readFileSync(new URL("../../../app/(hub)/hub/sales-dashboard/page.tsx", import.meta.url), "utf8");
+  const repository = readFileSync(new URL("../data/salesDashboardRepository.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(page, /params\.view|params\.member|(?:^|[?&])view=|(?:^|[?&])member=/);
+  assert.doesNotMatch(repository, /getSalesDashboardQueryPlan|DashboardView/);
+});
+
 test("company dashboard keeps monthly content separate from year to date", () => {
   const dashboard = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
   const company = readFileSync(new URL("../components/CompanyKpiView.tsx", import.meta.url), "utf8");
@@ -39,9 +46,10 @@ test("company dashboard keeps monthly content separate from year to date", () =>
   assert.match(dashboard, /\{ value: "ytd", label: "YTD" \}/);
   assert.match(dashboard, /\{ value: "year-comparison", label: "Year Comparison" \}/);
   assert.match(dashboard, /\{ value: "team-members", label: "Team Members" \}/);
+  assert.doesNotMatch(dashboard, /TeamMemberKpiView|<Select[^>]+name="view"|name="member"/);
   assert.match(dashboard, /useState<DashboardView>\(initialDashboardView\)/);
   assert.match(dashboard, /activeDashboardView === "overview"[\s\S]*<CompanyKpiView[\s\S]*activeDashboardView === "ytd"[\s\S]*<YearToDateView[\s\S]*<YearComparisonChart/);
   assert.match(dashboard, /sales-dashboard-actions" className="flex flex-wrap/);
-  assert.match(dashboard, /view === "company" && isAdmin \? <MonthlyKpiFinals/);
+  assert.match(dashboard, /isAdmin \? <MonthlyKpiFinals/);
   assert.doesNotMatch(company, /MonthlyKpiFinals/);
 });

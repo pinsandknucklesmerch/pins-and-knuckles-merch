@@ -60,6 +60,7 @@ test("July cron payload isolates EPCC profit and unchanged reruns are idempotent
   assert.deepEqual(first, { outcome: "updated", year: 2026, month: 7, quotesDone: 1, ordersProcessed: 1, changed: true });
   assert.equal("monthly_profit" in payload, false);
   assert.equal("monthly_profit_source" in payload, false);
+  assert.deepEqual([payload.sales_inbox_enquiries, payload.converted], [1, 1]);
   assert.deepEqual((deps.writes[0] as { monday_sync_metadata: { reportingPeriod: unknown; quotesDone: unknown; ordersProcessed: unknown; trigger: unknown } }).monday_sync_metadata.reportingPeriod, { year: 2026, month: 7 });
   assert.deepEqual([(deps.writes[0] as { monday_sync_metadata: { quotesDone: unknown; ordersProcessed: unknown } }).monday_sync_metadata.quotesDone, (deps.writes[0] as { monday_sync_metadata: { quotesDone: unknown; ordersProcessed: unknown } }).monday_sync_metadata.ordersProcessed], [1, 1]);
   assert.equal((deps.writes[0] as { monday_sync_metadata: { trigger: unknown } }).monday_sync_metadata.trigger, "cron");

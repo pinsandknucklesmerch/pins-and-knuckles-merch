@@ -14,7 +14,6 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ProfitShirtKpi } from "./ProfitShirtKpi";
 import { SalesInboxKpi } from "./SalesInboxKpi";
 import { SnuggleView } from "./SnuggleView";
-import { TeamMemberKpiView } from "./TeamMemberKpiView";
 import { YearComparisonChart } from "./YearComparisonChart";
 import { YearToDateView } from "./YearToDateView";
 import styles from "./SalesDashboardTvView.module.css";
@@ -31,8 +30,6 @@ type SalesDashboardTvViewProps = {
   data: SalesDashboardData;
   year: number;
   month: number;
-  view: "company" | "members";
-  member?: string;
   companyMetrics: MetricResult[];
   monthlyProfitMetric: MetricResult;
   durationSeconds: number;
@@ -44,7 +41,7 @@ function metricByCode(metrics: MetricResult[], code: MetricResult["code"]) {
   return metric;
 }
 
-export function SalesDashboardTvView({ data, year, month, view, member, companyMetrics, monthlyProfitMetric, durationSeconds }: SalesDashboardTvViewProps) {
+export function SalesDashboardTvView({ data, year, month, companyMetrics, monthlyProfitMetric, durationSeconds }: SalesDashboardTvViewProps) {
   const router = useRouter();
   const [activeView, setActiveView] = useState<TvSlide>(TV_VIEWS[0]);
   const [cycleKey, setCycleKey] = useState(0);
@@ -124,15 +121,15 @@ export function SalesDashboardTvView({ data, year, month, view, member, companyM
         // Continue to the normal dashboard if fullscreen exit is unavailable.
       }
     }
-    router.push(buildNormalModeUrl({ year, month, view, member }));
-  }, [member, month, router, view, year]);
+    router.push(buildNormalModeUrl({ year, month }));
+  }, [month, router, year]);
 
   const changeDuration = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
     const nextDuration = parseTvDuration(event.target.value);
     setSelectedDuration(nextDuration);
     setProgressKey((current) => current + 1);
-    window.history.replaceState(null, "", buildTvModeUrl({ month, year, view, member, durationSeconds: nextDuration }));
-  }, [member, month, view, year]);
+    window.history.replaceState(null, "", buildTvModeUrl({ month, year, durationSeconds: nextDuration }));
+  }, [month, year]);
 
   const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "ArrowLeft") {
@@ -165,11 +162,11 @@ export function SalesDashboardTvView({ data, year, month, view, member, companyM
         <div data-tv-group="activity-card" style={{ "--tv-enter-index": 1 } as CSSProperties}><CombinedKpiCard first={quotes} second={orders} third={conversion} gaugeAnimationKey={cycleKey} gaugeAnimationDelayMs={120} gaugeInteractive={false} tvMode /></div>
       </section>;
     }
-    if (activeView === "snuggle") return <SnuggleView data={data.snuggle} year={year} month={month} view={view} member={member} tvMode />;
+    if (activeView === "snuggle") return <SnuggleView data={data.snuggle} year={year} month={month} tvMode />;
     if (activeView === "ytd") return <YearToDateView data={data.yearToDate} tvMode />;
     if (activeView === "year-comparison") return <YearComparisonChart comparison={data.yearComparison} showControls={false} tvMode />;
-    return data.members.length ? <TeamMemberKpiView rows={data.members} selectedKey={member} query={{ year, month }} /> : <EmptyState title="No team member data" />;
-  }, [activeView, companyMetrics, cycleKey, data, member, month, monthLabel, monthlyProfitMetric, view, year]);
+    return <EmptyState title="No dashboard view" />;
+  }, [activeView, companyMetrics, cycleKey, data, month, monthLabel, monthlyProfitMetric, year]);
 
   return (
     <div

@@ -3,14 +3,12 @@ import type { CompanyKpiMonth, MetricResult, SalesKpiDataSource } from "../domai
 export type DashboardExportFilters = {
   year: number;
   month: number;
-  view: "company" | "members";
-  member?: string;
 };
 
 export type MetricExportRow = {
   year: number;
   month: number;
-  view: DashboardExportFilters["view"];
+  view: "company";
   metric_name: string;
   raw_value: number | null;
   target: number | null;
@@ -39,7 +37,7 @@ export function buildMetricExportRows(
   return metrics.map((metric) => ({
     year: current.year,
     month: current.month,
-    view: filters.view,
+    view: "company",
     metric_name: metric.label,
     raw_value: metric.value,
     target: metric.target,

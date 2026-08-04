@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { executeTargetSave, type TargetSaveDependencies } from "../lib/targetSave.ts";
-import { getSalesDashboardQueryPlan } from "../lib/queryPlan.ts";
 import { mapTargets } from "../data/mappers.ts";
 import type { PinsHubAccessResult } from "../../../lib/access/pinsHubAccess.ts";
 
@@ -32,19 +31,6 @@ function dependencies(overrides: Partial<TargetSaveDependencies> = {}): TargetSa
     ...overrides,
   };
 }
-
-test("company view skips member-month reads", () => {
-  assert.deepEqual(getSalesDashboardQueryPlan("company", true, 2025), {
-    companyYears: [2025, 2024], fetchCompany: true, fetchMembers: false, fetchTargets: true,
-  });
-});
-
-test("member view skips targets and fetches company only for admin entry", () => {
-  assert.deepEqual(getSalesDashboardQueryPlan("members", false, 2025), {
-    companyYears: [2025], fetchCompany: false, fetchMembers: true, fetchTargets: false,
-  });
-  assert.equal(getSalesDashboardQueryPlan("members", true, 2025).fetchCompany, true);
-});
 
 test("target save rejects unsupported fields before access or writes", async () => {
   const formData = validForm();

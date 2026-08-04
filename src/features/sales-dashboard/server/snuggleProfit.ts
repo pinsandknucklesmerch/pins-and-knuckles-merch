@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { isDashboardAccountManager, mapMondayMember, type CanonicalMemberKey } from "../domain/memberIdentity";
+import { getSnuggleFailureCategory, SnuggleServiceError } from "./snuggleDiagnostics";
 
 const SNUGGLE_BOARD_ID = process.env.MONDAY_SNUGGLE_BOARD_ID?.trim() ?? "";
 const SNUGGLE_WORKSPACE_ID = "13775293";
@@ -72,20 +73,31 @@ function people(item: SnuggleItem) {
 
 async function queryMonday<T>(query: string, variables: Record<string, unknown>): Promise<T> {
   const token = process.env.MONDAY_API_TOKEN?.trim();
-  if (!token) throw new Error("MONDAY_API_TOKEN is not configured.");
-  const response = await fetch("https://api.monday.com/v2", {
-    method: "POST",
-    headers: { Authorization: token, "Content-Type": "application/json", "API-Version": "2024-10" },
-    body: JSON.stringify({ query, variables }),
-    cache: "no-store",
-  });
-  const payload = await response.json() as GraphQlResponse<T>;
-  if (!response.ok || payload.errors?.length || !payload.data) throw new Error("Monday Snuggle data request failed.");
+  if (!token) throw new SnuggleServiceError("missing configuration");
+  let response: Response;
+  try {
+    response = await fetch("https://api.monday.com/v2", {
+      method: "POST",
+      headers: { Authorization: token, "Content-Type": "application/json", "API-Version": "2024-10" },
+      body: JSON.stringify({ query, variables }),
+      cache: "no-store",
+    });
+  } catch {
+    throw new SnuggleServiceError("GraphQL response failure");
+  }
+  let payload: GraphQlResponse<T>;
+  try {
+    payload = await response.json() as GraphQlResponse<T>;
+  } catch {
+    throw new SnuggleServiceError(response.status === 401 || response.status === 403 ? "authentication failure" : "GraphQL response failure");
+  }
+  if (response.status === 401 || response.status === 403) throw new SnuggleServiceError("authentication failure");
+  if (!response.ok || payload.errors?.length || !payload.data) throw new SnuggleServiceError("GraphQL response failure");
   return payload.data;
 }
 
 async function collectItems(): Promise<{ board: SnuggleBoard; items: SnuggleItem[] }> {
-  if (!SNUGGLE_BOARD_ID) throw new Error("MONDAY_SNUGGLE_BOARD_ID is not configured.");
+  if (!SNUGGLE_BOARD_ID) throw new SnuggleServiceError("missing configuration");
   const boardQuery = `query ($ids: [ID!], $limit: Int!) {
     boards(ids: $ids) {
       id name workspace { id }
@@ -97,7 +109,7 @@ async function collectItems(): Promise<{ board: SnuggleBoard; items: SnuggleItem
   const first = await queryMonday<{ boards: SnuggleBoard[] }>(boardQuery, { ids: [SNUGGLE_BOARD_ID], limit: 100 });
   const board = first.boards[0];
   if (!board || board.name.trim().toLocaleLowerCase("en-GB") !== EXPECTED_BOARD_NAME.toLocaleLowerCase("en-GB") || board.workspace?.id !== SNUGGLE_WORKSPACE_ID) {
-    throw new Error("Configured Snuggle board does not match the expected board and workspace.");
+    throw new SnuggleServiceError("board/workspace validation failure");
   }
   const items = [...(board.items_page?.items ?? [])];
   let cursor = board.items_page?.cursor ?? null;
@@ -108,7 +120,7 @@ async function collectItems(): Promise<{ board: SnuggleBoard; items: SnuggleItem
       } } }
     }`, { cursor, limit: 100 });
     items.push(...page.next_items_page.items);
-    if (cursor === page.next_items_page.cursor && !page.next_items_page.items.length) throw new Error("Monday Snuggle pagination did not advance.");
+    if (cursor === page.next_items_page.cursor && !page.next_items_page.items.length) throw new SnuggleServiceError("GraphQL response failure");
     cursor = page.next_items_page.cursor ?? null;
   }
   return { board, items };
@@ -159,8 +171,19 @@ export function aggregateSnuggleProfit(input: { board: SnuggleBoard; items: Snug
 }
 
 async function loadSnuggleProfit(): Promise<SnuggleProfitData> {
-  try { return aggregateSnuggleProfit(await collectItems()); } catch (error) { console.error("Snuggle profit load failed", error instanceof Error ? error.message : "unknown error"); return { months: [], members: [], warnings: [], error: "Snuggle profit is currently unavailable." }; }
+  const data = aggregateSnuggleProfit(await collectItems());
+  if (data.error) throw new SnuggleServiceError("board/workspace validation failure");
+  const invalidFormulaCount = data.warnings.filter((warning) => warning.kind === "invalid-profit").length;
+  if (invalidFormulaCount > 0) console.warn("Snuggle data quality warning", { category: "invalid FormulaValue response", count: invalidFormulaCount });
+  return data;
 }
 
 const cachedSnuggleProfit = unstable_cache(loadSnuggleProfit, ["sales-dashboard-snuggle-profit", SNUGGLE_BOARD_ID], { revalidate: 600 });
-export async function getSnuggleProfit(): Promise<SnuggleProfitData> { return cachedSnuggleProfit(); }
+export async function getSnuggleProfit(): Promise<SnuggleProfitData> {
+  try {
+    return await cachedSnuggleProfit();
+  } catch (error) {
+    console.error("Snuggle profit load failed", { category: getSnuggleFailureCategory(error) });
+    return { months: [], members: [], warnings: [], error: "Snuggle profit is currently unavailable." };
+  }
+}

@@ -11,7 +11,7 @@ export function SnuggleMonthlyChart({ months }: { months: SnuggleMonth[] }) {
 
   return <Panel title="Monthly profit">
     <div className="overflow-x-auto pb-1" role="img" aria-label="Monthly Snuggle profit bar chart">
-      <div className="flex h-52 min-w-max items-end gap-2 border-b border-border/70 px-1 pt-4 sm:gap-3">
+      <div className="flex h-52 min-w-max items-end gap-2 border-b border-border/70 px-1 pt-4 sm:h-64 sm:gap-3">
         {chronologicalMonths.map((month, index) => {
           const label = formatSnuggleChartMonth(month);
           const height = getSnuggleBarHeight(month.total, maxMagnitude);
@@ -21,7 +21,7 @@ export function SnuggleMonthlyChart({ months }: { months: SnuggleMonth[] }) {
                 type="button"
                 title={`${label}: ${money(month.total)}`}
                 aria-label={`${label}: ${money(month.total)}`}
-                className={`w-8 rounded-t-sm border border-b-0 transition-[height,background-color] hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card sm:w-9 ${index === latestIndex ? "border-[#de3b43] bg-[#de3b43]" : "border-[#b5aa96] bg-[#b5aa96]/80"}`}
+                className={`w-8 rounded-t-sm border border-b-0 transition-[height,background-color] hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card sm:w-9 ${index === latestIndex ? "border-primary bg-primary" : "border-muted-foreground/60 bg-muted-foreground/60"}`}
                 style={{ height: `${height}%`, minHeight: height > 0 ? "0.25rem" : "0" }}
               />
             </div>

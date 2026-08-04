@@ -42,10 +42,10 @@ function MemberHistory({ row, snuggleData, year }: { row: MemberDashboardRow; sn
   return <div className="overflow-x-auto"><table className="w-full min-w-[34rem] text-sm"><thead><tr className="border-b border-border text-left text-xs text-muted-foreground"><th className="px-2 py-2 font-medium">Month</th><th className="px-2 py-2 text-right font-medium">Profit</th><th className="px-2 py-2 text-right font-medium">Snuggle</th><th className="px-2 py-2 text-right font-medium">PK Tax</th><th className="px-2 py-2 text-right font-medium">Quotes</th><th className="px-2 py-2 text-right font-medium">Orders</th></tr></thead><tbody><tr className="border-b border-border/70"><td className="px-2 py-2">{DASHBOARD_MONTHS[row.month - 1] ?? row.month} {year}</td><td className="px-2 py-2 text-right tabular-nums">{money(row.profit)}</td><td className="px-2 py-2 text-right tabular-nums">{money(snuggleMonth)}</td><td className="px-2 py-2 text-right tabular-nums">{money(row.pkTax)}</td><td className="px-2 py-2 text-right tabular-nums">{number(row.quotesDone)}</td><td className="px-2 py-2 text-right tabular-nums">{number(row.ordersProcessed)}</td></tr></tbody></table></div>;
 }
 
-export function TeamMembersTab({ data, year, month, member }: { data: SalesDashboardData; year: number; month: number; member?: string }) {
+export function TeamMembersTab({ data, year, month }: { data: SalesDashboardData; year: number; month: number }) {
   const visibleMembers = useMemo(() => getVisibleTeamMembers(data.members), [data.members]);
   const firstMemberKey = visibleMembers[0]?.teamMemberKey ?? "";
-  const [selectedKey, setSelectedKey] = useState(() => visibleMembers.find((row) => row.teamMemberKey === member)?.teamMemberKey ?? firstMemberKey);
+  const [selectedKey, setSelectedKey] = useState(firstMemberKey);
 
   useEffect(() => {
     setSelectedKey((current) => visibleMembers.some((row) => row.teamMemberKey === current) ? current : firstMemberKey);

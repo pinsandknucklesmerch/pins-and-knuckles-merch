@@ -3,7 +3,6 @@ import type { Database } from "@/types/database.types";
 import { historicalSalesDashboardFixture } from "./workbookFixture";
 import { buildDashboardData, getFixtureCompanyMonth, mapCompanyRow, mapFinalValues, mapMemberRow, mapMonthlyProfitTargets, mapTargets } from "./mappers";
 import type { FinalisableSalesKpiCode, SalesDashboardData, SalesKpiTargets } from "../domain/types";
-import { getSalesDashboardQueryPlan, type DashboardView } from "../lib/queryPlan";
 import { calculateYearToDate } from "../domain/calculateYearToDate";
 import { buildYearComparison } from "./yearComparison";
 import { getSnuggleProfit } from "../server/snuggleProfit";
@@ -23,24 +22,13 @@ export async function loadSalesDashboard(
   year: number,
   month: number,
   organisationId: string | null,
-  view: DashboardView,
-  includeCompanyEntry: boolean,
 ): Promise<SalesDashboardData> {
   const supabase = await createClient();
   const scope = organisationFilter(organisationId);
-  const plan = getSalesDashboardQueryPlan(view, includeCompanyEntry, year);
-  const companyPromise = plan.fetchCompany
-    ? supabase.from("sales_kpi_months").select(COMPANY_COLUMNS).or(scope).in("year", plan.companyYears).eq("month", month).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS))
-    : Promise.resolve({ data: [], error: null });
-  const memberPromise = (plan.fetchMembers || view === "company")
-    ? supabase.from("sales_kpi_member_months").select(MEMBER_COLUMNS).or(scope).in("year", [year, year - 1]).eq("month", month).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS))
-    : Promise.resolve({ data: [], error: null });
-  const trendPromise = view === "company"
-    ? supabase.from("sales_kpi_months").select(COMPANY_COLUMNS).or(scope).in("year", [year, year - 1]).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS))
-    : Promise.resolve({ data: [], error: null });
-  const targetPromise = plan.fetchTargets
-    ? supabase.from("sales_kpi_targets").select(TARGET_COLUMNS).or(scope).eq("is_active", true).lte("effective_from", `${year}-12-31`).or(`effective_to.is.null,effective_to.gte.${year}-01-01`).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS))
-    : Promise.resolve({ data: [], error: null });
+  const companyPromise = supabase.from("sales_kpi_months").select(COMPANY_COLUMNS).or(scope).in("year", [year, year - 1]).eq("month", month).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
+  const memberPromise = supabase.from("sales_kpi_member_months").select(MEMBER_COLUMNS).or(scope).in("year", [year, year - 1]).eq("month", month).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
+  const trendPromise = supabase.from("sales_kpi_months").select(COMPANY_COLUMNS).or(scope).in("year", [year, year - 1]).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
+  const targetPromise = supabase.from("sales_kpi_targets").select(TARGET_COLUMNS).or(scope).eq("is_active", true).lte("effective_from", `${year}-12-31`).or(`effective_to.is.null,effective_to.gte.${year}-01-01`).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
   const finalPromise = supabase.from("sales_kpi_month_final_values").select(FINAL_COLUMNS).or(scope).in("year", [year, year - 1]).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
   const snugglePromise = getSnuggleProfit();
   const [companyResult, memberResult, trendResult, targetResult, yearResult, finalResult] = await Promise.all([

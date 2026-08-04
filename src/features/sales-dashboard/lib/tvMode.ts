@@ -16,22 +16,16 @@ export function tvDurationMilliseconds(seconds: number) {
 type TvUrlOptions = {
   year: number;
   month: number;
-  view?: string;
-  member?: string;
   durationSeconds?: number;
 };
 
-export function buildTvModeUrl({ year, month, view, member, durationSeconds = DEFAULT_TV_DURATION_SECONDS }: TvUrlOptions) {
+export function buildTvModeUrl({ year, month, durationSeconds = DEFAULT_TV_DURATION_SECONDS }: TvUrlOptions) {
   const params = new URLSearchParams({ month: String(month), year: String(year), tv: "1", duration: String(parseTvDuration(String(durationSeconds))) });
-  if (view) params.set("view", view);
-  if (member) params.set("member", member);
   return `/hub/sales-dashboard?${params.toString()}`;
 }
 
-export function buildNormalModeUrl({ year, month, view, member }: TvUrlOptions) {
+export function buildNormalModeUrl({ year, month }: TvUrlOptions) {
   const params = new URLSearchParams({ month: String(month), year: String(year) });
-  if (view) params.set("view", view);
-  if (member) params.set("member", member);
   return `/hub/sales-dashboard?${params.toString()}`;
 }
 

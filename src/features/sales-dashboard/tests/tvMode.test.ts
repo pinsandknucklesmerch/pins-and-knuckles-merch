@@ -33,9 +33,9 @@ test("TV duration options validate to the default and milliseconds", () => {
 });
 
 test("TV entry and exit URLs preserve the applied reporting context", () => {
-  assert.equal(buildTvModeUrl({ month: 8, year: 2026, view: "company", durationSeconds: 30 }), "/hub/sales-dashboard?month=8&year=2026&tv=1&duration=30&view=company");
+  assert.equal(buildTvModeUrl({ month: 8, year: 2026, durationSeconds: 30 }), "/hub/sales-dashboard?month=8&year=2026&tv=1&duration=30");
   assert.equal(buildTvModeUrl({ month: 8, year: 2026, durationSeconds: 25 }), "/hub/sales-dashboard?month=8&year=2026&tv=1&duration=20");
-  assert.equal(buildNormalModeUrl({ month: 8, year: 2026, view: "members", member: "alice" }), "/hub/sales-dashboard?month=8&year=2026&view=members&member=alice");
+  assert.equal(buildNormalModeUrl({ month: 8, year: 2026 }), "/hub/sales-dashboard?month=8&year=2026");
 });
 
 test("TV controller resets its cycle and cleans up rotation and refresh timers", () => {
