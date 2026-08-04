@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { DashboardNav } from "metricui";
+import { ActionButton } from "@/components/ui/ActionButton";
 import { Panel } from "@/components/ui/Panel";
 import { Select } from "@/components/ui/Select";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -21,6 +23,7 @@ import type { DashboardView } from "../lib/dashboardView";
 import { SnuggleView } from "./SnuggleView";
 import { ProfitPdfReport } from "./ProfitPdfReport";
 import { SalesDashboardTvView } from "./SalesDashboardTvView";
+import { buildTvModeUrl, DEFAULT_TV_DURATION_SECONDS } from "../lib/tvMode";
 
 
 const DASHBOARD_TABS = [
@@ -30,7 +33,8 @@ const DASHBOARD_TABS = [
   { value: "snuggle", label: "Snuggle" },
 ];
 
-export function SalesDashboard({ data, year, month, view, member, isAdmin, initialDashboardView, tvMode = false }: { data: SalesDashboardData; year: number; month: number; view: "company" | "members"; member?: string; isAdmin: boolean; initialDashboardView: DashboardView; tvMode?: boolean }) {
+export function SalesDashboard({ data, year, month, view, member, isAdmin, initialDashboardView, tvMode = false, tvDurationSeconds = DEFAULT_TV_DURATION_SECONDS }: { data: SalesDashboardData; year: number; month: number; view: "company" | "members"; member?: string; isAdmin: boolean; initialDashboardView: DashboardView; tvMode?: boolean; tvDurationSeconds?: number }) {
+  const router = useRouter();
   const [activeDashboardView, setActiveDashboardView] = useState<DashboardView>(initialDashboardView);
   const dashboardMetricsRef = useRef<HTMLDivElement>(null);
   const profitReportRef = useRef<HTMLDivElement>(null);
@@ -58,7 +62,11 @@ if (!conversionRateMetric) {
   }, []);
   const exportTitle = `Pins Sales Metrics — ${DASHBOARD_MONTHS[month - 1]} ${year} — ${activeDashboardView === "year-comparison" ? "Year Comparison" : activeDashboardView === "ytd" ? "YTD" : "Overview"}`;
 
-  if (tvMode) return <MetricDashboardProvider><SalesDashboardTvView data={data} year={year} month={month} view={view} member={member} companyMetrics={companyMetrics} monthlyProfitMetric={monthlyProfitMetric} /></MetricDashboardProvider>;
+  const enterTvMode = useCallback(() => {
+    router.push(buildTvModeUrl({ year, month, view, member, durationSeconds: tvDurationSeconds }));
+  }, [member, month, router, tvDurationSeconds, view, year]);
+
+  if (tvMode) return <MetricDashboardProvider><SalesDashboardTvView data={data} year={year} month={month} view={view} member={member} companyMetrics={companyMetrics} monthlyProfitMetric={monthlyProfitMetric} durationSeconds={tvDurationSeconds} /></MetricDashboardProvider>;
 
   return <MetricDashboardProvider><div className="grid gap-3">
     <Panel><div className="flex flex-wrap items-end gap-3">
@@ -81,6 +89,7 @@ if (!conversionRateMetric) {
           title={exportTitle}
           profitFilename={`pins-profit-report-${DASHBOARD_MONTHS[month - 1].toLowerCase()}-${year}.pdf`}
         />
+        <ActionButton onClick={enterTvMode}>TV Mode</ActionButton>
 
       </div>
     </div></Panel>

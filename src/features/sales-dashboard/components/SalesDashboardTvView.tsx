@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import type { CSSProperties, KeyboardEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties, ChangeEvent, KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import { DASHBOARD_MONTHS } from "../types";
 import type { MetricResult, SalesDashboardData } from "../domain/types";
 import type { TvSlide } from "../lib/tvMode";
-import { nextTvView, previousTvView, TV_DATA_REFRESH_INTERVAL_MS, TV_ROTATION_INTERVAL_MS, TV_VIEWS } from "../lib/tvMode";
+import { buildNormalModeUrl, buildTvModeUrl, nextTvView, parseTvDuration, previousTvView, tvDurationMilliseconds, TV_DATA_REFRESH_INTERVAL_MS, TV_DURATION_OPTIONS_SECONDS, TV_VIEWS } from "../lib/tvMode";
 import { CombinedKpiCard } from "./CombinedKpiCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProfitShirtKpi } from "./ProfitShirtKpi";
@@ -34,6 +34,7 @@ type SalesDashboardTvViewProps = {
   member?: string;
   companyMetrics: MetricResult[];
   monthlyProfitMetric: MetricResult;
+  durationSeconds: number;
 };
 
 function metricByCode(metrics: MetricResult[], code: MetricResult["code"]) {
@@ -42,22 +43,27 @@ function metricByCode(metrics: MetricResult[], code: MetricResult["code"]) {
   return metric;
 }
 
-export function SalesDashboardTvView({ data, year, month, view, member, companyMetrics, monthlyProfitMetric }: SalesDashboardTvViewProps) {
+export function SalesDashboardTvView({ data, year, month, view, member, companyMetrics, monthlyProfitMetric, durationSeconds }: SalesDashboardTvViewProps) {
   const router = useRouter();
   const [activeView, setActiveView] = useState<TvSlide>(TV_VIEWS[0]);
   const [cycleKey, setCycleKey] = useState(0);
+  const [progressKey, setProgressKey] = useState(0);
+  const [selectedDuration, setSelectedDuration] = useState(() => parseTvDuration(String(durationSeconds)));
   const [pointerOver, setPointerOver] = useState(false);
   const [focusWithin, setFocusWithin] = useState(false);
   const [documentHidden, setDocumentHidden] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [canFullscreen, setCanFullscreen] = useState(false);
   const paused = pointerOver || focusWithin || documentHidden;
+  const durationMs = tvDurationMilliseconds(selectedDuration);
   const viewLabel = VIEW_LABELS[activeView];
   const monthLabel = DASHBOARD_MONTHS[month - 1] ?? "Current month";
+  const previousPausedRef = useRef(paused);
 
   const changeView = useCallback((nextView: TvSlide) => {
     setActiveView(nextView);
     setCycleKey((current) => current + 1);
+    setProgressKey((current) => current + 1);
   }, []);
 
   const moveNext = useCallback(() => changeView(nextTvView(activeView)), [activeView, changeView]);
@@ -65,9 +71,18 @@ export function SalesDashboardTvView({ data, year, month, view, member, companyM
 
   useEffect(() => {
     if (paused) return;
-    const timeout = window.setTimeout(moveNext, TV_ROTATION_INTERVAL_MS);
+    const timeout = window.setTimeout(moveNext, durationMs);
     return () => window.clearTimeout(timeout);
-  }, [activeView, moveNext, paused]);
+  }, [activeView, durationMs, moveNext, paused]);
+
+  useEffect(() => {
+    if (previousPausedRef.current && !paused) setProgressKey((current) => current + 1);
+    previousPausedRef.current = paused;
+  }, [paused]);
+
+  useEffect(() => {
+    setSelectedDuration(parseTvDuration(String(durationSeconds)));
+  }, [durationSeconds]);
 
   useEffect(() => {
     const updateVisibility = () => setDocumentHidden(document.hidden);
@@ -99,6 +114,24 @@ export function SalesDashboardTvView({ data, year, month, view, member, companyM
       setIsFullscreen(document.fullscreenElement !== null);
     }
   }, [canFullscreen]);
+
+  const exitTvMode = useCallback(async () => {
+    if (document.fullscreenElement) {
+      try {
+        await document.exitFullscreen();
+      } catch {
+        // Continue to the normal dashboard if fullscreen exit is unavailable.
+      }
+    }
+    router.push(buildNormalModeUrl({ year, month, view, member }));
+  }, [member, month, router, view, year]);
+
+  const changeDuration = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
+    const nextDuration = parseTvDuration(event.target.value);
+    setSelectedDuration(nextDuration);
+    setProgressKey((current) => current + 1);
+    window.history.replaceState(null, "", buildTvModeUrl({ month, year, view, member, durationSeconds: nextDuration }));
+  }, [member, month, view, year]);
 
   const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "ArrowLeft") {
@@ -158,13 +191,17 @@ export function SalesDashboardTvView({ data, year, month, view, member, companyM
       </main>
 
       <footer className={styles.footer}>
-        <div className={styles.progressTrack} aria-hidden="true"><div key={cycleKey} className={styles.progressFill} /></div>
+        <div className={styles.progressTrack} aria-hidden="true"><div key={progressKey} className={styles.progressFill} style={{ "--tv-duration": `${durationMs}ms` } as CSSProperties} /></div>
         <div className={styles.controls}>
           <span className={styles.viewName}>{viewLabel} · {paused ? "Paused" : "Rotating"}</span>
-          <div className={styles.buttonGroup}>
+          <div className={styles.toolbar}>
+            <label className={styles.durationControl}><span>Display duration</span><select className={styles.durationSelect} value={selectedDuration} onChange={changeDuration}>{TV_DURATION_OPTIONS_SECONDS.map((seconds) => <option key={seconds} value={seconds}>{seconds} seconds</option>)}</select></label>
+            <div className={styles.buttonGroup}>
             <button className={styles.controlButton} type="button" onClick={movePrevious} aria-label="Previous TV view"><ChevronLeft size={14} aria-hidden="true" />Previous</button>
             <button className={styles.controlButton} type="button" onClick={moveNext} aria-label="Next TV view">Next<ChevronRight size={14} aria-hidden="true" /></button>
             <button className={styles.controlButton} type="button" onClick={toggleFullscreen} disabled={!canFullscreen} aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}>{isFullscreen ? <Minimize2 size={14} aria-hidden="true" /> : <Maximize2 size={14} aria-hidden="true" />}{isFullscreen ? "Exit" : "Fullscreen"}</button>
+            <button className={styles.controlButton} type="button" onClick={exitTvMode}>Exit TV Mode</button>
+            </div>
           </div>
         </div>
       </footer>
