@@ -15,6 +15,7 @@ import { EuDeliveryHelper } from "./EuDeliveryHelper";
 import { CalculatorToolbar } from "./CalculatorToolbar";
 import type { EuQuoteLine } from "../domain/euQuoteFormatter.ts";
 import { formatEuStandardQuote, formatUsClientQuote } from "../domain/euQuoteFormatter.ts";
+import { shouldShowMissingGarmentError } from "../domain/euCalculatorInteractions.ts";
 
 type EuCalculatorProps = {
   referenceData: CalculatorReferenceData;
@@ -60,6 +61,7 @@ export function EuCalculator({ referenceData, profileCode = "EU_STANDARD" }: EuC
   const [items, setItems] = useState<EuCalculatorItemInput[]>([
     createDefaultEuCalculatorItem(1),
   ]);
+  const [missingGarmentActions, setMissingGarmentActions] = useState<Record<string, { attemptedAddItem?: boolean; attemptedPrintSelection?: boolean }>>({});
 
   const calculations = useMemo<ItemCalculation[]>(() => {
     return items.map((item) => {
@@ -104,6 +106,13 @@ export function EuCalculator({ referenceData, profileCode = "EU_STANDARD" }: EuC
   });
 
   function updateItem(updatedItem: EuCalculatorItemInput) {
+    if (updatedItem.garmentId) {
+      setMissingGarmentActions((current) => {
+        const next = { ...current };
+        delete next[updatedItem.id];
+        return next;
+      });
+    }
     setItems((currentItems) =>
       currentItems.map((item) =>
         item.id === updatedItem.id ? updatedItem : item,
@@ -111,7 +120,25 @@ export function EuCalculator({ referenceData, profileCode = "EU_STANDARD" }: EuC
     );
   }
 
+  function markPrintPositionSelected(itemId: string) {
+    const item = items.find((currentItem) => currentItem.id === itemId);
+    if (item?.garmentId) return;
+    setMissingGarmentActions((current) => ({
+      ...current,
+      [itemId]: { ...current[itemId], attemptedPrintSelection: true },
+    }));
+  }
+
   function addItem() {
+    setMissingGarmentActions((current) => {
+      const next = { ...current };
+      items.forEach((item) => {
+        if (!item.garmentId) {
+          next[item.id] = { ...next[item.id], attemptedAddItem: true };
+        }
+      });
+      return next;
+    });
     setItems((currentItems) => [...currentItems, createDefaultEuCalculatorItem(nextItemIndex)]);
     setNextItemIndex((currentIndex) => currentIndex + 1);
   }
@@ -127,13 +154,14 @@ export function EuCalculator({ referenceData, profileCode = "EU_STANDARD" }: EuC
   function reset() {
     setItems([createDefaultEuCalculatorItem(1)]);
     setNextItemIndex(2);
+    setMissingGarmentActions({});
   }
 
   return (
     <div className="grid min-w-0 gap-4">
       <CalculatorToolbar validItemCount={validItemCount} totalItemCount={items.length} onAddItem={addItem} onReset={reset} />
 
-      <div className={hasValidItems ? "grid min-w-0 gap-4 xl:grid-cols-[minmax(0,2.3fr)_minmax(19rem,0.85fr)]" : "grid min-w-0 gap-4"}>
+      <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(19rem,0.85fr)]">
         <div className="grid min-w-0 content-start gap-4">
           <div className="grid gap-4">
             {items.map((item, index) => (
@@ -142,28 +170,23 @@ export function EuCalculator({ referenceData, profileCode = "EU_STANDARD" }: EuC
                 item={item}
                 index={index}
                 garments={referenceData.garments}
-                errors={
-                  calculations.find((calculation) => calculation.itemId === item.id)
-                    ?.errors ?? []
-                }
+                errors={(calculations.find((calculation) => calculation.itemId === item.id)?.errors ?? []).filter((error) => error.code !== "MISSING_GARMENT" || shouldShowMissingGarmentError({ garmentId: item.garmentId, ...missingGarmentActions[item.id] }))}
                 canRemove={items.length > 1}
                 onChange={updateItem}
                 onRemove={() => removeItem(item.id)}
+                onPrintPositionSelect={() => markPrintPositionSelected(item.id)}
               />
             ))}
           </div>
         </div>
 
-        {hasValidItems ? <div className="grid min-w-0 content-start gap-4">
-          <EuCalculatorResults items={validQuoteLines} totals={totals} quoteFormatter={profileCode === "EU_US_CLIENTS" ? formatUsClientQuote : formatEuStandardQuote} showBreakdown={false} showEmptyState={false} />
+        {hasValidItems ? <div className="grid min-w-0 content-start gap-4 xl:row-span-2">
+          <EuCalculatorResults items={validQuoteLines} totals={totals} quoteFormatter={profileCode === "EU_US_CLIENTS" ? formatUsClientQuote : formatEuStandardQuote} showEmptyState={false} />
         </div> : null}
+        <div className="min-w-0">
+          <EuDeliveryHelper deliveryRates={referenceData.deliveryRates} deliveryRatesError={referenceData.deliveryRatesError} />
+        </div>
       </div>
-
-      <EuDeliveryHelper deliveryRates={referenceData.deliveryRates} deliveryRatesError={referenceData.deliveryRatesError} />
-
-      {hasValidItems ? <div className="min-w-0">
-        <EuCalculatorResults items={validQuoteLines} totals={totals} quoteFormatter={profileCode === "EU_US_CLIENTS" ? formatUsClientQuote : formatEuStandardQuote} showSummary={false} />
-      </div> : null}
     </div>
   );
 }

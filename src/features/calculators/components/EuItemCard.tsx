@@ -18,6 +18,7 @@ type EuItemCardProps = {
   canRemove: boolean;
   onChange: (item: EuCalculatorItemInput) => void;
   onRemove: () => void;
+  onPrintPositionSelect: () => void;
 };
 
 export function EuItemCard({
@@ -28,6 +29,7 @@ export function EuItemCard({
   canRemove,
   onChange,
   onRemove,
+  onPrintPositionSelect,
 }: EuItemCardProps) {
   return (
     <Panel className="border-border/90 bg-card">
@@ -76,6 +78,7 @@ export function EuItemCard({
         <PrintPositionControls
           value={item.printPositions}
           onChange={(printPositions) => onChange({ ...item, printPositions })}
+          onPositionSelect={onPrintPositionSelect}
         />
 
         <EmbroideryControls
