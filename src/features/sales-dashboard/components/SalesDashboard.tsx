@@ -23,6 +23,7 @@ import type { DashboardView } from "../lib/dashboardView";
 import { SnuggleView } from "./SnuggleView";
 import { ProfitPdfReport } from "./ProfitPdfReport";
 import { SalesDashboardTvView } from "./SalesDashboardTvView";
+import { TeamMembersTab } from "./TeamMembersTab";
 import { buildTvModeUrl, DEFAULT_TV_DURATION_SECONDS } from "../lib/tvMode";
 
 
@@ -31,6 +32,7 @@ const DASHBOARD_TABS = [
   { value: "ytd", label: "YTD" },
   { value: "year-comparison", label: "Year Comparison" },
   { value: "snuggle", label: "Snuggle" },
+  { value: "team-members", label: "Team Members" },
 ];
 
 export function SalesDashboard({ data, year, month, view, member, isAdmin, initialDashboardView, tvMode = false, tvDurationSeconds = DEFAULT_TV_DURATION_SECONDS }: { data: SalesDashboardData; year: number; month: number; view: "company" | "members"; member?: string; isAdmin: boolean; initialDashboardView: DashboardView; tvMode?: boolean; tvDurationSeconds?: number }) {
@@ -57,10 +59,10 @@ if (!conversionRateMetric) {
   throw new Error("Conversion Rate metric is unavailable.");
 }
   const changeDashboardView = useCallback((value: string) => {
-    const nextView: DashboardView = value === "year-comparison" ? "year-comparison" : value === "ytd" ? "ytd" : value === "snuggle" ? "snuggle" : "overview";
+    const nextView: DashboardView = value === "year-comparison" ? "year-comparison" : value === "ytd" ? "ytd" : value === "snuggle" ? "snuggle" : value === "team-members" ? "team-members" : "overview";
     setActiveDashboardView((currentView) => currentView === nextView ? currentView : nextView);
   }, []);
-  const exportTitle = `Pins Sales Metrics — ${DASHBOARD_MONTHS[month - 1]} ${year} — ${activeDashboardView === "year-comparison" ? "Year Comparison" : activeDashboardView === "ytd" ? "YTD" : "Overview"}`;
+  const exportTitle = `Pins Sales Metrics — ${DASHBOARD_MONTHS[month - 1]} ${year} — ${activeDashboardView === "year-comparison" ? "Year Comparison" : activeDashboardView === "ytd" ? "YTD" : activeDashboardView === "snuggle" ? "Snuggle" : activeDashboardView === "team-members" ? "Team Members" : "Overview"}`;
 
   const enterTvMode = useCallback(() => {
     router.push(buildTvModeUrl({ year, month, view, member, durationSeconds: tvDurationSeconds }));
@@ -96,7 +98,7 @@ if (!conversionRateMetric) {
     <div ref={dashboardMetricsRef} data-testid="sales-dashboard-export-content" className="grid gap-3">
       {data.setupIssue ? <p role="alert" className="text-sm text-destructive">{data.setupIssue}</p> : null}
       <DashboardNav tabs={DASHBOARD_TABS} value={activeDashboardView} onChange={changeDashboardView} mode="tabs" />
-      {activeDashboardView === "snuggle" ? <SnuggleView data={data.snuggle} year={year} month={month} view={view} member={member} /> : view === "company" ? <>{activeDashboardView === "overview" ? <CompanyKpiView current={data.company} metrics={companyMetrics} /> : activeDashboardView === "ytd" ? <YearToDateView data={data.yearToDate} /> : <YearComparisonChart comparison={data.yearComparison} />}</> : data.members.length ? <TeamMemberKpiView rows={data.members} selectedKey={member} query={{ year, month }} /> : <EmptyState title="No team member data" />}
+      {activeDashboardView === "snuggle" ? <SnuggleView data={data.snuggle} year={year} month={month} view={view} member={member} /> : activeDashboardView === "team-members" ? <TeamMembersTab data={data} year={year} month={month} member={member} /> : view === "company" ? <>{activeDashboardView === "overview" ? <CompanyKpiView current={data.company} metrics={companyMetrics} /> : activeDashboardView === "ytd" ? <YearToDateView data={data.yearToDate} /> : <YearComparisonChart comparison={data.yearComparison} />}</> : data.members.length ? <TeamMemberKpiView rows={data.members} selectedKey={member} query={{ year, month }} /> : <EmptyState title="No team member data" />}
     </div>
     <div
       aria-hidden="true"

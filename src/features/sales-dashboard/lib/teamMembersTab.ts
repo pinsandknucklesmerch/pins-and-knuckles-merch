@@ -1,0 +1,17 @@
+import { normalDashboardMembers } from "../domain/memberVisibility.ts";
+import type { MemberDashboardRow } from "../domain/types.ts";
+import type { SnuggleProfitData } from "../server/snuggleProfit.ts";
+
+export function getVisibleTeamMembers(rows: MemberDashboardRow[]) {
+  return normalDashboardMembers(rows);
+}
+
+export function getMemberSnuggleProfit(
+  data: SnuggleProfitData,
+  memberKey: string,
+  year: number,
+  month: number,
+) {
+  const member = data.members.find((candidate) => candidate.memberKey === memberKey);
+  return member?.months.find((candidate) => candidate.year === year && candidate.month === month)?.total ?? null;
+}

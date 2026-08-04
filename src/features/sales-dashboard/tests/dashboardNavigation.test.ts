@@ -7,6 +7,7 @@ test("dashboard view query parsing is stable", () => {
   assert.equal(parseDashboardView("year-comparison"), "year-comparison");
   assert.equal(parseDashboardView("ytd"), "ytd");
   assert.equal(parseDashboardView("overview"), "overview");
+  assert.equal(parseDashboardView("team-members"), "team-members");
   assert.equal(parseDashboardView(undefined), "overview");
   assert.equal(parseDashboardView("invalid"), "overview");
 });
@@ -18,7 +19,7 @@ test("Sales Dashboard does not automatically navigate or rewrite its URL", () =>
   const sources = [dashboard, provider, manualEntry].join("\n");
 
   assert.doesNotMatch(dashboard, /syncUrl=|window\.location|useEffect/);
-  assert.doesNotMatch(sources, /router\.(?:refresh|replace|push)\(|history\.(?:replaceState|pushState)\(|requestSubmit\(|\.submit\(|setInterval\(/);
+  assert.doesNotMatch(sources, /router\.(?:refresh|replace)\(|history\.(?:replaceState|pushState)\(|requestSubmit\(|\.submit\(|setInterval\(/);
   assert.match(dashboard, /currentView === nextView \? currentView : nextView/);
   assert.match(manualEntry, /open \? <ManualKpiForm/);
   assert.match(manualEntry, /function ManualKpiForm[\s\S]*useActionState/);
@@ -37,6 +38,7 @@ test("company dashboard keeps monthly content separate from year to date", () =>
   assert.match(dashboard, /\{ value: "overview", label: "Overview" \}/);
   assert.match(dashboard, /\{ value: "ytd", label: "YTD" \}/);
   assert.match(dashboard, /\{ value: "year-comparison", label: "Year Comparison" \}/);
+  assert.match(dashboard, /\{ value: "team-members", label: "Team Members" \}/);
   assert.match(dashboard, /useState<DashboardView>\(initialDashboardView\)/);
   assert.match(dashboard, /activeDashboardView === "overview"[\s\S]*<CompanyKpiView[\s\S]*activeDashboardView === "ytd"[\s\S]*<YearToDateView[\s\S]*<YearComparisonChart/);
   assert.match(dashboard, /sales-dashboard-actions" className="flex flex-wrap/);

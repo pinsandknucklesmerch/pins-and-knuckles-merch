@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Panel } from "@/components/ui/Panel";
 import type { SnuggleProfitData, SnuggleMonth } from "../server/snuggleProfit";
+import { SnuggleMonthlyChart } from "./SnuggleMonthlyChart";
 
 const money = (value: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(value);
 const monthName = (value: SnuggleMonth) => new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(value.year, value.month - 1, 1)));
@@ -28,6 +29,7 @@ export function SnuggleView({ data, year, month, view, member, tvMode = false }:
         <div className="text-2xl font-semibold tabular-nums">{selected ? money(selected.total) : "—"}</div>
         <p className="mt-1 text-xs text-muted-foreground">{view === "members" ? selectedMember?.memberKey ?? "Selected team member" : "Company total"}</p>
       </Panel>
+      <SnuggleMonthlyChart months={history} />
       <Panel title="Monthly Snuggle profit" tvGroup={tvMode ? "snuggle-table" : undefined}>
         <div className="overflow-x-auto"><table className="w-full min-w-[20rem] text-sm"><thead><tr className="border-b border-border text-left text-xs text-muted-foreground"><th className="px-2 py-2 font-medium">Month</th><th className="px-2 py-2 text-right font-medium">Profit</th></tr></thead><tbody>{history.map((entry) => <tr key={`${entry.year}-${entry.month}`} className="border-b border-border/70"><td className="px-2 py-2">{monthName(entry)}</td><td className="px-2 py-2 text-right tabular-nums">{money(entry.total)}</td></tr>)}</tbody></table></div>
       </Panel>
