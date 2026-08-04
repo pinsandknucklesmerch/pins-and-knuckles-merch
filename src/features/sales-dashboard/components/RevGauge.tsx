@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { gaugeZoneRatios } from "../lib/gaugeZones";
 import styles from "./RevGauge.module.css";
 
 type RevGaugeProps = {
@@ -87,7 +88,8 @@ function usePrefersReducedMotion() {
 
 export function RevGauge({ value, target, max, progress, format, label, interactive = true, animationKey, animationDelayMs = 0, tvMode = false }: RevGaugeProps) {
   const valueRatio = clampRatio(value / max);
-  const targetRatio = clampRatio(target / max);
+  const zoneRatios = gaugeZoneRatios(target, max);
+  const targetRatio = zoneRatios.greenStart;
   const needleAngle = START_ANGLE + valueRatio * (END_ANGLE - START_ANGLE);
   const prefersReducedMotion = usePrefersReducedMotion();
   const [renderedAngle, setRenderedAngle] = useState(interactive || animationKey !== undefined ? START_ANGLE : needleAngle);
@@ -102,6 +104,9 @@ export function RevGauge({ value, target, max, progress, format, label, interact
   const status = statusFor(progress);
   const currentText = formatValue(value, format);
   const targetText = formatValue(target, format);
+  const redEndAngle = START_ANGLE + zoneRatios.redEnd * (END_ANGLE - START_ANGLE);
+  const amberEndAngle = START_ANGLE + zoneRatios.amberEnd * (END_ANGLE - START_ANGLE);
+  const greenStartAngle = START_ANGLE + zoneRatios.greenStart * (END_ANGLE - START_ANGLE);
 
   const startNeedleAnimation = useCallback((fromAngle: number, destinationAngle: number) => {
     if (animationFrameRef.current !== null) cancelAnimationFrame(animationFrameRef.current);
@@ -187,9 +192,9 @@ export function RevGauge({ value, target, max, progress, format, label, interact
     >
       <svg className={styles.svg} viewBox="0 0 240 180" aria-hidden="true" focusable="false">
         <path className={styles.arcTrack} d={arcPath(START_ANGLE, END_ANGLE)} />
-        <path className={styles.arcZoneDanger} d={arcPath(START_ANGLE, -36)} />
-        <path className={styles.arcZoneWarning} d={arcPath(-36, 36)} />
-        <path className={styles.arcZoneSuccess} d={arcPath(36, END_ANGLE)} />
+        <path className={styles.arcZoneDanger} d={arcPath(START_ANGLE, redEndAngle)} />
+        <path className={styles.arcZoneWarning} d={arcPath(redEndAngle, amberEndAngle)} />
+        <path className={styles.arcZoneSuccess} d={arcPath(greenStartAngle, END_ANGLE)} />
         {TICK_RATIOS.map((ratio, index) => {
           const angle = START_ANGLE + ratio * (END_ANGLE - START_ANGLE);
           const inner = pointAt(angle, TICK_INNER_RADIUS);
