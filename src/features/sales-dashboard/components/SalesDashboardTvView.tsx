@@ -113,7 +113,7 @@ export function SalesDashboardTvView({ data, year, month, view, member, companyM
   const viewContent = useMemo(() => {
     if (activeView === "profit-overview") return <section className={styles.profitSlide} data-tv-view="profit-overview">
       <div className={styles.slideHeading} data-tv-group="profit-heading" style={{ "--tv-enter-index": 0 } as CSSProperties}><h2>{VIEW_LABELS[activeView]}</h2><span>{monthLabel} {year}</span></div>
-      <div className={styles.profitCard} data-tv-group="profit-card" style={{ "--tv-enter-index": 1 } as CSSProperties}><ProfitShirtKpi metric={monthlyProfitMetric} /></div>
+      <div className={styles.profitCard} data-tv-group="profit-card" style={{ "--tv-enter-index": 1 } as CSSProperties}><ProfitShirtKpi metric={monthlyProfitMetric} animationKey={cycleKey} /></div>
     </section>;
     if (activeView === "sales-activity") {
       const quotes = metricByCode(companyMetrics, "QUOTES_DONE");

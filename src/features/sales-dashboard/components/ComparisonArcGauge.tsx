@@ -1,12 +1,14 @@
+import type { CSSProperties } from "react";
 import { comparisonArcFillPercent, comparisonArcRatio } from "../lib/metricDisplay";
 import styles from "./ComparisonArcGauge.module.css";
 
 type ComparisonArcGaugeProps = {
   current: number | null;
   previousYear: number | null;
+  animationKey?: string | number;
 };
 
-export function ComparisonArcGauge({ current, previousYear }: ComparisonArcGaugeProps) {
+export function ComparisonArcGauge({ current, previousYear, animationKey }: ComparisonArcGaugeProps) {
   const ratio = comparisonArcRatio(current, previousYear);
   const fillPercent = comparisonArcFillPercent(current, previousYear);
   const trend = ratio !== null && ratio > 1 ? styles.above : styles.below;
@@ -20,7 +22,7 @@ export function ComparisonArcGauge({ current, previousYear }: ComparisonArcGauge
     <svg className={styles.gauge} viewBox="0 0 180 108" role="img" aria-label={label}>
       <title>{label}</title>
       <path className={styles.remainder} d="M24 96A66 66 0 0 1 156 96" pathLength="100" />
-      {ratio !== null ? <path className={trend} d="M24 96A66 66 0 0 1 156 96" pathLength="100" strokeDasharray={`${fillPercent} 100`} /> : null}
+      {ratio !== null ? <path key={animationKey} className={`${trend} ${animationKey !== undefined ? styles.animated : ""}`} style={{ "--arc-progress": fillPercent } as CSSProperties} d="M24 96A66 66 0 0 1 156 96" pathLength="100" /> : null}
     </svg>
   );
 }

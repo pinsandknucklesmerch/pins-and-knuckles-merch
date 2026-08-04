@@ -195,10 +195,10 @@ export function RevGauge({ value, target, max, progress, format, label, interact
       <svg className={styles.svg} viewBox="0 0 240 180" aria-hidden="true" focusable="false">
         <path className={styles.arcTrack} d={arcPath(START_ANGLE, END_ANGLE)} />
         <path className={styles.arcZoneNeutral} d={arcPath(START_ANGLE, neutralEndAngle)} />
-        <path className={styles.arcZoneDanger} d={arcPath(neutralEndAngle, redEndAngle)} />
+        <path className={styles.arcZoneYellow} d={arcPath(neutralEndAngle, redEndAngle)} />
         <path className={styles.arcZoneOrange} d={arcPath(redEndAngle, orangeEndAngle)} />
-        <path className={styles.arcZoneWarning} d={arcPath(orangeEndAngle, amberEndAngle)} />
-        <path className={styles.arcZoneSuccess} d={arcPath(greenStartAngle, END_ANGLE)} />
+        <path className={styles.arcZoneRed} d={arcPath(orangeEndAngle, amberEndAngle)} />
+        <path className={styles.arcZoneGreen} d={arcPath(greenStartAngle, END_ANGLE)} />
         {TICK_RATIOS.map((ratio, index) => {
           const angle = START_ANGLE + ratio * (END_ANGLE - START_ANGLE);
           const inner = pointAt(angle, TICK_INNER_RADIUS);

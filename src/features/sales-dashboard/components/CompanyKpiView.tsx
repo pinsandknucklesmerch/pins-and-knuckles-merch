@@ -32,10 +32,10 @@ export function CompanyKpiView({ current, metrics, gaugeAnimationKey, gaugeAnima
         <MetricGrid.Item span="full">
           <div className={styles.topRow}>
             <div className={`${styles.tvGroup} ${tvMode ? styles.tvGroupTv : ""}`} data-tv-group={tvMode ? "overview-profit" : undefined} style={tvMode ? { "--tv-enter-index": 0 } as CSSProperties : undefined}>
-              <ProfitShirtKpi metric={profit} />
+              <ProfitShirtKpi metric={profit} animationKey={gaugeAnimationKey ?? "initial"} />
             </div>
             <div className={`${styles.tvGroup} ${tvMode ? styles.tvGroupTv : ""}`} data-tv-group={tvMode ? "overview-inbox" : undefined} style={tvMode ? { "--tv-enter-index": 4 } as CSSProperties : undefined}>
-              <SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} />
+              <SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} animationKey={gaugeAnimationKey ?? "initial"} />
             </div>
           </div>
         </MetricGrid.Item>
