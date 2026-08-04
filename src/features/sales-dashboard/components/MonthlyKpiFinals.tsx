@@ -3,7 +3,8 @@
 import { useActionState, useEffect, useRef, useState, type MouseEvent, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { clearSalesKpiMonthFinalValue, saveSalesKpiMonthFinalValue, type FinalValueActionState } from "../actions";
+import { clearSalesKpiMonthFinalValue, saveSalesKpiMonthFinalValue } from "../actions";
+import type { FinalValueActionState } from "../lib/finalValue";
 import type { FinalisableSalesKpiCode, MetricResult } from "../domain/types";
 import { ActionButton } from "@/components/ui/ActionButton";
 import { feedback } from "@/components/ui/feedback";

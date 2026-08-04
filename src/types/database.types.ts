@@ -747,6 +747,51 @@ export type Database = {
         }
         Relationships: []
       }
+      sales_dashboard_tv_settings: {
+        Row: {
+          display_order: number
+          duration_seconds: number
+          is_enabled: boolean
+          organisation_id: string
+          slide_key: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          display_order: number
+          duration_seconds?: number
+          is_enabled?: boolean
+          organisation_id: string
+          slide_key: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          display_order?: number
+          duration_seconds?: number
+          is_enabled?: boolean
+          organisation_id?: string
+          slide_key?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_dashboard_tv_settings_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_dashboard_tv_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sales_kpi_member_months: {
         Row: {
           converted: number | null
@@ -1308,6 +1353,10 @@ export type Database = {
         Args: { required_access_level?: string }
         Returns: boolean
       }
+      has_pins_hub_access_for_organisation: {
+        Args: { required_access_level?: string; target_organisation_id: string }
+        Returns: boolean
+      }
       ingest_epcc_monthly_profit:
         | {
             Args: {
@@ -1391,6 +1440,14 @@ export type Database = {
           p_organisation_id: string
           p_year: number
         }
+        Returns: undefined
+      }
+      reset_sales_dashboard_tv_settings: {
+        Args: { p_organisation_id: string }
+        Returns: undefined
+      }
+      save_sales_dashboard_tv_settings: {
+        Args: { p_organisation_id: string; p_settings: Json }
         Returns: undefined
       }
       try_acquire_monday_sales_sync_lock: {

@@ -1,29 +1,30 @@
 "use client";
 
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2, Pause, Play } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties, ChangeEvent, KeyboardEvent } from "react";
+import type { CSSProperties, KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import { DASHBOARD_MONTHS } from "../types";
 import type { MetricResult, SalesDashboardData } from "../domain/types";
 import type { TvSlide } from "../lib/tvMode";
-import { buildNormalModeUrl, buildTvModeUrl, nextTvView, parseTvDuration, previousTvView, tvDurationMilliseconds, TV_DATA_REFRESH_INTERVAL_MS, TV_DURATION_OPTIONS_SECONDS, TV_VIEWS } from "../lib/tvMode";
-import { CombinedKpiCard } from "./CombinedKpiCard";
+import { buildNormalModeUrl, nextTvView, previousTvView, tvDurationMilliseconds, TV_DATA_REFRESH_INTERVAL_MS } from "../lib/tvMode";
+import { safeTvSettings } from "../lib/tvSettings";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProfitShirtKpi } from "./ProfitShirtKpi";
 import { SalesInboxKpi } from "./SalesInboxKpi";
 import { SnuggleView } from "./SnuggleView";
 import { YearComparisonChart } from "./YearComparisonChart";
 import { YearToDateView } from "./YearToDateView";
+import { TeamMembersTab } from "./TeamMembersTab";
 import styles from "./SalesDashboardTvView.module.css";
 
 const VIEW_LABELS: Record<TvSlide, string> = {
   overview: "Overview",
-  "sales-activity": "Sales Activity",
   ytd: "Year to Date",
-  "year-comparison": "Year Comparison",
+  year_comparison: "Year Comparison",
   snuggle: "Snuggle",
+  team_members: "Team Members",
 };
 
 type SalesDashboardTvViewProps = {
@@ -43,29 +44,37 @@ function metricByCode(metrics: MetricResult[], code: MetricResult["code"]) {
 
 export function SalesDashboardTvView({ data, year, month, companyMetrics, monthlyProfitMetric, durationSeconds }: SalesDashboardTvViewProps) {
   const router = useRouter();
-  const [activeView, setActiveView] = useState<TvSlide>(TV_VIEWS[0]);
+  const rotation = useMemo(() => safeTvSettings().slides.filter((slide) => slide.isEnabled), []);
+  const rotationKeys = useMemo(() => rotation.map((slide) => slide.slideKey), [rotation]);
+  const [activeView, setActiveView] = useState<TvSlide>(rotation[0]?.slideKey ?? "overview");
   const [cycleKey, setCycleKey] = useState(0);
   const [progressKey, setProgressKey] = useState(0);
-  const [selectedDuration, setSelectedDuration] = useState(() => parseTvDuration(String(durationSeconds)));
+  const [manualPaused, setManualPaused] = useState(false);
   const [pointerOver, setPointerOver] = useState(false);
   const [focusWithin, setFocusWithin] = useState(false);
   const [documentHidden, setDocumentHidden] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [canFullscreen, setCanFullscreen] = useState(false);
-  const paused = pointerOver || focusWithin || documentHidden;
-  const durationMs = tvDurationMilliseconds(selectedDuration);
+  const paused = manualPaused || pointerOver || focusWithin || documentHidden;
+  const activeSetting = rotation.find((slide) => slide.slideKey === activeView) ?? rotation[0];
+  const durationMs = tvDurationMilliseconds(activeSetting?.durationSeconds ?? durationSeconds);
   const viewLabel = VIEW_LABELS[activeView];
   const monthLabel = DASHBOARD_MONTHS[month - 1] ?? "Current month";
   const previousPausedRef = useRef(paused);
 
   const changeView = useCallback((nextView: TvSlide) => {
+    if (!rotationKeys.includes(nextView)) return;
     setActiveView(nextView);
     setCycleKey((current) => current + 1);
     setProgressKey((current) => current + 1);
-  }, []);
+  }, [rotationKeys]);
 
-  const moveNext = useCallback(() => changeView(nextTvView(activeView)), [activeView, changeView]);
-  const movePrevious = useCallback(() => changeView(previousTvView(activeView)), [activeView, changeView]);
+  const moveNext = useCallback(() => { if (rotationKeys.length) changeView(nextTvView(activeView, rotationKeys)); }, [activeView, changeView, rotationKeys]);
+  const movePrevious = useCallback(() => { if (rotationKeys.length) changeView(previousTvView(activeView, rotationKeys)); }, [activeView, changeView, rotationKeys]);
+
+  useEffect(() => {
+    if (!rotationKeys.includes(activeView) && rotationKeys[0]) changeView(rotationKeys[0]);
+  }, [activeView, changeView, rotationKeys]);
 
   useEffect(() => {
     if (paused) return;
@@ -77,10 +86,6 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
     if (previousPausedRef.current && !paused) setProgressKey((current) => current + 1);
     previousPausedRef.current = paused;
   }, [paused]);
-
-  useEffect(() => {
-    setSelectedDuration(parseTvDuration(String(durationSeconds)));
-  }, [durationSeconds]);
 
   useEffect(() => {
     const updateVisibility = () => setDocumentHidden(document.hidden);
@@ -124,13 +129,6 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
     router.push(buildNormalModeUrl({ year, month }));
   }, [month, router, year]);
 
-  const changeDuration = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
-    const nextDuration = parseTvDuration(event.target.value);
-    setSelectedDuration(nextDuration);
-    setProgressKey((current) => current + 1);
-    window.history.replaceState(null, "", buildTvModeUrl({ month, year, durationSeconds: nextDuration }));
-  }, [month, year]);
-
   const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
@@ -153,18 +151,10 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
       </div>
     </section>;
     }
-    if (activeView === "sales-activity") {
-      const quotes = metricByCode(companyMetrics, "QUOTES_DONE");
-      const orders = metricByCode(companyMetrics, "ORDERS_PROCESSED");
-      const conversion = metricByCode(companyMetrics, "CONVERSION_RATE");
-      return <section className={styles.activitySlide} data-tv-view="sales-activity">
-        <div className={styles.slideHeading} data-tv-group="activity-heading" style={{ "--tv-enter-index": 0 } as CSSProperties}><h2>{VIEW_LABELS[activeView]}</h2><span>{monthLabel} {year}</span></div>
-        <div data-tv-group="activity-card" style={{ "--tv-enter-index": 1 } as CSSProperties}><CombinedKpiCard first={quotes} second={orders} third={conversion} gaugeAnimationKey={cycleKey} gaugeAnimationDelayMs={120} gaugeInteractive={false} tvMode /></div>
-      </section>;
-    }
     if (activeView === "snuggle") return <SnuggleView data={data.snuggle} year={year} month={month} tvMode />;
     if (activeView === "ytd") return <YearToDateView data={data.yearToDate} tvMode />;
-    if (activeView === "year-comparison") return <YearComparisonChart comparison={data.yearComparison} showControls={false} tvMode />;
+    if (activeView === "year_comparison") return <YearComparisonChart comparison={data.yearComparison} showControls={false} tvMode />;
+    if (activeView === "team_members") return <TeamMembersTab data={data} year={year} month={month} />;
     return <EmptyState title="No dashboard view" />;
   }, [activeView, companyMetrics, cycleKey, data, month, monthLabel, monthlyProfitMetric, year]);
 
@@ -200,9 +190,9 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
         <div className={styles.controls}>
           <span className={styles.viewName}>{viewLabel} · {paused ? "Paused" : "Rotating"}</span>
           <div className={styles.toolbar}>
-            <label className={styles.durationControl}><span>Display duration</span><select className={styles.durationSelect} value={selectedDuration} onChange={changeDuration}>{TV_DURATION_OPTIONS_SECONDS.map((seconds) => <option key={seconds} value={seconds}>{seconds} seconds</option>)}</select></label>
             <div className={styles.buttonGroup}>
             <button className={styles.controlButton} type="button" onClick={movePrevious} aria-label="Previous TV view"><ChevronLeft size={14} aria-hidden="true" />Previous</button>
+            <button className={styles.controlButton} type="button" onClick={() => setManualPaused((current) => !current)} aria-label={manualPaused ? "Resume TV rotation" : "Pause TV rotation"}>{manualPaused ? <Play size={14} aria-hidden="true" /> : <Pause size={14} aria-hidden="true" />}{manualPaused ? "Resume" : "Pause"}</button>
             <button className={styles.controlButton} type="button" onClick={moveNext} aria-label="Next TV view">Next<ChevronRight size={14} aria-hidden="true" /></button>
             <button className={styles.controlButton} type="button" onClick={toggleFullscreen} disabled={!canFullscreen} aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}>{isFullscreen ? <Minimize2 size={14} aria-hidden="true" /> : <Maximize2 size={14} aria-hidden="true" />}{isFullscreen ? "Exit" : "Fullscreen"}</button>
             <button className={styles.controlButton} type="button" onClick={exitTvMode}>Exit TV Mode</button>

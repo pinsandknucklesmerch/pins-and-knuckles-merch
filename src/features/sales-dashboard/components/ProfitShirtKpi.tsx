@@ -4,6 +4,7 @@ import { Surface } from "@/components/ui/Surface";
 import type { MetricResult } from "../domain/types";
 import { MONTHLY_PROFIT_TARGET, previousYearComparisonState, profitProgress, targetState } from "../lib/metricDisplay";
 import { ComparisonBadge } from "./ComparisonBadge";
+import { AnimatedMetricValue } from "./AnimatedMetricValue";
 import { ProfitShirtMeter } from "./ProfitShirtMeter";
 import styles from "./ProfitShirtKpi.module.css";
 
@@ -20,7 +21,7 @@ export function ProfitShirtKpi({ metric, animationKey, animationDelayMs = 0 }: {
   return (
     <Surface variant="metric" className={styles.card}>
       <div className={styles.label}>Monthly Profit</div>
-      <div className={styles.value}>{currency(metric.value)}</div>
+      <AnimatedMetricValue value={metric.value} format="currency" maximumFractionDigits={2} className={styles.value} />
       <div className={styles.progress}>{progress === null ? "—" : `${(progress * 100).toFixed(1)}% of £155,000`}</div>
       <div className={styles.shirt}><ProfitShirtMeter value={metric.value} target={MONTHLY_PROFIT_TARGET} targetState={state} animationKey={animationKey} animationDelayMs={animationDelayMs} /></div>
       {isAboveTarget ? <span className={styles.aboveTarget}>+{((progress - 1) * 100).toFixed(1)}%</span> : null}

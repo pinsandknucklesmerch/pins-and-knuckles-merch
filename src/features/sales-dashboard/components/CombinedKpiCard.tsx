@@ -5,15 +5,9 @@ import { Surface } from "@/components/ui/Surface";
 import type { MetricResult } from "../domain/types";
 import { formatPercentagePoints, previousYearComparisonState, targetBullet } from "../lib/metricDisplay";
 import { ComparisonBadge } from "./ComparisonBadge";
+import { AnimatedMetricValue } from "./AnimatedMetricValue";
 import { RevGauge } from "./RevGauge";
 import styles from "./CombinedKpiCard.module.css";
-
-function value(metric: MetricResult) {
-  if (metric.value === null) return "—";
-  return metric.format === "percent"
-    ? formatPercentagePoints(metric.value)
-    : metric.value.toLocaleString("en-GB", { maximumFractionDigits: metric.format === "currency" ? 2 : 0 });
-}
 
 function target(metric: MetricResult) {
   const bullet = targetBullet(metric.value, metric.target);
@@ -28,7 +22,7 @@ function KpiSection({ metric, divided, className, gaugeAnimationKey, gaugeAnimat
   return (
     <section className={`${divided ? styles.divided : styles.section} ${className ?? ""}`} aria-label={metric.label} data-tv-group={gaugeAnimationKey !== undefined ? metric.code : undefined} style={gaugeAnimationKey !== undefined ? { "--tv-enter-index": tvEnterIndex ?? 0 } as CSSProperties : undefined}>
       <div className={styles.metricLabel}>{metric.label}</div>
-      <div className={styles.value}>{value(metric)}</div>
+      <AnimatedMetricValue value={metric.value} format={metric.format} maximumFractionDigits={metric.format === "currency" ? 2 : metric.format === "percent" ? 1 : 0} className={styles.value} />
       {metricTarget ? (
         <div className={styles.target}>
           <div className={styles.targetRow}><span>Target {metricTarget.display}</span><span>{metric.targetProgress?.toFixed(1)}%</span></div>

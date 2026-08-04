@@ -7,6 +7,7 @@ type ActionButtonProps = {
   href?: string;
   onClick?: () => void;
   type?: "button" | "submit";
+  disabled?: boolean;
 };
 
 export function ActionButton({
@@ -15,6 +16,7 @@ export function ActionButton({
   href,
   onClick,
   type = "button",
+  disabled = false,
 }: ActionButtonProps) {
   const classes = cn(
     "inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -30,7 +32,7 @@ export function ActionButton({
   }
 
   return (
-    <button type={type} className={classes} onClick={onClick}>
+    <button type={type} className={classes} onClick={onClick} disabled={disabled}>
       {children}
     </button>
   );

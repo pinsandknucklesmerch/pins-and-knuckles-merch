@@ -26,6 +26,7 @@ async function SalesDashboardPageContent({ searchParams }: Props) {
   const tvMode = isTvMode(params.tv);
   const tvDurationSeconds = parseTvDuration(params.duration);
   const isAdmin = access.access?.access_level === "admin";
-  const data = await loadSalesDashboard(year, month, access.membership?.organisation_id ?? null);
+  const organisationId = access.membership?.organisation_id ?? null;
+  const data = await loadSalesDashboard(year, month, organisationId);
   return <AppShell tvMode={tvMode}>{tvMode ? null : <PageHeader title="Sales Dashboard" />}<SalesDashboard data={data} year={year} month={month} isAdmin={isAdmin} initialDashboardView={dashboardView} tvMode={tvMode} tvDurationSeconds={tvDurationSeconds} /></AppShell>;
 }

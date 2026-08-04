@@ -1,5 +1,7 @@
 import type { FinalisableSalesKpiCode } from "../domain/types.ts";
 
+export type FinalValueActionState = { ok: boolean; message: string };
+
 const FINAL_CODES = ["MONTHLY_PROFIT", "PK_TAX", "QUOTES_DONE", "ORDERS_PROCESSED"] as const satisfies readonly FinalisableSalesKpiCode[];
 
 export function validateSalesKpiMonthFinalValue(metricCode: string, raw: string): { metricCode: FinalisableSalesKpiCode; value: number } | null {

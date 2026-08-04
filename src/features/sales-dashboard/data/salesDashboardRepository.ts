@@ -26,7 +26,7 @@ export async function loadSalesDashboard(
   const supabase = await createClient();
   const scope = organisationFilter(organisationId);
   const companyPromise = supabase.from("sales_kpi_months").select(COMPANY_COLUMNS).or(scope).in("year", [year, year - 1]).eq("month", month).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
-  const memberPromise = supabase.from("sales_kpi_member_months").select(MEMBER_COLUMNS).or(scope).in("year", [year, year - 1]).eq("month", month).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
+  const memberPromise = supabase.from("sales_kpi_member_months").select(MEMBER_COLUMNS).or(scope).in("year", [year, year - 1]).lte("month", month).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
   const trendPromise = supabase.from("sales_kpi_months").select(COMPANY_COLUMNS).or(scope).in("year", [year, year - 1]).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
   const targetPromise = supabase.from("sales_kpi_targets").select(TARGET_COLUMNS).or(scope).eq("is_active", true).lte("effective_from", `${year}-12-31`).or(`effective_to.is.null,effective_to.gte.${year}-01-01`).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
   const finalPromise = supabase.from("sales_kpi_month_final_values").select(FINAL_COLUMNS).or(scope).in("year", [year, year - 1]).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
@@ -44,10 +44,15 @@ export async function loadSalesDashboard(
   const memberRows = memberResult.data ?? [];
   const trendRows = trendResult.data ?? [];
   const chooseCompany = (selectedYear: number) => companyRows.find((row) => row.year === selectedYear && row.organisation_id === organisationId) ?? companyRows.find((row) => row.year === selectedYear && row.organisation_id === null) ?? null;
-  const chooseMembers = (selectedYear: number) => {
-    const rows = memberRows.filter((row) => row.year === selectedYear);
+  const chooseMembers = (selectedYear: number, selectedMonth: number) => {
+    const rows = memberRows.filter((row) => row.year === selectedYear && row.month === selectedMonth);
     const organisationKeys = new Set(rows.filter((row) => row.organisation_id === organisationId).map((row) => row.team_member_key));
     return rows.filter((row) => row.organisation_id === organisationId || (row.organisation_id === null && !organisationKeys.has(row.team_member_key))).map(mapMemberRow);
+  };
+  const chooseMemberHistory = (selectedYear: number, selectedMonth: number) => {
+    const rows = memberRows.filter((row) => row.year === selectedYear && row.month <= selectedMonth);
+    const organisationKeys = new Set(rows.filter((row) => row.organisation_id === organisationId).map((row) => `${row.year}-${row.month}-${row.team_member_key}`));
+    return rows.filter((row) => row.organisation_id === organisationId || (row.organisation_id === null && !organisationKeys.has(`${row.year}-${row.month}-${row.team_member_key}`))).map(mapMemberRow);
   };
   const chooseTrendCompany = (selectedYear: number, selectedMonth: number) => trendRows.find((row) => row.year === selectedYear && row.month === selectedMonth && row.organisation_id === organisationId) ?? trendRows.find((row) => row.year === selectedYear && row.month === selectedMonth && row.organisation_id === null) ?? null;
   const trendYear = (selectedYear: number) => Array.from({ length: 12 }, (_, index) => {
@@ -68,7 +73,7 @@ export async function loadSalesDashboard(
     companyRow: company ? mapCompanyRow(company) : null,
     previousCompanyRow: previousCompany ? mapCompanyRow(previousCompany) : null,
     trendCurrent: trendYear(year), trendPrevious: trendYear(year - 1),
-    memberRows: chooseMembers(year), previousMemberRows: chooseMembers(year - 1),
+    memberRows: chooseMembers(year, month), previousMemberRows: chooseMembers(year - 1, month), memberHistoryRows: chooseMemberHistory(year, month),
     fixture: historicalSalesDashboardFixture, year, month,
     targets: mapTargets(targetRows, organisationId, new Date(Date.UTC(year, month - 1, 1))),
     authoritativeCompanyYear: authoritativeYear, monthlyProfitTargets: mapMonthlyProfitTargets(targetRows, organisationId, year),
@@ -87,8 +92,8 @@ export async function loadSalesDashboard(
   };
   const companyYear = result.companyYear.map((row) => ({ ...row, finalValues: finalsFor(row.year, row.month) }));
   const previousCompanyYear = trendYear(year - 1).map((row) => ({ ...row, finalValues: finalsFor(row.year, row.month) }));
-  const currentCompany = { ...result.company, monthlyPkTax: sumPkTax(chooseMembers(year)), finalValues: finalsFor(year, month) };
-  const priorCompany = result.previousCompany ? { ...result.previousCompany, monthlyPkTax: sumPkTax(chooseMembers(year - 1)), finalValues: finalsFor(year - 1, month) } : null;
+  const currentCompany = { ...result.company, monthlyPkTax: sumPkTax(chooseMembers(year, month)), finalValues: finalsFor(year, month) };
+  const priorCompany = result.previousCompany ? { ...result.previousCompany, monthlyPkTax: sumPkTax(chooseMembers(year - 1, month)), finalValues: finalsFor(year - 1, month) } : null;
   return {
     ...result,
     company: currentCompany,

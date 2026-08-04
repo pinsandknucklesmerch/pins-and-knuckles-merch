@@ -2,7 +2,8 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { saveSalesKpiTargets, type TargetActionState } from "../actions";
+import { saveSalesKpiTargets } from "../actions";
+import type { TargetActionState } from "../lib/targetSave";
 import type { SalesKpiTargets, SalesMetricCode } from "../domain/types";
 import { feedback, isInlineValidation } from "@/components/ui/feedback";
 

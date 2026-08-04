@@ -122,6 +122,7 @@ export type SalesDashboardData = {
   companyYear: CompanyKpiMonth[];
   previousCompany: CompanyKpiMonth | null;
   members: MemberDashboardRow[];
+  memberHistory: TeamMemberKpiMonth[];
   targets: SalesKpiTargets;
   yearToDate: YearToDateData;
   yearComparison: YearComparisonData;
