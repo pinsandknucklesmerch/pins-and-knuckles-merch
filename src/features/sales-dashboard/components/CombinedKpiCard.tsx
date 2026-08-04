@@ -59,23 +59,16 @@ function KpiSection({ metric, divided, className, gaugeAnimationKey, gaugeAnimat
 }
 
 export function CombinedKpiCard({ title, first, second, third, gaugeAnimationKey, gaugeAnimationDelayMs, gaugeInteractive = true, tvMode = false }: { title?: string; first: MetricResult; second?: MetricResult; third?: MetricResult; gaugeAnimationKey?: string | number; gaugeAnimationDelayMs?: number; gaugeInteractive?: boolean; tvMode?: boolean }) {
+  const metricCountClass = third && second ? styles.triple : second ? styles.double : styles.single;
+
   return (
     <Surface variant="metric" className={`${styles.card} ${tvMode ? styles.tvCard : ""}`} data-tv-group={gaugeAnimationKey !== undefined ? "overview-performance" : undefined} style={gaugeAnimationKey !== undefined ? { "--tv-enter-index": 1 } as CSSProperties : undefined}>
       {title ? <h2 className={styles.title}>{title}</h2> : null}
-      {third && second ? (
-        <div className={`${title ? styles.sections : styles.sectionsWithoutTitle} ${styles.stackedSections}`}>
-          <div className={styles.topRow}>
-            <KpiSection metric={first} gaugeAnimationKey={gaugeAnimationKey} gaugeAnimationDelayMs={gaugeAnimationDelayMs} gaugeInteractive={gaugeInteractive} gaugeTvMode={tvMode} tvEnterIndex={0} />
-            <KpiSection metric={second} divided gaugeAnimationKey={gaugeAnimationKey} gaugeAnimationDelayMs={gaugeAnimationDelayMs} gaugeInteractive={gaugeInteractive} gaugeTvMode={tvMode} tvEnterIndex={1} />
-          </div>
-          <KpiSection metric={third} className={styles.fullWidthSection} gaugeAnimationKey={gaugeAnimationKey} gaugeAnimationDelayMs={gaugeAnimationDelayMs} gaugeInteractive={gaugeInteractive} gaugeTvMode={tvMode} tvEnterIndex={2} />
-        </div>
-      ) : (
-        <div className={`${title ? styles.sections : styles.sectionsWithoutTitle} ${second ? "" : styles.singleSection}`}>
-          <KpiSection metric={first} gaugeAnimationKey={gaugeAnimationKey} gaugeAnimationDelayMs={gaugeAnimationDelayMs} gaugeInteractive={gaugeInteractive} gaugeTvMode={tvMode} tvEnterIndex={0} />
-          {second ? <KpiSection metric={second} divided gaugeAnimationKey={gaugeAnimationKey} gaugeAnimationDelayMs={gaugeAnimationDelayMs} gaugeInteractive={gaugeInteractive} gaugeTvMode={tvMode} tvEnterIndex={1} /> : null}
-        </div>
-      )}
+      <div className={`${title ? styles.sections : styles.sectionsWithoutTitle} ${metricCountClass}`}>
+        <KpiSection metric={first} gaugeAnimationKey={gaugeAnimationKey} gaugeAnimationDelayMs={gaugeAnimationDelayMs} gaugeInteractive={gaugeInteractive} gaugeTvMode={tvMode} tvEnterIndex={0} />
+        {second ? <KpiSection metric={second} divided gaugeAnimationKey={gaugeAnimationKey} gaugeAnimationDelayMs={gaugeAnimationDelayMs} gaugeInteractive={gaugeInteractive} gaugeTvMode={tvMode} tvEnterIndex={1} /> : null}
+        {third && second ? <KpiSection metric={third} divided className={styles.trailing} gaugeAnimationKey={gaugeAnimationKey} gaugeAnimationDelayMs={gaugeAnimationDelayMs} gaugeInteractive={gaugeInteractive} gaugeTvMode={tvMode} tvEnterIndex={2} /> : null}
+      </div>
     </Surface>
   );
 }

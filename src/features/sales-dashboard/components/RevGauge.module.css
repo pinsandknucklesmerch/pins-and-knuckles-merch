@@ -1,5 +1,7 @@
 .gauge {
+  --gauge-neutral: #d1d5db;
   --gauge-danger: #d9474b;
+  --gauge-orange: #e07a3f;
   --gauge-warning: #d59b3d;
   --gauge-success: #6fc49a;
   display: grid;
@@ -17,7 +19,9 @@
 .gauge[data-tv="true"] .svg { width: min(100%, 16rem); }
 
 .arcTrack,
+.arcZoneNeutral,
 .arcZoneDanger,
+.arcZoneOrange,
 .arcZoneWarning,
 .arcZoneSuccess {
   fill: none;
@@ -25,7 +29,9 @@
 }
 
 .arcTrack { stroke: hsl(var(--border) / 0.8); }
+.arcZoneNeutral { stroke: var(--gauge-neutral); }
 .arcZoneDanger { stroke: var(--gauge-danger); }
+.arcZoneOrange { stroke: var(--gauge-orange); }
 .arcZoneWarning { stroke: var(--gauge-warning); }
 .arcZoneSuccess { stroke: var(--gauge-success); }
 
@@ -66,7 +72,9 @@
 .gauge[data-status="success"] .needle { stroke: var(--gauge-success); }
 
 .gauge[data-interactive="true"]:is(:hover, :focus-visible) .arcTrack,
+.gauge[data-interactive="true"]:is(:hover, :focus-visible) .arcZoneNeutral,
 .gauge[data-interactive="true"]:is(:hover, :focus-visible) .arcZoneDanger,
+.gauge[data-interactive="true"]:is(:hover, :focus-visible) .arcZoneOrange,
 .gauge[data-interactive="true"]:is(:hover, :focus-visible) .arcZoneWarning,
 .gauge[data-interactive="true"]:is(:hover, :focus-visible) .arcZoneSuccess,
 .gauge[data-interactive="true"]:is(:hover, :focus-visible) .tick line {

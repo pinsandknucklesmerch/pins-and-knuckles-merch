@@ -32,22 +32,25 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
-.singleSection { grid-template-columns: minmax(0, 1fr); }
+.single { grid-template-columns: minmax(0, 1fr); }
 
-.stackedSections { grid-template-columns: minmax(0, 1fr); }
+.double { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
-.singleSection .section { padding-right: 0; }
-
-.topRow {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+.triple {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  column-gap: var(--sales-kpi-section-gap);
 }
 
-.fullWidthSection {
-  border-top: 1px solid hsl(var(--border) / 0.8);
-  margin-top: var(--sales-kpi-section-gap);
-  padding-top: var(--sales-kpi-section-gap);
+.triple .section,
+.triple .divided {
+  height: 100%;
+  padding-right: var(--sales-kpi-section-gap);
 }
+
+.triple .svg { width: min(100%, 12rem); }
+
+.single .section { padding-right: 0; }
 
 .section,
 .divided {
@@ -97,11 +100,22 @@
   .card { min-height: 0; }
   .sections,
   .sectionsWithoutTitle { grid-template-columns: minmax(0, 1fr); gap: var(--sales-kpi-section-gap); }
-  .topRow { grid-template-columns: minmax(0, 1fr); gap: var(--sales-kpi-section-gap); }
   .section { padding-right: 0; }
   .divided { border-top: 1px solid hsl(var(--border) / 0.8); border-left: 0; padding-top: var(--sales-kpi-section-gap); padding-left: 0; }
-  .fullWidthSection { margin-top: 0; }
+  .triple .section,
+  .triple .divided { padding-right: 0; }
   .comparison,
   .reference { margin-top: 0.125rem; }
   .comparison { align-items: flex-start; flex-wrap: wrap; }
+}
+
+@media (min-width: 640px) and (max-width: 899px) {
+  .triple { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .triple .trailing {
+    border-left: 0;
+    border-top: 1px solid hsl(var(--border) / 0.8);
+    padding-left: 0;
+    padding-top: var(--sales-kpi-section-gap);
+  }
 }

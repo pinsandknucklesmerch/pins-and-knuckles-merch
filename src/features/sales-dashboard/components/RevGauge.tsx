@@ -104,7 +104,9 @@ export function RevGauge({ value, target, max, progress, format, label, interact
   const status = statusFor(progress);
   const currentText = formatValue(value, format);
   const targetText = formatValue(target, format);
+  const neutralEndAngle = START_ANGLE + zoneRatios.neutralEnd * (END_ANGLE - START_ANGLE);
   const redEndAngle = START_ANGLE + zoneRatios.redEnd * (END_ANGLE - START_ANGLE);
+  const orangeEndAngle = START_ANGLE + zoneRatios.orangeEnd * (END_ANGLE - START_ANGLE);
   const amberEndAngle = START_ANGLE + zoneRatios.amberEnd * (END_ANGLE - START_ANGLE);
   const greenStartAngle = START_ANGLE + zoneRatios.greenStart * (END_ANGLE - START_ANGLE);
 
@@ -192,8 +194,10 @@ export function RevGauge({ value, target, max, progress, format, label, interact
     >
       <svg className={styles.svg} viewBox="0 0 240 180" aria-hidden="true" focusable="false">
         <path className={styles.arcTrack} d={arcPath(START_ANGLE, END_ANGLE)} />
-        <path className={styles.arcZoneDanger} d={arcPath(START_ANGLE, redEndAngle)} />
-        <path className={styles.arcZoneWarning} d={arcPath(redEndAngle, amberEndAngle)} />
+        <path className={styles.arcZoneNeutral} d={arcPath(START_ANGLE, neutralEndAngle)} />
+        <path className={styles.arcZoneDanger} d={arcPath(neutralEndAngle, redEndAngle)} />
+        <path className={styles.arcZoneOrange} d={arcPath(redEndAngle, orangeEndAngle)} />
+        <path className={styles.arcZoneWarning} d={arcPath(orangeEndAngle, amberEndAngle)} />
         <path className={styles.arcZoneSuccess} d={arcPath(greenStartAngle, END_ANGLE)} />
         {TICK_RATIOS.map((ratio, index) => {
           const angle = START_ANGLE + ratio * (END_ANGLE - START_ANGLE);
