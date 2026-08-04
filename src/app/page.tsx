@@ -5,6 +5,7 @@ import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { GalaxyPageBackground } from "@/components/backgrounds/GalaxyPageBackground";
 import { Panel } from "@/components/ui/Panel";
+import { LoadingState } from "@/components/ui/LoadingState";
 import { createClient } from "@/lib/supabase/server";
 
 // async function LandingPanel() {
@@ -93,7 +94,7 @@ export default function Home() {
             {/* <h1 className="text-3xl font-semibold text-[#f4f0d0]">Pins Hub</h1> */}
           </div>
 
-          <Suspense fallback={<LoginPanel isAuthenticated={false} />}>
+          <Suspense fallback={<LoadingState label="Loading Pins Hub" />}>
             <LandingPanel />
           </Suspense>
         </section>

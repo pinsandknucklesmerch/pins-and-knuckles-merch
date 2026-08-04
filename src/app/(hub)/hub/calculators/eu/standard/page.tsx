@@ -25,7 +25,7 @@ async function EuStandardCalculatorPageContent() {
     );
 
     return (
-      <AppShell>
+      <AppShell wideContent>
         <CalculatorShell title="EU Standard">
           <EuCalculator referenceData={referenceData} />
         </CalculatorShell>
@@ -33,7 +33,7 @@ async function EuStandardCalculatorPageContent() {
     );
   } catch (error) {
     return (
-      <AppShell>
+      <AppShell wideContent>
         <CalculatorShell title="EU Standard">
           <ErrorState
             title="Calculator unavailable"

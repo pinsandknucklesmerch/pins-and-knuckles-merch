@@ -4,6 +4,7 @@ import { connection } from "next/server";
 
 import { UpdatePasswordForm } from "@/components/auth/UpdatePasswordForm";
 import { Panel } from "@/components/ui/Panel";
+import { LoadingState } from "@/components/ui/LoadingState";
 import { createClient } from "@/lib/supabase/server";
 
 type UpdatePasswordMode = "invite" | "recovery";
@@ -26,7 +27,7 @@ export default async function UpdatePasswordPage({
   searchParams,
 }: UpdatePasswordPageProps) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<LoadingState label="Loading password update" />}>
       <AuthenticatedUpdatePasswordPage searchParams={searchParams} />
     </Suspense>
   );

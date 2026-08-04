@@ -15,11 +15,12 @@ test("EU delivery markup and VAT preserve the legacy calculation", () => {
   assert.ok(Math.abs(result.deliveryTotalInclVat - 76.2) < 1e-9);
 });
 
-test("box count changes delivery only and legacy copy retains its subtotal label", () => {
+test("box count changes delivery only and copy labels the total excl. VAT", () => {
   const result = calculateEuDelivery({ country: "Germany", boxCount: 2, markupEnabled: false, markupPerBox: 0 }, rates);
   assert.equal(result.ok, true);
   if (!result.ok) return;
-  assert.match(formatEuDeliveryCopy(result), /Cost Per Box: €50\.00 excl\. VAT/);
+  assert.match(formatEuDeliveryCopy(result), /Total Delivery Cost Excl\. VAT: €50\.00/);
+  assert.doesNotMatch(formatEuDeliveryCopy(result), /Cost Per Box/);
   assert.match(formatEuDeliveryCopy(result), /Total Delivery Cost Incl\. VAT: €63\.50/);
 });
 

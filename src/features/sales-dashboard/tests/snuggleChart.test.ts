@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildSnuggleChartData, formatSnuggleChartMonth, sortSnuggleMonthsChronologically } from "../lib/snuggleChart.ts";
+import { buildSnuggleChartData, formatSnuggleChartMonth, resolveSelectedSnuggleMonth, sortSnuggleMonthsChronologically } from "../lib/snuggleChart.ts";
 
 const months = [
   { year: 2026, month: 3, total: 30 },
@@ -22,4 +22,9 @@ test("Snuggle MetricUI chart data preserves exact values and does not invent mon
     { month: "Jan 2026", profit: 10 },
     { month: "Mar 2026", profit: 30 },
   ]);
+});
+
+test("Snuggle headline resolves the exact selected month, including zero", () => {
+  assert.equal(resolveSelectedSnuggleMonth([{ year: 2026, month: 8, total: 0 }], 2026, 8)?.total, 0);
+  assert.equal(resolveSelectedSnuggleMonth([{ year: 2026, month: 7, total: 120 }], 2026, 8), null);
 });

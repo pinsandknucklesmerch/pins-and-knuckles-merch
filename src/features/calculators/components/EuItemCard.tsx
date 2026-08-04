@@ -16,6 +16,8 @@ type EuItemCardProps = {
   garments: Garment[];
   errors: CalculatorValidationError[];
   canRemove: boolean;
+  includeDeliveryCosts: boolean;
+  onIncludeDeliveryCostsChange: (enabled: boolean) => void;
   onChange: (item: EuCalculatorItemInput) => void;
   onRemove: () => void;
   onPrintPositionSelect: () => void;
@@ -27,14 +29,16 @@ export function EuItemCard({
   garments,
   errors,
   canRemove,
+  includeDeliveryCosts,
+  onIncludeDeliveryCostsChange,
   onChange,
   onRemove,
   onPrintPositionSelect,
 }: EuItemCardProps) {
   return (
     <Panel className="border-border/90 bg-card">
-      <div className="grid gap-4">
-        <div className="flex items-center justify-between gap-3">
+      <div className="grid min-w-0 gap-4">
+        <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
           <EditableItemHeading
             index={index}
             value={item.itemLabel ?? ""}
@@ -52,7 +56,7 @@ export function EuItemCard({
           </button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-[1fr_140px]">
+        <div className="grid min-w-0 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,140px)]">
           <GarmentCombobox
             garments={garments}
             value={item.garmentId}
@@ -86,8 +90,8 @@ export function EuItemCard({
           onChange={(embroideryItems) => onChange({ ...item, embroideryItems })}
         />
 
-        <div className="grid gap-2 rounded-md border border-border/70 bg-background/55 p-3 backdrop-blur-sm sm:grid-cols-[1fr_140px]">
-          <label className="flex items-center gap-2 text-sm text-foreground">
+        <div className="grid min-w-0 gap-2 rounded-md border border-border/70 bg-background/55 p-3 backdrop-blur-sm sm:grid-cols-[minmax(0,1fr)_minmax(0,140px)]">
+          <label className="flex min-w-0 items-center gap-2 text-sm text-foreground">
             <input
               type="checkbox"
               checked={item.pkMarkupEnabled ?? false}
@@ -99,7 +103,7 @@ export function EuItemCard({
             PK markup
           </label>
           <input
-            className="h-8 rounded-md border border-input bg-card px-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring disabled:opacity-50"
+            className="h-8 w-full min-w-0 rounded-md border border-input bg-card px-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring disabled:opacity-50"
             disabled={!item.pkMarkupEnabled}
             step="0.01"
             type="number"
@@ -109,6 +113,16 @@ export function EuItemCard({
             }
           />
         </div>
+
+        <label className="flex min-w-0 items-center gap-2 text-sm text-foreground">
+          <input
+            type="checkbox"
+            checked={includeDeliveryCosts}
+            onChange={(event) => onIncludeDeliveryCostsChange(event.target.checked)}
+            className="size-4 shrink-0 rounded border-input bg-background accent-primary"
+          />
+          <span className="min-w-0 break-words">Include delivery costs</span>
+        </label>
 
         <CalculatorErrors errors={errors} />
       </div>

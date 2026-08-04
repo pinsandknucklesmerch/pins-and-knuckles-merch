@@ -15,7 +15,7 @@ const MONTHS: Record<string, number> = {
 };
 
 type GraphQlResponse<T> = { data?: T; errors?: Array<{ message: string }> };
-type Person = { id: string; kind?: string | null };
+type Person = { id: string; kind?: string | null; name?: string | null };
 type SnuggleItem = {
   id: string;
   name: string;
@@ -38,6 +38,11 @@ export type SnuggleWarning = {
   itemName: string;
   group: string;
   detail?: string;
+  resolvedYear?: number;
+  resolvedMonth?: number;
+  mondayPersonId?: string;
+  mondayPersonName?: string;
+  assignedPeople?: Array<{ id: string; name: string }>;
 };
 
 export type SnuggleMonth = { year: number; month: number; total: number };
@@ -143,12 +148,18 @@ export function aggregateSnuggleProfit(input: { board: SnuggleBoard; items: Snug
     const resolved = parseCompletedSnuggleGroup(groupLabel(item));
     if (!resolved) continue;
     const assigned = people(item);
-    if (!assigned.length) warnings.push({ kind: "unassigned", itemId: item.id, itemName: item.name, group: groupLabel(item) });
-    else if (assigned.length !== 1) warnings.push({ kind: "multi-assignee", itemId: item.id, itemName: item.name, group: groupLabel(item), detail: `${assigned.length} Account Manager assignments.` });
+    const warningContext = { resolvedYear: resolved.year, resolvedMonth: resolved.month };
+    if (!assigned.length) warnings.push({ kind: "unassigned", itemId: item.id, itemName: item.name, group: groupLabel(item), ...warningContext });
+    else if (assigned.length !== 1) warnings.push({
+      kind: "multi-assignee", itemId: item.id, itemName: item.name, group: groupLabel(item),
+      detail: `${assigned.length} Account Manager assignments.`,
+      assignedPeople: assigned.map((person) => ({ id: person.id, name: person.name?.trim() || "Unknown Monday member" })),
+      ...warningContext,
+    });
     const profitValue = column(item, PROFIT_COLUMN_ID)?.display_value;
     const profit = parseProfit(profitValue);
     if (profit === null) {
-      warnings.push({ kind: "invalid-profit", itemId: item.id, itemName: item.name, group: groupLabel(item), detail: "Profit display value is blank or non-numeric." });
+      warnings.push({ kind: "invalid-profit", itemId: item.id, itemName: item.name, group: groupLabel(item), detail: "Profit display value is blank or non-numeric.", ...warningContext });
       continue;
     }
     const key = `${resolved.year}-${resolved.month}`;
@@ -158,7 +169,13 @@ export function aggregateSnuggleProfit(input: { board: SnuggleBoard; items: Snug
     if (!assigned.length || assigned.length !== 1) continue;
     const identity = mapMondayMember({ id: assigned[0].id });
     if (!isDashboardAccountManager(identity.classification)) {
-      warnings.push({ kind: "unmapped", itemId: item.id, itemName: item.name, group: groupLabel(item), detail: `Monday person ID ${assigned[0].id} is not mapped to a dashboard member.` });
+      warnings.push({
+        kind: "unmapped", itemId: item.id, itemName: item.name, group: groupLabel(item),
+        detail: `Monday person ID ${assigned[0].id} is not mapped to a dashboard member.`,
+        mondayPersonId: assigned[0].id,
+        mondayPersonName: assigned[0].name?.trim() || "Unknown Monday member",
+        ...warningContext,
+      });
       continue;
     }
     const member = members.get(identity.key) ?? { memberKey: identity.key, total: 0, months: [] };

@@ -14,7 +14,7 @@ export default function UsClientsCalculatorPage() {
 async function Content() {
   try {
     const data = await loadEuCalculatorReferenceData(await createClient(), "EU_US_CLIENTS");
-    return <AppShell><CalculatorShell title="EU US Clients"><EuCalculator referenceData={data} profileCode="EU_US_CLIENTS" /></CalculatorShell></AppShell>;
+    return <AppShell wideContent><CalculatorShell title="EU US Clients"><EuCalculator referenceData={data} profileCode="EU_US_CLIENTS" /></CalculatorShell></AppShell>;
   } catch (error) {
     return <AppShell><CalculatorShell title="EU US Clients"><ErrorState title="Calculator unavailable" message={error instanceof Error ? error.message : "Reference data failed"} /></CalculatorShell></AppShell>;
   }

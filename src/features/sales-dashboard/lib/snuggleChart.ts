@@ -18,3 +18,7 @@ export function buildSnuggleChartData(months: SnuggleMonth[]) {
     profit: month.total,
   }));
 }
+
+export function resolveSelectedSnuggleMonth(months: SnuggleMonth[], year: number, month: number) {
+  return months.find((candidate) => candidate.year === year && candidate.month === month) ?? null;
+}

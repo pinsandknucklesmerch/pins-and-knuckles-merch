@@ -66,7 +66,7 @@ export function formatEuDeliveryCopy(delivery: Extract<EuDeliveryCalculation, { 
     `Delivery Time: ${delivery.rate.deliveryTime}`,
     `Boxes: ${delivery.boxCount}`,
     // Legacy copy passes the full ex-VAT delivery subtotal into this label.
-    `Cost Per Box: ${money(delivery.deliverySubtotalExclVat)} excl. VAT`,
+    `Total Delivery Cost Excl. VAT: ${money(delivery.deliverySubtotalExclVat)}`,
     `Total Delivery Cost Incl. VAT: ${money(delivery.deliveryTotalInclVat)}`,
   ].join("\n");
 }

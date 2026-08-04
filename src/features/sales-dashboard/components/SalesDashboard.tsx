@@ -94,7 +94,7 @@ if (!conversionRateMetric) {
     <div ref={dashboardMetricsRef} data-testid="sales-dashboard-export-content" className="grid gap-3">
       {data.setupIssue ? <p role="alert" className="text-sm text-destructive">{data.setupIssue}</p> : null}
       <DashboardNav tabs={DASHBOARD_TABS} value={activeDashboardView} onChange={changeDashboardView} mode="tabs" />
-      {activeDashboardView === "snuggle" ? <SnuggleView data={data.snuggle} year={year} month={month} /> : activeDashboardView === "team-members" ? <TeamMembersTab data={data} year={year} month={month} /> : activeDashboardView === "overview" ? <CompanyKpiView current={data.company} metrics={companyMetrics} /> : activeDashboardView === "ytd" ? <YearToDateView data={data.yearToDate} /> : <YearComparisonChart comparison={data.yearComparison} />}
+      {activeDashboardView === "snuggle" ? <SnuggleView data={data.snuggle} year={year} month={month} isAdmin={isAdmin} /> : activeDashboardView === "team-members" ? <TeamMembersTab data={data} year={year} month={month} /> : activeDashboardView === "overview" ? <CompanyKpiView current={data.company} metrics={companyMetrics} /> : activeDashboardView === "ytd" ? <YearToDateView data={data.yearToDate} /> : <YearComparisonChart comparison={data.yearComparison} />}
     </div>
     <div
       aria-hidden="true"
