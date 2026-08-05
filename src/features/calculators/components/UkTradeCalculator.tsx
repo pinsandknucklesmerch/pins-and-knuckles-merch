@@ -22,12 +22,11 @@ export function UkTradeCalculator({ referenceData }: { referenceData: UkTradeRef
   const [decorationAttempts, setDecorationAttempts] = useState<Record<string, boolean>>({});
   const results = useMemo(() => items.map((item) => calculateUkTradeItem(item, referenceData)), [items, referenceData]);
   const validResults = results.filter((result) => result.errors.length === 0);
-  const totalsIncVat = validResults.reduce((sum, result) => sum + result.totalCostIncVat, 0);
-  const garmentSubtotalExVat = validResults.reduce((sum, result) => sum + result.garmentSubtotalExVat, 0);
-  const screenSetupCost = validResults.reduce((sum, result) => sum + result.screenSetupCost, 0);
-  const vatAmount = validResults.reduce((sum, result) => sum + result.vatAmount, 0);
+  const totalsIncVat = validResults.reduce((sum, result) => sum + result.itemTotalIncVat, 0);
+  const quantitySubtotalExVat = validResults.reduce((sum, result) => sum + result.quantitySubtotalExVatExcludingSetup, 0);
+  const totalSetupExVat = validResults.reduce((sum, result) => sum + result.totalSetupExVat, 0);
+  const vatAmount = validResults.reduce((sum, result) => sum + result.itemVat, 0);
   const hasValidItems = validResults.length > 0;
-  const screenSetupUnitPrice = referenceData.fees.find((fee) => fee.feeCode === "UK_SCREEN_SETUP" && fee.costSide === "trade")?.amount ?? 0;
 
   const update = (item: UkTradeItemInput) => setItems((current) => current.map((row) => row.id === item.id ? item : row));
   async function copyQuote() {
@@ -60,12 +59,12 @@ export function UkTradeCalculator({ referenceData }: { referenceData: UkTradeRef
       </div>
       {hasValidItems ? <div className="grid min-w-0 content-start gap-4 xl:row-span-2">
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-          <Panel className="p-4"><div className="text-xs text-muted-foreground">Garment & production</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(garmentSubtotalExVat)}</div><div className="mt-1 text-xs text-muted-foreground">ex VAT</div></Panel>
-          <Panel className="p-4"><div className="text-xs text-muted-foreground">Screen setup</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(screenSetupCost)}</div><div className="mt-1 text-xs text-muted-foreground">ex VAT</div></Panel>
+          <Panel className="p-4"><div className="text-xs text-muted-foreground">Quantity subtotal</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(quantitySubtotalExVat)}</div><div className="mt-1 text-xs text-muted-foreground">ex VAT, excl. setup</div></Panel>
+          <Panel className="p-4"><div className="text-xs text-muted-foreground">Setup</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(totalSetupExVat)}</div><div className="mt-1 text-xs text-muted-foreground">ex VAT</div></Panel>
           <Panel className="p-4"><div className="text-xs text-muted-foreground">VAT</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(vatAmount)}</div></Panel>
           <Panel className="p-4"><div className="text-xs text-muted-foreground">Final total</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(totalsIncVat)}</div><button type="button" onClick={() => void copyQuote()} className="mt-4 inline-flex items-center gap-2 text-sm text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Copy className="size-4" />Copy quote</button></Panel>
         </div>
-        <UkTradeBreakdown items={items} results={results} screenSetupUnitPrice={screenSetupUnitPrice} />
+        <UkTradeBreakdown items={items} results={results} />
       </div> : null}
     </div>
   </div>;

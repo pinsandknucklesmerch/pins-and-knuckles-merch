@@ -17,16 +17,17 @@ test("EU breakdown values reconcile with existing totals without changing quote 
 
 test("UK breakdown aggregates valid items and excludes invalid items", () => {
   const items: UkTradeItemInput[] = [{ id: "valid", garmentId: "g", quantity: 50, printPositions: [], embroideryStitches: [null, null, null] }, { id: "invalid", garmentId: null, quantity: 50, printPositions: [], embroideryStitches: [null, null, null] }];
-  const results: UkTradeItemResult[] = [{ itemId: "valid", garmentId: "g", quantity: 50, garmentCost: 100, printCost: 50, screenSetupCount: 2, screenSetupCost: 40, embroideryCost: 20, embroiderySetupCost: 30, unitPriceExcludingScreenSetup: 4, garmentSubtotalExVat: 200, garmentSubtotalIncVat: 240, screenSetupTotalIncVat: 48, vatAmount: 48, totalCost: 240, totalCostIncVat: 288, printBreakdowns: [], embroideryBreakdowns: [], errors: [] }, { itemId: "invalid", garmentId: "", quantity: 50, garmentCost: 0, printCost: 0, screenSetupCount: 0, screenSetupCost: 0, embroideryCost: 0, embroiderySetupCost: 0, unitPriceExcludingScreenSetup: 0, garmentSubtotalExVat: 0, garmentSubtotalIncVat: 0, screenSetupTotalIncVat: 0, vatAmount: 0, totalCost: 0, totalCostIncVat: 0, printBreakdowns: [], embroideryBreakdowns: [], errors: [{ code: "MISSING_GARMENT", message: "Select garment." }] }];
-  const breakdown = buildUkTradeBreakdown(items, results, 20);
-  assert.equal(breakdown.total, 240);
+  const valid: UkTradeItemResult = { itemId: "valid", garmentId: "g", quantity: 50, garmentCost: 100, printCost: 50, embroideryCost: 20, unitPriceExVatExcludingSetup: 3.4, quantitySubtotalExVatExcludingSetup: 170, quantityTotalIncVatExcludingSetup: 204, screenCount: 2, screenSetupUnitExVat: 20, screenSetupSubtotalExVat: 40, screenSetupTotalIncVat: 48, embroiderySetupCount: 1, embroiderySetupUnitExVat: 30, embroiderySetupSubtotalExVat: 30, embroiderySetupTotalIncVat: 36, totalSetupExVat: 70, totalSetupIncVat: 84, itemSubtotalExVat: 240, itemVat: 48, itemTotalIncVat: 288, printBreakdowns: [], embroideryBreakdowns: [], errors: [] };
+  const invalid: UkTradeItemResult = { ...valid, itemId: "invalid", garmentId: "", garmentCost: 0, printCost: 0, embroideryCost: 0, unitPriceExVatExcludingSetup: 0, quantitySubtotalExVatExcludingSetup: 0, quantityTotalIncVatExcludingSetup: 0, screenCount: 0, screenSetupSubtotalExVat: 0, screenSetupTotalIncVat: 0, embroiderySetupCount: 0, embroiderySetupSubtotalExVat: 0, embroiderySetupTotalIncVat: 0, totalSetupExVat: 0, totalSetupIncVat: 0, itemSubtotalExVat: 0, itemVat: 0, itemTotalIncVat: 0, errors: [{ code: "MISSING_GARMENT", message: "Select garment." }] };
+  const breakdown = buildUkTradeBreakdown(items, [valid, invalid]);
+  assert.equal(breakdown.itemSubtotalExVat, 240);
   assert.equal(breakdown.printCost, 50);
-  assert.equal(breakdown.screenSetupCount, 2);
-  assert.equal(breakdown.screenSetupCost, 40);
+  assert.equal(breakdown.screenCount, 2);
+  assert.equal(breakdown.screenSetupSubtotalExVat, 40);
   assert.equal(breakdown.embroideryCost, 20);
-  assert.equal(breakdown.embroiderySetupCost, 30);
-  assert.equal(breakdown.unitCost, 4);
-  assert.equal(breakdown.garmentSubtotalIncVat, 240);
+  assert.equal(breakdown.embroiderySetupSubtotalExVat, 30);
+  assert.equal(breakdown.unitCost, 3.4);
+  assert.equal(breakdown.quantityTotalIncVatExcludingSetup, 204);
   assert.equal(breakdown.totalIncVat, 288);
   assert.equal(breakdown.validItems.length, 1);
 });

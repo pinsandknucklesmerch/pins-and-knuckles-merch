@@ -16,9 +16,12 @@ export function formatUkTradeQuote(items: UkTradeItemInput[], results: UkTradeIt
       `${getEuItemLabel(item.itemLabel, index)}:`,
       "",
       `${[garment.code, garment.brandName, garment.name, garment.colour].filter(Boolean).join(" ")}${work ? ` (${work})` : ""}`,
-      `${item.quantity} x ${currency.format(result.unitPriceExcludingScreenSetup)} + vat ea (${currency.format(result.garmentSubtotalIncVat)} inc VAT)`,
-      ...(result.screenSetupCount > 0
-        ? [`${result.screenSetupCount} x ${result.screenSetupCount === 1 ? "screen" : "screens"} @ ${currency.format(result.screenSetupCost / result.screenSetupCount)} + vat ea / ${currency.format(result.screenSetupTotalIncVat)} total (inc VAT)`]
+      `${item.quantity} x ${currency.format(result.unitPriceExVatExcludingSetup)} + VAT each (${currency.format(result.quantityTotalIncVatExcludingSetup)} inc VAT)`,
+      ...(result.screenCount > 0
+        ? [`${result.screenCount} x ${result.screenCount === 1 ? "screen" : "screens"} @ ${currency.format(result.screenSetupUnitExVat)} + VAT each / ${currency.format(result.screenSetupTotalIncVat)} total inc VAT`]
+        : []),
+      ...(result.embroiderySetupCount > 0
+        ? [`${result.embroiderySetupCount} x embroidery setup @ ${currency.format(result.embroiderySetupUnitExVat)} + VAT / ${currency.format(result.embroiderySetupTotalIncVat)} total inc VAT`]
         : []),
     ].join("\n");
   }).filter((entry): entry is string => Boolean(entry)).join("\n\n");

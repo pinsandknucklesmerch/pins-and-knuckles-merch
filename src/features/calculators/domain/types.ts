@@ -159,20 +159,24 @@ export type UkTradeItemResult = {
   quantity: number;
   garmentCost: number;
   printCost: number;
-  screenSetupCount: number;
-  screenSetupCost: number;
   embroideryCost: number;
-  embroiderySetupCost: number;
-  /** Per-unit production price excluding all screen setup costs and VAT. */
-  unitPriceExcludingScreenSetup: number;
-  /** Garment and per-unit decoration subtotal, excluding VAT and screen setup. */
-  garmentSubtotalExVat: number;
-  garmentSubtotalIncVat: number;
+  /** Per-unit garment and decoration price, excluding all setup and VAT. */
+  unitPriceExVatExcludingSetup: number;
+  quantitySubtotalExVatExcludingSetup: number;
+  quantityTotalIncVatExcludingSetup: number;
+  screenCount: number;
+  screenSetupUnitExVat: number;
+  screenSetupSubtotalExVat: number;
   screenSetupTotalIncVat: number;
-  vatAmount: number;
-  /** Existing overall ex-VAT total, including all setup costs. */
-  totalCost: number;
-  totalCostIncVat: number;
+  embroiderySetupCount: number;
+  embroiderySetupUnitExVat: number;
+  embroiderySetupSubtotalExVat: number;
+  embroiderySetupTotalIncVat: number;
+  totalSetupExVat: number;
+  totalSetupIncVat: number;
+  itemSubtotalExVat: number;
+  itemVat: number;
+  itemTotalIncVat: number;
   printBreakdowns: UkTradePrintCostBreakdown[];
   embroideryBreakdowns: UkTradeEmbroideryCostBreakdown[];
   errors: CalculatorValidationError[];

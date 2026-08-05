@@ -33,7 +33,7 @@ export function calculateUkTradeItem(input: UkTradeItemInput, data: UkTradeRefer
     screens += screenSetupCount;
     printBreakdowns.push({ position: selection.position, colourCount: colourCount ?? null, unitPrice: tier.unitPrice, cost, screenSetupCount });
   }
-  let embroideryCost = 0, embroiderySetupCost = 0;
+  let embroideryCost = 0;
   const embroideryBreakdowns = [];
   for (const stitches of input.embroideryStitches.filter((value): value is number => value !== null)) {
     const normal = Math.max(7000, Math.ceil(stitches)); const base = Math.min(15000, Math.ceil(normal / 1000) * 1000); const extra = normal > 15000 ? Math.ceil((normal - 15000) / 1000) : 0;
@@ -42,18 +42,25 @@ export function calculateUkTradeItem(input: UkTradeItemInput, data: UkTradeRefer
     if (basePrice === undefined || (extra > 0 && extraPrice === undefined)) { errors.push({ code: "MISSING_EMBROIDERY_PRICE", itemId: input.id, message: "Missing embroidery price." }); continue; }
     const unitPrice = basePrice + extra * (extraPrice ?? 0);
     const cost = unitPrice * input.quantity;
-    const setupCost = embroiderySetup ?? 0;
-    embroideryCost += cost; embroiderySetupCost += setupCost;
-    embroideryBreakdowns.push({ stitches, unitPrice, cost, setupCost });
+    embroideryCost += cost;
+    embroideryBreakdowns.push({ stitches, unitPrice, cost, setupCost: embroiderySetup ?? 0 });
   }
   const garmentCost = garment?.gbpPrice != null ? garment.gbpPrice * input.quantity : 0;
-  const screenSetupCost = screens * (screenSetup ?? 0);
-  const garmentSubtotalExVat = garmentCost + printCost + embroideryCost + embroiderySetupCost;
-  const totalCost = garmentSubtotalExVat + screenSetupCost;
-  const garmentSubtotalIncVat = garmentSubtotalExVat * (1 + UK_TRADE_VAT_RATE / 100);
-  const screenSetupTotalIncVat = screenSetupCost * (1 + UK_TRADE_VAT_RATE / 100);
-  const vatAmount = totalCost * (UK_TRADE_VAT_RATE / 100);
-  const totalCostIncVat = totalCost + vatAmount;
-  const unitPriceExcludingScreenSetup = input.quantity > 0 ? garmentSubtotalExVat / input.quantity : 0;
-  return { itemId: input.id, garmentId: garment?.id ?? "", quantity: input.quantity, garmentCost, printCost, screenSetupCount: screens, screenSetupCost, embroideryCost, embroiderySetupCost, unitPriceExcludingScreenSetup, garmentSubtotalExVat, garmentSubtotalIncVat, screenSetupTotalIncVat, vatAmount, totalCost, totalCostIncVat, printBreakdowns, embroideryBreakdowns, errors };
+  const quantitySubtotalExVatExcludingSetup = garmentCost + printCost + embroideryCost;
+  const screenSetupUnitExVat = screenSetup ?? 0;
+  const screenSetupSubtotalExVat = screens * screenSetupUnitExVat;
+  const embroiderySetupCount = embroideryBreakdowns.length;
+  const embroiderySetupUnitExVat = embroiderySetup ?? 0;
+  const embroiderySetupSubtotalExVat = embroiderySetupCount * embroiderySetupUnitExVat;
+  const totalSetupExVat = screenSetupSubtotalExVat + embroiderySetupSubtotalExVat;
+  const vatMultiplier = 1 + UK_TRADE_VAT_RATE / 100;
+  const quantityTotalIncVatExcludingSetup = quantitySubtotalExVatExcludingSetup * vatMultiplier;
+  const screenSetupTotalIncVat = screenSetupSubtotalExVat * vatMultiplier;
+  const embroiderySetupTotalIncVat = embroiderySetupSubtotalExVat * vatMultiplier;
+  const totalSetupIncVat = totalSetupExVat * vatMultiplier;
+  const itemSubtotalExVat = quantitySubtotalExVatExcludingSetup + totalSetupExVat;
+  const itemVat = itemSubtotalExVat * (UK_TRADE_VAT_RATE / 100);
+  const itemTotalIncVat = itemSubtotalExVat + itemVat;
+  const unitPriceExVatExcludingSetup = input.quantity > 0 ? quantitySubtotalExVatExcludingSetup / input.quantity : 0;
+  return { itemId: input.id, garmentId: garment?.id ?? "", quantity: input.quantity, garmentCost, printCost, embroideryCost, unitPriceExVatExcludingSetup, quantitySubtotalExVatExcludingSetup, quantityTotalIncVatExcludingSetup, screenCount: screens, screenSetupUnitExVat, screenSetupSubtotalExVat, screenSetupTotalIncVat, embroiderySetupCount, embroiderySetupUnitExVat, embroiderySetupSubtotalExVat, embroiderySetupTotalIncVat, totalSetupExVat, totalSetupIncVat, itemSubtotalExVat, itemVat, itemTotalIncVat, printBreakdowns, embroideryBreakdowns, errors };
 }

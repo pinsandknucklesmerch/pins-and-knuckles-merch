@@ -59,11 +59,11 @@ test("numeric strings are converted correctly at the mapper boundary", () => {
     code: "GD01",
     alt_code: "64000",
     brand_name: "Gildan",
-    name: "Gildan SoftStyle Adult T-Shirt",
+    name: "SoftStyle Adult T-Shirt",
     colour: "Colours",
     garment_type: "TSHIRT",
     eur_base_price: "2.2500",
-    gbp_price: null,
+    gbp_price: "1.9600",
     extra_size_cost: "0.7000",
     tags: "",
     is_active: true,
@@ -72,7 +72,7 @@ test("numeric strings are converted correctly at the mapper boundary", () => {
   } as unknown as Tables<"garments">);
 
   assert.equal(garment.eurBasePrice, 2.25);
-  assert.equal(garment.gbpPrice, null);
+  assert.equal(garment.gbpPrice, 1.96);
   assert.equal(garment.extraSizeCost, 0.7);
 });
 
