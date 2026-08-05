@@ -26,6 +26,8 @@ test("EU breakdown rows share stable semantic keys and retain empty Production m
   assert.equal(rows.find((row) => row.key === "pk-markup")?.production, undefined);
   assert.equal(rows.find((row) => row.key === "print-front")?.pins?.label, "Front · 1 colour");
   assert.equal(rows.find((row) => row.key === "embroidery-small-1")?.production?.label, "small embroidery");
-  assert.equal(rows.find((row) => row.key === "unit-cost")?.pins?.label, "Total unit cost excl. VAT");
+  assert.equal(rows.find((row) => row.key === "unit-cost")?.production?.label, "Unit cost excl. VAT");
+  assert.equal(rows.find((row) => row.key === "unit-cost")?.pins?.label, "Unit cost excl. VAT");
+  assert.equal(rows.find((row) => row.key === "subtotal")?.production?.label, "Item subtotal excl. VAT");
   assert.equal(rows.find((row) => row.key === "subtotal")?.production?.amount, 472.5);
 });

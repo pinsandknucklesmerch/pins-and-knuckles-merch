@@ -16,6 +16,8 @@ import { CalculatorToolbar } from "./CalculatorToolbar";
 import type { EuQuoteLine } from "../domain/euQuoteFormatter.ts";
 import { formatEuStandardQuote, formatUsClientQuote } from "../domain/euQuoteFormatter.ts";
 import { shouldShowMissingGarmentError } from "../domain/euCalculatorInteractions.ts";
+import { Plus } from "lucide-react";
+import { ActionButton } from "@/components/ui/ActionButton";
 
 type EuCalculatorProps = {
   referenceData: CalculatorReferenceData;
@@ -61,7 +63,11 @@ export function EuCalculator({ referenceData, profileCode = "EU_STANDARD" }: EuC
   const [items, setItems] = useState<EuCalculatorItemInput[]>([
     createDefaultEuCalculatorItem(1),
   ]);
-  const [includeDeliveryCosts, setIncludeDeliveryCosts] = useState<Record<string, boolean>>({});
+  const [includeDeliveryCosts, setIncludeDeliveryCosts] = useState(false);
+  const [deliveryCountry, setDeliveryCountry] = useState<string | null>(referenceData.deliveryRates[0]?.country ?? null);
+  const [deliveryBoxCount, setDeliveryBoxCount] = useState(1);
+  const [deliveryMarkupEnabled, setDeliveryMarkupEnabled] = useState(false);
+  const [deliveryMarkupPerBox, setDeliveryMarkupPerBox] = useState(0);
   const [missingGarmentActions, setMissingGarmentActions] = useState<Record<string, { attemptedAddItem?: boolean; attemptedPrintSelection?: boolean }>>({});
 
   const calculations = useMemo<ItemCalculation[]>(() => {
@@ -156,12 +162,16 @@ export function EuCalculator({ referenceData, profileCode = "EU_STANDARD" }: EuC
     setItems([createDefaultEuCalculatorItem(1)]);
     setNextItemIndex(2);
     setMissingGarmentActions({});
-    setIncludeDeliveryCosts({});
+    setIncludeDeliveryCosts(false);
+    setDeliveryCountry(referenceData.deliveryRates[0]?.country ?? null);
+    setDeliveryBoxCount(1);
+    setDeliveryMarkupEnabled(false);
+    setDeliveryMarkupPerBox(0);
   }
 
   return (
     <div className="grid min-w-0 gap-4">
-      <CalculatorToolbar validItemCount={validItemCount} totalItemCount={items.length} onAddItem={addItem} onReset={reset} />
+      <CalculatorToolbar validItemCount={validItemCount} totalItemCount={items.length} onAddItem={addItem} onReset={reset} showAddItem={false} />
 
       <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(20rem,1fr)]">
         <div className="grid min-w-0 content-start gap-4">
@@ -173,15 +183,30 @@ export function EuCalculator({ referenceData, profileCode = "EU_STANDARD" }: EuC
                 garments={referenceData.garments}
                 errors={(calculations.find((calculation) => calculation.itemId === item.id)?.errors ?? []).filter((error) => error.code !== "MISSING_GARMENT" || shouldShowMissingGarmentError({ garmentId: item.garmentId, ...missingGarmentActions[item.id] }))}
                 canRemove={items.length > 1}
-                includeDeliveryCosts={Boolean(includeDeliveryCosts[item.id])}
-                onIncludeDeliveryCostsChange={(enabled) => setIncludeDeliveryCosts((current) => ({ ...current, [item.id]: enabled }))}
                 onChange={updateItem}
                 onRemove={() => removeItem(item.id)}
                 onPrintPositionSelect={() => markPrintPositionSelected(item.id)}
               />
-              {includeDeliveryCosts[item.id] ? <EuDeliveryHelper deliveryRates={referenceData.deliveryRates} deliveryRatesError={referenceData.deliveryRatesError} /> : null}
             </div>)}
           </div>
+
+          <ActionButton onClick={addItem}><Plus className="mr-2 size-4" />Add item</ActionButton>
+          <label className="flex min-w-0 items-center gap-2 text-sm text-foreground">
+            <input type="checkbox" checked={includeDeliveryCosts} onChange={(event) => setIncludeDeliveryCosts(event.target.checked)} className="size-4 shrink-0 rounded border-input bg-background accent-primary" />
+            <span className="min-w-0 break-words">Include delivery costs</span>
+          </label>
+          {includeDeliveryCosts ? <EuDeliveryHelper
+            deliveryRates={referenceData.deliveryRates}
+            deliveryRatesError={referenceData.deliveryRatesError}
+            country={deliveryCountry}
+            boxCount={deliveryBoxCount}
+            markupEnabled={deliveryMarkupEnabled}
+            markupPerBox={deliveryMarkupPerBox}
+            onCountryChange={setDeliveryCountry}
+            onBoxCountChange={setDeliveryBoxCount}
+            onMarkupEnabledChange={setDeliveryMarkupEnabled}
+            onMarkupPerBoxChange={setDeliveryMarkupPerBox}
+          /> : null}
         </div>
 
         {hasValidItems ? <div className="grid min-w-0 content-start gap-4">

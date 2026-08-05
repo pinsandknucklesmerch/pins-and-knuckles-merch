@@ -7,15 +7,17 @@ const helper = readFileSync(new URL("../components/EuDeliveryHelper.tsx", import
 const item = readFileSync(new URL("../components/EuItemCard.tsx", import.meta.url), "utf8");
 
 test("delivery is disabled by default and only renders after the checkbox is enabled", () => {
-  assert.match(component, /useState<Record<string, boolean>>\(\{\}\)/);
-  assert.match(item, /Include delivery costs/);
-  assert.match(component, /includeDeliveryCosts\[item\.id\] \? <EuDeliveryHelper/);
+  assert.match(component, /useState\(false\)/);
+  assert.doesNotMatch(item, /Include delivery costs/);
+  assert.match(component, /checked=\{includeDeliveryCosts\}/);
+  assert.match(component, /includeDeliveryCosts \? <EuDeliveryHelper/);
   assert.doesNotMatch(component, /<label className="flex min-w-0 w-full/);
 });
 
-test("unchecking delivery resets the delivery helper by unmounting it and reset clears the option", () => {
-  assert.match(component, /setIncludeDeliveryCosts\(\{\}\)/);
-  assert.match(component, /onIncludeDeliveryCostsChange/);
+test("unchecking delivery hides the helper while reset clears quote-level delivery state", () => {
+  assert.match(component, /setIncludeDeliveryCosts\(false\)/);
+  assert.match(component, /setDeliveryBoxCount\(1\)/);
+  assert.doesNotMatch(component, /onIncludeDeliveryCostsChange/);
   assert.doesNotMatch(component, /CollapsibleSurface/);
   assert.doesNotMatch(helper, /CollapsibleSurface/);
 });
@@ -23,7 +25,7 @@ test("unchecking delivery resets the delivery helper by unmounting it and reset 
 test("delivery controls and results remain separate from calculator totals", () => {
   assert.match(component, /calculateEuStandardPrice\(/);
   assert.match(component, /<EuCalculatorResults items=\{validQuoteLines\} totals=\{totals\}/);
-  assert.match(component, /<EuDeliveryHelper deliveryRates=\{referenceData\.deliveryRates\}/);
+  assert.match(component, /<EuDeliveryHelper[\s\S]*deliveryRates=\{referenceData\.deliveryRates\}/);
   assert.doesNotMatch(component.slice(component.indexOf("const calculations"), component.indexOf("return (")), /includeDeliveryCosts/);
 });
 
@@ -44,14 +46,28 @@ test("EU calculator controls use wrapping and min-width-safe layouts", () => {
   assert.match(results, /min-w-0 break-words text-sm font-semibold/);
 });
 
-test("delivery helper stays directly beneath its item and does not require another expander", () => {
-  assert.match(component, /<EuItemCard[\s\S]*?\/>\s*\{includeDeliveryCosts\[item\.id\] \? <EuDeliveryHelper/);
+test("one delivery helper stays beneath the complete item list and does not require another expander", () => {
+  const itemListEnd = component.indexOf("</div>\n\n          <ActionButton");
+  const addItem = component.indexOf("Add item", itemListEnd);
+  const includeDelivery = component.indexOf("Include delivery costs", addItem);
+  const helperRender = component.indexOf("{includeDeliveryCosts ? <EuDeliveryHelper", includeDelivery);
+  assert.ok(itemListEnd >= 0 && itemListEnd < addItem && addItem < includeDelivery && includeDelivery < helperRender);
+  assert.equal((component.match(/<EuDeliveryHelper/g) ?? []).length, 1);
   assert.match(helper, /<Surface aria-label="Delivery helper"/);
   assert.doesNotMatch(helper, /CollapsibleSurface/);
 });
 
 test("delivery controls use responsive, non-wrapping value cells", () => {
-  assert.match(helper, /sm:grid-cols-1 md:grid-cols-2/);
+  assert.match(helper, /grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4/);
   assert.match(helper, /whitespace-nowrap/);
   assert.match(helper, /grid-cols-\[minmax\(0,1fr\)_auto\]/);
+  assert.match(helper, /Number of boxes[\s\S]*Cost per box[\s\S]*Delivery time[\s\S]*Delivery markup/);
+  assert.match(helper, /gap-1\.5/);
+});
+
+test("delivery state is controlled by the calculator rather than stored on an item", () => {
+  assert.match(component, /const \[deliveryCountry, setDeliveryCountry\]/);
+  assert.match(component, /const \[deliveryBoxCount, setDeliveryBoxCount\]/);
+  assert.match(helper, /onBoxCountChange/);
+  assert.doesNotMatch(item, /delivery|Delivery/);
 });

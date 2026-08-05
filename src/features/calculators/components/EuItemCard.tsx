@@ -16,8 +16,6 @@ type EuItemCardProps = {
   garments: Garment[];
   errors: CalculatorValidationError[];
   canRemove: boolean;
-  includeDeliveryCosts: boolean;
-  onIncludeDeliveryCostsChange: (enabled: boolean) => void;
   onChange: (item: EuCalculatorItemInput) => void;
   onRemove: () => void;
   onPrintPositionSelect: () => void;
@@ -29,8 +27,6 @@ export function EuItemCard({
   garments,
   errors,
   canRemove,
-  includeDeliveryCosts,
-  onIncludeDeliveryCostsChange,
   onChange,
   onRemove,
   onPrintPositionSelect,
@@ -113,16 +109,6 @@ export function EuItemCard({
             }
           />
         </div>
-
-        <label className="flex min-w-0 items-center gap-2 text-sm text-foreground">
-          <input
-            type="checkbox"
-            checked={includeDeliveryCosts}
-            onChange={(event) => onIncludeDeliveryCostsChange(event.target.checked)}
-            className="size-4 shrink-0 rounded border-input bg-background accent-primary"
-          />
-          <span className="min-w-0 break-words">Include delivery costs</span>
-        </label>
 
         <CalculatorErrors errors={errors} />
       </div>

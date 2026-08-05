@@ -1,7 +1,7 @@
 "use client";
 
 import { Copy } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { calculateEuDelivery, formatEuDeliveryCopy } from "../domain/euDeliveryHelper.ts";
 import type { DeliveryRate } from "../domain/types.ts";
 import { Select } from "@/components/ui/Select";
@@ -11,6 +11,14 @@ import { copyText } from "@/components/ui/copyText";
 type EuDeliveryHelperProps = {
   deliveryRates: DeliveryRate[];
   deliveryRatesError?: string | null;
+  country: string | null;
+  boxCount: number;
+  markupEnabled: boolean;
+  markupPerBox: number;
+  onCountryChange: (country: string | null) => void;
+  onBoxCountChange: (boxCount: number) => void;
+  onMarkupEnabledChange: (enabled: boolean) => void;
+  onMarkupPerBoxChange: (markupPerBox: number) => void;
 };
 
 const money = (value: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(value);
@@ -19,11 +27,7 @@ function Row({ label, value, strong = false }: { label: string; value: string; s
   return <div className={`grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 py-1.5 text-sm ${strong ? "border-t border-border pt-3 font-semibold text-foreground" : "text-muted-foreground"}`}><dt className="min-w-0 break-words">{label}</dt><dd className="min-w-0 whitespace-nowrap text-right font-medium tabular-nums text-foreground">{value}</dd></div>;
 }
 
-export function EuDeliveryHelper({ deliveryRates, deliveryRatesError }: EuDeliveryHelperProps) {
-  const [country, setCountry] = useState<string | null>(deliveryRates[0]?.country ?? null);
-  const [boxCount, setBoxCount] = useState(1);
-  const [markupEnabled, setMarkupEnabled] = useState(false);
-  const [markupPerBox, setMarkupPerBox] = useState(0);
+export function EuDeliveryHelper({ deliveryRates, deliveryRatesError, country, boxCount, markupEnabled, markupPerBox, onCountryChange, onBoxCountChange, onMarkupEnabledChange, onMarkupPerBoxChange }: EuDeliveryHelperProps) {
   const delivery = useMemo(() => calculateEuDelivery({ country, boxCount, markupEnabled, markupPerBox }, deliveryRates, deliveryRatesError), [boxCount, country, deliveryRates, deliveryRatesError, markupEnabled, markupPerBox]);
 
   async function copyDelivery() {
@@ -32,16 +36,14 @@ export function EuDeliveryHelper({ deliveryRates, deliveryRatesError }: EuDelive
   }
 
   return <Surface aria-label="Delivery helper" className="min-w-0">
-    <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)]">
-      <div className="grid min-w-0 gap-4">
-        <label className="grid gap-2 text-xs font-medium text-muted-foreground sm:col-span-2">Delivery area<Select value={country ?? ""} placeholder="Select delivery area" onValueChange={(value) => setCountry(value || null)} disabled={Boolean(deliveryRatesError) || deliveryRates.length === 0}>{deliveryRates.map((rate) => <option key={rate.country} value={rate.country}>{rate.country}</option>)}</Select></label>
-        <div className="grid min-w-0 gap-4 sm:grid-cols-1 md:grid-cols-2">
-          <label className="grid min-w-0 gap-2 text-xs font-medium text-muted-foreground">Number of boxes<input type="number" min={1} step={1} value={Number.isFinite(boxCount) ? boxCount : ""} onChange={(event) => setBoxCount(Number(event.target.value))} className="h-9 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm text-foreground" /></label>
-          <label className="grid min-w-0 gap-2 text-xs font-medium text-muted-foreground">Cost per box<output className="flex h-9 min-w-0 items-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground">{delivery.ok ? `${money(delivery.rate.costPerBox)} excl. VAT` : "—"}</output></label>
-        </div>
-        <div className="grid min-w-0 gap-4 sm:grid-cols-1 md:grid-cols-2">
-          <label className="grid min-w-0 gap-2 text-xs font-medium text-muted-foreground">Delivery time<output className="flex h-9 min-w-0 items-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground">{delivery.ok ? delivery.rate.deliveryTime : "—"}</output></label>
-          <div className="grid min-w-0 gap-2"><label className="flex h-5 min-w-0 items-center gap-2 text-xs text-muted-foreground"><input type="checkbox" checked={markupEnabled} onChange={(event) => setMarkupEnabled(event.target.checked)} className="size-3.5 shrink-0 accent-primary" />Delivery markup</label>{markupEnabled ? <input aria-label="Delivery markup per box" type="number" step="0.01" value={Number.isFinite(markupPerBox) ? markupPerBox : ""} onChange={(event) => setMarkupPerBox(Number(event.target.value))} className="h-9 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm text-foreground" /> : <output className="flex h-9 min-w-0 items-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-xs text-muted-foreground">No delivery markup applied</output>}</div>
+    <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.85fr)]">
+      <div className="grid min-w-0 gap-3">
+        <label className="grid min-w-0 gap-1.5 text-xs font-medium text-muted-foreground">Delivery area<Select value={country ?? ""} placeholder="Select delivery area" onValueChange={(value) => onCountryChange(value || null)} disabled={Boolean(deliveryRatesError) || deliveryRates.length === 0}>{deliveryRates.map((rate) => <option key={rate.country} value={rate.country}>{rate.country}</option>)}</Select></label>
+        <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4">
+          <label className="grid min-w-0 gap-1.5 text-xs font-medium text-muted-foreground"><span className="min-w-0 break-words">Number of boxes</span><input type="number" min={1} step={1} value={Number.isFinite(boxCount) ? boxCount : ""} onChange={(event) => onBoxCountChange(Number(event.target.value))} className="h-9 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm text-foreground" /></label>
+          <div className="grid min-w-0 gap-1.5 text-xs font-medium text-muted-foreground"><span className="min-w-0 break-words">Cost per box</span><output className="flex h-9 min-w-0 items-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground">{delivery.ok ? `${money(delivery.rate.costPerBox)} excl. VAT` : "—"}</output></div>
+          <div className="grid min-w-0 gap-1.5 text-xs font-medium text-muted-foreground"><span className="min-w-0 break-words">Delivery time</span><output className="flex h-9 min-w-0 items-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground">{delivery.ok ? delivery.rate.deliveryTime : "—"}</output></div>
+          <div className="grid min-w-0 gap-1.5"><label className="flex min-w-0 items-start gap-2 text-xs text-muted-foreground"><input type="checkbox" checked={markupEnabled} onChange={(event) => onMarkupEnabledChange(event.target.checked)} className="mt-0.5 size-3.5 shrink-0 accent-primary" /><span className="min-w-0 break-words">Delivery markup</span></label>{markupEnabled && <input aria-label="Delivery markup per box" type="number" step="0.01" value={Number.isFinite(markupPerBox) ? markupPerBox : ""} onChange={(event) => onMarkupPerBoxChange(Number(event.target.value))} className="h-9 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm text-foreground" />}</div>
         </div>
       </div>
       <Surface variant="compact" className="min-w-0 bg-background/55" aria-label="Delivery summary">

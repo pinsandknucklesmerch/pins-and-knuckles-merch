@@ -77,13 +77,13 @@ export function buildAlignedEuBreakdownRows(line: EuQuoteLine, production: Produ
   rows.push(
     {
       key: "unit-cost",
-      production: { label: "Production unit cost excl. VAT", amount: production.unitCost },
-      pins: { label: "Total unit cost excl. VAT", amount: pins.unitCost },
+      production: { label: "Unit cost excl. VAT", amount: production.unitCost },
+      pins: { label: "Unit cost excl. VAT", amount: pins.unitCost },
     },
     {
       key: "subtotal",
-      production: { label: "Production item subtotal excl. VAT", amount: production.subtotal },
-      pins: { label: "Pins item subtotal excl. VAT", amount: pins.subtotal },
+      production: { label: "Item subtotal excl. VAT", amount: production.subtotal },
+      pins: { label: "Item subtotal excl. VAT", amount: pins.subtotal },
     },
   );
 

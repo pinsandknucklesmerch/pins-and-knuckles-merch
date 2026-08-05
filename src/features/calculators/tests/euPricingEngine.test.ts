@@ -373,6 +373,11 @@ test("EU US Clients resolves the exact independent legacy markup matrix", () => 
     assert.equal(result.ok, true, result.ok ? "" : JSON.stringify(result.errors));
     if (result.ok) assert.equal(result.items[0].garmentMarkupCost, expected);
   }
+
+  const representative = assertOk(calculateEuStandardPrice({ ...createInput(), profileCode: "EU_US_CLIENTS" }, reference));
+  assert.equal(representative.totals.productionSubtotalExVat, 482.5);
+  assert.equal(representative.totals.customerSubtotalExVat, 689.5);
+  assertNearlyEqual(representative.totals.customerTotalIncVat, 875.665);
 });
 
 test("validates EU quantity boundaries", () => {
