@@ -47,16 +47,17 @@ function ItemHeading({ line, index }: { line: EuQuoteLine; index: number }) {
   );
 }
 
-function BreakdownValue({ cell }: { cell?: AlignedEuBreakdownRow["production"] }) {
-  return cell ? <span className="min-w-0 whitespace-nowrap text-right font-medium tabular-nums text-foreground">{money(cell.amount)}{cell.perUnit ? " / unit" : ""}</span> : <span aria-hidden="true" />;
+function BreakdownValue({ cell, valueClassName }: { cell?: AlignedEuBreakdownRow["production"]; valueClassName?: string }) {
+  return cell ? <span className={`min-w-0 whitespace-nowrap text-right font-medium tabular-nums ${valueClassName ?? "text-foreground"}`}>{money(cell.amount)}{cell.perUnit ? " / unit" : ""}</span> : <span aria-hidden="true" />;
 }
 
 function BreakdownRow({ row }: { row: AlignedEuBreakdownRow }) {
   const emphasis = row.key === "unit-cost" || row.key === "subtotal";
+  const unitCostValueClassName = row.key === "unit-cost" ? "text-red-500" : undefined;
   return <div className={`grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(max-content,0.75fr)_minmax(max-content,0.75fr)] items-start gap-x-3 border-b border-border/60 py-2 text-xs last:border-0 max-md:grid-cols-[minmax(0,1fr)_minmax(max-content,0.75fr)] max-md:gap-y-1 ${emphasis ? "font-semibold" : ""}`}>
     <span className="min-w-0 break-words text-muted-foreground max-md:col-span-2">{row.production?.label ?? row.pins?.label}</span>
-    <BreakdownValue cell={row.production} />
-    <BreakdownValue cell={row.pins} />
+    <BreakdownValue cell={row.production} valueClassName={unitCostValueClassName} />
+    <BreakdownValue cell={row.pins} valueClassName={unitCostValueClassName} />
   </div>;
 }
 
@@ -92,7 +93,11 @@ export function EuCalculatorResults({
             <div className="text-xs font-medium text-accent">Pins Price (incl VAT)</div>
             {copyState === "copied" ? <Check className="size-4 text-accent" aria-hidden="true" /> : <Copy className="size-4 text-accent" aria-hidden="true" />}
           </div>
-          <div className="mt-2 whitespace-nowrap text-2xl font-semibold tabular-nums text-foreground">{money(totals.customerTotalIncVat)}</div>
+          <div className="mt-2 whitespace-nowrap text-2xl font-semibold tabular-nums text-foreground">
+              <p className="text-2xl font-semibold text-red-500">
+                  {money(totals.customerTotalIncVat)}
+                  </p>
+              </div>
           <div className="mt-1 text-xs text-muted-foreground">Click to copy</div>
           </>}
         </CopyableCard>
