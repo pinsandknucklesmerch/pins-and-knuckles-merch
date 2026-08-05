@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { toggleUkTradeEmbroidery, toggleUkTradePrintPosition } from "../domain/ukTradeCalculatorInteractions.ts";
 
@@ -23,4 +24,23 @@ test("UK neck and transfer positions remain distinct", () => {
     { position: "NECK_PRINT_STANDARD" },
     { position: "NECK_PRINT_TRANSFER" },
   ]);
+});
+
+test("UK Trade results use a two-card summary and one native final-total copy activation", () => {
+  const calculator = readFileSync(new URL("../components/UkTradeCalculator.tsx", import.meta.url), "utf8");
+  assert.match(calculator, /grid gap-3 sm:grid-cols-2/);
+  assert.match(calculator, />Quantity subtotal</);
+  assert.match(calculator, />Final total</);
+  assert.doesNotMatch(calculator, />Setup</);
+  assert.doesNotMatch(calculator, />VAT</);
+  assert.match(calculator, /<button type="button" onClick=\{\(\) => void copyQuote\(\)\}/);
+  assert.match(calculator, /Click to copy/);
+  assert.equal((calculator.match(/copyQuote\(\)/g) ?? []).length, 2);
+});
+
+test("UK Trade breakdown keeps setup and VAT there and marks only unit-price values with Pins red", () => {
+  const breakdown = readFileSync(new URL("../components/UkTradeBreakdown.tsx", import.meta.url), "utf8");
+  assert.match(breakdown, /Setup \(excl\. VAT\)/);
+  assert.match(breakdown, /VAT/);
+  assert.match(breakdown, /label="Unit price \(excl\. setup & VAT\)"[^>]*valueClassName="text-primary"/);
 });

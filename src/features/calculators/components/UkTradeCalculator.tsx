@@ -24,8 +24,6 @@ export function UkTradeCalculator({ referenceData }: { referenceData: UkTradeRef
   const validResults = results.filter((result) => result.errors.length === 0);
   const totalsIncVat = validResults.reduce((sum, result) => sum + result.itemTotalIncVat, 0);
   const quantitySubtotalExVat = validResults.reduce((sum, result) => sum + result.quantitySubtotalExVatExcludingSetup, 0);
-  const totalSetupExVat = validResults.reduce((sum, result) => sum + result.totalSetupExVat, 0);
-  const vatAmount = validResults.reduce((sum, result) => sum + result.itemVat, 0);
   const hasValidItems = validResults.length > 0;
 
   const update = (item: UkTradeItemInput) => setItems((current) => current.map((row) => row.id === item.id ? item : row));
@@ -57,15 +55,13 @@ export function UkTradeCalculator({ referenceData }: { referenceData: UkTradeRef
           </Panel>;
         })}
       </div>
-      {hasValidItems ? <div className="grid min-w-0 content-start gap-4 xl:row-span-2">
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-          <Panel className="p-4"><div className="text-xs text-muted-foreground">Quantity subtotal</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(quantitySubtotalExVat)}</div><div className="mt-1 text-xs text-muted-foreground">ex VAT, excl. setup</div></Panel>
-          <Panel className="p-4"><div className="text-xs text-muted-foreground">Setup</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(totalSetupExVat)}</div><div className="mt-1 text-xs text-muted-foreground">ex VAT</div></Panel>
-          <Panel className="p-4"><div className="text-xs text-muted-foreground">VAT</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(vatAmount)}</div></Panel>
-          <Panel className="p-4"><div className="text-xs text-muted-foreground">Final total</div><div className="mt-2 text-2xl font-semibold tabular-nums">{money(totalsIncVat)}</div><button type="button" onClick={() => void copyQuote()} className="mt-4 inline-flex items-center gap-2 text-sm text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Copy className="size-4" />Copy quote</button></Panel>
+      {hasValidItems ? <Panel className="grid min-w-0 content-start gap-4 p-3 xl:row-span-2">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="min-w-0 rounded-md border border-border/90 bg-background/55 p-3"><div className="text-xs text-muted-foreground">Quantity subtotal</div><div className="mt-2 truncate text-2xl font-semibold tabular-nums">{money(quantitySubtotalExVat)}</div><div className="mt-1 text-xs text-muted-foreground">ex VAT, excl. setup</div></div>
+          <button type="button" onClick={() => void copyQuote()} className="min-w-0 rounded-md border border-primary/60 bg-background/55 p-3 text-left transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"><span className="flex items-start justify-between gap-3"><span className="text-xs text-muted-foreground">Final total</span><span className="inline-flex shrink-0 items-center gap-1 text-xs text-primary"><Copy className="size-3.5" aria-hidden="true" />Click to copy</span></span><span className="mt-2 block truncate text-2xl font-semibold tabular-nums text-foreground">{money(totalsIncVat)}</span><span className="mt-1 block text-xs text-muted-foreground">inc VAT</span></button>
         </div>
         <UkTradeBreakdown items={items} results={results} />
-      </div> : null}
+      </Panel> : null}
     </div>
   </div>;
 }
