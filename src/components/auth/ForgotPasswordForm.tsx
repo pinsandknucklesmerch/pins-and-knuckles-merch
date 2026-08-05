@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { sendPasswordRecoveryEmail } from "@/features/auth/lib/passwordRecovery";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
@@ -16,12 +17,8 @@ export function ForgotPasswordForm() {
     setMessage(null);
     setIsSubmitting(true);
 
-    const redirectTo = `${window.location.origin}/auth/confirm?next=/auth/update-password`;
     const supabase = createClient();
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-      email,
-      { redirectTo },
-    );
+    const { error: resetError } = await sendPasswordRecoveryEmail(supabase, email, window.location.origin);
 
     setIsSubmitting(false);
 

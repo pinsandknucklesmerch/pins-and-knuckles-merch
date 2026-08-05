@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
-import { hubFeatureNavigation } from "./hubNavigation.ts";
+import { hubFeatureNavigation, hubProfileNavigation } from "./hubNavigation.ts";
 
 test("defines every Hub feature card from shared navigation", () => {
   assert.deepEqual(
@@ -42,4 +43,17 @@ test("does not expose Dashboard as a feature card or duplicate routes", () => {
   const hrefs = hubFeatureNavigation.map((item) => item.href);
   assert.equal(hrefs.includes("/hub"), false);
   assert.equal(new Set(hrefs).size, hrefs.length);
+});
+
+test("defines the Profile route separately for placement beside sign out", () => {
+  assert.deepEqual({ label: hubProfileNavigation.label, href: hubProfileNavigation.href }, { label: "Profile", href: "/hub/profile" });
+  assert.equal(hubFeatureNavigation.some((item) => item.href === "/hub/profile"), false);
+});
+
+test("sidebar account area keeps only Profile and sign out", () => {
+  const sidebar = readFileSync(new URL("../components/layout/SidebarNav.tsx", import.meta.url), "utf8");
+  assert.match(sidebar, /hubProfileNavigation/);
+  assert.match(sidebar, /<LogoutButton \/>/);
+  assert.doesNotMatch(sidebar, /Signed in/);
+  assert.doesNotMatch(sidebar, /\{organisationRole/);
 });

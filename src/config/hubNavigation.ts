@@ -4,6 +4,7 @@ import {
   FileText,
   Landmark,
   Database,
+  UserRound,
   type LucideIcon,
 } from "lucide-react";
 
@@ -35,3 +36,5 @@ export const hubFeatureNavigation: HubFeatureNavigationItem[] = [
     ],
   },
 ];
+
+export const hubProfileNavigation = { href: "/hub/profile", label: "Profile", icon: UserRound } satisfies HubFeatureNavigationItem;
