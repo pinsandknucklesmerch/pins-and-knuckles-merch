@@ -199,7 +199,7 @@ Verified 2026-07-28 using read-only/dry-run checks only; no live writes were per
 | `/hub/sales-dashboard` | Protected Supabase-first sales dashboard with historical fixture fallback |
 | `/hub/calculators` | Protected calculator region menu |
 | `/hub/calculators/eu` | Protected EU calculator menu |
-| `/hub/calculators/eu/standard` | Protected initial EU Standard calculator |
+| `/hub/calculators/eu/standard` | Protected EU Standard calculator |
 | `/hub/calculators/eu/us-clients` | Protected EU US Clients calculator |
 | `/hub/calculators/uk/trade` | Protected UK Trade calculator |
 | `/hub/commercial-invoices` | Protected Commercial Invoice Generator |
@@ -321,13 +321,11 @@ Implemented:
 
 - Supabase schema and seed migrations for calculator reference data.
 - Generated Supabase database types.
-- EU Standard route and initial UI.
-- EU calculator repository loading global reference data.
-- EU domain engine, validation, price lookup, profile constants, mappers, and tests.
-- EU US Clients route using the shared EU foundation and its seeded profile: garment markups are T-shirt €2, long-sleeve €3, and hoodie €4. Its pure formatter preserves legacy lowercase decoration wording and `+ base` copy.
-- UK Trade route, Supabase reference-data loading, pure tier engine, copy formatter, and tests. Print uses floor tiers through 10,000 with £20 screen setup; embroidery uses 7,000–15,000 stitch tiers, additional 1,000-stitch blocks, £30 setup per position, and the 2,500 tier above 2,500 units.
-- EU Standard and EU US Clients include a collapsed-by-default delivery sales helper backed by Supabase delivery rates. Delivery remains separate from production, Pins totals, VAT, profit, and quote-copy totals; its separate copy output preserves the legacy structure.
-- EU results provide an open detailed Production/Pins breakdown, and UK Trade provides an open detailed cost breakdown. These surfaces read existing result data only; no pricing rules changed.
+- EU Standard and EU US Clients share global Supabase reference-data loading, typed domain engines, validation, price lookup, mappers, client-local state, and presentation components. EU US Clients uses its seeded profile (T-shirt €2, long-sleeve €3, hoodie €4 garment markups); its formatter retains legacy lowercase decoration wording and `+ base` copy.
+- EU desktop calculator layout is a responsive two-column surface that uses the available AppShell width: the wider left column contains item inputs and any enabled per-item Delivery Helper; the right column contains Production Costs, Pins Price, and the detailed breakdown. The compact page gutter is retained. At narrow widths the calculator stacks.
+- UK Trade route, Supabase reference-data loading, pure tier engine, copy formatter, and detailed cost breakdown are implemented. Print uses floor tiers through 10,000; standard prints use colours plus an underbase screen, neck-standard uses two setup screens, and neck-transfer uses no screens. Screen setup is £20 per screen. Embroidery uses 7,000–15,000 stitch tiers, additional 1,000-stitch blocks above 15,000, £30 setup per applicable position, and the 2,500 tier for quantities above 2,500.
+- EU Delivery Helper is per-item and opt-in. Its checkbox is directly beneath PK Markup; when enabled, the expanded helper appears directly beneath that item with no second expand action. It is separate from production, Pins totals, VAT, profit, and quote-copy totals. Its responsive fields do not overlap, its monetary values do not wrap, and copied output uses `Total Delivery Cost Excl. VAT` and `Total Delivery Cost Incl. VAT`.
+- EU results provide an open detailed aligned Production/Pins breakdown; UK Trade provides an open detailed cost breakdown. These surfaces read existing result data only; no pricing rules changed.
 - Reference assets: `public/reference-assets/eu-delivery-helper-reference.png`, `public/reference-assets/eu-detailed-breakdown-reference.png`, and `public/reference-assets/uk-trade-breakdown-reference.png`.
 - Calculator state is client-local only; no browser persistence is used and revisiting a route starts fresh.
 
@@ -355,6 +353,7 @@ Deferred:
   - `src/app/(hub)/hub/calculators/page.tsx`
   - `src/app/(hub)/hub/calculators/eu/page.tsx`
   - `src/app/(hub)/hub/calculators/eu/standard/page.tsx`
+  - `src/app/(hub)/hub/calculators/eu/us-clients/page.tsx`
 - Data:
   - `src/features/calculators/data/calculatorRepository.ts`
   - `src/features/calculators/data/mappers.ts`
@@ -367,10 +366,53 @@ Deferred:
 - UI:
   - `src/features/calculators/components/CalculatorShell.tsx`
   - `src/features/calculators/components/EuCalculator.tsx`
-  - Supporting controls and summary components in the same folder.
+  - `src/features/calculators/components/EuItemCard.tsx`
+  - `src/features/calculators/components/EuDeliveryHelper.tsx`
+  - `src/features/calculators/components/EuCalculatorResults.tsx`
+  - `src/features/calculators/lib/euBreakdownRows.ts`
 - Tests:
   - `src/features/calculators/tests/calculatorRepository.test.ts`
+  - `src/features/calculators/tests/euCalculatorInteractions.test.ts`
+  - `src/features/calculators/tests/euDeliveryHelper.test.ts`
+  - `src/features/calculators/tests/euDeliveryVisibility.test.ts`
+  - `src/features/calculators/tests/euBreakdownRows.test.ts`
+  - `src/features/calculators/tests/euCalculatorResults.test.ts`
   - `src/features/calculators/tests/euPricingEngine.test.ts`
+  - `src/features/calculators/tests/euQuoteFormatter.test.ts`
+  - `src/features/calculators/tests/ukTradePricingEngine.test.ts`
+
+### EU Standard and EU US Clients UI
+
+- Desktop uses a responsive two-column calculator layout. The left column contains garment/quantity inputs, compact print controls, compact embroidery controls, PK Markup, Include delivery costs, and an enabled Delivery Helper immediately beneath its related item. The right column contains Production Costs and Pins Price cards side by side where space permits, then the detailed breakdown.
+- On narrow screens the surfaces stack. The working tree keeps an enabled Delivery Helper directly below its related item; it does not currently move below the right-column results on mobile.
+- Print positions are compact multi-select buttons: Front, Back, Left Sleeve, Right Sleeve, and Neck. Only selected positions render their configuration controls. Embroidery 1, Embroidery 2, and Embroidery 3 are compact selectable buttons; only selected embroidery controls render. EU Standard and EU US Clients pricing behaviour is unchanged.
+- Every EU print-position colour input has a maximum of 9. Entering 10 or more normalises the displayed value to 9; values 1–9 remain unchanged; a field can be temporarily empty while editing; blur retains the existing minimum-value normalisation.
+- Missing-garment validation is action-gated: it is absent on initial load and after focus/blur of an empty garment field. It appears only after attempting to add another item with no garment, or selecting/adding a print position with no garment. Selecting a garment clears it immediately. Embroidery retains its existing independent behaviour unless it reaches the same shared path.
+- Pins Price is an explicit accessible copy action. Clicking the card or its copy control copies the existing customer-facing quote, keyboard activation is supported, and shared toast feedback and quote content are unchanged. The semantic button implementation uses one activation path so nested interaction cannot duplicate clipboard calls or toasts.
+
+### EU Delivery Helper
+
+- Include delivery costs appears directly beneath PK Markup. The helper is expanded when enabled and requires no second expand action.
+- Number of boxes and Cost per box use responsive minimum-safe grid cells and do not overlap. Cost per box, delivery subtotal excl. VAT, VAT, total delivery cost incl. VAT, and delivery-summary values are non-wrapping.
+- Delivery remains separate from Production Costs, Pins Price, VAT, profit, and quote totals. Delivery rates, calculations, delivery markup, and delivery VAT are unchanged.
+- The separate delivery copy uses `Total Delivery Cost Excl. VAT` and `Total Delivery Cost Incl. VAT`; it no longer labels the total ex-VAT value as `Cost Per Box`.
+
+### EU Breakdown
+
+- Breakdown remains directly beneath the result cards. Each quote item is one combined outer card with its item heading/quantity, Production Cost section, and Pins Price section.
+- Desktop/tablet renders Production Cost and Pins Price side by side. Mobile stacks Production Cost above Pins Price inside the same card.
+- `src/features/calculators/lib/euBreakdownRows.ts` creates the presentation-only shared semantic row order: garment base price per unit; garment markup per unit; PK markup per unit; selected print-position rows; selected embroidery rows; digitising where applicable; unit cost; item subtotal.
+- Both columns consume the same row slots. Pins-only garment/PK markup keeps an empty aligned Production cell: no dash, zero, placeholder, duplicate label, or upward shift of later Production values. On mobile, empty slots are not rendered as visual spacers.
+- Decoration rows use semantic keys, not array position: Front, Back, Left Sleeve, Right Sleeve, Neck, matching embroidery occurrences, and digitising align with their corresponding Pins values. Currency values remain right-aligned and non-wrapping.
+
+### Pricing and persistence boundary
+
+The EU UI revisions did not change EU Standard or EU US Clients pricing; garment markup matrices; PK markup calculations; print tiers; embroidery prices; digitising fees; VAT; delivery markup/VAT; quote formatting; exports; Supabase repository behaviour; or seeded calculator reference data. Calculator state remains client-local with no persistence.
+
+### Calculator test and verification snapshot
+
+- Interaction and presentation coverage protects initial/action-gated missing-garment validation, clearing after garment selection, 1–9 colour values and the cap at 9, multiple print selection, selected-only print/embroidery controls, delivery calculation/copy wording, breakdown reconciliation and aligned slots, representative EU Standard/EU US Clients totals, and UK Trade pricing-engine behaviour.
+- Current recorded calculator validation: production build passed; lint passed; TypeScript passed; calculator tests passed: 57; calculator test failures: 0; `git diff --check` passed. Node `MODULE_TYPELESS_PACKAGE_JSON` notices are non-blocking warnings, not test failures.
 
 ## Repository Structure
 
