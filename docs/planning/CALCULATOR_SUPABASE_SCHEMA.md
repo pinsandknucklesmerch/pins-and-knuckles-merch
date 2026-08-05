@@ -8,6 +8,11 @@ Source of truth:
 
 This document began as the calculator schema plan. The schema and seed data have since been implemented in `supabase/migrations/20260715120000_calculator_schema.sql` and `supabase/migrations/20260715130000_calculator_seed.sql`; treat the migrations and generated types as implementation truth.
 
+Current implementation also includes Product Types, the `OTHER` pricing
+category, invoice/customs fields, and normalized profile-specific markups.
+Some table/check recommendations below predate those changes and are retained
+as historical planning context, not as a complete current schema specification.
+
 ## Confirmed Migration Decisions
 
 - EU calculators support quantities `50` to `2000` only.
@@ -81,6 +86,11 @@ RLS recommendation:
 
 ## Table: `garments`
 
+> Historical planning note: this table description predates the Product Types
+> directory and invoice/customs fields. `garment_type` remains transitional
+> legacy markup data; current Product Type `pricing_category` supports `OTHER`
+> and is the active category source for new management flows.
+
 Purpose: shared garment catalogue for EU calculators, UK Trade, and the garment directory.
 
 Columns:
@@ -116,9 +126,12 @@ Unique constraints:
 - Do not enforce unique `code`; legacy data contains duplicate codes by colour/variant.
 - Recommended soft uniqueness: unique active row on `(organisation_id, code, brand_name, name, colour)` if data cleanup confirms it is safe.
 
-Check constraints:
+Historical check-constraint recommendation (superseded as a complete category
+model):
 
-- `garment_type in ('TSHIRT', 'LONGSLEEVE', 'HOODIE')`.
+- `garment_type in ('TSHIRT', 'LONGSLEEVE', 'HOODIE')` was the original limited
+  recommendation. Preserve the transitional field, but do not infer from it
+  that Product Types lack `OTHER`.
 - `eur_base_price is null or eur_base_price >= 0`.
 - `gbp_price is null or gbp_price >= 0`.
 - `extra_size_cost is null or extra_size_cost >= 0`.
@@ -132,6 +145,17 @@ Indexes:
 - `(brand_name)`.
 - `(garment_type)`.
 - Optional trigram/search index later for garment picker search.
+
+### Current Product Types and invoice/customs fields
+
+The original schema plan did not include Product Types or the later invoice
+directory model. Those omissions are superseded by the current implementation:
+`product_types` supplies pricing categories including `OTHER`, and its invoice
+description, default invoice cost, invoice currency, commodity code, country of
+origin, and related fields support commercial-invoice/customs workflows. See
+`src/features/data-management`, `src/features/commercial-invoices`, the active
+migrations, and generated database types. Do not treat their absence from this
+historical table plan as an implementation gap.
 
 Organisation requirement:
 
@@ -228,6 +252,11 @@ Example rows:
 
 ## Table: `calculator_garment_markups`
 
+> Historical schema note: the original markup table used the three legacy
+> `garment_type` values below. Current profile-specific markup mapping is
+> normalized through Product Type/pricing-category data while preserving the
+> transitional field for compatibility.
+
 Purpose: profile-specific per-unit garment markups for EU calculators.
 
 Columns:
@@ -258,9 +287,11 @@ Unique constraints:
 
 - Unique active row on `(calculator_profile_id, garment_type)` where `is_active`.
 
-Check constraints:
+Historical check-constraint recommendation (superseded as a complete category
+model):
 
-- `garment_type in ('TSHIRT', 'LONGSLEEVE', 'HOODIE')`.
+- `garment_type in ('TSHIRT', 'LONGSLEEVE', 'HOODIE')` is retained only as
+  transitional legacy logic; current Product Types include `OTHER`.
 - `markup_value >= 0`.
 - `valid_to is null or valid_to >= valid_from`.
 

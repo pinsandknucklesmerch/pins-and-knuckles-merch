@@ -1,5 +1,5 @@
 import { Panel } from "@/components/ui/Panel";
-import type { SnuggleMonth } from "../server/snuggleProfit";
+import type { SnuggleMonth } from "../lib/snuggleProfit";
 import { BarChart } from "metricui";
 import { buildSnuggleChartData, sortSnuggleMonthsChronologically } from "../lib/snuggleChart";
 

@@ -1,5 +1,11 @@
 # Database Foundation
 
+> Historical foundation note: this document preserves the original schema and
+> access-model decisions. The migration instructions below are not a current
+> “apply when ready” task list. The foundation migration is part of the active
+> forward-only migration chain; consult [`PROJECT_CONTEXT.md`](ai-context/PROJECT_CONTEXT.md)
+> for current schema status.
+
 ## Tables
 
 `profiles` stores one application profile per Supabase Auth user.
@@ -20,6 +26,9 @@ Users can read and update their own profile, read organisations they belong to, 
 
 `public.handle_new_user()` creates a `profiles` row whenever Supabase Auth creates an `auth.users` row.
 
-## Manual Step
+## Historical Manual Step
 
-Apply `supabase/migrations/20260709120000_foundation_auth_access.sql` through the Supabase CLI or dashboard SQL editor when ready.
+The original plan said to apply `supabase/migrations/20260709120000_foundation_auth_access.sql`
+through the Supabase CLI or dashboard SQL editor when ready. Preserve this as
+historical context; do not interpret it as a pending instruction without checking
+the current migration history and project context.

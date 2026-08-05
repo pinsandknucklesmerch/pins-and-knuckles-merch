@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { aggregateSnuggleProfit, parseCompletedSnuggleGroup } from "../server/snuggleProfit.ts";
+import { aggregateSnuggleProfit, parseCompletedSnuggleGroup } from "../lib/snuggleProfit.ts";
 import { groupUnmappedSnuggleWarnings } from "../lib/snuggleDiagnostics.ts";
 
 const item = (id: string, group: string, profit: string | null, people: string[] = []) => ({ id, name: `Order ${id}`, group: { id: group, title: group }, column_values: [

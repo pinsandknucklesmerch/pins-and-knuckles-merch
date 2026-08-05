@@ -16,9 +16,12 @@ The legacy Hub is reference-only. Use it only to confirm business behaviour and 
 - Prefer explicit, typed domain engines over configurable formulas stored in data.
 - Keep Supabase Auth, SSR cookie handling, RLS, migrations, and `pins_hub` access checks intact.
 
-## Current Status Snapshot (2026-08-03)
+## Current Status Snapshot (repository review 2026-08-05)
 
-The repository's current committed revision is `5b2747c` (`Updated Sales Dashbaord layout`). The working tree also contains one uncommitted two-line presentation-only edit in `src/features/sales-dashboard/components/YearToDateView.tsx` (the variance card label changes from `Ahead / Behind` to `Status`); it is not treated as committed project status here.
+The deployment and release-validation details below are dated evidence recorded
+on 2026-08-03. The current repository source and migration files are
+authoritative for implementation; remote deployment, migration application, and
+environment state are not inferred from static files alone.
 
 ### Complete and deployed or production-confirmed
 
@@ -26,10 +29,16 @@ The repository's current committed revision is `5b2747c` (`Updated Sales Dashbao
 - Production evidence confirms the Supabase migrations through the member-KPI and final-value migrations, the EPCC/Monday cron routes, their `08:05 UTC` / `08:15 UTC` schedules, and the required encrypted production variable names.
 - Confirmed company final Profit values are July 2026: **£165,942.07** and December 2025: **£153,931.76**. These are month-end final values; calculated/source-owned profit remains separate.
 
-### Implemented; latest UI revision awaits separate production verification
+### Implemented; external deployment verification remains separately scoped
 
 - The latest committed Sales Dashboard UI has one Overview/YTD/Year Comparison tab row, an admin-only outlined Manage final values action beside Edit Targets, wrapped action controls, source-effective KPI cards, and Leads removed from the comparison selector with a Monthly Profit fallback.
 - The formatted monetary final-value editor accepts grouped and currency-prefixed input while retaining server-side validation.
+
+### Batch 1 cleanup
+
+- Completed: removed the seven confirmed-unreachable modules and the direct
+  `@radix-ui/react-checkbox`, `@radix-ui/react-label`, and `@radix-ui/react-slot`
+  declarations. Any remaining `react-slot` lockfile entries are transitive.
 
 ### Planned or outstanding
 
@@ -56,14 +65,14 @@ Installed versions from `package-lock.json`:
 - `@supabase/supabase-js` 2.110.1
 - `supabase` CLI 2.109.1 as a dev dependency
 
-Other active UI/helper packages include Radix checkbox/dropdown/label/slot, `lucide-react`, `next-themes`, `class-variance-authority`, `clsx`, `tailwind-merge`, and `tailwindcss-animate`.
+Other active UI/helper packages include Radix dropdown/select, `lucide-react`, `next-themes`, `class-variance-authority`, `clsx`, `tailwind-merge`, and `tailwindcss-animate`.
 
 ## Development Runtime
 
 - `npm run dev` runs `next dev --webpack`.
 - Webpack is required for local development because Turbopack HMR caused repeated reload/request loops.
 - `next.config.ts` currently enables `cacheComponents: true`.
-- Verification commands are `npm run lint`, `npx tsc --noEmit`, `npm run build`, focused Node tests via `node --experimental-strip-types --test <test-files>`, and `git diff --check`.
+- Verification commands are `npm run lint`, `npx tsc --noEmit`, `npm test`, `npm run build`, and `git diff --check`. `npm test` runs the complete Node TypeScript test suite under `src` and `scripts`.
 
 ## Environment Variables
 
@@ -181,7 +190,9 @@ Verified 2026-07-28 using read-only/dry-run checks only; no live writes were per
 - Monday: required local server-side configuration is present. The API is reachable and the July 2026 dry-run resolved an accessible monthly board, its expected columns and weekly groups, and a safe planned snapshot with no writes. The manual Monday sync command is dry-run by default; historical writes require explicit bounded review/apply flags. The scheduled cron writes only the UTC current month under its database lock.
 - EPCC/NetSuite Gmail: Gmail OAuth and parsing succeeded for the bounded July 2026 report. The existing conflicting KPI value had no tracked ingestion record; after metadata-only audit verification, one approved report was applied and a duplicate rerun was a no-op. July profit is EPCC-sourced, while Monday quote/order fields were preserved. The audit reader is service-role-only and returns no message, sender, subject, or source-hash values.
 - Cron and service role: the 2026-07-28 deployment check confirmed the EPCC route and unauthenticated `401` behaviour. The 2026-08-03 authorised route validation is recorded below.
-- Remaining action: monitor the first normally scheduled cron result and its EPCC ingestion audit outcome; no further manual trigger is needed solely for verification.
+- The 2026-08-03 authorised validation is historical evidence; ongoing work is
+  monitoring scheduled outcomes and retaining operational run history, not
+  repeating that completed validation as an outstanding task.
 - Authorised live validation on 2026-08-03 invoked EPCC first and Monday second. EPCC returned `duplicate_member_backfill_not_needed` for August; Monday returned `updated` with `quotesDone=4` and `ordersProcessed=1`. The resulting August company row retained EPCC-owned `monthly_profit=358.80` and `monthly_profit_source=epcc_email`, while Monday wrote its own snapshot metadata and quote/order fields. A bounded July EPCC rerun was also `duplicate_member_backfill_not_needed`, with zero reconciliation differences and no change to July's Monday-owned fields.
 
 ## Current Routes
@@ -306,14 +317,14 @@ The committed read-only audit was generated 2026-07-21 and covers January–July
 
 - Committed work on 2026-07-30 and 2026-07-31 completed the weighted PK Tax allocation/export rules, source-isolated member KPI ingestion, source-safe duplicate EPCC backfill, Monday member sync permissions, YTD dashboard reporting, responsive navigation, and shared toast feedback.
 - The calculator, delivery-helper, UK Trade, invoice, garment, and Product Type changes in this period were UI/action-feedback standardisation only; calculator pricing formulas were not changed.
-- The working tree was clean at audit time. Local verification passed: `npm run lint`, `npx tsc --noEmit`, `npm run build`, and 28 targeted Node tests.
-- The 2026-07-31 migrations and current cron routes were not yet confirmed in production at the time of this audit; the 2026-08-03 release validation below supersedes that status.
+- The working tree was clean at audit time. Historical local verification passed: `npm run lint`, `npx tsc --noEmit`, `npm run build`, and 28 targeted Node tests.
+- The 2026-07-31 migrations and current cron routes were not yet confirmed in production at the time of this audit; the 2026-08-03 release validation below supersedes that historical status.
 - The 2026-08-03 authorised release validation confirmed the migrations, configured schedules, required encrypted Production variable names, and both cron routes. The exact Vercel Git SHA remains unavailable from deployment inspection.
 - A bounded July 2026 Monday dry-run proposes `quotes_done=302` and `orders_processed=181`, versus persisted `301` and `178`. This deferred source delta must be reviewed before any apply; it is not an idempotent rerun.
 
-### Next Recommended Step
+### Current outstanding work
 
-Review the changed July Monday source data before any bounded July apply: the latest dry-run proposes 302 quotes and 181 orders, not the persisted 301 and 178. Continue monitoring the first normally scheduled EPCC/Monday cycle and add failure-alert/retained-audit operations.
+Review the changed July Monday source data before any bounded July apply: the latest dry-run proposes 302 quotes and 181 orders, not the persisted 301 and 178. Continue monitoring scheduled EPCC/Monday outcomes, add failure-alert and retained-audit operations, keep the historical fixture fallback explicitly bounded, and confirm the unresolved schema-drift ownership/retention question before changing generated types or migrations.
 
 ## Calculator Status
 
@@ -409,10 +420,16 @@ Deferred:
 
 The EU UI revisions did not change EU Standard or EU US Clients pricing; garment markup matrices; PK markup calculations; print tiers; embroidery prices; digitising fees; VAT; delivery markup/VAT; quote formatting; exports; Supabase repository behaviour; or seeded calculator reference data. Calculator state remains client-local with no persistence.
 
-### Calculator test and verification snapshot
+### Historical calculator test and verification snapshot
 
 - Interaction and presentation coverage protects initial/action-gated missing-garment validation, clearing after garment selection, 1–9 colour values and the cap at 9, multiple print selection, selected-only print/embroidery controls, delivery calculation/copy wording, breakdown reconciliation and aligned slots, representative EU Standard/EU US Clients totals, and UK Trade pricing-engine behaviour.
 - Current recorded calculator validation: production build passed; lint passed; TypeScript passed; calculator tests passed: 57; calculator test failures: 0; `git diff --check` passed. Node `MODULE_TYPELESS_PACKAGE_JSON` notices are non-blocking warnings, not test failures.
+
+### Current unified test status
+
+- `npm test` discovers and passes all 49 `.test.ts` files under `src` and
+  `scripts`, containing 329 `test(...)` declarations. The current result is
+  49 file-level test entries passed and 0 failed.
 
 ## Repository Structure
 
@@ -472,16 +489,17 @@ Verification:
 ```bash
 npm run lint
 npx tsc --noEmit
-node --test src/features/calculators/tests/*.test.ts
+npm test
 npm run build
+git diff --check
 ```
 
 ## Known Issues
 
 - Turbopack HMR caused repeated reload/request loops; local development uses Webpack.
 - Sales dashboard is Supabase-first with historical fixture fallback when persistent data is unavailable.
-- Monday audit/import/sync tooling exists, but production configuration and deployment verification remain required.
-- EPCC Gmail profit ingestion exists, but Gmail OAuth, cron, service-role configuration, and migration deployment require production verification.
+- Monday audit/import/sync tooling exists; external configuration and deployment evidence remain environment-scoped, while repository implementation is present.
+- EPCC Gmail profit ingestion exists; external Gmail OAuth, cron, service-role configuration, and remote migration status are environment-scoped rather than statically provable here.
 - Admin workflows for calculator data are not implemented.
 - Product Types and reviewed garment data are imported from the reviewed datasets. A temporary generic `Hoodies` Product Type maps the 16 hoodie records whose material is not reliably known; it uses the existing `HOODIE` pricing category and must later be replaced with `Hoodies - cotton` or `Hoodies - poly / cotton` when material evidence is available. Near-match garment conflicts outside those safely matched hoodie rows remain pending manual review. Garment Product Type assignment remains staged through nullable `product_type_id`.
 - Invoice addresses remain deferred.
@@ -497,11 +515,11 @@ npm run build
 
 ## Next Recommended Work
 
-1. Deploy and validate the 2026-07-31 member-KPI migrations and scheduled EPCC/Monday release; confirm source ownership is preserved on persisted rows.
-2. Reconcile `vercel.json`, deployed cron schedules, and operational documentation; current repository schedules are `08:05 UTC` EPCC and `08:15 UTC` Monday.
+1. Review the deferred July Monday source delta before any bounded apply; confirm source ownership remains preserved on persisted rows.
+2. Add failure alerts and retain operational run history for scheduled EPCC/Monday outcomes.
 3. Replace or explicitly bound the sales-dashboard fixture fallback as persistent historical KPI coverage is confirmed.
-4. Run approved real-world calculator and commercial-invoice export parity cases before changing pricing/reference data.
-5. Design admin-only calculator reference-data editing after read-only calculator flows are stable.
+4. Resolve ownership and retention for the remote-only schema drift before changing generated types or migrations.
+5. Run approved real-world calculator and commercial-invoice export parity cases before changing pricing/reference data.
 # Feedback standardisation
 
 Operational mutations, exports, and clipboard actions use shared Sonner feedback; field, calculator, invoice, access, and route-level validation remains inline.

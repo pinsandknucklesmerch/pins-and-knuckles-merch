@@ -32,3 +32,5 @@ Dry runs fetch and parse Gmail but do not create audit records or update KPI dat
 ## Cron
 
 Vercel calls `GET /api/cron/epcc-profit` daily with `Authorization: Bearer <CRON_SECRET>`. The configured schedule is `0 10 * * *` (10:00 UTC, 10:00 London in winter and 11:00 in summer), deliberately after the expected 09:00 Europe/London report.
+
+> Historical schedule note: the paragraph above describes the obsolete planned schedule. The repository-authoritative `vercel.json` currently configures EPCC at `5 8 * * *` (08:05 UTC) and Monday sales sync at `15 8 * * *` (08:15 UTC). This document does not assert that either schedule is deployed remotely.

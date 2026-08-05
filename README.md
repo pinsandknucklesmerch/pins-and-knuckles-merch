@@ -18,7 +18,7 @@ Pins Hub is the internal operations hub for Pins & Knuckles merchandise workflow
    npm install
    ```
 
-2. Create `.env.local` from `.env.example`.
+2. Create `.env.local` from [`.env.example`](.env.example). It is the complete operational variable checklist, including server-only integration and cron variables.
 
 3. Set the required environment variables by name:
 
@@ -60,8 +60,9 @@ Run these before handing off code changes:
 ```bash
 npm run lint
 npx tsc --noEmit
-node --test src/features/calculators/tests/*.test.ts
+npm test
 npm run build
+git diff --check
 ```
 
 ## Legacy Reference Warning

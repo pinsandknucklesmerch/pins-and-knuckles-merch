@@ -1,6 +1,6 @@
 import { normalDashboardMembers } from "../domain/memberVisibility.ts";
 import type { MemberDashboardRow, TeamMemberKpiMonth } from "../domain/types.ts";
-import type { SnuggleProfitData } from "../server/snuggleProfit.ts";
+import type { SnuggleProfitData } from "./snuggleProfit.ts";
 
 export function getVisibleTeamMembers(rows: MemberDashboardRow[]) {
   return normalDashboardMembers(rows);

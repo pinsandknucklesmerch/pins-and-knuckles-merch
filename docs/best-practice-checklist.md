@@ -29,10 +29,23 @@
 - Mapping and normalisation happen before rendering.
 - KPI calculations are pure functions.
 - Monday API responses are not passed raw into UI components.
-- Date range filtering is typed and tested.
+- Dashboard reporting state uses validated year/month route parameters rather
+  than the historical date-range filter proposal.
+- Supabase is the primary dashboard read source; the historical workbook fixture
+  is an explicitly bounded fallback for missing history.
+- Monday owns quote/order fields and EPCC owns July-2026-onward profit fields;
+  dashboard writes preserve that source isolation.
+- Final-value overrides remain separate from calculated/source-owned KPI values.
 
 ## Verification
 
 - `npm run lint`
 - `npx tsc --noEmit`
+- `npm test`
 - `npm run build`
+- `git diff --check`
+
+> Historical dashboard guidance: date-range, lead-source, and salesperson-table
+> architecture from earlier planning is not current project architecture. Keep
+> this checklist reusable; use [`PROJECT_CONTEXT.md`](ai-context/PROJECT_CONTEXT.md)
+> for current dashboard details.

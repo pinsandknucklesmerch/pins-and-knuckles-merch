@@ -1,4 +1,4 @@
-import type { SnuggleMonth } from "../server/snuggleProfit";
+import type { SnuggleMonth } from "./snuggleProfit.ts";
 
 export function sortSnuggleMonthsChronologically(months: SnuggleMonth[]) {
   return [...months].sort((a, b) => a.year - b.year || a.month - b.month);

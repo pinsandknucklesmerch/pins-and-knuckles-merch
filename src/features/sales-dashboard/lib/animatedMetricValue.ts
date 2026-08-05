@@ -5,8 +5,8 @@ export function formatAnimatedMetricValue(value: number, format: AnimatedMetricF
     return new Intl.NumberFormat("en-GB", {
       style: "currency",
       currency: "GBP",
-      maximumFractionDigits: maximumFractionDigits ?? 0,
-      minimumFractionDigits: minimumFractionDigits ?? 0,
+      maximumFractionDigits: maximumFractionDigits ?? 2,
+      minimumFractionDigits: minimumFractionDigits ?? 2,
     }).format(value);
   }
   if (format === "percent") return `${value.toFixed(maximumFractionDigits ?? 1)}%`;

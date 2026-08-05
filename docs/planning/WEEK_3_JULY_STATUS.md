@@ -1,5 +1,7 @@
 # Pins Hub — Week 3 July Status
 
+> Historical status record from July 2026. Its follow-up checklist and production notes are retained for context, not as current operational instructions. Use the verification process in `README.md` and `docs/ai-context/PROJECT_CONTEXT.md` for current work.
+
 ## Status
 
 The Sales/KPI Dashboard is production-ready, pending confirmation of the first unattended cron executions.
@@ -52,7 +54,7 @@ Vercel schedules are stored in UTC in `vercel.json`.
 - Malformed reporting dates remain blocking errors.
 - Monday and EPCC cron routes fail independently.
 
-## Tomorrow’s Verification
+## Historical Verification Follow-up
 
 - [ ] Confirm the EPCC cron ran.
 - [ ] Confirm the Monday cron ran.

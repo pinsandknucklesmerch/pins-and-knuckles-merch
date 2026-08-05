@@ -4,6 +4,13 @@ Source repository inspected: Legacy Pins Hub Next.js App Router app.
 
 This document is analysis only. It preserves observed behavior from source and does not propose Prisma for the rebuild.
 
+> Historical legacy analysis: component names and trees in this document refer
+> to the earlier implementation/proposal. In particular, `GarmentSelector` is
+> not a current source module; the unreachable legacy modules were removed in
+> Batch 1. Current calculator components live under
+> `src/features/calculators/components/`; consult
+> [`PROJECT_CONTEXT.md`](../ai-context/PROJECT_CONTEXT.md) for current status.
+
 ## 1. Calculator Inventory
 
 ### EU Standard
@@ -133,11 +140,11 @@ No implemented EU Trade calculator was found. There is no route under `src/app/h
 - Inputs: `design`, `garments`, optional `itemNumber`, `onChange`, optional `onRemove`.
 - State owned: local colour input strings and `colorError`.
 - Calculations: exported `getPrintUnitPrices` and `calculateDesignCosts`; local normalization of colour input, PK markup input, embroidery selection.
-- Child components: internal `GarmentSelector`.
+- Child components: internal `GarmentSelector` (historical).
 - Reusable responsibility: item editor and current EU pricing helper container.
 - Legacy coupling to avoid: React file exports domain types and calculation functions; garment selector and price engine are mixed; `PrintPrice` and `GarmentMarkup` Prisma types leak into UI.
 
-### `GarmentSelector` in `DesignCard`
+### Historical `GarmentSelector` in `DesignCard`
 
 - Inputs: `garments`, selected `value`, `onChange`.
 - State owned: search query and dropdown open state.
@@ -162,7 +169,7 @@ No implemented EU Trade calculator was found. There is no route under `src/app/h
 - Inputs: `design`, `garments`, optional `itemNumber`, `onChange`, optional `onRemove`.
 - State owned: colour input strings, embroidery stitch-count input strings, `colorError`.
 - Calculations: validates/normalizes colour count 1-10 and stitch count min 7000; toggles standard and neck print positions.
-- Child components: internal UK `GarmentSelector`.
+- Child components: internal UK `GarmentSelector` (historical).
 - Reusable responsibility: UK trade item editor.
 - Legacy coupling to avoid: duplicated garment selector and item label logic from EU card.
 
@@ -187,7 +194,7 @@ EU Standard:
    ├─ BackLink
    └─ CalculatorClient
       ├─ DesignCard[]
-      │  └─ GarmentSelector
+      │  └─ GarmentSelector (historical)
       ├─ Delivery helper
       ├─ Box capacity modal
       └─ Result/breakdown/copy panels
@@ -208,7 +215,7 @@ UK Trade:
 └─ getUkTradeCalculatorGarments()
 └─ UkTradeCalculatorClient
    └─ UkTradeDesignCard[]
-      └─ GarmentSelector
+      └─ GarmentSelector (historical)
    └─ Result/breakdown/copy panels
 ```
 
@@ -928,7 +935,7 @@ src/app/hub/calculators/
   _components/
     CalculatorShell.tsx
     ItemEditor.tsx
-    GarmentSelector.tsx
+    GarmentSelector.tsx  # historical proposal; not a current module
     PrintPositionControls.tsx
     EmbroideryControls.tsx
     ResultPanel.tsx

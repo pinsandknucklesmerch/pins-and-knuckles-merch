@@ -1,5 +1,23 @@
 # Sales Dashboard Plan
 
+> Historical planning document. The target structure, Monday lead architecture,
+> and implementation sequence below preserve earlier decisions; they are not a
+> description of the current source tree.
+
+## Current state
+
+The active dashboard is Supabase-first: route parameters provide year/month
+state, `src/features/sales-dashboard/data/salesDashboardRepository.ts` reads
+persisted KPI data, `src/features/sales-dashboard/domain/calculateDashboardKpis.ts`
+and feature libraries calculate/map data, and current views use MetricUI/shared
+UI components. `workbookFixture.ts` remains a historical fallback for missing
+periods. Monday and EPCC fields remain source-isolated. See
+[`PROJECT_CONTEXT.md`](ai-context/PROJECT_CONTEXT.md) for canonical status.
+
+`DateRangeFilter.tsx`, the old lead-source/salesperson table architecture, and
+proposed files such as `getSalesDashboardData.ts` are historical plan references;
+they are not current implementation locations.
+
 ## Route
 
 `/hub/sales-dashboard`
@@ -11,14 +29,14 @@ The route stays behind existing Supabase authentication and Pins Hub access cont
 ```text
 src/features/sales-dashboard/
   components/
-    DateRangeFilter.tsx
+    DateRangeFilter.tsx  # historical proposal; removed/unimplemented
     KpiCard.tsx
-    LeadSourceBreakdown.tsx
-    SalespersonKpiTable.tsx
+    LeadSourceBreakdown.tsx  # historical proposal
+    SalespersonKpiTable.tsx  # historical proposal
     SalesDashboardView.tsx
   data/
     fixtures.ts
-    getSalesDashboardData.ts
+    getSalesDashboardData.ts  # historical proposal; not current
     mondayClient.server.ts
     mondayQueries.server.ts
   lib/
@@ -30,7 +48,7 @@ src/features/sales-dashboard/
 
 Page files should compose the feature and load initial data. They should not contain Monday query strings, column mapping, KPI math, or data normalisation.
 
-## Dashboard Scope
+## Historical Dashboard Scope
 
 - new incoming leads
 - leads split by salesperson

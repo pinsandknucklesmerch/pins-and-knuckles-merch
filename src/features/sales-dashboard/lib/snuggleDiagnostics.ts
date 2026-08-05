@@ -1,4 +1,4 @@
-import type { SnuggleWarning } from "../server/snuggleProfit";
+import type { SnuggleWarning } from "./snuggleProfit.ts";
 
 export type UnmappedSnuggleGroup = {
   personId: string;

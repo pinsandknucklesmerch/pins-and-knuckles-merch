@@ -1,15 +1,36 @@
 # Sales Dashboard TV Settings Implementation Plan
 
-## Current state
+> Status: implemented in the repository. The original approval sequence is retained below as a historical plan; it is not a list of unapplied work.
 
-The forward-only migration is staged at
+## Current implementation
+
+The repository contains the TV settings migration and RPC migrations, generated
+database types, settings repository, server actions, admin route/form, TV
+runtime, and focused tests:
+
+- `supabase/migrations/20260804120000_sales_dashboard_tv_settings.sql`
+- `supabase/migrations/20260804123000_sales_dashboard_tv_settings_rpc.sql`
+- `src/features/sales-dashboard/data/salesDashboardTvSettingsRepository.ts`
+- `src/features/sales-dashboard/lib/tvSettings.ts` and `tvMode.ts`
+- `src/features/sales-dashboard/actions.ts`
+- `src/app/hub/sales-dashboard/tv/settings/page.tsx`
+- `src/features/sales-dashboard/components/TvSettingsForm.tsx` and `SalesDashboardTvView.tsx`
+- `src/features/sales-dashboard/tests/tvSettings.test.ts` and `tvMode.test.ts`
+
+The repository records implementation and migration files only; remote migration
+application status is not asserted here. Current schema/deployment context belongs
+in [`PROJECT_CONTEXT.md`](ai-context/PROJECT_CONTEXT.md).
+
+## Historical plan state
+
+Historical plan text: the forward-only migration was described as staged at
 `supabase/migrations/20260804120000_sales_dashboard_tv_settings.sql` but has not
 been applied. Remote migration state is current through `20260803100000`.
 
 The migration creates organisation-scoped settings for the five registered TV
 slides: `overview`, `ytd`, `year_comparison`, `snuggle`, and `team_members`.
 
-## Post-approval implementation sequence
+## Historical post-approval implementation sequence
 
 1. Apply the migration intentionally with `npx supabase db push`.
 2. Regenerate `src/types/database.types.ts` using the project Supabase type
@@ -35,7 +56,7 @@ slides: `overview`, `ytd`, `year_comparison`, `snuggle`, and `team_members`.
 7. Keep dashboard data loading outside slide transitions so changing slides
    does not issue new KPI or Snuggle requests.
 
-## Validation and tests
+## Historical validation and tests
 
 Add focused tests for the registry/defaults, normalization, duration bounds,
 duplicate detection, enabled-slide validation, repository fallback, admin-only
