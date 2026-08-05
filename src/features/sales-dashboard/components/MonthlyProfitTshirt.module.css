@@ -1,0 +1,68 @@
+.visual {
+  position: relative;
+  width: min(12rem, 100%);
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.liquid,
+.shirtArtwork {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.liquid { overflow: hidden; }
+
+.fillLevel {
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.waveFill {
+  fill: #de3b43;
+  transition: fill 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.targetMet .waveFill { fill: #6fc49a; }
+
+.waveHighlight {
+  fill: none;
+  stroke: hsl(var(--foreground) / 0.22);
+  stroke-width: 1.5;
+}
+
+.wavePrimary,
+.waveSecondary {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+
+.wavePrimary { animation: monthly-profit-wave-primary 3.8s linear infinite; }
+.waveSecondary {
+  opacity: 0.42;
+  animation: monthly-profit-wave-secondary 5.6s linear infinite reverse;
+}
+
+.shirtArtwork {
+  object-fit: contain;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+@keyframes monthly-profit-wave-primary {
+  from { transform: translateX(0); }
+  to { transform: translateX(-480px); }
+}
+
+@keyframes monthly-profit-wave-secondary {
+  from { transform: translateX(0); }
+  to { transform: translateX(-620px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fillLevel { transition: none; }
+  .wavePrimary,
+  .waveSecondary { animation: none; }
+}

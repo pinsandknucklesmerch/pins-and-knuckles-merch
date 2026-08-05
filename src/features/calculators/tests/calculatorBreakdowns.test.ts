@@ -17,7 +17,7 @@ test("EU breakdown values reconcile with existing totals without changing quote 
 
 test("UK breakdown aggregates valid items and excludes invalid items", () => {
   const items: UkTradeItemInput[] = [{ id: "valid", garmentId: "g", quantity: 50, printPositions: [], embroideryStitches: [null, null, null] }, { id: "invalid", garmentId: null, quantity: 50, printPositions: [], embroideryStitches: [null, null, null] }];
-  const results: UkTradeItemResult[] = [{ itemId: "valid", garmentId: "g", quantity: 50, garmentCost: 100, printCost: 50, screenSetupCount: 2, screenSetupCost: 40, embroideryCost: 20, embroiderySetupCost: 30, totalCost: 240, printBreakdowns: [], embroideryBreakdowns: [], errors: [] }, { itemId: "invalid", garmentId: "", quantity: 50, garmentCost: 0, printCost: 0, screenSetupCount: 0, screenSetupCost: 0, embroideryCost: 0, embroiderySetupCost: 0, totalCost: 0, printBreakdowns: [], embroideryBreakdowns: [], errors: [{ code: "MISSING_GARMENT", message: "Select garment." }] }];
+  const results: UkTradeItemResult[] = [{ itemId: "valid", garmentId: "g", quantity: 50, garmentCost: 100, printCost: 50, screenSetupCount: 2, screenSetupCost: 40, embroideryCost: 20, embroiderySetupCost: 30, unitPriceExcludingScreenSetup: 4, garmentSubtotalExVat: 200, garmentSubtotalIncVat: 240, screenSetupTotalIncVat: 48, vatAmount: 48, totalCost: 240, totalCostIncVat: 288, printBreakdowns: [], embroideryBreakdowns: [], errors: [] }, { itemId: "invalid", garmentId: "", quantity: 50, garmentCost: 0, printCost: 0, screenSetupCount: 0, screenSetupCost: 0, embroideryCost: 0, embroiderySetupCost: 0, unitPriceExcludingScreenSetup: 0, garmentSubtotalExVat: 0, garmentSubtotalIncVat: 0, screenSetupTotalIncVat: 0, vatAmount: 0, totalCost: 0, totalCostIncVat: 0, printBreakdowns: [], embroideryBreakdowns: [], errors: [{ code: "MISSING_GARMENT", message: "Select garment." }] }];
   const breakdown = buildUkTradeBreakdown(items, results, 20);
   assert.equal(breakdown.total, 240);
   assert.equal(breakdown.printCost, 50);
@@ -25,6 +25,8 @@ test("UK breakdown aggregates valid items and excludes invalid items", () => {
   assert.equal(breakdown.screenSetupCost, 40);
   assert.equal(breakdown.embroideryCost, 20);
   assert.equal(breakdown.embroiderySetupCost, 30);
-  assert.equal(breakdown.unitCost, 4.8);
+  assert.equal(breakdown.unitCost, 4);
+  assert.equal(breakdown.garmentSubtotalIncVat, 240);
+  assert.equal(breakdown.totalIncVat, 288);
   assert.equal(breakdown.validItems.length, 1);
 });

@@ -16,7 +16,10 @@ export function formatUkTradeQuote(items: UkTradeItemInput[], results: UkTradeIt
       `${getEuItemLabel(item.itemLabel, index)}:`,
       "",
       `${[garment.code, garment.brandName, garment.name, garment.colour].filter(Boolean).join(" ")}${work ? ` (${work})` : ""}`,
-      `${item.quantity} x ${currency.format(result.totalCost / item.quantity)} each (${currency.format(result.totalCost)} ex vat)`,
+      `${item.quantity} x ${currency.format(result.unitPriceExcludingScreenSetup)} + vat ea (${currency.format(result.garmentSubtotalIncVat)} inc VAT)`,
+      ...(result.screenSetupCount > 0
+        ? [`${result.screenSetupCount} x ${result.screenSetupCount === 1 ? "screen" : "screens"} @ ${currency.format(result.screenSetupCost / result.screenSetupCount)} + vat ea / ${currency.format(result.screenSetupTotalIncVat)} total (inc VAT)`]
+        : []),
     ].join("\n");
   }).filter((entry): entry is string => Boolean(entry)).join("\n\n");
 }

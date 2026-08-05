@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { comparisonArcFillPercent, comparisonArcRatio, MONTHLY_PROFIT_TARGET, metricComparison, previousYearComparisonState, profitProgress, shirtFillPercent, targetBullet, targetState } from "../lib/metricDisplay.ts";
+import { comparisonArcFillPercent, comparisonArcRatio, MONTHLY_PROFIT_TARGET, metricComparison, monthlyProfitFillPercent, monthlyProfitTshirtFillState, previousYearComparisonState, profitProgress, shirtFillPercent, targetBullet, targetState } from "../lib/metricDisplay.ts";
 import type { MetricResult } from "../domain/types.ts";
 import { comparisonBadgeDetails } from "../lib/comparisonBadge.ts";
 
@@ -16,6 +16,29 @@ test("calculates a clamped shirt fill while retaining above-target progress", ()
   assert.equal(profitProgress(200000, MONTHLY_PROFIT_TARGET), 200000 / MONTHLY_PROFIT_TARGET);
   assert.equal(shirtFillPercent(null, MONTHLY_PROFIT_TARGET), 0);
   assert.deepEqual(metricComparison(metric), { value: 70000, label: "Last year", mode: "both" });
+});
+
+test("calculates safe monthly-profit liquid-fill percentages", () => {
+  assert.equal(monthlyProfitFillPercent(0, 100_000), 0);
+  assert.equal(monthlyProfitFillPercent(50_000, 100_000), 50);
+  assert.equal(monthlyProfitFillPercent(100_000, 100_000), 100);
+  assert.equal(monthlyProfitFillPercent(150_000, 100_000), 100);
+  assert.equal(monthlyProfitFillPercent(-1, 100_000), 0);
+  assert.equal(monthlyProfitFillPercent(50_000, 0), 0);
+  assert.equal(monthlyProfitFillPercent(null, 100_000), 0);
+  assert.equal(monthlyProfitFillPercent(50_000, null), 0);
+  assert.equal(monthlyProfitFillPercent(Number.NaN, 100_000), 0);
+  assert.equal(monthlyProfitFillPercent(50_000, Number.POSITIVE_INFINITY), 0);
+});
+
+test("monthly-profit T-shirt state clamps liquid fill and changes colour only at target", () => {
+  assert.deepEqual(monthlyProfitTshirtFillState(0, 100_000), { fillPercent: 0, tone: "red" });
+  assert.deepEqual(monthlyProfitTshirtFillState(62_000, 100_000), { fillPercent: 62, tone: "red" });
+  assert.deepEqual(monthlyProfitTshirtFillState(100_000, 100_000), { fillPercent: 100, tone: "green" });
+  assert.deepEqual(monthlyProfitTshirtFillState(107_100, 100_000), { fillPercent: 100, tone: "green" });
+  assert.equal(profitProgress(107_100, 100_000), 1.071);
+  assert.deepEqual(monthlyProfitTshirtFillState(-100, 100_000), { fillPercent: 0, tone: "red" });
+  assert.deepEqual(monthlyProfitTshirtFillState(100_000, 0), { fillPercent: 0, tone: "red" });
 });
 
 test("calculates a safe comparison arc for below, equal, and above previous-year values", () => {

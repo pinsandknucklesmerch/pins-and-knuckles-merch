@@ -2,6 +2,7 @@ import type { CalculatorValidationError, UkTradeItemInput, UkTradeItemResult, Uk
 
 const printTiers = [50, 100, 200, 500, 1000, 2500, 5000, 10000];
 const embroideryTiers = [50, 100, 200, 500, 1000, 2500];
+export const UK_TRADE_VAT_RATE = 20;
 const floorTier = (quantity: number, tiers: number[]) => [...tiers].reverse().find((tier) => quantity >= tier) ?? null;
 const setupFee = (data: UkTradeReferenceData, code: "UK_SCREEN_SETUP" | "UK_EMBROIDERY_SETUP") => data.fees.find((fee) => fee.feeCode === code && fee.costSide === "trade")?.amount;
 const isNeck = (position: UkTradePrintPosition) => position.startsWith("NECK_");
@@ -46,6 +47,13 @@ export function calculateUkTradeItem(input: UkTradeItemInput, data: UkTradeRefer
     embroideryBreakdowns.push({ stitches, unitPrice, cost, setupCost });
   }
   const garmentCost = garment?.gbpPrice != null ? garment.gbpPrice * input.quantity : 0;
-  const screenSetupCost = screens * (screenSetup ?? 0); const totalCost = garmentCost + printCost + screenSetupCost + embroideryCost + embroiderySetupCost;
-  return { itemId: input.id, garmentId: garment?.id ?? "", quantity: input.quantity, garmentCost, printCost, screenSetupCount: screens, screenSetupCost, embroideryCost, embroiderySetupCost, totalCost, printBreakdowns, embroideryBreakdowns, errors };
+  const screenSetupCost = screens * (screenSetup ?? 0);
+  const garmentSubtotalExVat = garmentCost + printCost + embroideryCost + embroiderySetupCost;
+  const totalCost = garmentSubtotalExVat + screenSetupCost;
+  const garmentSubtotalIncVat = garmentSubtotalExVat * (1 + UK_TRADE_VAT_RATE / 100);
+  const screenSetupTotalIncVat = screenSetupCost * (1 + UK_TRADE_VAT_RATE / 100);
+  const vatAmount = totalCost * (UK_TRADE_VAT_RATE / 100);
+  const totalCostIncVat = totalCost + vatAmount;
+  const unitPriceExcludingScreenSetup = input.quantity > 0 ? garmentSubtotalExVat / input.quantity : 0;
+  return { itemId: input.id, garmentId: garment?.id ?? "", quantity: input.quantity, garmentCost, printCost, screenSetupCount: screens, screenSetupCost, embroideryCost, embroiderySetupCost, unitPriceExcludingScreenSetup, garmentSubtotalExVat, garmentSubtotalIncVat, screenSetupTotalIncVat, vatAmount, totalCost, totalCostIncVat, printBreakdowns, embroideryBreakdowns, errors };
 }

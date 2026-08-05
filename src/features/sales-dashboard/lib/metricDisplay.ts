@@ -27,8 +27,8 @@ export function metricComparison(metric: MetricResult) {
   return metric.previousYear === null ? undefined : { value: metric.previousYear, label: "Last year", mode: "both" as const };
 }
 
-export function profitProgress(value: number | null, target: number) {
-  return value === null || target <= 0 ? null : value / target;
+export function profitProgress(value: number | null, target: number | null) {
+  return value === null || !Number.isFinite(value) || target === null || !Number.isFinite(target) || target <= 0 ? null : value / target;
 }
 
 export function targetState(value: number | null, target: number | null): TargetState {
@@ -54,9 +54,28 @@ export function previousYearComparisonState(value: number | null, previousYear: 
   return "neutral";
 }
 
+/**
+ * Returns a safe, visual-only target completion percentage for Monthly Profit.
+ * Invalid inputs intentionally render as empty rather than implying progress.
+ */
+export function monthlyProfitFillPercent(value: number | null | undefined, target: number | null | undefined) {
+  if (value === null || value === undefined || target === null || target === undefined) return 0;
+  if (!Number.isFinite(value) || !Number.isFinite(target) || target <= 0) return 0;
+  return Math.min(100, Math.max(0, (value / target) * 100));
+}
+
+export type MonthlyProfitTshirtFillState = {
+  fillPercent: number;
+  tone: "red" | "green";
+};
+
+export function monthlyProfitTshirtFillState(value: number | null | undefined, target: number | null | undefined): MonthlyProfitTshirtFillState {
+  const fillPercent = monthlyProfitFillPercent(value, target);
+  return { fillPercent, tone: fillPercent >= 100 ? "green" : "red" };
+}
+
 export function shirtFillPercent(value: number | null, target: number) {
-  const progress = profitProgress(value, target);
-  return progress === null ? 0 : Math.min(100, Math.max(0, progress * 100));
+  return monthlyProfitFillPercent(value, target);
 }
 
 export function comparisonArcRatio(current: number | null, previousYear: number | null) {

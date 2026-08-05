@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { formatAnimatedMetricValue, getAccessibleMetricText, shouldAnimateMetricValue, type AnimatedMetricFormat } from "../lib/animatedMetricValue";
 
 type AnimatedMetricValueProps = {
-  value: number | null;
+  value: number | null | undefined;
   format: AnimatedMetricFormat;
   className?: string;
   maximumFractionDigits?: number;
@@ -13,13 +13,13 @@ type AnimatedMetricValueProps = {
 
 export function AnimatedMetricValue({ value, format, className, maximumFractionDigits, minimumFractionDigits }: AnimatedMetricValueProps) {
   const previousValue = useRef<number | null>(null);
-  const [animatedValue, setAnimatedValue] = useState<number | null>(value);
+  const [animatedValue, setAnimatedValue] = useState<number | null>(value ?? null);
   const finalText = getAccessibleMetricText(value, format, maximumFractionDigits, minimumFractionDigits);
 
   useEffect(() => {
-    if (value === null || !Number.isFinite(value)) {
-      previousValue.current = value;
-      setAnimatedValue(value);
+    if (value === null || value === undefined || !Number.isFinite(value)) {
+      previousValue.current = null;
+      setAnimatedValue(null);
       return;
     }
 
