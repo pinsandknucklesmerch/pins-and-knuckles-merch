@@ -1,5 +1,7 @@
 import "../../features/sales-dashboard/styles/metricui.generated.css";
+import { updateCurrentUserLastActive } from "@/lib/access/updateLastActive";
 
-export default function HubLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function HubLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  await updateCurrentUserLastActive();
   return children;
 }
