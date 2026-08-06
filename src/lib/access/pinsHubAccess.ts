@@ -2,9 +2,10 @@ import { cache } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database.types";
+import { canManagePinsHub, canUseDeveloperArea, isPinsHubAccessLevel, type PinsHubAccessLevel } from "./pinsHubRoles";
 
-type OrganisationRole = "owner" | "admin" | "manager" | "staff" | "viewer";
-type PinsHubAccessLevel = "admin" | "write" | "read";
+export type OrganisationRole = "owner" | "admin" | "manager" | "staff" | "viewer";
+export type { PinsHubAccessLevel } from "./pinsHubRoles";
 
 type Membership = {
   id: string;
@@ -43,7 +44,15 @@ type ProfileAccessRow = {
   }>;
 };
 
-const VALID_PINS_HUB_ACCESS_LEVELS = new Set(["admin", "write", "read"]);
+export { canManagePinsHub } from "./pinsHubRoles";
+
+export function hasAdminAccess(access: Pick<PinsHubAccessResult, "access"> | null | undefined) {
+  return canManagePinsHub(access?.access?.access_level);
+}
+
+export function hasDeveloperAccess(access: Pick<PinsHubAccessResult, "access" | "membership"> | null | undefined) {
+  return canUseDeveloperArea(access?.access?.access_level, access?.membership?.role);
+}
 
 function createUnauthenticatedResult(): PinsHubAccessResult {
   return {
@@ -109,7 +118,7 @@ export async function resolvePinsHubAccess(
 
     const accessRow = memberships
       .flatMap((membership) => membership.app_access)
-      .find((row) => row.app_key === "pins_hub" && VALID_PINS_HUB_ACCESS_LEVELS.has(row.access_level) && memberships.some((membership) => membership.id === row.organisation_member_id && membership.is_active));
+      .find((row) => row.app_key === "pins_hub" && isPinsHubAccessLevel(row.access_level) && memberships.some((membership) => membership.id === row.organisation_member_id && membership.is_active));
     const membership =
       memberships.find(
         (candidate) => candidate.id === accessRow?.organisation_member_id,

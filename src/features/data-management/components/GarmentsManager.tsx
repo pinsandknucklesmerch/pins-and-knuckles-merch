@@ -8,6 +8,7 @@ import { initialDataManagementActionState, type AccessLevel, type GarmentRecord,
 import { Select } from "@/components/ui/Select";
 import { Surface } from "@/components/ui/Surface";
 import { feedback, isInlineValidation } from "@/components/ui/feedback";
+import { canManagePinsHub, hasPinsHubAccessLevel } from "@/lib/access/pinsHubRoles";
 
 const inputClass = "h-9 w-full min-w-0 rounded-md border border-input bg-background px-2.5 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring";
 const display = (value: string | number | null) => value ?? "—";
@@ -17,7 +18,7 @@ export function GarmentsManager({ garments, productTypes, accessLevel }: { garme
   const [sort, setSort] = useState<GarmentSortKey>("code");
   const [direction, setDirection] = useState<SortDirection>("asc");
   const [selected, setSelected] = useState<GarmentRecord | null>(null);
-  const canWrite = accessLevel !== "read";
+  const canWrite = hasPinsHubAccessLevel(accessLevel, "write");
   const visible = useMemo(() => sortGarments(garments.filter((item) => [item.code, item.altCode, item.brand, item.name, item.colour, item.tags, item.productTypeName].filter(Boolean).join(" ").toLowerCase().includes(query.toLowerCase())), sort, direction), [garments, query, sort, direction]);
   const changeSort = (key: GarmentSortKey) => { const next = nextGarmentSort(sort, direction, key); setSort(next.key); setDirection(next.direction); };
 
@@ -40,7 +41,7 @@ function GarmentForm({ record, productTypes, accessLevel, onClose }: { record: G
   }, [record, saveState]);
   return <Surface className="bg-card/80"><form action={saveAction} className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4"><input name="id" value={record?.id ?? ""} readOnly hidden />
     <Field label="Code" name="code" required defaultValue={record?.code ?? ""} /><Field label="Alt Code" name="alt_code" defaultValue={record?.altCode ?? ""} /><Field label="Brand" name="brand_name" defaultValue={record?.brand ?? ""} /><Field label="Name" name="name" required defaultValue={record?.name ?? ""} /><Field label="Colour" name="colour" defaultValue={record?.colour ?? ""} /><label className="grid min-w-0 gap-1 text-sm"><span>Product Type</span><Select required name="product_type_id" defaultValue={record?.productTypeId ?? undefined} placeholder="Select Product Type">{activeTypes.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select></label><Field label="Tags" name="tags" defaultValue={record?.tags ?? ""} /><NumberField label="EUR Price" name="eur_base_price" value={record?.eurBasePrice} prefix="€" /><NumberField label="GBP Price" name="gbp_price" value={record?.gbpPrice} prefix="£" /><NumberField label="Extra Size Cost" name="extra_size_cost" value={record?.extraSizeCost} />
-    {saveState.message && !saveState.ok && isInlineValidation(saveState.message) ? <p role="alert" className="text-sm text-destructive sm:col-span-2 xl:col-span-4">{saveState.message}</p> : null}<div className="flex flex-wrap gap-2 sm:col-span-2 xl:col-span-4"><button disabled={pending} className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-50">{pending ? "Saving…" : "Save Garment"}</button><button type="button" onClick={onClose} className="h-9 rounded-md border border-input px-3 text-sm hover:bg-accent">Close</button>{record && accessLevel === "admin" ? <DeactivateGarment id={record.id} /> : null}</div></form></Surface>;
+    {saveState.message && !saveState.ok && isInlineValidation(saveState.message) ? <p role="alert" className="text-sm text-destructive sm:col-span-2 xl:col-span-4">{saveState.message}</p> : null}<div className="flex flex-wrap gap-2 sm:col-span-2 xl:col-span-4"><button disabled={pending} className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-50">{pending ? "Saving…" : "Save Garment"}</button><button type="button" onClick={onClose} className="h-9 rounded-md border border-input px-3 text-sm hover:bg-accent">Close</button>{record && canManagePinsHub(accessLevel) ? <DeactivateGarment id={record.id} /> : null}</div></form></Surface>;
 }
 
 function Field({ label, name, defaultValue, required = false }: { label: string; name: string; defaultValue: string; required?: boolean }) { return <label className="grid min-w-0 gap-1 text-sm"><span>{label}</span><input required={required} name={name} defaultValue={defaultValue} className={inputClass} /></label>; }

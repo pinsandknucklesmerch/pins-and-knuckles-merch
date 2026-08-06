@@ -4,6 +4,7 @@ import { useActionState, useEffect, useMemo, useState } from "react";
 import { ActionButton } from "@/components/ui/ActionButton";
 import { Surface } from "@/components/ui/Surface";
 import { feedback } from "@/components/ui/feedback";
+import { canManagePinsHub, hasPinsHubAccessLevel } from "@/lib/access/pinsHubRoles";
 import { createInvoiceCompanyAction, deleteInvoiceCompanyAction, setInvoiceCompanyActiveAction, updateInvoiceCompanyAction } from "../actions/invoiceDirectoryActions";
 import { filterInvoiceCompanies, sortInvoiceCompanies } from "../lib/invoiceDirectory";
 import { initialDataManagementActionState, type AccessLevel, type InvoiceCompanyRecord } from "../types";
@@ -17,8 +18,8 @@ const emptyCompany: InvoiceCompanyRecord = { id: "", organisationId: "", label: 
 export function InvoiceCompaniesManager({ companies, accessLevel }: { companies: InvoiceCompanyRecord[]; accessLevel: AccessLevel }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<InvoiceCompanyRecord | null>(null);
-  const canWrite = accessLevel !== "read";
-  const canAdmin = accessLevel === "admin";
+  const canWrite = hasPinsHubAccessLevel(accessLevel, "write");
+  const canAdmin = canManagePinsHub(accessLevel);
   const visible = useMemo(() => sortInvoiceCompanies(filterInvoiceCompanies(companies, query)), [companies, query]);
 
   return <div className="space-y-4">

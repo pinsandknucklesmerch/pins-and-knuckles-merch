@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { resolvePinsHubAccess } from "@/lib/access/pinsHubAccess";
+import { canManagePinsHub, resolvePinsHubAccess } from "@/lib/access/pinsHubAccess";
 import { createClient } from "@/lib/supabase/server";
 import { PRICING_CATEGORIES, type DataManagementActionState } from "./types";
 import { canDeactivateGarment, deactivateGarmentRecord } from "./lib/deactivateGarment";
@@ -31,7 +31,7 @@ async function actionContext() {
 
 export async function saveProductType(_: DataManagementActionState, formData: FormData): Promise<DataManagementActionState> {
   const { supabase, accessLevel } = await actionContext();
-  if (accessLevel !== "admin" && accessLevel !== "write") return state(false, "You do not have permission to change Product Types.");
+  if (!canManagePinsHub(accessLevel) && accessLevel !== "write") return state(false, "You do not have permission to change Product Types.");
   const id = nullable(formData.get("id"));
   const name = nullable(formData.get("name"));
   const commodityCode = nullable(formData.get("commodity_code"));
@@ -63,7 +63,7 @@ export async function saveProductType(_: DataManagementActionState, formData: Fo
 
 export async function deleteProductType(_: DataManagementActionState, formData: FormData): Promise<DataManagementActionState> {
   const { supabase, accessLevel } = await actionContext();
-  if (accessLevel !== "admin") return state(false, "You do not have permission to delete Product Types.");
+  if (!canManagePinsHub(accessLevel)) return state(false, "You do not have permission to delete Product Types.");
   const id = nullable(formData.get("id"));
   if (!id) return state(false, "Product Type is required.");
   const { count, error: dependencyError } = await supabase.from("garments").select("id", { count: "exact", head: true }).eq("product_type_id", id);
@@ -77,7 +77,7 @@ export async function deleteProductType(_: DataManagementActionState, formData: 
 
 export async function saveGarment(_: DataManagementActionState, formData: FormData): Promise<DataManagementActionState> {
   const { supabase, accessLevel } = await actionContext();
-  if (accessLevel !== "admin" && accessLevel !== "write") return state(false, "You do not have permission to change garments.");
+  if (!canManagePinsHub(accessLevel) && accessLevel !== "write") return state(false, "You do not have permission to change garments.");
   const id = nullable(formData.get("id"));
   const code = nullable(formData.get("code"));
   const name = nullable(formData.get("name"));

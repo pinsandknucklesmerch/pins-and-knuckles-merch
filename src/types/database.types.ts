@@ -46,6 +46,67 @@ export type Database = {
           },
         ]
       }
+      hub_feedback_reports: {
+        Row: {
+          id: string
+          organisation_id: string
+          submitted_by: string
+          issue_type: string
+          comment: string
+          attempted_action: string | null
+          page_route: string
+          user_agent: string | null
+          status: string
+          developer_notes: string | null
+          created_at: string
+          updated_at: string
+          resolved_at: string | null
+          resolved_by: string | null
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          submitted_by: string
+          issue_type: string
+          comment: string
+          attempted_action?: string | null
+          page_route: string
+          user_agent?: string | null
+          status?: string
+          developer_notes?: string | null
+          created_at?: string
+          updated_at?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          submitted_by?: string
+          issue_type?: string
+          comment?: string
+          attempted_action?: string | null
+          page_route?: string
+          user_agent?: string | null
+          status?: string
+          developer_notes?: string | null
+          created_at?: string
+          updated_at?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Relationships: [
+          { foreignKeyName: "hub_feedback_reports_organisation_id_fkey", columns: ["organisation_id"], isOneToOne: false, referencedRelation: "organisations", referencedColumns: ["id"] },
+          { foreignKeyName: "hub_feedback_reports_submitted_by_fkey", columns: ["submitted_by"], isOneToOne: false, referencedRelation: "profiles", referencedColumns: ["id"] },
+          { foreignKeyName: "hub_feedback_reports_resolved_by_fkey", columns: ["resolved_by"], isOneToOne: false, referencedRelation: "profiles", referencedColumns: ["id"] },
+        ]
+      }
+      developer_diagnostic_issues: {
+        Row: { id: string; organisation_id: string; source: string; issue_key: string; issue_type: string; reporting_year: number; reporting_month: number; affected_item_id: string | null; affected_member_key: string | null; summary: string; occurrence_count: number; status: string; developer_notes: string | null; first_detected_at: string; last_detected_at: string; no_longer_detected_at: string | null; resolved_at: string | null; resolved_by: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; organisation_id: string; source: string; issue_key: string; issue_type: string; reporting_year: number; reporting_month: number; affected_item_id?: string | null; affected_member_key?: string | null; summary: string; occurrence_count?: number; status?: string; developer_notes?: string | null; first_detected_at?: string; last_detected_at?: string; no_longer_detected_at?: string | null; resolved_at?: string | null; resolved_by?: string | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; organisation_id?: string; source?: string; issue_key?: string; issue_type?: string; reporting_year?: number; reporting_month?: number; affected_item_id?: string | null; affected_member_key?: string | null; summary?: string; occurrence_count?: number; status?: string; developer_notes?: string | null; first_detected_at?: string; last_detected_at?: string; no_longer_detected_at?: string | null; resolved_at?: string | null; resolved_by?: string | null; created_at?: string; updated_at?: string }
+        Relationships: [{ foreignKeyName: "developer_diagnostic_issues_organisation_id_fkey"; columns: ["organisation_id"]; isOneToOne: false; referencedRelation: "organisations"; referencedColumns: ["id"] }, { foreignKeyName: "developer_diagnostic_issues_resolved_by_fkey"; columns: ["resolved_by"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] }]
+      }
       calculator_fees: {
         Row: {
           amount: number
@@ -1514,6 +1575,10 @@ export type Database = {
         Args: { required_access_level?: string; target_organisation_id: string }
         Returns: boolean
       }
+      has_pins_hub_developer_access: { Args: Record<PropertyKey, never>; Returns: boolean }
+      submit_hub_feedback_report: { Args: { p_issue_type: string; p_comment: string; p_attempted_action: string | null; p_page_route: string; p_user_agent: string | null }; Returns: string }
+      update_hub_feedback_report: { Args: { p_id: string; p_status: string; p_developer_notes: string | null }; Returns: undefined }
+      update_developer_diagnostic_issue: { Args: { p_id: string; p_status: string; p_developer_notes: string | null }; Returns: undefined }
       ingest_epcc_monthly_profit:
         | {
             Args: {

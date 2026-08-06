@@ -1,4 +1,5 @@
 import type { PinsHubAccessResult } from "@/lib/access/pinsHubAccess";
+import { hasAdminAccess } from "@/lib/access/pinsHubAccess";
 import type { SalesKpiTargets, SalesMetricCode } from "../domain/types.ts";
 
 export type TargetActionState = { ok: boolean; message: string };
@@ -57,7 +58,7 @@ export async function executeTargetSave(
     };
     const access = await dependencies.getAccess();
     if (access.queryError) return { ok: false, message: "Authentication is temporarily unavailable." };
-    if (access.access?.access_level !== "admin" || !access.user) return { ok: false, message: "Admin access required." };
+    if (!hasAdminAccess(access) || !access.user) return { ok: false, message: "Admin access required." };
     if (!access.membership?.organisation_id) return { ok: false, message: "Organisation unavailable." };
 
     const result = await dependencies.upsertTargets(

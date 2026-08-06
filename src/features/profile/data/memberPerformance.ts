@@ -1,4 +1,5 @@
 import type { PinsHubAccessResult } from "@/lib/access/pinsHubAccess";
+import { hasAdminAccess } from "@/lib/access/pinsHubAccess";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { mapMondayMember } from "@/features/sales-dashboard/domain/memberIdentity";
@@ -35,7 +36,7 @@ export async function getOwnProfilePerformance(access: PinsHubAccessResult): Pro
 }
 
 export async function getAdminProfilePerformance(access: PinsHubAccessResult, membershipId: string): Promise<ProfilePerformanceSubject | null> {
-  if (access.access?.access_level !== "admin" || !access.membership?.organisation_id) return null;
+  if (!hasAdminAccess(access) || !access.membership?.organisation_id) return null;
   const admin = createAdminClient();
   const { data: membership, error } = await admin
     .from("organisation_members")

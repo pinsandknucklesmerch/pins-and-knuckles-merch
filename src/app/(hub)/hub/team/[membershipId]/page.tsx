@@ -5,13 +5,13 @@ import { Panel } from "@/components/ui/Panel";
 import { ProfileAccountSummary } from "@/features/profile/components/ProfileAccountSummary";
 import { ProfilePerformanceSection } from "@/features/profile/components/ProfilePerformanceSection";
 import { getAdminProfilePerformance } from "@/features/profile/data/memberPerformance";
-import { getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
+import { getCurrentPinsHubAccess, hasAdminAccess } from "@/lib/access/pinsHubAccess";
 
 type Props = { params: Promise<{ membershipId: string }> };
 
 export default async function TeamMemberProfilePage({ params }: Props) {
   const [{ membershipId }, access] = await Promise.all([params, getCurrentPinsHubAccess()]);
-  if (access.access?.access_level !== "admin") notFound();
+  if (!hasAdminAccess(access)) notFound();
   const subject = await getAdminProfilePerformance(access, membershipId);
   if (!subject) notFound();
   const now = new Date();

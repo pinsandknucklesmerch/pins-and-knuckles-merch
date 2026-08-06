@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
+import { canManagePinsHub, getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { mondayIdentities } from "@/features/sales-dashboard/domain/memberIdentity";
 import { initialUserAccessActionState, type UserAccessActionState } from "../types";
@@ -14,7 +14,7 @@ const ok = (message: string): UserAccessActionState => { revalidatePath("/hub/te
 
 async function adminContext() {
   const current = await getCurrentPinsHubAccess();
-  if (!current.authenticated || current.access?.access_level !== "admin" || !current.membership?.organisation_id || !current.user) return null;
+  if (!current.authenticated || !canManagePinsHub(current.access?.access_level) || !current.membership?.organisation_id || !current.user) return null;
   return current;
 }
 
@@ -40,7 +40,7 @@ export async function updateUser(previousState: UserAccessActionState = initialU
   if (target.role === "owner" && role !== "owner") return fail("Owner access is protected.");
   const existingAccessLevel = target.app_access.find((item) => item.app_key === "pins_hub")?.access_level ?? null;
   if (target.role === "owner" && (!isActive || accessLevel !== existingAccessLevel)) return fail("Owner access is protected.");
-  if (target.user_id === user.id && (!isActive || role !== "admin" || accessLevel !== "admin")) return fail("You cannot remove your own administrator access or deactivate yourself.");
+  if (target.user_id === user.id && (!isActive || role !== target.role || accessLevel !== existingAccessLevel)) return fail("You cannot remove your own administrator access or deactivate yourself.");
   const { data: duplicate } = mondayMemberId ? await admin.from("organisation_members").select("id").eq("organisation_id", membership.organisation_id).eq("monday_member_id", mondayMemberId).neq("id", membershipId).maybeSingle() : { data: null };
   if (duplicate) return fail("That Monday account is already linked to another user.");
 

@@ -1,7 +1,7 @@
 export const PRICING_CATEGORIES = ["TSHIRT", "LONGSLEEVE", "HOODIE", "OTHER"] as const;
 
 export type PricingCategory = (typeof PRICING_CATEGORIES)[number];
-export type AccessLevel = "admin" | "write" | "read";
+export type AccessLevel = "developer" | "admin" | "write" | "read";
 
 export type InvoiceCompanyRecord = import("@/features/commercial-invoices/domain/directoryTypes").InvoiceCompany;
 export type ProductTypeRecord = {

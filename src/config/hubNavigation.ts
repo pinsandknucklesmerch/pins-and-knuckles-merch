@@ -5,6 +5,7 @@ import {
   Landmark,
   Database,
   UserRound,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 
@@ -38,3 +39,4 @@ export const hubFeatureNavigation: HubFeatureNavigationItem[] = [
 ];
 
 export const hubProfileNavigation = { href: "/hub/profile", label: "Profile", icon: UserRound } satisfies HubFeatureNavigationItem;
+export const hubDeveloperNavigation = { href: "/hub/developer", label: "Developer", icon: Wrench, children: [{ label: "Feedback", href: "/hub/developer/feedback" }, { label: "Diagnostics", href: "/hub/developer/diagnostics" }] } satisfies HubFeatureNavigationItem;

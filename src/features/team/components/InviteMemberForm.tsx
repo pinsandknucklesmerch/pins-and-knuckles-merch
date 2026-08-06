@@ -6,6 +6,7 @@ import { initialInviteActionState } from "../types";
 import { Select } from "@/components/ui/Select";
 import { feedback, isInlineValidation } from "@/components/ui/feedback";
 import { mondayIdentities } from "@/features/sales-dashboard/domain/memberIdentity";
+import { pinsHubAccessLabels, pinsHubAccessLevels } from "@/lib/access/pinsHubRoles";
 
 export function InviteMemberForm() {
   const [state, formAction, pending] = useActionState(inviteMember, initialInviteActionState);
@@ -55,7 +56,7 @@ export function InviteMemberForm() {
       <label className="grid gap-1 text-sm">
         <span>Pins Hub access</span>
         <Select name="access_level" defaultValue="admin">
-          <option value="admin">admin</option><option value="write">write</option><option value="read">read</option>
+          {pinsHubAccessLevels.map((level) => <option key={level} value={level}>{pinsHubAccessLabels[level]}</option>)}
         </Select>
       </label>
       <label className="grid gap-1 text-sm">

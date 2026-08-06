@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { resolveCanonicalInvoiceOrganisation } from "@/features/commercial-invoices/data/invoiceDirectoryQueries";
 import { resolvePinsHubAccess } from "@/lib/access/pinsHubAccess";
+import { canManagePinsHub, hasPinsHubAccessLevel } from "@/lib/access/pinsHubRoles";
 import { createClient } from "@/lib/supabase/server";
 import type { DataManagementActionState } from "../types";
 import { validateInvoiceCompany, type InvoiceCompanyFormValues } from "../lib/invoiceDirectoryValidation";
@@ -30,8 +31,8 @@ async function context() {
   return { supabase, accessLevel, organisationId };
 }
 
-function canWrite(accessLevel: string | null) { return accessLevel === "write" || accessLevel === "admin"; }
-function canAdmin(accessLevel: string | null) { return accessLevel === "admin"; }
+function canWrite(accessLevel: string | null) { return hasPinsHubAccessLevel(accessLevel, "write"); }
+function canAdmin(accessLevel: string | null) { return canManagePinsHub(accessLevel); }
 
 function companyValues(formData: FormData): InvoiceCompanyFormValues {
   return {

@@ -1,7 +1,7 @@
 import { AccessDenied } from "@/components/layout/AccessDenied";
 import { SidebarNav } from "@/components/layout/SidebarNav";
 import Galaxy from "@/components/backgrounds/Galaxy";
-import { getCurrentPinsHubAccess, type PinsHubAccessResult } from "@/lib/access/pinsHubAccess";
+import { getCurrentPinsHubAccess, hasAdminAccess, hasDeveloperAccess, type PinsHubAccessResult } from "@/lib/access/pinsHubAccess";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -24,7 +24,8 @@ export async function AppShell({ children, pinsHubAccess: suppliedPinsHubAccess,
       </div>
       <div className={`relative z-10 flex min-h-screen flex-col ${tvMode ? "" : "md:flex-row"}`}>
         {!tvMode ? <SidebarNav
-          accessLevel={pinsHubAccess.access.access_level}
+          canAdmin={hasAdminAccess(pinsHubAccess)}
+          canDeveloper={hasDeveloperAccess(pinsHubAccess)}
         /> : null}
         <main className={`min-w-0 flex-1 ${tvMode ? "h-screen overflow-hidden px-4 py-4 sm:px-6" : "px-4 py-4 pt-[4.25rem] sm:px-6 md:pt-4 lg:px-8"}`}>
           <div className={`mx-auto flex h-full w-full flex-col gap-4 ${tvMode || wideContent ? "max-w-none" : "max-w-6xl"}`}>

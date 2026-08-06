@@ -22,7 +22,7 @@ test("Profile resolves its own identity server-side and does not accept a client
 test("admin profile viewing verifies admin access, organisation, and owner protection", () => {
   const source = readFileSync(new URL("../data/memberPerformance.ts", import.meta.url), "utf8");
   const route = readFileSync(new URL("../../../app/(hub)/hub/team/[membershipId]/page.tsx", import.meta.url), "utf8");
-  assert.match(source, /access\.access\?\.access_level !== "admin"/);
+  assert.match(source, /hasAdminAccess\(access\)/);
   assert.match(source, /eq\("organisation_id", access\.membership\.organisation_id\)/);
   assert.match(source, /membership\.role === "owner"/);
   assert.match(route, /getAdminProfilePerformance/);

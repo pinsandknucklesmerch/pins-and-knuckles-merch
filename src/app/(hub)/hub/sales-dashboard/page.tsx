@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LoadingState } from "@/components/ui/LoadingState";
-import { getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
+import { getCurrentPinsHubAccess, hasAdminAccess } from "@/lib/access/pinsHubAccess";
 import { SalesDashboard } from "@/features/sales-dashboard/components/SalesDashboard";
 import { loadSalesDashboard } from "@/features/sales-dashboard/data/salesDashboardRepository";
 import { parseDashboardView } from "@/features/sales-dashboard/lib/dashboardView";
@@ -25,7 +25,7 @@ async function SalesDashboardPageContent({ searchParams }: Props) {
   const dashboardView = parseDashboardView(first(params.dashboardView));
   const tvMode = isTvMode(params.tv);
   const tvDurationSeconds = parseTvDuration(params.duration);
-  const isAdmin = access.access?.access_level === "admin";
+  const isAdmin = hasAdminAccess(access);
   const organisationId = access.membership?.organisation_id ?? null;
   const data = await loadSalesDashboard(year, month, organisationId);
   return <AppShell tvMode={tvMode}>{tvMode ? null : <PageHeader title="Sales Dashboard" />}<SalesDashboard data={data} year={year} month={month} isAdmin={isAdmin} initialDashboardView={dashboardView} tvMode={tvMode} tvDurationSeconds={tvDurationSeconds} /></AppShell>;

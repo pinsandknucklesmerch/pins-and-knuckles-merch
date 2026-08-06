@@ -1,10 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.types";
+import { canManagePinsHub } from "@/lib/access/pinsHubAccess";
 
 type DeactivationResult = "deactivated" | "not_found" | "already_inactive" | "database_error";
 
 export function canDeactivateGarment(accessLevel: string | null) {
-  return accessLevel === "admin";
+  return canManagePinsHub(accessLevel);
 }
 
 export async function deactivateGarmentRecord(supabase: SupabaseClient<Database>, id: string): Promise<DeactivationResult> {

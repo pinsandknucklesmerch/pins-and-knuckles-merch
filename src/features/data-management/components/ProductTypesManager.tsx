@@ -6,6 +6,7 @@ import { initialDataManagementActionState, PRICING_CATEGORIES, type AccessLevel,
 import { Select } from "@/components/ui/Select";
 import { Surface } from "@/components/ui/Surface";
 import { feedback, isInlineValidation } from "@/components/ui/feedback";
+import { canManagePinsHub, hasPinsHubAccessLevel } from "@/lib/access/pinsHubRoles";
 
 const inputClass = "h-9 rounded-md border border-input bg-background px-2.5 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring";
 type SortKey = "name" | "commodityCode" | "pricingCategory";
@@ -14,7 +15,7 @@ export function ProductTypesManager({ productTypes, accessLevel }: { productType
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("name");
   const [selected, setSelected] = useState<ProductTypeRecord | null>(null);
-  const canWrite = accessLevel !== "read";
+  const canWrite = hasPinsHubAccessLevel(accessLevel, "write");
   const visible = useMemo(() => productTypes.filter((item) => [item.name, item.commodityCode, item.countryOfOrigin, item.invoiceDescription, item.pricingCategory].join(" ").toLowerCase().includes(query.toLowerCase())).sort((left, right) => left[sort].localeCompare(right[sort])), [productTypes, query, sort]);
   return <div className="space-y-4">
     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -51,7 +52,7 @@ function ProductTypeForm({ record, accessLevel, onClose }: { record: ProductType
     <label className="grid gap-1 text-sm"><span>Active</span><Select name="is_active" defaultValue={record?.isActive === false ? "false" : "true"}><option value="true">Active</option><option value="false">Inactive</option></Select></label>
     {saveState.message && !saveState.ok && isInlineValidation(saveState.message) ? <p role="alert" className="sm:col-span-2 lg:col-span-4 text-sm text-destructive">{saveState.message}</p> : null}
     <div className="flex gap-2 sm:col-span-2 lg:col-span-4"><button disabled={pending} className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-50">{pending ? "Saving…" : "Save Product Type"}</button><button type="button" onClick={onClose} className="h-9 rounded-md border border-input px-3 text-sm hover:bg-accent">Close</button></div>
-  </form>{record && accessLevel === "admin" ? <div className="mt-3"><DeleteProductType id={record.id} /></div> : null}</Surface>;
+  </form>{record && canManagePinsHub(accessLevel) ? <div className="mt-3"><DeleteProductType id={record.id} /></div> : null}</Surface>;
 }
 
 function DeleteProductType({ id }: { id: string }) { const [state, action, pending] = useActionState(deleteProductType, initialDataManagementActionState); useEffect(() => { if (!state.message) return; if (state.ok) feedback.success("Product Type deleted"); else feedback.error(state.message); }, [state]); return <form action={action} onSubmit={(event) => { if (!window.confirm("Permanently delete this unreferenced Product Type?")) event.preventDefault(); }}><input hidden name="id" value={id} readOnly /><button disabled={pending} className="h-9 rounded-md border border-destructive/60 px-3 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50">Delete</button></form>; }
