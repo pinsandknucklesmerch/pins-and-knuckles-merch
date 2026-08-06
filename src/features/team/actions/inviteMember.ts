@@ -5,9 +5,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { mondayIdentities } from "@/features/sales-dashboard/domain/memberIdentity";
-import { inviteFailureState, resolveSiteUrl, validateInviteInput } from "../lib/invite";
+import { canInviteMembers, inviteFailureState, resolveSiteUrl, validateInviteInput } from "../lib/invite";
 import { logProvisioningFailure, provisionPinsHubAccess } from "../lib/provisionAccess";
 import { initialInviteActionState, type InviteActionState } from "../types";
+import { authDisplayNameMetadata } from "../lib/authDisplayName";
 
 async function provisionAccess(input: { userId: string; email: string; fullName: string; role: string; accessLevel: string; organisationId: string }) {
   const admin = createAdminClient() as unknown as Parameters<typeof provisionPinsHubAccess>[0];
@@ -40,7 +41,8 @@ export async function inviteMember(previousState: InviteActionState = initialInv
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { status: "error", message: "You do not have permission to invite users." };
   const current = await getCurrentPinsHubAccess();
-  if (!current.authenticated || current.access?.access_level !== "admin" || !current.membership?.organisation_id) {
+  const membership = current.membership;
+  if (!canInviteMembers({ authenticated: current.authenticated, accessLevel: current.access?.access_level, membershipRole: membership?.role, organisationId: membership?.organisation_id }) || !membership) {
     return { status: "error", message: "You do not have permission to manage User Access Management." };
   }
 
@@ -52,13 +54,13 @@ export async function inviteMember(previousState: InviteActionState = initialInv
     return { status: "error", message: "Select a known Monday account or Not linked." };
   }
   if (input.mondayMemberId) {
-    const { data: duplicate } = await admin.from("organisation_members").select("id").eq("organisation_id", current.membership.organisation_id).eq("monday_member_id", input.mondayMemberId).maybeSingle();
+    const { data: duplicate } = await admin.from("organisation_members").select("id").eq("organisation_id", membership.organisation_id).eq("monday_member_id", input.mondayMemberId).maybeSingle();
     if (duplicate) return { status: "error", message: "That Monday account is already linked to another user." };
   }
   const existingUserId = await findExistingUserId(admin, input.email);
   if (existingUserId) {
     try {
-      if (!await provisionAccess({ ...input, userId: existingUserId, organisationId: current.membership.organisation_id })) throw new Error();
+      if (!await provisionAccess({ ...input, userId: existingUserId, organisationId: membership.organisation_id })) throw new Error();
       return inviteSuccess("Existing account granted access.");
     } catch {
       return { status: "error", message: "Invitation could not be sent." };
@@ -67,7 +69,7 @@ export async function inviteMember(previousState: InviteActionState = initialInv
   const redirectTo = `${siteUrl}/auth/invite`;
   const { data, error } = await admin.auth.admin.inviteUserByEmail(input.email, {
     redirectTo,
-    data: { full_name: input.fullName },
+    data: authDisplayNameMetadata(input.fullName),
   });
 
   if (error) {
@@ -79,7 +81,7 @@ export async function inviteMember(previousState: InviteActionState = initialInv
       const existingUserIdAfterInvite = await findExistingUserId(admin, input.email);
       if (existingUserIdAfterInvite) {
         try {
-          if (!await provisionAccess({ ...input, userId: existingUserIdAfterInvite, organisationId: current.membership.organisation_id })) throw new Error();
+          if (!await provisionAccess({ ...input, userId: existingUserIdAfterInvite, organisationId: membership.organisation_id })) throw new Error();
           return inviteSuccess("Existing account granted access.");
         } catch {
           return { status: "error", message: "Invitation could not be sent." };
@@ -92,7 +94,7 @@ export async function inviteMember(previousState: InviteActionState = initialInv
 
   if (!data.user) return { status: "error", message: "Invitation could not be sent." };
   try {
-    if (!await provisionAccess({ ...input, userId: data.user.id, organisationId: current.membership.organisation_id })) {
+    if (!await provisionAccess({ ...input, userId: data.user.id, organisationId: membership.organisation_id })) {
       return { status: "error", message: "Invitation sent, but access provisioning failed." };
     }
     return inviteSuccess("Invitation sent.");

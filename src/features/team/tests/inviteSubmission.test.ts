@@ -6,6 +6,7 @@ import { validateInviteInput } from "../lib/invite.ts";
 
 const componentPath = new URL("../components/InviteMemberForm.tsx", import.meta.url);
 const actionPath = new URL("../actions/inviteMember.ts", import.meta.url);
+const pagePath = new URL("../../../app/(hub)/hub/team/page.tsx", import.meta.url);
 
 async function componentSource() {
   return readFile(componentPath, "utf8");
@@ -38,6 +39,26 @@ test("empty FormData is rejected before any Auth or provisioning work", async ()
   const authClient = source.indexOf("const supabase = await createClient();");
   assert.ok(validation >= 0 && validation < authClient);
   assert.equal(validateInviteInput(new FormData()), null);
+});
+
+test("only organisation owners receive the invite form, without an empty invite surface for other roles", async () => {
+  const page = await readFile(pagePath, "utf8");
+  assert.match(page, /isOrganisationOwner\(access\.membership\.role\) \? <InviteMemberForm \/> : null/);
+  assert.equal((page.match(/InviteMemberForm/g) ?? []).length, 3);
+  assert.doesNotMatch(page, /<InviteMemberForm \/>\s*<\/div>/);
+});
+
+test("invite action requires the owner role even when the caller has Pins Hub admin access", async () => {
+  const source = await readFile(actionPath, "utf8");
+  assert.match(source, /canInviteMembers\(\{ authenticated: current\.authenticated, accessLevel: current\.access\?\.access_level, membershipRole: membership\?\.role/);
+  assert.match(source, /You do not have permission to manage User Access Management\./);
+});
+
+test("new invites write both trimmed display-name metadata fields", async () => {
+  const source = await readFile(actionPath, "utf8");
+  assert.match(source, /data: authDisplayNameMetadata\(input\.fullName\)/);
+  assert.match(source, /inviteUserByEmail/);
+  assert.deepEqual(validateInviteInput(new FormData()), null);
 });
 
   test("success revalidates the User Access Management route without client navigation", async () => {

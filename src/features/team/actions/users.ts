@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { mondayIdentities } from "@/features/sales-dashboard/domain/memberIdentity";
 import { initialUserAccessActionState, type UserAccessActionState } from "../types";
 import { validateUserUpdateInput } from "../lib/updateUser";
+import { authDisplayNameMetadata } from "../lib/authDisplayName";
 
 const mondayIds = new Set(mondayIdentities().map((person) => person.id));
 const fail = (message: string): UserAccessActionState => ({ status: "error", message });
@@ -43,8 +44,13 @@ export async function updateUser(previousState: UserAccessActionState = initialU
   const { data: duplicate } = mondayMemberId ? await admin.from("organisation_members").select("id").eq("organisation_id", membership.organisation_id).eq("monday_member_id", mondayMemberId).neq("id", membershipId).maybeSingle() : { data: null };
   if (duplicate) return fail("That Monday account is already linked to another user.");
 
-  const { error: profileError } = target.user_id ? await admin.from("profiles").update({ full_name: fullName }).eq("id", target.user_id) : { error: null };
+  if (!target.user_id) return fail("User could not be identified for profile synchronisation.");
+  const { error: profileError } = await admin.from("profiles").update({ full_name: fullName }).eq("id", target.user_id);
   if (profileError) return fail("User could not be updated.");
+  const { data: authResult, error: authReadError } = await admin.auth.admin.getUserById(target.user_id);
+  if (authReadError || !authResult.user) return fail("Profile updated, but Auth display-name synchronisation failed. The profile name remains canonical; retry the update.");
+  const { error: authUpdateError } = await admin.auth.admin.updateUserById(target.user_id, { user_metadata: authDisplayNameMetadata(fullName, authResult.user.user_metadata) });
+  if (authUpdateError) return fail("Profile updated, but Auth display-name synchronisation failed. The profile name remains canonical; retry the update.");
   const { error: membershipError } = await admin.from("organisation_members").update({ role, is_active: isActive, monday_member_id: mondayMemberId }).eq("id", membershipId);
   if (membershipError) return fail("User access could not be updated.");
   const { error: accessError } = await admin.from("app_access").update({ access_level: accessLevel }).eq("organisation_member_id", membershipId).eq("app_key", "pins_hub");

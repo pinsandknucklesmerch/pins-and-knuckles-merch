@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { inviteFailureState, resolveSiteUrl, validateInviteInput } from "../lib/invite.ts";
+import { canInviteMembers, inviteFailureState, isOrganisationOwner, resolveSiteUrl, validateInviteInput } from "../lib/invite.ts";
 import { provisionPinsHubAccess } from "../lib/provisionAccess.ts";
 
 function input(values: Record<string, string>) {
@@ -35,6 +35,20 @@ test("normalizes valid invite fields and rejects invalid email or enums", () => 
 test("maps email rate limits and hides raw provider failures", () => {
   assert.deepEqual(inviteFailureState({ code: "over_email_send_rate_limit", message: "provider detail" }), { status: "rate-limit", message: "Email limit reached. Try again later." });
   assert.deepEqual(inviteFailureState({ message: "private Supabase failure" }), { status: "error", message: "Invitation could not be sent." });
+});
+
+test("only an owner with existing Pins Hub admin access can invite", () => {
+  assert.equal(canInviteMembers({ authenticated: true, accessLevel: "admin", membershipRole: "owner", organisationId: "org-1" }), true);
+  assert.equal(canInviteMembers({ authenticated: true, accessLevel: "admin", membershipRole: "admin", organisationId: "org-1" }), false);
+  assert.equal(canInviteMembers({ authenticated: true, accessLevel: "admin", membershipRole: "staff", organisationId: "org-1" }), false);
+  assert.equal(canInviteMembers({ authenticated: true, accessLevel: "read", membershipRole: "owner", organisationId: "org-1" }), false);
+});
+
+test("invite form visibility is limited to the resolved owner membership role", () => {
+  assert.equal(isOrganisationOwner("owner"), true);
+  assert.equal(isOrganisationOwner("admin"), false);
+  assert.equal(isOrganisationOwner("staff"), false);
+  assert.equal(isOrganisationOwner("viewer"), false);
 });
 
 function mockAdmin(options: { profileError?: unknown; membershipError?: unknown; lookup?: { id: string } | null; lookupError?: unknown; accessError?: unknown } = {}) {

@@ -2,11 +2,18 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { mondayIdentities } from "../../sales-dashboard/domain/memberIdentity.ts";
+import { resolveLastActive } from "../data/teamMembers.ts";
 import { USER_TABLE_COLUMNS } from "../lib/table.ts";
 import { validateUserUpdateInput } from "../lib/updateUser.ts";
 
 test("uses the compact User Access Management table contract", () => {
   assert.deepEqual(USER_TABLE_COLUMNS, ["Full Name", "Email", "Status", "Role", "Joined Date", "Last Active", "Actions"]);
+});
+
+test("Last Active prefers tracked Pins Hub activity, then auth sign-in, then a dash", () => {
+  assert.equal(resolveLastActive("2026-08-06T10:00:00.000Z", "2026-08-06T09:00:00.000Z"), "2026-08-06T10:00:00.000Z");
+  assert.equal(resolveLastActive(null, "2026-08-06T09:00:00.000Z"), "2026-08-06T09:00:00.000Z");
+  assert.equal(resolveLastActive(null, null), null);
 });
 
 test("Monday selector is sourced from every canonical known identity and supports an unlinked state", () => {

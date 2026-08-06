@@ -4,6 +4,14 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ORGANISATION_ROLES = new Set<OrganisationRole>(["admin", "manager", "staff", "viewer"]);
 const ACCESS_LEVELS = new Set<PinsHubAccessLevel>(["admin", "write", "read"]);
 
+export function isOrganisationOwner(role: string | null | undefined) {
+  return role === "owner";
+}
+
+export function canInviteMembers(context: { authenticated: boolean; accessLevel: string | null | undefined; membershipRole: string | null | undefined; organisationId: string | null | undefined }) {
+  return context.authenticated && context.accessLevel === "admin" && isOrganisationOwner(context.membershipRole) && Boolean(context.organisationId);
+}
+
 export function resolveSiteUrl(environment: NodeJS.ProcessEnv = process.env) {
   const configuredUrl = environment.NEXT_PUBLIC_SITE_URL?.trim();
   if (configuredUrl) {
