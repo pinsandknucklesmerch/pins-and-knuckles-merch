@@ -266,8 +266,9 @@ export function calculateEuStandardPrice(
 
     const baseCost = garment.eurBasePrice * item.quantity;
     const garmentMarkupCost = garmentMarkup.markupValue * item.quantity;
+    const pkMarkupPerUnit = item.pkMarkupPerUnit ?? 0;
     const pkMarkupCost =
-      item.pkMarkupEnabled === true ? (item.pkMarkupPerUnit ?? 0) * item.quantity : 0;
+      item.pkMarkupEnabled === true && Number.isFinite(pkMarkupPerUnit) ? pkMarkupPerUnit * item.quantity : 0;
     const printProductionCost = sumBy(
       printBreakdowns,
       (breakdown) => breakdown.productionCost,

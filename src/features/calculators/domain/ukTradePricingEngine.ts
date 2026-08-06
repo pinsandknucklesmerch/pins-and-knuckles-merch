@@ -1,4 +1,5 @@
 import type { CalculatorValidationError, UkTradeItemInput, UkTradeItemResult, UkTradePrintPosition, UkTradeReferenceData } from "./types.ts";
+import { UK_TRADE_MAX_COLOURS } from "./ukTradeCalculatorInteractions.ts";
 
 const printTiers = [50, 100, 200, 500, 1000, 2500, 5000, 10000];
 const embroideryTiers = [50, 100, 200, 500, 1000, 2500];
@@ -6,6 +7,10 @@ export const UK_TRADE_VAT_RATE = 20;
 const floorTier = (quantity: number, tiers: number[]) => [...tiers].reverse().find((tier) => quantity >= tier) ?? null;
 const setupFee = (data: UkTradeReferenceData, code: "UK_SCREEN_SETUP" | "UK_EMBROIDERY_SETUP") => data.fees.find((fee) => fee.feeCode === code && fee.costSide === "trade")?.amount;
 const isNeck = (position: UkTradePrintPosition) => position.startsWith("NECK_");
+export function isWhiteUkTradeGarment(colour: string | null | undefined) {
+  const normalized = colour?.trim().toLowerCase();
+  return normalized === "white" || normalized === "whites";
+}
 
 export function calculateUkTradeItem(input: UkTradeItemInput, data: UkTradeReferenceData): UkTradeItemResult {
   const errors: CalculatorValidationError[] = [];
@@ -24,10 +29,14 @@ export function calculateUkTradeItem(input: UkTradeItemInput, data: UkTradeRefer
   const printBreakdowns = [];
   for (const selection of input.printPositions) {
     const colourCount = selection.position === "NECK_PRINT_STANDARD" ? 1 : selection.position === "NECK_PRINT_TRANSFER" ? null : selection.colourCount;
+    if (!isNeck(selection.position) && (typeof colourCount !== "number" || !Number.isInteger(colourCount) || colourCount < 1 || colourCount > UK_TRADE_MAX_COLOURS)) {
+      errors.push({ code: "INVALID_PRINT_COLOUR_COUNT", itemId: input.id, message: `Enter between 1 and ${UK_TRADE_MAX_COLOURS} colours for ${selection.position.replaceAll("_", " ").toLowerCase()}.` });
+      continue;
+    }
     const positionCode = isNeck(selection.position) ? selection.position : "STANDARD";
     const tier = printTier === null ? undefined : data.printTiers.find((row) => row.positionCode === positionCode && row.colourCount === colourCount && row.quantityTier === printTier);
     if (!tier) { errors.push({ code: "MISSING_PRINT_TIER", itemId: input.id, message: `Missing price for ${selection.position.replaceAll("_", " ").toLowerCase()}.` }); continue; }
-    const screenSetupCount = tier.setupScreenCountStrategy === "colour_count" ? (colourCount ?? 0) + 1 : tier.setupScreenCountStrategy === "one" ? 2 : 0;
+    const screenSetupCount = tier.setupScreenCountStrategy === "colour_count" ? (colourCount ?? 0) + (isWhiteUkTradeGarment(garment?.colour) ? 0 : 1) : tier.setupScreenCountStrategy === "one" ? 2 : 0;
     const cost = tier.unitPrice * input.quantity;
     printCost += cost;
     screens += screenSetupCount;

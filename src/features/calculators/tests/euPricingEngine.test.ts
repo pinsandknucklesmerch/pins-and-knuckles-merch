@@ -378,6 +378,10 @@ test("EU US Clients resolves the exact independent legacy markup matrix", () => 
   assert.equal(representative.totals.productionSubtotalExVat, 482.5);
   assert.equal(representative.totals.customerSubtotalExVat, 689.5);
   assertNearlyEqual(representative.totals.customerTotalIncVat, 875.665);
+  const signedMarkup = assertOk(calculateEuStandardPrice({ ...createInput({ pkMarkupEnabled: true, pkMarkupPerUnit: -0.5 }), profileCode: "EU_US_CLIENTS" }, reference));
+  assert.equal(signedMarkup.items[0].productionSubtotalExVat, representative.items[0].productionSubtotalExVat);
+  assert.equal(signedMarkup.items[0].pkMarkupCost, -25);
+  assert.equal(signedMarkup.totals.customerSubtotalExVat, representative.totals.customerSubtotalExVat - 25);
 });
 
 test("validates EU quantity boundaries", () => {
@@ -479,6 +483,22 @@ test("adds optional PK markup to customer subtotal only", () => {
   assert.equal(result.items[0].pkMarkupCost, 62.5);
   assert.equal(result.totals.productionSubtotalExVat, 482.5);
   assert.equal(result.totals.customerSubtotalExVat, 802);
+});
+
+test("signed PK markup changes Pins totals and profit without changing production cost", () => {
+  const reference = createReferenceData();
+  const base = assertOk(calculateEuStandardPrice(createInput(), reference));
+  const positive = assertOk(calculateEuStandardPrice(createInput({ pkMarkupEnabled: true, pkMarkupPerUnit: 0.5 }), reference));
+  const negative = assertOk(calculateEuStandardPrice(createInput({ pkMarkupEnabled: true, pkMarkupPerUnit: -1.25 }), reference));
+  assert.equal(positive.items[0].productionSubtotalExVat, base.items[0].productionSubtotalExVat);
+  assert.equal(negative.items[0].productionSubtotalExVat, base.items[0].productionSubtotalExVat);
+  assert.equal(positive.items[0].pkMarkupCost, 25);
+  assert.equal(negative.items[0].pkMarkupCost, -62.5);
+  assert.equal(positive.totals.customerSubtotalExVat, base.totals.customerSubtotalExVat + 25);
+  assert.equal(negative.totals.customerSubtotalExVat, base.totals.customerSubtotalExVat - 62.5);
+  assert.equal(positive.totals.vatAmount, (base.totals.customerSubtotalExVat + 25) * 0.27);
+  assert.equal(negative.totals.profitExVat, negative.totals.customerSubtotalExVat - negative.totals.productionSubtotalExVat);
+  assert.equal(assertOk(calculateEuStandardPrice(createInput({ pkMarkupEnabled: true, pkMarkupPerUnit: 0 }), reference)).totals.customerSubtotalExVat, base.totals.customerSubtotalExVat);
 });
 
 test("returns an explicit error for missing garment", () => {

@@ -9,6 +9,8 @@ import { GarmentCombobox } from "./GarmentCombobox";
 import { EditableItemHeading } from "./EditableItemHeading";
 import { PrintPositionControls } from "./PrintPositionControls";
 import type { CalculatorValidationError } from "../domain/types.ts";
+import { normaliseEuPkMarkupInput } from "../domain/euCalculatorInteractions.ts";
+import { useState } from "react";
 
 type EuItemCardProps = {
   item: EuCalculatorItemInput;
@@ -31,6 +33,7 @@ export function EuItemCard({
   onRemove,
   onPrintPositionSelect,
 }: EuItemCardProps) {
+  const [pkMarkupDraft, setPkMarkupDraft] = useState(String(item.pkMarkupPerUnit ?? 0));
   return (
     <Panel className="border-border/90 bg-card">
       <div className="grid min-w-0 gap-4">
@@ -101,12 +104,27 @@ export function EuItemCard({
           <input
             className="h-8 w-full min-w-0 rounded-md border border-input bg-card px-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring disabled:opacity-50"
             disabled={!item.pkMarkupEnabled}
-            step="0.01"
-            type="number"
-            value={item.pkMarkupPerUnit ?? 0}
-            onChange={(event) =>
-              onChange({ ...item, pkMarkupPerUnit: Number(event.target.value) })
-            }
+            type="text"
+            inputMode="decimal"
+            pattern="-?[0-9]*\.?[0-9]*"
+            value={pkMarkupDraft}
+            onChange={(event) => {
+              const value = normaliseEuPkMarkupInput(event.target.value);
+              setPkMarkupDraft(value);
+              const numericValue = Number(value);
+              onChange({ ...item, pkMarkupPerUnit: Number.isFinite(numericValue) && value !== "" && value !== "-" && value !== "." && value !== "-." ? numericValue : undefined });
+            }}
+            onBlur={() => {
+              const value = normaliseEuPkMarkupInput(pkMarkupDraft);
+              const numericValue = Number(value);
+              if (!Number.isFinite(numericValue) || value === "" || value === "-" || value === "." || value === "-.") {
+                setPkMarkupDraft("0");
+                onChange({ ...item, pkMarkupPerUnit: 0 });
+              } else {
+                setPkMarkupDraft(value);
+                onChange({ ...item, pkMarkupPerUnit: numericValue });
+              }
+            }}
           />
         </div>
 

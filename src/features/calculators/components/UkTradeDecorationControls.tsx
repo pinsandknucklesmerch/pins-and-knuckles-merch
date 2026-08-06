@@ -1,7 +1,7 @@
 "use client";
 
 import type { UkTradeItemInput, UkTradePrintPosition } from "../domain/types.ts";
-import { toggleUkTradeEmbroidery, toggleUkTradePrintPosition } from "../domain/ukTradeCalculatorInteractions.ts";
+import { normaliseUkTradeColourInput, toggleUkTradeEmbroidery, toggleUkTradePrintPosition } from "../domain/ukTradeCalculatorInteractions.ts";
 
 const PRINT_POSITIONS: Array<{ value: UkTradePrintPosition; label: string }> = [
   { value: "FRONT", label: "Front" },
@@ -58,7 +58,7 @@ export function UkTradeDecorationControls({ printPositions, embroideryStitches, 
             if (!selection) return null;
             return <label key={position.value} className="flex items-center justify-between gap-3 rounded-md border border-border/70 bg-background/55 px-3 py-2 text-xs text-muted-foreground">
               {position.label} colours
-              <input aria-label={`${position.label} colours`} className="h-8 w-16 rounded-md border border-input bg-card px-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring" min={1} max={10} type="number" value={selection.colourCount ?? 1} onChange={(event) => onPrintPositionsChange(printPositions.map((entry) => entry.position === position.value ? { ...entry, colourCount: Number(event.target.value) } : entry))} />
+              <input aria-label={`${position.label} colours`} className="h-8 w-16 rounded-md border border-input bg-card px-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring" min={1} max={10} type="text" inputMode="numeric" pattern="[0-9]*" value={selection.colourCount ? String(selection.colourCount) : ""} onChange={(event) => { const value = normaliseUkTradeColourInput(event.target.value); onPrintPositionsChange(printPositions.map((entry) => entry.position === position.value ? { ...entry, colourCount: value ? Number(value) : undefined } : entry)); }} />
             </label>;
           })}
         </div>

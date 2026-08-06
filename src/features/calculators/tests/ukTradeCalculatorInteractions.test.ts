@@ -1,13 +1,29 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { toggleUkTradeEmbroidery, toggleUkTradePrintPosition } from "../domain/ukTradeCalculatorInteractions.ts";
+import { normaliseUkTradeColourInput, toggleUkTradeEmbroidery, toggleUkTradePrintPosition } from "../domain/ukTradeCalculatorInteractions.ts";
 
 test("UK decoration selection supports multiple print positions and safe deselection", () => {
   let positions = toggleUkTradePrintPosition([{ position: "FRONT", colourCount: 2 }], "BACK", true);
   assert.deepEqual(positions.map((entry) => entry.position), ["FRONT", "BACK"]);
   positions = toggleUkTradePrintPosition(positions, "FRONT", false);
   assert.deepEqual(positions.map((entry) => entry.position), ["BACK"]);
+});
+
+test("UK standard print positions start at one colour and removed positions reinitialise", () => {
+  assert.deepEqual(toggleUkTradePrintPosition([], "FRONT", true), [{ position: "FRONT", colourCount: 1 }]);
+  assert.deepEqual(toggleUkTradePrintPosition([], "BACK", true), [{ position: "BACK", colourCount: 1 }]);
+  assert.deepEqual(toggleUkTradePrintPosition([], "NECK_PRINT_STANDARD", true), [{ position: "NECK_PRINT_STANDARD" }]);
+  assert.deepEqual(toggleUkTradePrintPosition([{ position: "FRONT", colourCount: 4 }], "FRONT", false), []);
+  assert.deepEqual(toggleUkTradePrintPosition([], "FRONT", true), [{ position: "FRONT", colourCount: 1 }]);
+  assert.equal(normaliseUkTradeColourInput("06"), "6");
+  assert.equal(normaliseUkTradeColourInput("001"), "1");
+  assert.equal(normaliseUkTradeColourInput("0009"), "9");
+  assert.equal(normaliseUkTradeColourInput("0"), "");
+  assert.equal(normaliseUkTradeColourInput("000"), "");
+  assert.equal(normaliseUkTradeColourInput("a0b6"), "6");
+  assert.equal(normaliseUkTradeColourInput("99"), "10");
+  assert.equal(normaliseUkTradeColourInput(""), "");
 });
 
 test("UK embroidery selection supports multiple slots and safe deselection", () => {
@@ -43,4 +59,14 @@ test("UK Trade breakdown keeps setup and VAT there and marks only unit-price val
   assert.match(breakdown, /Setup \(excl\. VAT\)/);
   assert.match(breakdown, /VAT/);
   assert.match(breakdown, /label="Unit price \(excl\. setup & VAT\)"[^>]*valueClassName="text-primary"/);
+});
+
+test("UK Trade colour controls use editable numeric text inputs without changing the colour limit", () => {
+  const controls = readFileSync(new URL("../components/UkTradeDecorationControls.tsx", import.meta.url), "utf8");
+  assert.match(controls, /aria-label=\{`\$\{position\.label\} colours`\}[^]*type="text"/);
+  assert.match(controls, /inputMode="numeric"/);
+  assert.match(controls, /pattern="\[0-9\]\*"/);
+  assert.match(controls, /max=\{10\}/);
+  assert.match(controls, /colourCount: value \? Number\(value\) : undefined/);
+  assert.doesNotMatch(controls, /aria-label=\{`\$\{position\.label\} colours`\}[^>\n]*type="number"/);
 });

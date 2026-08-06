@@ -30,6 +30,7 @@ const data: UkTradeReferenceData = {
     { pricingSetCode: "e", stitchCount: 1000, isExtra1000Stitches: true, quantityTier, unitPrice: extra1000[index] },
   ]),
 };
+const whiteData: UkTradeReferenceData = { ...data, garments: [...data.garments, { ...data.garments[0], id: "white", colour: "Whites" }] };
 const item = (overrides: Partial<UkTradeItemInput> = {}): UkTradeItemInput => ({ id: "i", garmentId: "g", quantity: 50, printPositions: [{ position: "FRONT", colourCount: 1 }], embroideryStitches: [null, null, null], ...overrides });
 
 test("UK print matrix uses every floor quantity tier for one and ten colours", () => {
@@ -90,6 +91,26 @@ test("UK print underbase and neck rules charge the approved calculated screens",
   assert.equal(transfer.screenSetupSubtotalExVat, 0);
 });
 
+test("UK coloured garments add one underbase per standard print position", () => {
+  assert.equal(calculateUkTradeItem(item(), data).screenCount, 2);
+  assert.equal(calculateUkTradeItem(item({ printPositions: [{ position: "FRONT", colourCount: 1 }, { position: "BACK", colourCount: 1 }] }), data).screenCount, 4);
+  assert.equal(calculateUkTradeItem(item({ printPositions: [{ position: "FRONT", colourCount: 10 }] }), data).screenCount, 11);
+});
+
+test("UK white and Whites garments do not add standard underbase screens", () => {
+  assert.equal(calculateUkTradeItem(item({ garmentId: "white" }), whiteData).screenCount, 1);
+  assert.equal(calculateUkTradeItem(item({ garmentId: "white", printPositions: [{ position: "FRONT", colourCount: 1 }, { position: "BACK", colourCount: 1 }] }), whiteData).screenCount, 2);
+  assert.equal(calculateUkTradeItem(item({ garmentId: "white", printPositions: [{ position: "FRONT", colourCount: 10 }] }), whiteData).screenCount, 10);
+  const lowerCaseWhite = { ...whiteData, garments: whiteData.garments.map((garment) => garment.id === "white" ? { ...garment, colour: "white" } : garment) };
+  assert.equal(calculateUkTradeItem(item({ garmentId: "white" }), lowerCaseWhite).screenCount, 1);
+});
+
+test("UK empty colour counts are invalid and never treated as one colour", () => {
+  const result = calculateUkTradeItem(item({ printPositions: [{ position: "FRONT" }] }), data);
+  assert.equal(result.screenCount, 0);
+  assert.equal(result.errors.some((error) => error.code === "INVALID_PRINT_COLOUR_COUNT"), true);
+});
+
 test("UK neck prices use the PDF 50-99 and 100+ rules", () => {
   assert.equal(calculateUkTradeItem(item({ printPositions: [{ position: "NECK_PRINT_STANDARD" }] }), data).printBreakdowns[0].unitPrice, .89);
   assert.equal(calculateUkTradeItem(item({ quantity: 100, printPositions: [{ position: "NECK_PRINT_STANDARD" }] }), data).printBreakdowns[0].unitPrice, .60);
@@ -107,6 +128,12 @@ test("UK copied quote has separate setup lines with exact singular and plural wo
   assert.doesNotMatch(formatUkTradeQuote([embroideryOnly], [calculateUkTradeItem(embroideryOnly, data)], data.garments), /screen/);
   const singular = { ...calculateUkTradeItem(item(), data), screenCount: 1, screenSetupSubtotalExVat: 20, screenSetupTotalIncVat: 24 };
   assert.match(formatUkTradeQuote([item()], [singular], data.garments), /1 x screen @ £20\.00/);
+});
+
+test("UK copied white-garment quote uses the corrected screen setup total", () => {
+  const decorated = item({ garmentId: "white", itemLabel: "White Shirt", printPositions: [{ position: "FRONT", colourCount: 1 }, { position: "BACK", colourCount: 1 }] });
+  const quote = formatUkTradeQuote([decorated], [calculateUkTradeItem(decorated, whiteData)], whiteData.garments);
+  assert.match(quote, /2 x screens @ £20\.00 \+ VAT each \/ £48\.00 total inc VAT/);
 });
 
 test("UK invalid items do not produce copied output", () => {

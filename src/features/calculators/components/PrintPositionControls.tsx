@@ -51,7 +51,7 @@ export function PrintPositionControls({
     ]);
   }
 
-  function setColourCount(position: EuPrintPosition, colourCount: number) {
+  function setColourCount(position: EuPrintPosition, colourCount: number | undefined) {
     onChange(
       value.map((selection) =>
         selection.position === position ? { ...selection, colourCount } : selection,
@@ -84,7 +84,7 @@ export function PrintPositionControls({
         {PRINT_POSITIONS.filter((position) => getSelection(value, position.value) && position.value !== "NECK").map((position) => {
           const selection = getSelection(value, position.value);
           if (!selection) return null;
-          const draftValue = draftColourCounts[position.value] ?? String(selection.colourCount ?? 1);
+          const draftValue = draftColourCounts[position.value] ?? String(selection.colourCount ?? "");
           return (
                 <label
                   key={position.value}
@@ -94,25 +94,19 @@ export function PrintPositionControls({
                   <input
                   aria-label={`${position.label} colours`}
                   className="h-8 w-16 rounded-md border border-input bg-card px-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring"
-                  min={1}
                   max={9}
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={draftValue}
                   onChange={(event) => {
                     const nextValue = event.target.value;
                     const normalisedValue = normaliseEuPrintColourInput(nextValue);
                     setDraftColourCounts((current) => ({
                       ...current,
-                      [position.value]: normalisedValue === null ? nextValue : String(normalisedValue),
+                      [position.value]: normalisedValue,
                     }));
-                    if (normalisedValue !== null) setColourCount(position.value, normalisedValue);
-                  }}
-                  onBlur={() => {
-                    const nextValue = draftColourCounts[position.value];
-                    if (nextValue === "") {
-                      setColourCount(position.value, 1);
-                      setDraftColourCounts((current) => ({ ...current, [position.value]: "1" }));
-                    }
+                    setColourCount(position.value, normalisedValue ? Number(normalisedValue) : undefined);
                   }}
                 />
                 </label>
