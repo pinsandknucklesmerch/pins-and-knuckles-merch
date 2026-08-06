@@ -1,14 +1,24 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-type ActionButtonProps = {
+type ActionButtonBaseProps = {
   children: React.ReactNode;
   className?: string;
-  href?: string;
-  onClick?: () => void;
-  type?: "button" | "submit";
-  disabled?: boolean;
 };
+
+export type ActionButtonProps =
+  | (ActionButtonBaseProps & {
+      href?: never;
+      onClick?: () => void;
+      type?: "button" | "submit";
+      disabled?: boolean;
+    })
+  | (ActionButtonBaseProps & {
+      href: string;
+      disabled?: false;
+      onClick?: never;
+      type?: never;
+    });
 
 export function ActionButton({
   children,

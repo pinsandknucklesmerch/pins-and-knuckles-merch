@@ -80,7 +80,7 @@ export function UkTradeDecorationControls({ printPositions, embroideryStitches, 
           {[0, 1, 2].map((index) => <ToggleButton key={index} label={`Embroidery ${index + 1}`} selected={embroideryStitches[index] !== null} onClick={() => { if (embroideryStitches[index] === null) onDecorationSelect?.(); onEmbroideryChange(toggleUkTradeEmbroidery(embroideryStitches, index, embroideryStitches[index] === null)); }} />)}
         </div>
         <div className="grid gap-2 sm:grid-cols-3">
-          {embroideryStitches.map((value, index) => value === null ? null : <label key={index} className="grid gap-2 rounded-md border border-border/70 bg-background/55 p-3 text-xs text-muted-foreground">Embroidery {index + 1} stitches<input aria-label={`Embroidery ${index + 1} stitches`} className="h-8 rounded-md border border-input bg-card px-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring" min={7000} type="number" value={value} onChange={(event) => { const next = [...embroideryStitches]; next[index] = event.target.value === "" ? null : Number(event.target.value); onEmbroideryChange(next); }} /></label>)}
+          {embroideryStitches.map((value, index) => value === null ? null : <label key={index} className="grid gap-2 rounded-md border border-border/70 bg-background/55 p-3 text-xs text-muted-foreground">Embroidery {index + 1} stitches<input aria-label={`Embroidery ${index + 1} stitches`} className="hub-native-control h-8" min={7000} type="number" value={value} onChange={(event) => { const next = [...embroideryStitches]; next[index] = event.target.value === "" ? null : Number(event.target.value); onEmbroideryChange(next); }} /></label>)}
         </div>
       </div>
     </div>

@@ -8,7 +8,7 @@ import { Surface } from "@/components/ui/Surface";
 import { feedback, isInlineValidation } from "@/components/ui/feedback";
 import { canManagePinsHub, hasPinsHubAccessLevel } from "@/lib/access/pinsHubRoles";
 
-const inputClass = "h-9 rounded-md border border-input bg-background px-2.5 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring";
+const inputClass = "hub-native-control";
 type SortKey = "name" | "commodityCode" | "pricingCategory";
 
 export function ProductTypesManager({ productTypes, accessLevel }: { productTypes: ProductTypeRecord[]; accessLevel: AccessLevel }) {

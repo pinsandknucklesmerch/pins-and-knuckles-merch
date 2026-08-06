@@ -26,7 +26,7 @@ export function ProfileDetailsForm({ profile }: { profile: ProfileDetails }) {
 
   return <div className="grid gap-4">
     <form className="grid gap-3 sm:grid-cols-2" onSubmit={saveDisplayName}>
-      <FormField label="Display name" error={displayNameError} id="display-name"><input name="display-name" value={displayName} onChange={(event) => setDisplayName(event.target.value)} maxLength={120} autoComplete="name" className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/35" /></FormField>
+      <FormField label="Display name" error={displayNameError} id="display-name"><input name="display-name" value={displayName} onChange={(event) => setDisplayName(event.target.value)} maxLength={120} autoComplete="name" className="hub-native-control" /></FormField>
       <div className="grid content-end"><ActionButton type="submit" disabled={saving}>{saving ? "Saving" : "Save name"}</ActionButton></div>
     </form>
     <dl className="grid gap-3 border-t border-border pt-4 sm:grid-cols-3">

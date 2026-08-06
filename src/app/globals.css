@@ -6,7 +6,7 @@
   html,
   body {
     min-height: 100%;
-    overflow-x: clip;
+    color-scheme: dark;
   }
 
   :root {
@@ -84,6 +84,97 @@
     @apply bg-background text-foreground;
   }
 
+  .hub-control,
+  .hub-native-control,
+  .hub-native-select {
+    color-scheme: dark;
+    caret-color: hsl(var(--foreground));
+  }
+
+  .hub-native-control,
+  .hub-native-select {
+    min-width: 0;
+    width: 100%;
+    border: 1px solid hsl(var(--input));
+    border-radius: var(--hub-control-radius);
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+  }
+
+  .hub-native-control {
+    height: 2.25rem;
+    padding: 0 0.75rem;
+  }
+
+  .hub-native-select {
+    height: 2.25rem;
+    padding: 0 0.5rem 0 0.75rem;
+  }
+
+  .hub-native-control:hover,
+  .hub-native-select:hover {
+    border-color: hsl(var(--primary) / 0.8);
+  }
+
+  .hub-native-control:focus-visible,
+  .hub-native-select:focus-visible,
+  .hub-control:focus-visible {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.85);
+  }
+
+  .hub-native-control:disabled,
+  .hub-native-select:disabled,
+  .hub-control:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .hub-native-control[aria-invalid="true"],
+  .hub-native-select[aria-invalid="true"] {
+    border-color: hsl(var(--destructive));
+  }
+
+  .hub-native-control[aria-invalid="true"]:focus-visible,
+  .hub-native-select[aria-invalid="true"]:focus-visible {
+    box-shadow: 0 0 0 2px hsl(var(--destructive) / 0.85);
+  }
+
+  .hub-native-select option,
+  .hub-native-select optgroup {
+    background-color: hsl(var(--popover));
+    color: hsl(var(--popover-foreground));
+  }
+
+  .hub-control:-webkit-autofill,
+  .hub-native-control:-webkit-autofill,
+  .hub-native-select:-webkit-autofill {
+    -webkit-text-fill-color: hsl(var(--foreground));
+    -webkit-box-shadow: 0 0 0 1000px hsl(var(--background)) inset;
+    caret-color: hsl(var(--foreground));
+  }
+
+  .hub-free-entry-number::-webkit-inner-spin-button,
+  .hub-free-entry-number::-webkit-outer-spin-button {
+    margin: 0;
+    appearance: none;
+  }
+
+  .hub-free-entry-number {
+    -moz-appearance: textfield;
+  }
+
+  input[type="date"].hub-native-control {
+    appearance: auto;
+  }
+
+  input[type="date"].hub-native-control::-webkit-calendar-picker-indicator {
+    opacity: 0.85;
+    filter: invert(0.85);
+  }
+
   a {
     @apply text-inherit;
   }
@@ -95,6 +186,10 @@
 }
 
 @media print {
+  :root {
+    color-scheme: light;
+  }
+
   body {
     background: white !important;
   }
@@ -113,6 +208,11 @@
     inset: 0;
     width: 100%;
     padding: 0;
+  }
+
+  #commercial-invoice-preview,
+  #commercial-invoice-preview * {
+    color-scheme: light;
   }
 
   .no-print {

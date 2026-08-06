@@ -1,13 +1,13 @@
 import { forwardRef, type InputHTMLAttributes, type TextareaHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
-import { controlClassName } from "./styles";
+import { controlClassName, freeEntryNumberClassName } from "./styles";
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function Input({ className, ...props }, ref) {
   return <input ref={ref} className={cn(controlClassName, "h-9", className)} {...props} />;
 });
 
-export const NumberInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function NumberInput({ type = "number", ...props }, ref) {
-  return <Input ref={ref} type={type} {...props} />;
+export const NumberInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function NumberInput({ type = "number", className, ...props }, ref) {
+  return <Input ref={ref} type={type} className={cn(freeEntryNumberClassName, className)} {...props} />;
 });
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(function Textarea({ className, ...props }, ref) {

@@ -10,7 +10,7 @@ import { Surface } from "@/components/ui/Surface";
 import { feedback, isInlineValidation } from "@/components/ui/feedback";
 import { canManagePinsHub, hasPinsHubAccessLevel } from "@/lib/access/pinsHubRoles";
 
-const inputClass = "h-9 w-full min-w-0 rounded-md border border-input bg-background px-2.5 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring";
+const inputClass = "hub-native-control";
 const display = (value: string | number | null) => value ?? "—";
 
 export function GarmentsManager({ garments, productTypes, accessLevel }: { garments: GarmentRecord[]; productTypes: ProductTypeRecord[]; accessLevel: AccessLevel }) {

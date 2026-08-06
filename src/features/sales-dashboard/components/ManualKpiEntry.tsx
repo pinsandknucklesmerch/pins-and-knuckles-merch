@@ -8,7 +8,7 @@ import type { SalesKpiTargets, SalesMetricCode } from "../domain/types";
 import { feedback, isInlineValidation } from "@/components/ui/feedback";
 
 const initialState: TargetActionState = { ok: false, message: "" };
-const inputClass = "h-9 rounded-md border border-input bg-background px-2.5 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring";
+const inputClass = "hub-native-control";
 
 const fields: Array<{ code: SalesMetricCode; label: string; step: string; suffix: string }> = [
   { code: "MONTHLY_PROFIT", label: "Monthly Profit", step: "0.01", suffix: "GBP" },

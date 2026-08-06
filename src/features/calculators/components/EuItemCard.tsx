@@ -66,7 +66,7 @@ export function EuItemCard({
               Quantity
             </label>
             <input
-              className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-ring"
+              className="hub-native-control"
               min={50}
               max={2000}
               type="number"
@@ -102,7 +102,7 @@ export function EuItemCard({
             PK markup
           </label>
           <input
-            className="h-8 w-full min-w-0 rounded-md border border-input bg-card px-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring disabled:opacity-50"
+            className="hub-native-control h-8"
             disabled={!item.pkMarkupEnabled}
             type="text"
             inputMode="decimal"

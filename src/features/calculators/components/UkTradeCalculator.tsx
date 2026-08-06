@@ -48,7 +48,7 @@ export function UkTradeCalculator({ referenceData }: { referenceData: UkTradeRef
             </div>
             <div className="grid gap-4 md:grid-cols-[1fr_140px]">
               <GarmentCombobox garments={referenceData.garments} value={item.garmentId} onChange={(garmentId) => update({ ...item, garmentId })} />
-              <label className="grid gap-2 text-xs font-medium text-muted-foreground">Quantity<input min={50} max={10000} type="number" value={item.quantity} onChange={(event) => update({ ...item, quantity: Number(event.target.value) })} className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring" /></label>
+              <label className="grid gap-2 text-xs font-medium text-muted-foreground">Quantity<input min={50} max={10000} type="number" value={item.quantity} onChange={(event) => update({ ...item, quantity: Number(event.target.value) })} className="hub-native-control" /></label>
             </div>
             <UkTradeDecorationControls printPositions={item.printPositions} embroideryStitches={item.embroideryStitches} onPrintPositionsChange={(printPositions) => update({ ...item, printPositions })} onEmbroideryChange={(embroideryStitches) => update({ ...item, embroideryStitches })} onDecorationSelect={() => setDecorationAttempts((current) => ({ ...current, [item.id]: true }))} />
             <CalculatorErrors errors={itemErrors} />

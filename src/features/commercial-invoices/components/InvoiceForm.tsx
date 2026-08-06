@@ -34,8 +34,7 @@ type Props = {
   onRemoveLine: (id: string) => void;
 };
 
-const inputClass =
-  "h-9 w-full rounded-md border border-input bg-background px-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring";
+const inputClass = "hub-native-control";
 const areaClass = `${inputClass} h-auto min-h-20 resize-y py-2`;
 
 function Field({

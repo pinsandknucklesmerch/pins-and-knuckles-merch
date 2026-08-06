@@ -75,7 +75,7 @@ export function UpdatePasswordForm({
           minLength={8}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/35"
+          className="hub-native-control"
           placeholder="New password"
         />
       </label>
@@ -94,7 +94,7 @@ export function UpdatePasswordForm({
           minLength={8}
           value={confirmPassword}
           onChange={(event) => setConfirmPassword(event.target.value)}
-          className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/35"
+          className="hub-native-control"
           placeholder="Confirm password"
         />
       </label>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, ChevronDown, X } from "lucide-react";
+import { createPortal } from "react-dom";
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 
 export type SearchableComboboxProps<T> = {
@@ -38,10 +39,12 @@ export function SearchableCombobox<T>({
 }: SearchableComboboxProps<T>) {
   const listboxId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const [menuPosition, setMenuPosition] = useState<{ left: number; top: number; width: number; maxHeight: number } | null>(null);
 
   const filteredItems = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -53,7 +56,7 @@ export function SearchableCombobox<T>({
 
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
+      if (!rootRef.current?.contains(event.target as Node) && !menuRef.current?.contains(event.target as Node)) {
         setIsOpen(false);
         setQuery("");
       }
@@ -68,6 +71,34 @@ export function SearchableCombobox<T>({
       Math.min(index, Math.max(filteredItems.length - 1, 0)),
     );
   }, [filteredItems.length]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setMenuPosition(null);
+      return;
+    }
+
+    const updatePosition = () => {
+      const input = inputRef.current;
+      if (!input) return;
+      const rect = input.getBoundingClientRect();
+      const gap = 6;
+      const below = Math.max(window.innerHeight - rect.bottom - gap, 0);
+      const above = Math.max(rect.top - gap, 0);
+      const openAbove = below < 160 && above > below;
+      const maxHeight = Math.max(96, Math.min(256, openAbove ? above : below));
+      const top = openAbove ? Math.max(gap, rect.top - gap - maxHeight) : rect.bottom + gap;
+      setMenuPosition({ left: rect.left, top, width: rect.width, maxHeight });
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [isOpen]);
 
   function openList() {
     if (disabled) return;
@@ -117,6 +148,7 @@ export function SearchableCombobox<T>({
           role="combobox"
           aria-label={ariaLabel}
           aria-expanded={isOpen}
+          aria-haspopup="listbox"
           aria-controls={isOpen ? listboxId : undefined}
           aria-autocomplete="list"
           aria-activedescendant={
@@ -159,11 +191,13 @@ export function SearchableCombobox<T>({
         />
       </div>
 
-      {isOpen ? (
+      {isOpen && menuPosition ? createPortal(
         <div
+          ref={menuRef}
           id={listboxId}
           role="listbox"
-          className="absolute inset-x-0 top-10 z-30 max-h-64 overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-lg"
+          style={{ left: menuPosition.left, top: menuPosition.top, width: menuPosition.width, maxHeight: menuPosition.maxHeight }}
+          className="fixed z-40 overflow-y-auto rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-lg"
         >
           {filteredItems.length > 0 ? (
             filteredItems.map((item, index) => {
@@ -193,7 +227,8 @@ export function SearchableCombobox<T>({
               {emptyMessage}
             </div>
           )}
-        </div>
+        </div>,
+        rootRef.current?.closest("dialog") ?? document.body,
       ) : null}
     </div>
   );

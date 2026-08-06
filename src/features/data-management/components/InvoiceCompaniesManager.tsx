@@ -10,7 +10,7 @@ import { filterInvoiceCompanies, sortInvoiceCompanies } from "../lib/invoiceDire
 import { initialDataManagementActionState, type AccessLevel, type InvoiceCompanyRecord } from "../types";
 import { InvoiceDirectoryLifecycleDialog } from "./InvoiceDirectoryLifecycleDialog";
 
-const inputClass = "h-9 w-full min-w-0 rounded-md border border-input bg-background px-2.5 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring";
+const inputClass = "hub-native-control";
 const areaClass = `${inputClass} h-auto min-h-20 resize-y py-2`;
 
 const emptyCompany: InvoiceCompanyRecord = { id: "", organisationId: "", label: "", companyName: "", contactName: "", country: "", eori: "", vatNumber: "", taxId: "", telephone: "", email: "", addressLine1: "", addressLine2: "", city: "", region: "", postalCode: "", notes: "", isActive: true };
