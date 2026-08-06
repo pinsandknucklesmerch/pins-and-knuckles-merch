@@ -1,6 +1,6 @@
 import { AccessDenied } from "@/components/layout/AccessDenied";
 import { SidebarNav } from "@/components/layout/SidebarNav";
-import Galaxy from "@/components/backgrounds/Galaxy";
+import { BackgroundLayer } from "@/components/backgrounds/BackgroundLayer";
 import { getCurrentPinsHubAccess, hasAdminAccess, hasDeveloperAccess, type PinsHubAccessResult } from "@/lib/access/pinsHubAccess";
 
 type AppShellProps = {
@@ -19,9 +19,7 @@ export async function AppShell({ children, pinsHubAccess: suppliedPinsHubAccess,
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
-      <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
-        <Galaxy mouseRepulsion={false} mouseInteraction={false} density={0.7} glowIntensity={0.16} saturation={0} hueShift={140} twinkleIntensity={0.15} rotationSpeed={0.03} starSpeed={0.2} speed={0.4} transparent />
-      </div>
+      <BackgroundLayer variant="hub" />
       <div className={`relative z-10 flex min-h-screen flex-col ${tvMode ? "" : "md:flex-row"}`}>
         {!tvMode ? <SidebarNav
           canAdmin={hasAdminAccess(pinsHubAccess)}
