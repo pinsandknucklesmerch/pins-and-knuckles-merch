@@ -1,8 +1,8 @@
 import type { InviteActionState, OrganisationRole, PinsHubAccessLevel } from "../types";
-import { canManagePinsHub, pinsHubAccessLevels } from "@/lib/access/pinsHubRoles";
+import { canManageOrganisationUsers, pinsHubAccessLevels } from "@/lib/access/pinsHubRoles";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const ORGANISATION_ROLES = new Set<OrganisationRole>(["admin", "manager", "staff", "viewer"]);
+const ORGANISATION_ROLES = new Set<OrganisationRole>(["owner", "admin", "manager", "staff", "viewer"]);
 const ACCESS_LEVELS = new Set<PinsHubAccessLevel>(pinsHubAccessLevels);
 
 export function isOrganisationOwner(role: string | null | undefined) {
@@ -10,7 +10,7 @@ export function isOrganisationOwner(role: string | null | undefined) {
 }
 
 export function canInviteMembers(context: { authenticated: boolean; accessLevel: string | null | undefined; membershipRole: string | null | undefined; organisationId: string | null | undefined }) {
-  return context.authenticated && canManagePinsHub(context.accessLevel) && isOrganisationOwner(context.membershipRole) && Boolean(context.organisationId);
+  return context.authenticated && canManageOrganisationUsers(context.accessLevel, context.membershipRole) && Boolean(context.organisationId);
 }
 
 export function resolveSiteUrl(environment: NodeJS.ProcessEnv = process.env) {

@@ -26,6 +26,13 @@ async function findExistingUserId(admin: ReturnType<typeof createAdminClient>, e
   return data.users.find((candidate) => candidate.email?.toLowerCase() === email)?.id ?? null;
 }
 
+async function canChangeExistingOwner(admin: ReturnType<typeof createAdminClient>, organisationId: string, userId: string, nextRole: string) {
+  const { data: membership } = await admin.from("organisation_members").select("id,role,is_active").eq("organisation_id", organisationId).eq("user_id", userId).maybeSingle();
+  if (membership?.role !== "owner" || nextRole === "owner") return true;
+  const { count } = await admin.from("organisation_members").select("id", { count: "exact", head: true }).eq("organisation_id", organisationId).eq("role", "owner").eq("is_active", true);
+  return (count ?? 0) > 1;
+}
+
 function inviteSuccess(message: string): InviteActionState {
   revalidatePath("/hub/team");
   return { status: "success", message };
@@ -60,8 +67,9 @@ export async function inviteMember(previousState: InviteActionState = initialInv
   const existingUserId = await findExistingUserId(admin, input.email);
   if (existingUserId) {
     try {
+      if (!await canChangeExistingOwner(admin, membership.organisation_id, existingUserId, input.role)) return { status: "error", message: "The last active Owner cannot be removed or demoted." };
       if (!await provisionAccess({ ...input, userId: existingUserId, organisationId: membership.organisation_id })) throw new Error();
-      return inviteSuccess("Existing account granted access.");
+      return inviteSuccess("User details updated successfully.");
     } catch {
       return { status: "error", message: "Invitation could not be sent." };
     }
@@ -81,8 +89,9 @@ export async function inviteMember(previousState: InviteActionState = initialInv
       const existingUserIdAfterInvite = await findExistingUserId(admin, input.email);
       if (existingUserIdAfterInvite) {
         try {
+          if (!await canChangeExistingOwner(admin, membership.organisation_id, existingUserIdAfterInvite, input.role)) return { status: "error", message: "The last active Owner cannot be removed or demoted." };
           if (!await provisionAccess({ ...input, userId: existingUserIdAfterInvite, organisationId: membership.organisation_id })) throw new Error();
-          return inviteSuccess("Existing account granted access.");
+          return inviteSuccess("User details updated successfully.");
         } catch {
           return { status: "error", message: "Invitation could not be sent." };
         }
@@ -97,7 +106,7 @@ export async function inviteMember(previousState: InviteActionState = initialInv
     if (!await provisionAccess({ ...input, userId: data.user.id, organisationId: membership.organisation_id })) {
       return { status: "error", message: "Invitation sent, but access provisioning failed." };
     }
-    return inviteSuccess("Invitation sent.");
+    return inviteSuccess("User invited successfully.");
   } catch {
     return { status: "error", message: "Invitation sent, but access provisioning failed." };
   }

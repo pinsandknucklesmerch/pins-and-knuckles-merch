@@ -2,7 +2,7 @@ export const organisationRoles = ["admin", "manager", "staff", "viewer"] as cons
 export const allOrganisationRoles = ["owner", ...organisationRoles] as const;
 export { pinsHubAccessLevels } from "@/lib/access/pinsHubRoles";
 
-export type OrganisationRole = (typeof organisationRoles)[number];
+export type OrganisationRole = (typeof allOrganisationRoles)[number];
 export type { PinsHubAccessLevel } from "@/lib/access/pinsHubRoles";
 
 export type UserAccessActionState = {

@@ -56,6 +56,6 @@ export function TeamMembersTable({ members, currentUserId }: { members: TeamMemb
         </tr>) : <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">{members.length ? "No users match these filters." : "No users in User Access Management."}</td></tr>}</tbody>
       </table>
     </div>
-    {editing ? <UserEditDialog key={editing.id} member={editing} currentUserId={currentUserId} onClose={() => setEditing(null)} /> : null}
+    {editing ? <UserEditDialog key={editing.id} member={editing} onClose={() => setEditing(null)} /> : null}
   </>;
 }

@@ -1,7 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { canManagePinsHub, getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
+import { getCurrentPinsHubAccess, hasAdminAccess } from "@/lib/access/pinsHubAccess";
+import { canManageOrganisationUsers } from "@/lib/access/pinsHubRoles";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { mondayIdentities } from "@/features/sales-dashboard/domain/memberIdentity";
 import { initialUserAccessActionState, type UserAccessActionState } from "../types";
@@ -14,7 +15,7 @@ const ok = (message: string): UserAccessActionState => { revalidatePath("/hub/te
 
 async function adminContext() {
   const current = await getCurrentPinsHubAccess();
-  if (!current.authenticated || !canManagePinsHub(current.access?.access_level) || !current.membership?.organisation_id || !current.user) return null;
+  if (!current.authenticated || !hasAdminAccess(current) || !current.membership?.organisation_id || !current.user) return null;
   return current;
 }
 
@@ -36,11 +37,10 @@ export async function updateUser(previousState: UserAccessActionState = initialU
   const { data: targetAccess } = targetMembership ? await admin.from("app_access").select("app_key,access_level").eq("organisation_member_id", targetMembership.id) : { data: [] };
   const target = targetMembership ? { ...targetMembership, app_access: targetAccess ?? [] } : null;
   if (error || !target) return fail("User could not be found.");
-  if (role === "owner" && target.role !== "owner") return fail("Owner role cannot be assigned.");
-  if (target.role === "owner" && role !== "owner") return fail("Owner access is protected.");
   const existingAccessLevel = target.app_access.find((item) => item.app_key === "pins_hub")?.access_level ?? null;
-  if (target.role === "owner" && (!isActive || accessLevel !== existingAccessLevel)) return fail("Owner access is protected.");
-  if (target.user_id === user.id && (!isActive || role !== target.role || accessLevel !== existingAccessLevel)) return fail("You cannot remove your own administrator access or deactivate yourself.");
+  const canManagePrivileged = canManageOrganisationUsers(current.access?.access_level, membership.role);
+  if ((role === "owner" || target.role === "owner" || accessLevel === "developer" || existingAccessLevel === "developer") && !canManagePrivileged) return fail("Only Owners and Developers may manage Owner or Developer access.");
+  if (target.role === "owner" && (!isActive || role !== "owner")) { const { count } = await admin.from("organisation_members").select("id", { count: "exact", head: true }).eq("organisation_id", membership.organisation_id).eq("role", "owner").eq("is_active", true); if ((count ?? 0) <= 1) return fail("The last active Owner cannot be removed or demoted."); }
   const { data: duplicate } = mondayMemberId ? await admin.from("organisation_members").select("id").eq("organisation_id", membership.organisation_id).eq("monday_member_id", mondayMemberId).neq("id", membershipId).maybeSingle() : { data: null };
   if (duplicate) return fail("That Monday account is already linked to another user.");
 

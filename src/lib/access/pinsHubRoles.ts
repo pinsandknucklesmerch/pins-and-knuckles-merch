@@ -19,4 +19,6 @@ export function canUseDeveloperArea(accessLevel: string | null | undefined, orga
   return organisationRole === "owner" || accessLevel === "developer";
 }
 
+export const canManageOrganisationUsers = canUseDeveloperArea;
+
 export const pinsHubAccessLabels: Record<PinsHubAccessLevel, string> = { read: "Read", write: "Write", admin: "Admin", developer: "Developer" };

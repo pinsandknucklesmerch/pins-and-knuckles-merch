@@ -46,8 +46,8 @@ type ProfileAccessRow = {
 
 export { canManagePinsHub } from "./pinsHubRoles";
 
-export function hasAdminAccess(access: Pick<PinsHubAccessResult, "access"> | null | undefined) {
-  return canManagePinsHub(access?.access?.access_level);
+export function hasAdminAccess(access: Pick<PinsHubAccessResult, "access" | "membership"> | null | undefined) {
+  return canManagePinsHub(access?.access?.access_level) || access?.membership?.role === "owner";
 }
 
 export function hasDeveloperAccess(access: Pick<PinsHubAccessResult, "access" | "membership"> | null | undefined) {
