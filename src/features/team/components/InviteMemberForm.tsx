@@ -5,6 +5,7 @@ import { inviteMember } from "../actions/inviteMember";
 import { initialInviteActionState } from "../types";
 import { Select } from "@/components/ui/Select";
 import { feedback, isInlineValidation } from "@/components/ui/feedback";
+import { mondayIdentities } from "@/features/sales-dashboard/domain/memberIdentity";
 
 export function InviteMemberForm() {
   const [state, formAction, pending] = useActionState(inviteMember, initialInviteActionState);
@@ -36,7 +37,7 @@ export function InviteMemberForm() {
   }, [state]);
 
   return (
-    <form ref={formRef} action={formAction} onSubmit={handleSubmit} onChange={unlockForChangedInvite} className="grid gap-3 rounded-lg border border-border bg-card/70 p-4 sm:grid-cols-2 lg:grid-cols-5">
+    <form ref={formRef} action={formAction} onSubmit={handleSubmit} onChange={unlockForChangedInvite} className="grid gap-3 rounded-lg border border-border bg-card/70 p-4 sm:grid-cols-2 lg:grid-cols-6">
       <label className="grid gap-1 text-sm">
         <span>Full name</span>
         <input required name="full_name" maxLength={200} className="h-9 rounded-md bg-background px-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-primary" />
@@ -48,7 +49,7 @@ export function InviteMemberForm() {
       <label className="grid gap-1 text-sm">
         <span>Organisation role</span>
         <Select name="organisation_role" defaultValue="admin">
-          <option value="owner">owner</option><option value="admin">admin</option><option value="manager">manager</option><option value="staff">staff</option><option value="viewer">viewer</option>
+          <option value="admin">Admin</option><option value="manager">Manager</option><option value="staff">Staff</option><option value="viewer">Viewer</option>
         </Select>
       </label>
       <label className="grid gap-1 text-sm">
@@ -57,12 +58,16 @@ export function InviteMemberForm() {
           <option value="admin">admin</option><option value="write">write</option><option value="read">read</option>
         </Select>
       </label>
+      <label className="grid gap-1 text-sm">
+        <span>Monday account</span>
+        <Select name="monday_member_id" defaultValue="none"><option value="none">Not linked</option>{mondayIdentities().map((person) => <option key={person.id} value={person.id}>{person.displayName}</option>)}</Select>
+      </label>
       <div className="flex items-end">
         <button disabled={pending} type="submit" className="h-9 w-full rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           {pending ? "Sending…" : "Send invite"}
         </button>
       </div>
-      {state.message && state.status !== "success" && isInlineValidation(state.message) ? <p role="alert" className="sm:col-span-2 lg:col-span-5 text-sm text-destructive">{state.message}</p> : null}
+      {state.message && state.status !== "success" && isInlineValidation(state.message) ? <p role="alert" className="sm:col-span-2 lg:col-span-6 text-sm text-destructive">{state.message}</p> : null}
     </form>
   );
 }

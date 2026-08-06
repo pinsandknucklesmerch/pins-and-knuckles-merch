@@ -1,7 +1,7 @@
 import type { InviteActionState, OrganisationRole, PinsHubAccessLevel } from "../types";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const ORGANISATION_ROLES = new Set<OrganisationRole>(["owner", "admin", "manager", "staff", "viewer"]);
+const ORGANISATION_ROLES = new Set<OrganisationRole>(["admin", "manager", "staff", "viewer"]);
 const ACCESS_LEVELS = new Set<PinsHubAccessLevel>(["admin", "write", "read"]);
 
 export function resolveSiteUrl(environment: NodeJS.ProcessEnv = process.env) {
@@ -25,11 +25,13 @@ export function validateInviteInput(formData: FormData) {
   const fullName = String(formData.get("full_name") ?? "").trim().replace(/\s+/g, " ");
   const role = String(formData.get("organisation_role") ?? "") as OrganisationRole;
   const accessLevel = String(formData.get("access_level") ?? "") as PinsHubAccessLevel;
+  const mondayMemberIdValue = String(formData.get("monday_member_id") ?? "").trim();
+  const mondayMemberId = mondayMemberIdValue && mondayMemberIdValue !== "none" ? mondayMemberIdValue : null;
 
   if (!EMAIL_PATTERN.test(email) || email.length > 320 || !fullName || fullName.length > 200 || !ORGANISATION_ROLES.has(role) || !ACCESS_LEVELS.has(accessLevel)) {
     return null;
   }
-  return { email, fullName, role, accessLevel };
+  return { email, fullName, role, accessLevel, mondayMemberId };
 }
 
 export function inviteFailureState(error: unknown): InviteActionState {

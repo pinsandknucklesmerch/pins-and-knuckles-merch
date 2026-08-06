@@ -40,7 +40,7 @@ test("empty FormData is rejected before any Auth or provisioning work", async ()
   assert.equal(validateInviteInput(new FormData()), null);
 });
 
-test("success revalidates the Team route without client navigation", async () => {
+  test("success revalidates the User Access Management route without client navigation", async () => {
   const component = await componentSource();
   const action = await readFile(actionPath, "utf8");
   assert.doesNotMatch(component, /router\.refresh|router\.push|window\.location/);

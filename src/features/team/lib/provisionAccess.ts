@@ -20,6 +20,7 @@ export type ProvisionAccessInput = {
   role: string;
   accessLevel: string;
   organisationId: string;
+  mondayMemberId?: string | null;
 };
 
 export function logProvisioningFailure(step: "profiles" | "organisation_members" | "app_access", error: unknown) {
@@ -36,7 +37,7 @@ export async function provisionPinsHubAccess(admin: AdminDatabaseClient, input: 
   const { error: membershipError } = await admin
     .from("organisation_members")
     .upsert(
-      { organisation_id: input.organisationId, user_id: input.userId, role: input.role },
+      { organisation_id: input.organisationId, user_id: input.userId, role: input.role, is_active: true, ...(input.mondayMemberId !== undefined ? { monday_member_id: input.mondayMemberId } : {}) },
       { onConflict: "organisation_id,user_id" },
     );
   if (membershipError) return { ok: false as const, step: "organisation_members" as const, error: membershipError as SupabaseError };

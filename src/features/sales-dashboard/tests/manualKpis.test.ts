@@ -7,7 +7,7 @@ import type { PinsHubAccessResult } from "../../../lib/access/pinsHubAccess.ts";
 const adminAccess: PinsHubAccessResult = {
   authenticated: true,
   user: { id: "user-1", email: "admin@example.com" },
-  membership: { id: "membership-1", organisation_id: "organisation-1", role: "admin" },
+  membership: { id: "membership-1", organisation_id: "organisation-1", role: "admin", is_active: true },
   access: { id: "access-1", organisation_member_id: "membership-1", app_key: "pins_hub", access_level: "admin" },
   error: null,
   queryError: null,

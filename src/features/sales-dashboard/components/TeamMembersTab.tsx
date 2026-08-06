@@ -3,47 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Panel } from "@/components/ui/Panel";
-import type { MemberDashboardRow, SalesDashboardData, TeamMemberKpiMonth } from "../domain/types";
-import { getMemberSnuggleProfit, getTeamMemberHistory, getVisibleTeamMembers } from "../lib/teamMembersTab";
-import { DASHBOARD_MONTHS } from "../types";
-import { AnimatedMetricValue } from "./AnimatedMetricValue";
-
-type MetricFormat = "currency" | "number" | "percent";
-type Metric = { label: string; value: number | null; format: MetricFormat };
-
-const money = (value: number | null) => value === null ? "—" : new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(value);
-const number = (value: number | null) => value === null ? "—" : value.toLocaleString("en-GB");
-
-function memberMetrics(row: MemberDashboardRow, snuggleProfit: number | null): Metric[] {
-  return [
-    { label: "Profit", value: row.profit, format: "currency" },
-    { label: "Snuggle Profit", value: snuggleProfit, format: "currency" },
-    { label: "PK Tax", value: row.pkTax, format: "currency" },
-    { label: "Quotes Done", value: row.quotesDone, format: "number" },
-    { label: "Orders Processed", value: row.ordersProcessed, format: "number" },
-  ];
-}
-
-function MetricValue({ metric, className }: { metric: Metric; className?: string }) {
-  return <AnimatedMetricValue value={metric.value} format={metric.format} maximumFractionDigits={metric.format === "percent" ? 1 : 0} className={className} />;
-}
-
-function MetricGrid({ metrics }: { metrics: Metric[] }) {
-  return <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">{metrics.map((metric) => <div key={metric.label} className="rounded-md border border-border/70 bg-background/45 p-2"><dt className="text-xs text-muted-foreground">{metric.label}</dt><dd className="mt-1 text-sm font-semibold tabular-nums text-foreground"><MetricValue metric={metric} /></dd></div>)}</dl>;
-}
-
-function MemberButton({ row, snuggleProfit, selected, onSelect }: { row: MemberDashboardRow; snuggleProfit: number | null; selected: boolean; onSelect: () => void }) {
-  const metrics = memberMetrics(row, snuggleProfit);
-  return <button type="button" aria-pressed={selected} onClick={onSelect} className={`grid gap-2 rounded-md border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${selected ? "border-primary bg-primary/10" : "border-border bg-card hover:bg-secondary/60"}`}>
-    <span className="font-medium text-foreground">{row.teamMemberName}</span>
-    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs sm:grid-cols-3">{metrics.map((metric) => <span key={metric.label} className="flex min-w-0 justify-between gap-2"><span className="truncate text-muted-foreground">{metric.label}</span><MetricValue metric={metric} className="shrink-0 tabular-nums text-foreground" /></span>)}</div>
-  </button>;
-}
-
-function MemberHistory({ rows, snuggleData, memberKey, year, month }: { rows: TeamMemberKpiMonth[]; snuggleData: SalesDashboardData["snuggle"]; memberKey: string; year: number; month: number }) {
-  const history = getTeamMemberHistory(rows, memberKey, year, month);
-  return <div className="overflow-x-auto"><table className="w-full min-w-[42rem] text-sm"><thead><tr className="border-b border-border text-left text-xs text-muted-foreground"><th className="px-2 py-2 font-medium">Month</th><th className="px-2 py-2 text-right font-medium">Profit</th><th className="px-2 py-2 text-right font-medium">Snuggle</th><th className="px-2 py-2 text-right font-medium">PK Tax</th><th className="px-2 py-2 text-right font-medium">Quotes</th><th className="px-2 py-2 text-right font-medium">Orders</th></tr></thead><tbody>{history.map((entry) => <tr key={`${entry.year}-${entry.month}`} className="border-b border-border/70"><td className="px-2 py-2">{DASHBOARD_MONTHS[entry.month - 1] ?? entry.month} {entry.year}</td><td className="px-2 py-2 text-right tabular-nums">{money(entry.profit)}</td><td className="px-2 py-2 text-right tabular-nums">{money(getMemberSnuggleProfit(snuggleData, memberKey, entry.year, entry.month))}</td><td className="px-2 py-2 text-right tabular-nums">{money(entry.pkTax)}</td><td className="px-2 py-2 text-right tabular-nums">{number(entry.quotesDone)}</td><td className="px-2 py-2 text-right tabular-nums">{number(entry.ordersProcessed)}</td></tr>)}</tbody></table></div>;
-}
+import { Select } from "@/components/ui/Select";
+import type { MemberDashboardRow, SalesDashboardData } from "../domain/types";
+import { getVisibleTeamMembers } from "../lib/teamMembersTab";
+import { MemberKpiCards, MemberKpiHistoryTable } from "./MemberKpiPresentation";
 
 export function TeamMembersTab({ data, year, month }: { data: SalesDashboardData; year: number; month: number }) {
   const visibleMembers = useMemo(() => getVisibleTeamMembers(data.members), [data.members]);
@@ -55,20 +18,17 @@ export function TeamMembersTab({ data, year, month }: { data: SalesDashboardData
   }, [firstMemberKey, visibleMembers]);
 
   const selected = visibleMembers.find((row) => row.teamMemberKey === selectedKey) ?? null;
-  const selectedSnuggleProfit = selected ? getMemberSnuggleProfit(data.snuggle, selected.teamMemberKey, year, month) : null;
-  const selectedMetrics = selected ? [...memberMetrics(selected, selectedSnuggleProfit), { label: "Conversion Rate", value: selected.conversionRate, format: "percent" as const }] : [];
 
   if (!visibleMembers.length) return <EmptyState title="No team member data" />;
 
-  return <div className="grid gap-3 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.4fr)]">
+  return <div data-testid="team-members-tab" className="grid gap-3">
     <Panel title="Team Members">
-      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">{visibleMembers.map((row) => <MemberButton key={row.teamMemberKey} row={row} snuggleProfit={getMemberSnuggleProfit(data.snuggle, row.teamMemberKey, year, month)} selected={row.teamMemberKey === selected?.teamMemberKey} onSelect={() => setSelectedKey(row.teamMemberKey)} />)}</div>
+      <label className="grid max-w-sm gap-1 text-xs font-medium text-muted-foreground" htmlFor="team-member-select">Member<Select id="team-member-select" value={selectedKey} onValueChange={setSelectedKey} aria-label="Select team member">{visibleMembers.map((row) => <option key={row.teamMemberKey} value={row.teamMemberKey}>{row.teamMemberName}</option>)}</Select></label>
     </Panel>
-    <div className="grid content-start gap-3">
-      <Panel title={selected?.teamMemberName ?? "Team Member"}>
-        {selected ? <><MetricGrid metrics={selectedMetrics} /><div className="mt-3 text-xs text-muted-foreground">{DASHBOARD_MONTHS[month - 1] ?? month} {year}</div></> : <p className="text-sm text-muted-foreground">No data</p>}
-      </Panel>
-      {selected ? <Panel title="Monthly history"><MemberHistory rows={data.memberHistory} snuggleData={data.snuggle} memberKey={selected.teamMemberKey} year={year} month={month} /></Panel> : null}
-    </div>
+    {selected ? <div className="grid content-start gap-3"><Panel title={selected.teamMemberName}><MemberKpiCards rows={data.memberHistory} memberKey={selected.teamMemberKey} year={year} month={month} /></Panel><Panel title="Monthly history"><MemberKpiHistoryTable rows={data.memberHistory} memberKey={selected.teamMemberKey} year={year} month={month} /></Panel></div> : null}
   </div>;
+}
+
+export function getTeamMemberSelectionRows(rows: MemberDashboardRow[]) {
+  return getVisibleTeamMembers(rows).map((row) => ({ key: row.teamMemberKey, name: row.teamMemberName }));
 }

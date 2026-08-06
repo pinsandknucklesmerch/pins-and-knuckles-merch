@@ -45,6 +45,10 @@ export function getFixtureMembers(fixture: HistoricalSalesDashboardFixture, year
   });
 }
 
+export function getFixtureMemberHistory(fixture: HistoricalSalesDashboardFixture, year: number, month: number): TeamMemberKpiMonth[] {
+  return Array.from({ length: month }, (_, index) => getFixtureMembers(fixture, year, index + 1)).flat();
+}
+
 export function mergeCompanyMonth(database: CompanyKpiMonth | null, fixture: CompanyKpiMonth): CompanyKpiMonth {
   return database ?? fixture;
 }
@@ -87,6 +91,6 @@ export function buildDashboardData(args: {
   const previousFixture = getFixtureCompanyMonth(args.fixture, args.year - 1, args.month);
   const currentMembers = mergeMemberMonths(args.memberRows, getFixtureMembers(args.fixture, args.year, args.month));
   const previousMembers = mergeMemberMonths(args.previousMemberRows, getFixtureMembers(args.fixture, args.year - 1, args.month));
-  const memberHistory = mergeMemberMonths(args.memberHistoryRows ?? [], getFixtureMembers(args.fixture, args.year, args.month));
+  const memberHistory = mergeMemberMonths(args.memberHistoryRows ?? [], getFixtureMemberHistory(args.fixture, args.year, args.month));
   return { company: mergeCompanyMonth(args.companyRow, fixtureCompany), companyYear: args.trendCurrent, previousCompany: mergeCompanyMonth(args.previousCompanyRow, previousFixture), members: buildMemberRows(currentMembers, previousMembers), memberHistory, targets: args.targets, yearToDate: calculateYearToDate(args.year, args.month, args.authoritativeCompanyYear ?? [], args.monthlyProfitTargets ?? Array(12).fill(args.targets.MONTHLY_PROFIT ?? null)), yearComparison: buildYearComparison(args.year, args.trendCurrent, args.trendPrevious), availableYears: args.availableYears, setupIssue: args.setupIssue ?? null, snuggle: args.snuggle ?? { months: [], members: [], warnings: [], error: "Snuggle profit is currently unavailable." } };
 }

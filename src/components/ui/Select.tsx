@@ -16,10 +16,12 @@ type SelectProps = {
   name?: string;
   onValueChange?: (value: string) => void;
   placeholder?: string;
+  portalContainer?: HTMLElement | null;
   required?: boolean;
   value?: string;
   "aria-describedby"?: string;
   "aria-invalid"?: boolean;
+  "aria-label"?: string;
 };
 
 function optionsFromChildren(children: ReactNode): ReactNode {
@@ -35,6 +37,6 @@ function optionsFromChildren(children: ReactNode): ReactNode {
   });
 }
 
-export function Select({ children, className, defaultValue, disabled, id, invalid, name, onValueChange, placeholder, required, value, "aria-describedby": ariaDescribedBy, "aria-invalid": ariaInvalid }: SelectProps) {
-  return <RadixSelect.Root value={value || undefined} defaultValue={defaultValue || undefined} onValueChange={onValueChange} disabled={disabled} name={name} required={required}><RadixSelect.Trigger id={id} aria-describedby={ariaDescribedBy} aria-invalid={invalid ?? ariaInvalid} className={cn(controlClassName, "h-9 min-w-0 flex items-center justify-between gap-2 pr-2 text-left data-[placeholder]:text-muted-foreground", className)}><RadixSelect.Value className="min-w-0 flex-1 truncate" placeholder={placeholder} /><RadixSelect.Icon asChild><ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" /></RadixSelect.Icon></RadixSelect.Trigger><RadixSelect.Portal><RadixSelect.Content position="popper" sideOffset={6} className="z-50 w-[var(--radix-select-trigger-width)] overflow-hidden rounded-[var(--hub-control-radius)] border border-border bg-popover text-popover-foreground shadow-lg"><RadixSelect.Viewport className="max-h-72 p-1">{optionsFromChildren(children)}</RadixSelect.Viewport></RadixSelect.Content></RadixSelect.Portal></RadixSelect.Root>;
+export function Select({ children, className, defaultValue, disabled, id, invalid, name, onValueChange, placeholder, portalContainer, required, value, "aria-describedby": ariaDescribedBy, "aria-invalid": ariaInvalid, "aria-label": ariaLabel }: SelectProps) {
+  return <RadixSelect.Root value={value || undefined} defaultValue={defaultValue || undefined} onValueChange={onValueChange} disabled={disabled} name={name} required={required}><RadixSelect.Trigger id={id} aria-label={ariaLabel} aria-describedby={ariaDescribedBy} aria-invalid={invalid ?? ariaInvalid} className={cn(controlClassName, "h-9 min-w-0 flex items-center justify-between gap-2 pr-2 text-left data-[placeholder]:text-muted-foreground", className)}><RadixSelect.Value className="min-w-0 flex-1 truncate" placeholder={placeholder} /><RadixSelect.Icon asChild><ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" /></RadixSelect.Icon></RadixSelect.Trigger><RadixSelect.Portal container={portalContainer ?? undefined}><RadixSelect.Content position="popper" sideOffset={6} className="z-[70] w-[var(--radix-select-trigger-width)] overflow-hidden rounded-[var(--hub-control-radius)] border border-border bg-popover text-popover-foreground shadow-lg"><RadixSelect.Viewport className="max-h-72 p-1">{optionsFromChildren(children)}</RadixSelect.Viewport></RadixSelect.Content></RadixSelect.Portal></RadixSelect.Root>;
 }

@@ -10,6 +10,7 @@ type Membership = {
   id: string;
   organisation_id: string;
   role: OrganisationRole;
+  is_active: boolean;
 };
 
 type PinsHubAppAccess = {
@@ -64,7 +65,7 @@ export async function resolvePinsHubAccess(
 
     const { data: profiles, error: accessQueryError } = await supabase
       .from("profiles")
-      .select("id,email,organisation_members!organisation_members_user_id_fkey(id,organisation_id,role,app_access(id,organisation_member_id,app_key,access_level))")
+      .select("id,email,organisation_members!organisation_members_user_id_fkey(id,organisation_id,role,is_active,app_access(id,organisation_member_id,app_key,access_level))")
       .returns<ProfileAccessRow[]>();
 
     if (accessQueryError) {
@@ -108,7 +109,7 @@ export async function resolvePinsHubAccess(
 
     const accessRow = memberships
       .flatMap((membership) => membership.app_access)
-      .find((row) => row.app_key === "pins_hub" && VALID_PINS_HUB_ACCESS_LEVELS.has(row.access_level));
+      .find((row) => row.app_key === "pins_hub" && VALID_PINS_HUB_ACCESS_LEVELS.has(row.access_level) && memberships.some((membership) => membership.id === row.organisation_member_id && membership.is_active));
     const membership =
       memberships.find(
         (candidate) => candidate.id === accessRow?.organisation_member_id,

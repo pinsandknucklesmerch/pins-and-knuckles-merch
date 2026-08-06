@@ -4,6 +4,7 @@ import { getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { mondayIdentities } from "@/features/sales-dashboard/domain/memberIdentity";
 import { inviteFailureState, resolveSiteUrl, validateInviteInput } from "../lib/invite";
 import { logProvisioningFailure, provisionPinsHubAccess } from "../lib/provisionAccess";
 import { initialInviteActionState, type InviteActionState } from "../types";
@@ -37,16 +38,23 @@ export async function inviteMember(previousState: InviteActionState = initialInv
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { status: "error", message: "You do not have permission to invite team members." };
+  if (!user) return { status: "error", message: "You do not have permission to invite users." };
   const current = await getCurrentPinsHubAccess();
   if (!current.authenticated || current.access?.access_level !== "admin" || !current.membership?.organisation_id) {
-    return { status: "error", message: "You do not have permission to invite team members." };
+    return { status: "error", message: "You do not have permission to manage User Access Management." };
   }
 
   const siteUrl = resolveSiteUrl();
   if (!siteUrl) return { status: "error", message: "Invitation could not be sent." };
 
   const admin = createAdminClient();
+  if (input.mondayMemberId && !mondayIdentities().some((person) => person.id === input.mondayMemberId)) {
+    return { status: "error", message: "Select a known Monday account or Not linked." };
+  }
+  if (input.mondayMemberId) {
+    const { data: duplicate } = await admin.from("organisation_members").select("id").eq("organisation_id", current.membership.organisation_id).eq("monday_member_id", input.mondayMemberId).maybeSingle();
+    if (duplicate) return { status: "error", message: "That Monday account is already linked to another user." };
+  }
   const existingUserId = await findExistingUserId(admin, input.email);
   if (existingUserId) {
     try {

@@ -767,6 +767,8 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          is_active: boolean
+          monday_member_id: string | null
           organisation_id: string | null
           role: string
           user_id: string | null
@@ -774,6 +776,8 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
+          is_active?: boolean
+          monday_member_id?: string | null
           organisation_id?: string | null
           role: string
           user_id?: string | null
@@ -781,6 +785,8 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
+          is_active?: boolean
+          monday_member_id?: string | null
           organisation_id?: string | null
           role?: string
           user_id?: string | null

@@ -10,7 +10,7 @@ import { TeamMembersTable } from "@/features/team/components/TeamMembersTable";
 import { getTeamMembers } from "@/features/team/data/teamMembers";
 
 export default function TeamPage() {
-  return <Suspense fallback={<LoadingState label="Loading team" />}><TeamContent /></Suspense>;
+  return <Suspense fallback={<LoadingState label="Loading User Access Management" />}><TeamContent /></Suspense>;
 }
 
 async function TeamContent() {
@@ -18,5 +18,5 @@ async function TeamContent() {
   const access = await getCurrentPinsHubAccess();
   if (access.access?.access_level !== "admin" || !access.membership?.organisation_id) notFound();
   const members = await getTeamMembers(access.membership.organisation_id);
-  return <AppShell><PageHeader title="Team" /><InviteMemberForm /><TeamMembersTable members={members} /></AppShell>;
+  return <AppShell><PageHeader title="User Access Management" /><InviteMemberForm /><TeamMembersTable members={members} currentUserId={access.user?.id} /></AppShell>;
 }

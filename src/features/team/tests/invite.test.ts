@@ -23,8 +23,10 @@ test("uses the local fallback only in development", () => {
 
 test("normalizes valid invite fields and rejects invalid email or enums", () => {
   assert.deepEqual(validateInviteInput(input({ email: "  MEMBER@EXAMPLE.COM ", full_name: "  Ada   Lovelace ", organisation_role: "admin", access_level: "admin" })), {
-    email: "member@example.com", fullName: "Ada Lovelace", role: "admin", accessLevel: "admin",
+    email: "member@example.com", fullName: "Ada Lovelace", role: "admin", accessLevel: "admin", mondayMemberId: null,
   });
+  assert.equal(validateInviteInput(input({ email: "a@example.com", full_name: "Ada", organisation_role: "owner", access_level: "admin" })), null);
+  assert.equal(validateInviteInput(input({ email: "a@example.com", full_name: "Ada", organisation_role: "admin", access_level: "admin", monday_member_id: "29869326" }))?.mondayMemberId, "29869326");
   assert.equal(validateInviteInput(input({ email: "not-email", full_name: "Ada", organisation_role: "admin", access_level: "admin" })), null);
   assert.equal(validateInviteInput(input({ email: "a@example.com", full_name: "Ada", organisation_role: "invalid", access_level: "admin" })), null);
   assert.equal(validateInviteInput(input({ email: "a@example.com", full_name: "Ada", organisation_role: "admin", access_level: "invalid" })), null);
@@ -65,7 +67,7 @@ test("new invites provision profile, membership, and Pins Hub access without wai
   assert.deepEqual(await provisionPinsHubAccess(client as never, provisionInput), { ok: true });
   assert.deepEqual(writes, [
     { table: "profiles", values: { id: "user-1", email: "member@example.com", full_name: "Member Name" } },
-    { table: "organisation_members", values: { organisation_id: "org-1", user_id: "user-1", role: "admin" } },
+    { table: "organisation_members", values: { organisation_id: "org-1", user_id: "user-1", role: "admin", is_active: true } },
     { table: "app_access", values: { organisation_member_id: "membership-1", app_key: "pins_hub", access_level: "admin" } },
   ]);
 });
