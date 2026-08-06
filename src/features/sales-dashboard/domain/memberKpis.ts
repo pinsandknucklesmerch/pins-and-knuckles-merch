@@ -7,6 +7,7 @@ export type MemberKpiMetric = {
   label: string;
   value: number | null;
   format: MemberKpiFormat;
+  target: number | null;
 };
 
 export type MemberKpiSnapshot = {
@@ -58,7 +59,8 @@ export function getMemberKpiSnapshot(rows: TeamMemberKpiMonth[], memberKey: stri
 }
 
 export function getMemberKpiMetrics(snapshot: MemberKpiSnapshot): MemberKpiMetric[] {
-  return MEMBER_KPI_METRICS.map((metric) => ({ ...metric, value: snapshot[metric.key] }));
+  // Dashboard targets are organisation-wide. Member-specific targets do not exist in the data model.
+  return MEMBER_KPI_METRICS.map((metric) => ({ ...metric, value: snapshot[metric.key], target: null }));
 }
 
 export function getMemberKpiHistory(rows: TeamMemberKpiMonth[], memberKey: string, year: number, month: number): TeamMemberKpiMonth[] {

@@ -11,9 +11,17 @@ function MemberMetricValue({ metric }: { metric: MemberKpiMetric }) {
 
 export function MemberKpiCards({ rows, memberKey, year, month }: { rows: TeamMemberKpiMonth[]; memberKey: string; year: number; month: number }) {
   const snapshot = getMemberKpiSnapshot(rows, memberKey, year, month);
-  return <div data-testid="member-kpi-cards" className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-4">
-    {getMemberKpiMetrics(snapshot).map((metric) => <KpiCard key={metric.key} title={metric.label} value={metric.value} format={metric.format === "currency" ? { style: "currency", currency: "GBP", compact: false, precision: 0 } : metric.format === "percent" ? { style: "percent", precision: 1 } : { style: "number", compact: false, precision: 0 }} nullDisplay="dash" animate className="min-w-0" />)}
+  return <div data-testid="member-kpi-cards" className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
+    {getMemberKpiMetrics(snapshot).map((metric) => <KpiCard key={metric.key} data-testid="member-kpi-metric" title={metric.label} value={metric.value} format={metric.format === "currency" ? { style: "currency", currency: "GBP", compact: false, precision: 0 } : metric.format === "percent" ? { style: "percent", precision: 1 } : { style: "number", compact: false, precision: 0 }} nullDisplay="dash" animate className="min-w-0" />)}
   </div>;
+}
+
+export function MemberSummaryCard({ rows, memberKey, year, month }: { rows: TeamMemberKpiMonth[]; memberKey: string; year: number; month: number }) {
+  const snapshot = getMemberKpiSnapshot(rows, memberKey, year, month);
+  return <section data-testid="member-summary-card" data-period={`${year}-${month}`} className="grid w-full gap-3 border-b border-border pb-5 text-left last:border-b-0 last:pb-0">
+    <h2 className="font-medium text-foreground">{snapshot.memberName}</h2>
+    <MemberKpiCards rows={rows} memberKey={memberKey} year={year} month={month} />
+  </section>;
 }
 
 export function MemberKpiHistoryTable({ rows, memberKey, year, month }: { rows: TeamMemberKpiMonth[]; memberKey: string; year: number; month: number }) {
