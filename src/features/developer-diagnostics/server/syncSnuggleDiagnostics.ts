@@ -3,6 +3,7 @@ import type { SnuggleWarning } from "@/features/sales-dashboard/server/snugglePr
 import type { DeveloperDiagnosticIssue, DiagnosticIssueType } from "../types";
 
 type DetectedIssue = Pick<DeveloperDiagnosticIssue, "source" | "issue_key" | "issue_type" | "reporting_year" | "reporting_month" | "affected_item_id" | "affected_member_key" | "summary">;
+type ExistingIssue = Pick<DeveloperDiagnosticIssue, "id" | "issue_key" | "occurrence_count" | "status" | "developer_notes" | "first_detected_at" | "resolved_at" | "resolved_by" | "no_longer_detected_at">;
 const typeFor = (warning: SnuggleWarning): DiagnosticIssueType => warning.kind === "invalid-profit" ? "invalid_formula_value" : warning.kind === "multi-assignee" ? "multi_assignee" : warning.kind;
 
 export function buildSnuggleDetectedIssues(warnings: SnuggleWarning[]): DetectedIssue[] {
@@ -21,18 +22,28 @@ export function buildSnuggleDetectedIssues(warnings: SnuggleWarning[]): Detected
   return detected;
 }
 
+export function buildSnuggleSyncPayload(organisationId: string, detected: DetectedIssue[], existing: ExistingIssue[], now: string) {
+  const known = new Map(existing.map((row) => [row.issue_key, row]));
+  const upserts = detected.map((issue) => {
+    const row = known.get(issue.issue_key);
+    return {
+      ...(row ? { id: row.id } : {}), organisation_id: organisationId, ...issue,
+      occurrence_count: (row?.occurrence_count ?? 0) + 1, status: (row?.status ?? "open") as ExistingIssue["status"],
+      developer_notes: row?.developer_notes ?? null, first_detected_at: row?.first_detected_at ?? now,
+      last_detected_at: now, no_longer_detected_at: null, resolved_at: row?.resolved_at ?? null, resolved_by: row?.resolved_by ?? null,
+    };
+  });
+  const detectedKeys = new Set(detected.map((issue) => issue.issue_key));
+  const staleIds = existing.filter((row) => !detectedKeys.has(row.issue_key) && !row.no_longer_detected_at).map((row) => row.id);
+  return { upserts, staleIds };
+}
+
 export async function syncSnuggleDiagnosticIssues(organisationId: string, warnings: SnuggleWarning[]) {
   const admin = createAdminClient(); const detected = buildSnuggleDetectedIssues(warnings); const now = new Date().toISOString();
-  const { data: existing, error } = await admin.from("developer_diagnostic_issues").select("id,issue_key,occurrence_count,no_longer_detected_at").eq("organisation_id", organisationId).eq("source", "snuggle");
+  const { data: existing, error } = await admin.from("developer_diagnostic_issues").select("id,issue_key,occurrence_count,status,developer_notes,first_detected_at,resolved_at,resolved_by,no_longer_detected_at").eq("organisation_id", organisationId).eq("source", "snuggle");
   if (error) return { error: "Diagnostics are unavailable." };
-  const known = new Map((existing ?? []).map((row) => [row.issue_key, row]));
-  for (const issue of detected) {
-    const row = known.get(issue.issue_key);
-    if (row) await admin.from("developer_diagnostic_issues").update({ ...issue, occurrence_count: row.occurrence_count + 1, last_detected_at: now, no_longer_detected_at: null }).eq("id", row.id);
-    else await admin.from("developer_diagnostic_issues").insert({ organisation_id: organisationId, ...issue, occurrence_count: 1, status: "open", first_detected_at: now, last_detected_at: now });
-  }
-  const detectedKeys = new Set(detected.map((issue) => issue.issue_key));
-  const staleIds = (existing ?? []).filter((row) => !detectedKeys.has(row.issue_key) && !row.no_longer_detected_at).map((row) => row.id);
+  const { upserts, staleIds } = buildSnuggleSyncPayload(organisationId, detected, (existing ?? []) as unknown as ExistingIssue[], now);
+  if (upserts.length) await admin.from("developer_diagnostic_issues").upsert(upserts, { onConflict: "organisation_id,issue_key" });
   if (staleIds.length) await admin.from("developer_diagnostic_issues").update({ no_longer_detected_at: now }).in("id", staleIds);
   return { error: null };
 }
