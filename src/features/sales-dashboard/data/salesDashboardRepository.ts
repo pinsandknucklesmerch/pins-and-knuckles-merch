@@ -25,19 +25,22 @@ export async function loadSalesDashboard(
 ): Promise<SalesDashboardData> {
   const supabase = await createClient();
   const scope = organisationFilter(organisationId);
+  const companyPromise = supabase.from("sales_kpi_months").select(COMPANY_COLUMNS).or(scope).in("year", [year, year - 1]).eq("month", month).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
   const memberPromise = supabase.from("sales_kpi_member_months").select(MEMBER_COLUMNS).or(scope).in("year", [year, year - 1]).lte("month", month).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
-  const trendPromise = supabase.from("sales_kpi_months").select(COMPANY_COLUMNS).or(scope).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
+  const trendPromise = supabase.from("sales_kpi_months").select(COMPANY_COLUMNS).or(scope).in("year", [year, year - 1]).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
   const targetPromise = supabase.from("sales_kpi_targets").select(TARGET_COLUMNS).or(scope).eq("is_active", true).lte("effective_from", `${year}-12-31`).or(`effective_to.is.null,effective_to.gte.${year}-01-01`).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
   const finalPromise = supabase.from("sales_kpi_month_final_values").select(FINAL_COLUMNS).or(scope).in("year", [year, year - 1]).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
   const snugglePromise = getSnuggleProfit();
-  const [memberResult, trendResult, targetResult, finalResult] = await Promise.all([
+  const [companyResult, memberResult, trendResult, targetResult, yearResult, finalResult] = await Promise.all([
+    companyPromise,
     memberPromise,
     trendPromise,
     targetPromise,
+    supabase.from("sales_kpi_months").select("year").or(scope).limit(1000).abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS)),
     finalPromise,
   ]);
-  const errors = [memberResult.error, trendResult.error, targetResult.error, finalResult.error].filter(Boolean);
-  const companyRows = trendResult.data ?? [];
+  const errors = [companyResult.error, memberResult.error, trendResult.error, targetResult.error, yearResult.error, finalResult.error].filter(Boolean);
+  const companyRows = companyResult.data ?? [];
   const memberRows = memberResult.data ?? [];
   const trendRows = trendResult.data ?? [];
   const chooseCompany = (selectedYear: number) => companyRows.find((row) => row.year === selectedYear && row.organisation_id === organisationId) ?? companyRows.find((row) => row.year === selectedYear && row.organisation_id === null) ?? null;
@@ -62,7 +65,7 @@ export async function loadSalesDashboard(
     return row ? mapCompanyRow(row) : null;
   });
   const fixtureYears = historicalSalesDashboardFixture.years.map((row) => row.year);
-  const databaseYears = trendRows.map((row) => row.year);
+  const databaseYears = (yearResult.data ?? []).map((row) => row.year);
   const company = chooseCompany(year);
   const previousCompany = chooseCompany(year - 1);
   const targetRows = targetResult.data ?? [];

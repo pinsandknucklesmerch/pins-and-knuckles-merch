@@ -38,6 +38,22 @@ test("Sales Dashboard no longer carries the redundant Company/Team Member select
   assert.doesNotMatch(repository, /getSalesDashboardQueryPlan|DashboardView/);
 });
 
+test("dashboard headline values come from the explicitly selected month", () => {
+  const repository = readFileSync(new URL("../data/salesDashboardRepository.ts", import.meta.url), "utf8");
+
+  assert.match(repository, /const companyPromise = [^\n]+\.in\("year", \[year, year - 1\]\)\.eq\("month", month\)/);
+  assert.match(repository, /const companyRows = companyResult\.data \?\? \[\]/);
+  assert.doesNotMatch(repository, /const companyRows = trendResult\.data/);
+});
+
+test("dashboard trend and available-year reads retain separate query bounds", () => {
+  const repository = readFileSync(new URL("../data/salesDashboardRepository.ts", import.meta.url), "utf8");
+
+  assert.match(repository, /const trendPromise = [^\n]+\.in\("year", \[year, year - 1\]\)/);
+  assert.match(repository, /\.select\("year"\)\.or\(scope\)\.limit\(1000\)/);
+  assert.match(repository, /const databaseYears = \(yearResult\.data \?\? \[\]\)\.map/);
+});
+
 test("company dashboard keeps monthly content separate from year to date", () => {
   const dashboard = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
   const company = readFileSync(new URL("../components/CompanyKpiView.tsx", import.meta.url), "utf8");
