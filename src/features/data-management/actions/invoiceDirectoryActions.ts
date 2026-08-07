@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { resolveCanonicalInvoiceOrganisation } from "@/features/commercial-invoices/data/invoiceDirectoryQueries";
-import { resolvePinsHubAccess } from "@/lib/access/pinsHubAccess";
-import { canManagePinsHub, hasPinsHubAccessLevel } from "@/lib/access/pinsHubRoles";
+import { effectivePinsHubAccessLevel, resolvePinsHubAccess } from "@/lib/access/pinsHubAccess";
+import { hasPinsHubAccessLevel } from "@/lib/access/pinsHubRoles";
 import { createClient } from "@/lib/supabase/server";
 import type { DataManagementActionState } from "../types";
 import { validateInvoiceCompany, type InvoiceCompanyFormValues } from "../lib/invoiceDirectoryValidation";
@@ -27,12 +27,12 @@ async function context() {
   const supabase = await createClient();
   const access = await resolvePinsHubAccess(supabase);
   const organisationId = await resolveCanonicalInvoiceOrganisation(supabase);
-  const accessLevel = access.membership?.organisation_id === organisationId ? access.access?.access_level ?? null : null;
+  const accessLevel = access.membership?.organisation_id === organisationId ? effectivePinsHubAccessLevel(access) : null;
   return { supabase, accessLevel, organisationId };
 }
 
 function canWrite(accessLevel: string | null) { return hasPinsHubAccessLevel(accessLevel, "write"); }
-function canAdmin(accessLevel: string | null) { return canManagePinsHub(accessLevel); }
+function canAdmin(accessLevel: string | null) { return hasPinsHubAccessLevel(accessLevel, "admin"); }
 
 function companyValues(formData: FormData): InvoiceCompanyFormValues {
   return {

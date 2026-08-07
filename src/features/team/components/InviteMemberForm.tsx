@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, type FormEvent } from "react";
 import { inviteMember } from "../actions/inviteMember";
 import { initialInviteActionState } from "../types";
 import { Select } from "@/components/ui/Select";
+import { Input } from "@/components/ui/Input";
 import { feedback, isInlineValidation } from "@/components/ui/feedback";
 import { mondayIdentities } from "@/features/sales-dashboard/domain/memberIdentity";
 import { pinsHubAccessLabels, pinsHubAccessLevels } from "@/lib/access/pinsHubRoles";
@@ -41,11 +42,11 @@ export function InviteMemberForm() {
     <form ref={formRef} action={formAction} onSubmit={handleSubmit} onChange={unlockForChangedInvite} className="grid gap-3 rounded-lg border border-border bg-card/70 p-4 sm:grid-cols-2 lg:grid-cols-6">
       <label className="grid gap-1 text-sm">
         <span>Full name</span>
-        <input required name="full_name" maxLength={200} className="h-9 rounded-md bg-background px-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-primary" />
+        <Input required name="full_name" maxLength={200} />
       </label>
       <label className="grid gap-1 text-sm">
         <span>Email</span>
-        <input required type="email" name="email" maxLength={320} className="h-9 rounded-md bg-background px-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-primary" />
+        <Input required type="email" name="email" maxLength={320} />
       </label>
       <label className="grid gap-1 text-sm">
         <span>Organisation role</span>

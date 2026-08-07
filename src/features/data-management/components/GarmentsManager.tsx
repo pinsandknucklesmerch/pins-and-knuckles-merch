@@ -1,11 +1,12 @@
 "use client";
 
 import { ArrowDown, ArrowDownUp, ArrowUp } from "lucide-react";
-import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { useActionState, useEffect, useMemo, useState } from "react";
 import { deactivateGarment, saveGarment } from "../actions";
 import { formatGarmentCurrency, garmentAriaSort, nextGarmentSort, sortGarments, type GarmentSortKey, type SortDirection } from "../lib/garments";
 import { initialDataManagementActionState, type AccessLevel, type GarmentRecord, type ProductTypeRecord } from "../types";
 import { Select } from "@/components/ui/Select";
+import { Dialog } from "@/components/ui/Dialog";
 import { Surface } from "@/components/ui/Surface";
 import { feedback, isInlineValidation } from "@/components/ui/feedback";
 import { canManagePinsHub, hasPinsHubAccessLevel } from "@/lib/access/pinsHubRoles";
@@ -39,7 +40,7 @@ function GarmentForm({ record, productTypes, accessLevel, onClose }: { record: G
     if (saveState.ok) feedback.success(record ? "Garment updated" : "Garment added");
     else if (!isInlineValidation(saveState.message)) feedback.error(saveState.message);
   }, [record, saveState]);
-  return <Surface className="bg-card/80"><form action={saveAction} className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4"><input name="id" value={record?.id ?? ""} readOnly hidden />
+  return <Surface className="min-w-0 bg-card/80"><form action={saveAction} className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4"><input name="id" value={record?.id ?? ""} readOnly hidden />
     <Field label="Code" name="code" required defaultValue={record?.code ?? ""} /><Field label="Alt Code" name="alt_code" defaultValue={record?.altCode ?? ""} /><Field label="Brand" name="brand_name" defaultValue={record?.brand ?? ""} /><Field label="Name" name="name" required defaultValue={record?.name ?? ""} /><Field label="Colour" name="colour" defaultValue={record?.colour ?? ""} /><label className="grid min-w-0 gap-1 text-sm"><span>Product Type</span><Select required name="product_type_id" defaultValue={record?.productTypeId ?? undefined} placeholder="Select Product Type">{activeTypes.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select></label><Field label="Tags" name="tags" defaultValue={record?.tags ?? ""} /><NumberField label="EUR Price" name="eur_base_price" value={record?.eurBasePrice} prefix="€" /><NumberField label="GBP Price" name="gbp_price" value={record?.gbpPrice} prefix="£" /><NumberField label="Extra Size Cost" name="extra_size_cost" value={record?.extraSizeCost} />
     {saveState.message && !saveState.ok && isInlineValidation(saveState.message) ? <p role="alert" className="text-sm text-destructive sm:col-span-2 xl:col-span-4">{saveState.message}</p> : null}<div className="flex flex-wrap gap-2 sm:col-span-2 xl:col-span-4"><button disabled={pending} className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-50">{pending ? "Saving…" : "Save Garment"}</button><button type="button" onClick={onClose} className="h-9 rounded-md border border-input px-3 text-sm hover:bg-accent">Close</button>{record && canManagePinsHub(accessLevel) ? <DeactivateGarment id={record.id} /> : null}</div></form></Surface>;
 }
@@ -50,10 +51,6 @@ function NumberField({ label, name, value, prefix }: { label: string; name: stri
 function DeactivateGarment({ id }: { id: string }) {
   const [open, setOpen] = useState(false);
   const [state, action, pending] = useActionState(deactivateGarment, initialDataManagementActionState);
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const close = () => dialogRef.current?.close();
-  useEffect(() => { if (open) dialogRef.current?.showModal(); }, [open]);
-  useEffect(() => { if (!state.message) return; if (state.ok) { feedback.success("Garment deactivated"); close(); } else feedback.error(state.message); }, [state]);
-  return <><button ref={triggerRef} type="button" onClick={() => setOpen(true)} className="h-9 rounded-md border border-destructive/60 px-3 text-sm text-destructive hover:bg-destructive/10">Deactivate</button>{open ? <dialog ref={dialogRef} onClose={() => { setOpen(false); triggerRef.current?.focus(); }} aria-labelledby="deactivate-garment-title" className="w-full max-w-md rounded-lg border border-border bg-card p-0 text-foreground shadow-lg backdrop:bg-black/65"><form action={action} className="grid gap-4 p-4"><input hidden name="id" value={id} readOnly /><div className="grid gap-2"><h2 id="deactivate-garment-title" className="text-base font-semibold">Deactivate garment</h2><p className="text-sm text-muted-foreground">This garment will no longer appear in calculators or the active garment list.</p></div><div className="flex justify-end gap-2"><button type="button" onClick={close} className="h-9 rounded-md border border-input px-3 text-sm hover:bg-accent">Cancel</button><button type="submit" disabled={pending} className="h-9 rounded-md bg-destructive px-3 text-sm font-medium text-destructive-foreground disabled:opacity-50">{pending ? "Deactivating…" : "Deactivate garment"}</button></div></form></dialog> : null}</>;
+  useEffect(() => { if (!state.message) return; if (state.ok) { feedback.success("Garment deactivated"); setOpen(false); } else feedback.error(state.message); }, [state]);
+  return <><button type="button" onClick={() => setOpen(true)} className="h-9 rounded-md border border-destructive/60 px-3 text-sm text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Deactivate</button><Dialog open={open} onClose={() => setOpen(false)} title="Deactivate garment" description="This garment will no longer appear in calculators or the active garment list." className="max-w-md"><form action={action} className="grid gap-4"><input hidden name="id" value={id} readOnly /><div className="flex justify-end gap-2"><button type="button" onClick={() => setOpen(false)} className="h-9 rounded-md border border-input px-3 text-sm hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Cancel</button><button type="submit" disabled={pending} className="h-9 rounded-md bg-destructive px-3 text-sm font-medium text-destructive-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{pending ? "Deactivating…" : "Deactivate garment"}</button></div></form></Dialog></>;
 }

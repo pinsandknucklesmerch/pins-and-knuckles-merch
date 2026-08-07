@@ -15,7 +15,7 @@ export type ActionButtonProps =
     })
   | (ActionButtonBaseProps & {
       href: string;
-      disabled?: false;
+      disabled?: boolean;
       onClick?: never;
       type?: never;
     });
@@ -35,7 +35,13 @@ export function ActionButton({
 
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link
+        href={href}
+        aria-disabled={disabled || undefined}
+        tabIndex={disabled ? -1 : undefined}
+        className={cn(classes, disabled && "pointer-events-none cursor-not-allowed opacity-50")}
+        onClick={disabled ? (event) => event.preventDefault() : undefined}
+      >
         {children}
       </Link>
     );

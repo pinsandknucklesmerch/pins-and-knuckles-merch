@@ -25,7 +25,7 @@ export function ProfileDetailsForm({ profile }: { profile: ProfileDetails }) {
   }
 
   return <div className="grid gap-4">
-    <form className="grid gap-3 sm:grid-cols-2" onSubmit={saveDisplayName}>
+    <form className="grid min-w-0 gap-3 sm:grid-cols-2" onSubmit={saveDisplayName}>
       <FormField label="Display name" error={displayNameError} id="display-name"><input name="display-name" value={displayName} onChange={(event) => setDisplayName(event.target.value)} maxLength={120} autoComplete="name" className="hub-native-control" /></FormField>
       <div className="grid content-end"><ActionButton type="submit" disabled={saving}>{saving ? "Saving" : "Save name"}</ActionButton></div>
     </form>

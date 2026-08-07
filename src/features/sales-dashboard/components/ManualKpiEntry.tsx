@@ -1,11 +1,11 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import { saveSalesKpiTargets } from "../actions";
 import type { TargetActionState } from "../lib/targetSave";
 import type { SalesKpiTargets, SalesMetricCode } from "../domain/types";
 import { feedback, isInlineValidation } from "@/components/ui/feedback";
+import { Dialog } from "@/components/ui/Dialog";
 
 const initialState: TargetActionState = { ok: false, message: "" };
 const inputClass = "hub-native-control";
@@ -35,14 +35,8 @@ function ManualKpiForm({ year, month, targets, onClose }: { year: number; month:
   const effectiveMonth = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(year, month - 1, 1)));
   useEffect(() => { if (!state.message) return; if (state.ok) feedback.success("Targets updated"); else if (!isInlineValidation(state.message)) feedback.error(state.message); }, [state]);
 
-  return createPortal(
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/65 p-4" role="dialog" aria-modal="true" aria-labelledby="edit-targets-title">
-          <form action={formAction} className="grid w-full max-w-2xl gap-4 rounded-lg border border-border bg-card p-4 shadow-lg">
-            <div className="flex items-center justify-between gap-3">
-              <h2 id="edit-targets-title" className="text-base font-semibold text-foreground">Edit Targets</h2>
-              <button type="button" onClick={onClose} className="h-8 rounded-md border border-input px-2 text-sm text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Close</button>
-            </div>
-            <p className="text-sm text-muted-foreground">Changes apply from {effectiveMonth} onward.</p>
+  return <Dialog open onClose={onClose} title="Edit Targets" description={`Changes apply from ${effectiveMonth} onward.`} className="max-w-2xl">
+          <form action={formAction} className="grid max-h-[calc(100dvh-10rem)] gap-4 overflow-y-auto">
             <div className="grid gap-3 sm:grid-cols-2">
               {configuredFields.map((field) => (
                 <label key={field.code} className="grid gap-1 text-xs font-medium text-muted-foreground">
@@ -57,6 +51,5 @@ function ManualKpiForm({ year, month, targets, onClose }: { year: number; month:
             {state.message && !state.ok && isInlineValidation(state.message) ? <p role="alert" className="text-sm text-destructive">{state.message}</p> : null}
             <button disabled={pending} className="h-9 justify-self-start rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-50" type="submit">{pending ? "Saving…" : "Save Targets"}</button>
           </form>
-        </div>
-      , document.body);
+        </Dialog>;
 }

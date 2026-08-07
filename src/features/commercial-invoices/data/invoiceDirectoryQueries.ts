@@ -40,7 +40,7 @@ export async function loadActiveInvoiceCompanies(
 ): Promise<InvoiceCompany[]> {
   const response = await supabase
     .from("invoice_companies")
-    .select("*")
+    .select("id,organisation_id,label,company_name,contact_name,country,eori,vat_number,tax_id,telephone,email,address_line_1,address_line_2,city,region,postal_code,notes,is_active")
     .eq("organisation_id", organisationId)
     .eq("is_active", true)
     .order("label", { ascending: true })
@@ -57,7 +57,7 @@ export async function loadActiveProductTypes(
   void organisationId;
   const response = await supabase
     .from("product_types")
-    .select("*")
+    .select("id,name,pricing_category,commodity_code,country_of_origin,invoice_description,default_invoice_cost,invoice_currency_code,is_active")
     .eq("is_active", true)
     .order("name", { ascending: true })
     .order("id", { ascending: true })

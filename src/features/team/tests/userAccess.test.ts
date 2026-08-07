@@ -16,6 +16,13 @@ test("Last Active prefers tracked Pins Hub activity, then auth sign-in, then a d
   assert.equal(resolveLastActive(null, null), null);
 });
 
+test("UAM resolves Auth metadata with one bounded list request", async () => {
+  const source = await readFile(new URL("../data/teamMembers.ts", import.meta.url), "utf8");
+  assert.match(source, /admin\.auth\.admin\.listUsers\(\{ page: 1, perPage: 1000 \}\)/);
+  assert.doesNotMatch(source, /getUserById/);
+  assert.match(source, /authUsers\.get\(member\.user_id\)/);
+});
+
 test("Monday selector is sourced from every canonical known identity and supports an unlinked state", () => {
   assert.equal(mondayIdentities().length, 6);
   assert.ok(mondayIdentities().every((person) => person.id && person.displayName));
@@ -56,7 +63,7 @@ test("handles each successful edit result once and creates a clean dialog for th
 test("editing Catherine then Johan remounts the form with the selected member values", async () => {
   const dialog = await readFile(dialogPath, "utf8");
   assert.match(dialog, /defaultValue=\{member\.fullName \?\? ""\}/);
-  assert.match(dialog, /defaultValue=\{protectedUser \? "owner" : member\.role\.toLowerCase\(\)\}/);
+  assert.match(dialog, /defaultValue=\{member\.role\.toLowerCase\(\)\}/);
   assert.match(dialog, /defaultValue=\{member\.mondayMemberId \?\? "none"\}/);
 });
 

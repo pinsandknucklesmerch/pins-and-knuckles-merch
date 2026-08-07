@@ -41,11 +41,11 @@ test("empty FormData is rejected before any Auth or provisioning work", async ()
   assert.equal(validateInviteInput(new FormData()), null);
 });
 
-test("only organisation owners receive the invite form, without an empty invite surface for other roles", async () => {
+test("only organisation owners receive the Add User link, without an empty invite surface for other roles", async () => {
   const page = await readFile(pagePath, "utf8");
-  assert.match(page, /isOrganisationOwner\(access\.membership\.role\) \? <InviteMemberForm \/> : null/);
-  assert.equal((page.match(/InviteMemberForm/g) ?? []).length, 3);
-  assert.doesNotMatch(page, /<InviteMemberForm \/>\s*<\/div>/);
+  assert.match(page, /canManageOrganisationUsers\(access\.access\?\.access_level, access\.membership\.role\) \? <Link href="\/hub\/team\/add"/);
+  assert.equal((page.match(/InviteMemberForm/g) ?? []).length, 0);
+  assert.doesNotMatch(page, /<InviteMemberForm \/>/);
 });
 
 test("invite action requires the owner role even when the caller has Pins Hub admin access", async () => {

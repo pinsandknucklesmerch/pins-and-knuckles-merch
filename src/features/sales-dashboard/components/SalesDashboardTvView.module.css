@@ -1,6 +1,7 @@
 .tvRoot {
   display: grid;
   min-height: calc(100vh - 2rem);
+  min-height: calc(100dvh - 2rem);
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 1rem;
 }
@@ -138,6 +139,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .toolbar {
@@ -182,6 +184,7 @@
 .buttonGroup {
   display: flex;
   gap: 0.375rem;
+  flex-wrap: wrap;
 }
 
 .controlButton {
@@ -249,7 +252,7 @@
 }
 
 @media (max-width: 639px) {
-  .tvRoot { min-height: calc(100vh - 1.5rem); }
+  .tvRoot { min-height: calc(100vh - 1.5rem); min-height: calc(100dvh - 1.5rem); }
   .tvHeader { align-items: flex-start; }
   .brand { width: 6.5rem; }
   .controls { align-items: flex-start; flex-direction: column; }

@@ -55,7 +55,7 @@ test("central mapping uses Monday IDs first and EPCC name variants without expos
   assert.equal(mapEpccMember("bUx").key, "bux");
   assert.equal(mapEpccMember("Shannon Wellby").classification, "admin_hidden");
   assert.equal(mapMondayMember({ name: "Johan" }).classification, "admin_hidden");
-  assert.deepEqual(mapEpccMember("Seth"), { key: "other_non_dashboard", displayName: "Other / reconciliation", classification: "other_non_dashboard" });
+  assert.deepEqual(mapEpccMember("Seth"), { key: "other_non_dashboard", id: "102110325", displayName: "Other / reconciliation", classification: "other_non_dashboard" });
 });
 
 test("July Monday member fixture produces the audited named totals and keeps other people reconcilable", () => {

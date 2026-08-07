@@ -3,9 +3,14 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
-import { gsap } from "gsap";
-
 import styles from "./MagicBento.module.css";
+
+type GsapTween = { kill: () => void };
+type GsapApi = {
+  killTweensOf: (target: unknown) => void;
+  to: (target: unknown, vars: Record<string, unknown>) => GsapTween;
+  fromTo: (target: unknown, fromVars: Record<string, unknown>, toVars: Record<string, unknown>) => GsapTween;
+};
 
 export type MagicBentoItem = {
   id: string;
@@ -86,20 +91,41 @@ export default function MagicBento({
     if (!grid || !section) return;
 
     const cards = Array.from(grid.querySelectorAll<HTMLElement>("[data-magic-bento-card]"));
+    const requiresGsap = enableStars || enableSpotlight || enableTilt || enableMagnetism || clickEffect;
+    let gsapApi: GsapApi | null = null;
+    let active = true;
     const timeouts: ReturnType<typeof setTimeout>[] = [];
     const dynamicNodes = new Set<HTMLElement>();
-    const tweens: gsap.core.Tween[] = [];
+    const tweens: GsapTween[] = [];
     const enterHandlers = new Map<HTMLElement, () => void>();
     const leaveHandlers = new Map<HTMLElement, () => void>();
     let spotlight: HTMLDivElement | null = null;
 
+    const createSpotlight = () => {
+      if (!gsapApi || !active || !enableSpotlight || shouldDisableAnimations || spotlight) return;
+      spotlight = document.createElement("div");
+      spotlight.className = styles.spotlight;
+      spotlight.dataset.magicBentoDynamic = "true";
+      spotlight.style.setProperty("--glow-color", glowColor);
+      document.body.appendChild(spotlight);
+      dynamicNodes.add(spotlight);
+    };
+
+    if (requiresGsap) {
+      void import("gsap").then(({ gsap }) => {
+        if (!active) return;
+        gsapApi = gsap as unknown as GsapApi;
+        createSpotlight();
+      });
+    }
+
     const killTween = (target: HTMLElement) => {
-      gsap.killTweensOf(target);
+      gsapApi?.killTweensOf(target);
     };
 
     const clearParticles = (card: HTMLElement) => {
       card.querySelectorAll<HTMLElement>(`.${styles.particle}`).forEach((particle) => {
-        gsap.killTweensOf(particle);
+        gsapApi?.killTweensOf(particle);
         dynamicNodes.delete(particle);
         particle.remove();
       });
@@ -118,8 +144,8 @@ export default function MagicBento({
           particle.style.top = `${Math.random() * rect.height}px`;
           card.appendChild(particle);
           dynamicNodes.add(particle);
-          gsap.fromTo(particle, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(1.7)" });
-          gsap.to(particle, {
+          gsapApi?.fromTo(particle, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(1.7)" });
+          gsapApi?.to(particle, {
             x: (Math.random() - 0.5) * 100,
             y: (Math.random() - 0.5) * 100,
             rotation: Math.random() * 360,
@@ -128,7 +154,7 @@ export default function MagicBento({
             repeat: -1,
             yoyo: true,
           });
-          gsap.to(particle, { opacity: 0.3, duration: 1.5, ease: "power2.inOut", repeat: -1, yoyo: true });
+          gsapApi?.to(particle, { opacity: 0.3, duration: 1.5, ease: "power2.inOut", repeat: -1, yoyo: true });
         }, index * 100);
         timeouts.push(timeout);
       }
@@ -158,7 +184,7 @@ export default function MagicBento({
         if (enableTilt || enableMagnetism) {
           const x = event.clientX - cardRect.left - cardRect.width / 2;
           const y = event.clientY - cardRect.top - cardRect.height / 2;
-          tweens.push(gsap.to(card, {
+          const tween = gsapApi?.to(card, {
             rotateX: enableTilt ? (y / (cardRect.height / 2)) * -10 : 0,
             rotateY: enableTilt ? (x / (cardRect.width / 2)) * 10 : 0,
             x: enableMagnetism ? x * 0.05 : 0,
@@ -166,14 +192,15 @@ export default function MagicBento({
             duration: 0.1,
             ease: "power2.out",
             transformPerspective: 1000,
-          }));
+          });
+          if (tween) tweens.push(tween);
         }
       });
 
       if (spotlight && enableSpotlight) {
         spotlight.style.left = `${event.clientX}px`;
         spotlight.style.top = `${event.clientY}px`;
-        gsap.to(spotlight, { opacity: 0.8, duration: 0.2, ease: "power2.out" });
+        gsapApi?.to(spotlight, { opacity: 0.8, duration: 0.2, ease: "power2.out" });
       }
     };
 
@@ -182,9 +209,9 @@ export default function MagicBento({
         card.style.setProperty("--glow-intensity", "0");
         clearParticles(card);
         killTween(card);
-        gsap.to(card, { rotateX: 0, rotateY: 0, x: 0, y: 0, duration: 0.3, ease: "power2.out" });
+        gsapApi?.to(card, { rotateX: 0, rotateY: 0, x: 0, y: 0, duration: 0.3, ease: "power2.out" });
       });
-      if (spotlight) gsap.to(spotlight, { opacity: 0, duration: 0.3, ease: "power2.out" });
+      if (spotlight) gsapApi?.to(spotlight, { opacity: 0, duration: 0.3, ease: "power2.out" });
     };
 
     const handleClick = (event: MouseEvent) => {
@@ -206,7 +233,7 @@ export default function MagicBento({
       ripple.style.background = `radial-gradient(circle, rgba(${glowColor}, 0.4) 0%, rgba(${glowColor}, 0.2) 30%, transparent 70%)`;
       card.appendChild(ripple);
       dynamicNodes.add(ripple);
-      gsap.fromTo(ripple, { scale: 0, opacity: 1 }, { scale: 1, opacity: 0, duration: 0.8, ease: "power2.out", onComplete: () => { dynamicNodes.delete(ripple); ripple.remove(); } });
+      gsapApi?.fromTo(ripple, { scale: 0, opacity: 1 }, { scale: 1, opacity: 0, duration: 0.8, ease: "power2.out", onComplete: () => { dynamicNodes.delete(ripple); ripple.remove(); } });
     };
 
     cards.forEach((card) => {
@@ -222,16 +249,8 @@ export default function MagicBento({
     grid.addEventListener("mouseleave", handleMouseLeave);
     grid.addEventListener("click", handleClick);
 
-    if (enableSpotlight && !shouldDisableAnimations) {
-      spotlight = document.createElement("div");
-      spotlight.className = styles.spotlight;
-      spotlight.dataset.magicBentoDynamic = "true";
-      spotlight.style.setProperty("--glow-color", glowColor);
-      document.body.appendChild(spotlight);
-      dynamicNodes.add(spotlight);
-    }
-
     return () => {
+      active = false;
       timeouts.forEach(clearTimeout);
       grid.removeEventListener("mousemove", handleMouseMove);
       grid.removeEventListener("mouseleave", handleMouseLeave);
@@ -244,11 +263,11 @@ export default function MagicBento({
         clearParticles(card);
         killTween(card);
       });
-      gsap.killTweensOf(cards);
+      gsapApi?.killTweensOf(cards);
       dynamicNodes.forEach((node) => node.remove());
       clearDynamicNodes(grid);
       if (spotlight) {
-        gsap.killTweensOf(spotlight);
+        gsapApi?.killTweensOf(spotlight);
         spotlight.remove();
       }
       tweens.forEach((tween) => tween.kill());

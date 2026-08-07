@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ActionMenu } from "@/components/ui/ActionMenu";
+import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { feedback } from "@/components/ui/feedback";
 import { resendInvite } from "../actions/users";
@@ -34,7 +35,7 @@ export function TeamMembersTable({ members, currentUserId }: { members: TeamMemb
 
   return <>
     <div className="flex flex-col gap-2 rounded-lg border border-border bg-card/70 p-3 md:flex-row">
-      <input aria-label="Search users by name or email" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or email" className="h-9 min-w-0 flex-1 rounded-md bg-background px-2 text-sm outline-none focus:ring-2 focus:ring-primary" />
+      <Input aria-label="Search users by name or email" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or email" className="flex-1" />
       <Select aria-label="Filter by role" value={role} onValueChange={setRole}><option value="all">All roles</option>{[...new Set(members.map((member) => member.role))].map((value) => <option key={value} value={value}>{value}</option>)}</Select>
       <Select aria-label="Filter by status" value={status} onValueChange={setStatus}><option value="all">All statuses</option><option value="Active">Active</option><option value="Inactive">Inactive</option><option value="Pending">Pending</option></Select>
     </div>

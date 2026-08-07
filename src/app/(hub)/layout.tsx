@@ -1,7 +1,8 @@
-import "../../features/sales-dashboard/styles/metricui.generated.css";
 import { updateCurrentUserLastActive } from "@/lib/access/updateLastActive";
+import { getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
 
 export default async function HubLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  await updateCurrentUserLastActive();
+  const access = await getCurrentPinsHubAccess();
+  await updateCurrentUserLastActive(access);
   return children;
 }

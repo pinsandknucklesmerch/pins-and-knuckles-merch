@@ -4,8 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { CommercialInvoiceGenerator } from "@/features/commercial-invoices/components/CommercialInvoiceGenerator";
 import {
-  getActiveInvoiceCompanies,
-  getActiveProductTypes,
+  getInvoiceDirectory,
 } from "@/features/commercial-invoices/data/invoiceDirectoryRepository";
 
 export default function CommercialInvoicesPage() {
@@ -17,10 +16,7 @@ export default function CommercialInvoicesPage() {
 }
 
 async function CommercialInvoicesContent() {
-  const [companies, products] = await Promise.all([
-    getActiveInvoiceCompanies(),
-    getActiveProductTypes(),
-  ]);
+  const [companies, products] = await getInvoiceDirectory();
 
   return (
     <AppShell>

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { mapMondayMember } from "@/features/sales-dashboard/domain/memberIdentity";
 import { loadMemberPerformance, type MemberPerformanceData } from "@/features/sales-dashboard/data/memberPerformanceRepository";
+import type { ProfileIdentity } from "./profileDetails";
 
 export type ProfilePerformanceSubject = {
   displayName: string;
@@ -13,7 +14,7 @@ export type ProfilePerformanceSubject = {
   performance: MemberPerformanceData | null;
 };
 
-export async function getOwnProfilePerformance(access: PinsHubAccessResult): Promise<ProfilePerformanceSubject | null> {
+export async function getOwnProfilePerformance(access: PinsHubAccessResult, identity?: ProfileIdentity | null): Promise<ProfilePerformanceSubject | null> {
   if (!access.user || !access.membership || !access.access) return null;
   const supabase = await createClient();
   const { data: membership } = await supabase
@@ -23,15 +24,14 @@ export async function getOwnProfilePerformance(access: PinsHubAccessResult): Pro
     .eq("organisation_id", access.membership.organisation_id)
     .eq("user_id", access.user.id)
     .maybeSingle();
-  const profile = await supabase.from("profiles").select("full_name,email").eq("id", access.user.id).maybeSingle();
-  if (!membership || profile.error) return null;
-  const identity = membership.monday_member_id ? mapMondayMember({ id: membership.monday_member_id }) : null;
+  if (!membership || !identity) return null;
+  const mondayIdentity = membership.monday_member_id ? mapMondayMember({ id: membership.monday_member_id }) : null;
   return {
-    displayName: profile.data?.full_name?.trim() || "Unavailable",
-    email: profile.data?.email ?? access.user.email ?? "Unavailable",
+    displayName: identity.fullName?.trim() || "Unavailable",
+    email: identity.email ?? access.user.email ?? "Unavailable",
     role: membership.role,
-    mondayMemberName: identity?.displayName ?? null,
-    performance: identity ? await loadMemberPerformance(identity.key, access.membership.organisation_id) : null,
+    mondayMemberName: mondayIdentity?.displayName ?? null,
+    performance: mondayIdentity ? await loadMemberPerformance(mondayIdentity.key, access.membership.organisation_id) : null,
   };
 }
 

@@ -78,7 +78,7 @@ export async function loadCalculatorReferenceData(
 
   const profileResponse = await supabase
     .from("calculator_profiles")
-    .select("*")
+    .select("id,code,name,region,currency_code,vat_rate,min_quantity,max_quantity,max_colours,tier_strategy,copy_formatter_code,supports_delivery,supports_pk_markup,supports_embroidery,supports_screen_setup,is_active,is_deferred")
     .eq("code", profileCode)
     .eq("region", "EU")
     .eq("currency_code", "EUR")
@@ -95,7 +95,7 @@ export async function loadCalculatorReferenceData(
 
   const priceSetsResponse = await supabase
     .from("calculator_profile_price_sets")
-    .select("*")
+    .select("calculator_profile_id,price_kind,pricing_set_code,region,currency_code")
     .eq("calculator_profile_id", profile.id)
     .eq("region", "EU")
     .eq("currency_code", "EUR")
@@ -108,30 +108,25 @@ export async function loadCalculatorReferenceData(
   const embroideryPricingSetCode = getPricingSetCode(priceSets, "embroidery");
   const deliveryPricingSetCode = getPricingSetCode(priceSets, "delivery");
 
-  const garmentsResponse = await supabase
-    .from("garments")
-    .select("*")
-    .eq("is_active", true)
-    .order("code", { ascending: true })
-    .returns<GarmentRow[]>();
-
-  throwIfError(garmentsResponse.error, "Failed to load garments");
-
-  const markupsResponse = await supabase
-    .from("calculator_garment_markups")
-    .select("*")
-    .eq("calculator_profile_id", profile.id)
-    .eq("is_active", true)
-    .lte("valid_from", effectiveDate)
-    .or(validToFilter)
-    .returns<CalculatorGarmentMarkupRow[]>();
-
-  throwIfError(markupsResponse.error, "Failed to load garment markups");
-
-  const euPrintResponse = printPricingSetCode
-    ? await supabase
+  const [garmentsResponse, markupsResponse, euPrintResponse, euEmbroideryResponse, feesResponse, deliveryResponse] = await Promise.all([
+    supabase
+      .from("garments")
+      .select("id,code,alt_code,brand_name,name,colour,garment_type,eur_base_price,gbp_price,extra_size_cost,tags")
+      .eq("is_active", true)
+      .order("code", { ascending: true })
+      .returns<GarmentRow[]>(),
+    supabase
+      .from("calculator_garment_markups")
+      .select("calculator_profile_id,garment_type,markup_value")
+      .eq("calculator_profile_id", profile.id)
+      .eq("is_active", true)
+      .lte("valid_from", effectiveDate)
+      .or(validToFilter)
+      .returns<CalculatorGarmentMarkupRow[]>(),
+    printPricingSetCode
+      ? supabase
         .from("eu_print_price_tiers")
-        .select("*")
+        .select("pricing_set_code,colour_count,quantity_min,quantity_max,production_unit_price,customer_unit_price,currency_code")
         .eq("pricing_set_code", printPricingSetCode)
         .eq("region", "EU")
         .eq("currency_code", "EUR")
@@ -141,14 +136,11 @@ export async function loadCalculatorReferenceData(
         .order("colour_count", { ascending: true })
         .order("quantity_min", { ascending: true })
         .returns<EuPrintPriceTierRow[]>()
-    : { data: [], error: null };
-
-  throwIfError(euPrintResponse.error, "Failed to load EU print tiers");
-
-  const euEmbroideryResponse = embroideryPricingSetCode
-    ? await supabase
+      : { data: [], error: null },
+    embroideryPricingSetCode
+      ? supabase
         .from("eu_embroidery_pricing")
-        .select("*")
+        .select("pricing_set_code,size_code,label,production_unit_price,customer_unit_price,currency_code")
         .eq("pricing_set_code", embroideryPricingSetCode)
         .eq("region", "EU")
         .eq("currency_code", "EUR")
@@ -157,28 +149,19 @@ export async function loadCalculatorReferenceData(
         .or(validToFilter)
         .order("size_code", { ascending: true })
         .returns<EuEmbroideryPriceRow[]>()
-    : { data: [], error: null };
-
-  throwIfError(
-    euEmbroideryResponse.error,
-    "Failed to load EU embroidery pricing",
-  );
-
-  const feesResponse = await supabase
-    .from("calculator_fees")
-    .select("*")
-    .eq("calculator_profile_id", profile.id)
-    .eq("is_active", true)
-    .lte("valid_from", effectiveDate)
-    .or(validToFilter)
-    .returns<CalculatorFeeRow[]>();
-
-  throwIfError(feesResponse.error, "Failed to load calculator fees");
-
-  const deliveryResponse = deliveryPricingSetCode
-    ? await supabase
+      : { data: [], error: null },
+    supabase
+      .from("calculator_fees")
+      .select("calculator_profile_id,fee_code,fee_label,amount,currency_code,applies_per,cost_side")
+      .eq("calculator_profile_id", profile.id)
+      .eq("is_active", true)
+      .lte("valid_from", effectiveDate)
+      .or(validToFilter)
+      .returns<CalculatorFeeRow[]>(),
+    deliveryPricingSetCode
+      ? supabase
         .from("delivery_rates")
-        .select("*")
+        .select("pricing_set_code,country,currency_code,cost_per_box,delivery_time,vat_rate")
         .eq("pricing_set_code", deliveryPricingSetCode)
         .eq("region", "EU")
         .eq("currency_code", "EUR")
@@ -187,7 +170,14 @@ export async function loadCalculatorReferenceData(
         .or(validToFilter)
         .order("country", { ascending: true })
         .returns<DeliveryRateRow[]>()
-    : { data: [], error: null };
+      : { data: [], error: null },
+  ]);
+
+  throwIfError(garmentsResponse.error, "Failed to load garments");
+  throwIfError(markupsResponse.error, "Failed to load garment markups");
+  throwIfError(euPrintResponse.error, "Failed to load EU print tiers");
+  throwIfError(euEmbroideryResponse.error, "Failed to load EU embroidery pricing");
+  throwIfError(feesResponse.error, "Failed to load calculator fees");
 
   return {
     profile,
@@ -220,21 +210,21 @@ export async function loadUkTradeCalculatorReferenceData(supabase: CalculatorSup
   const printSet = getPricingSetCode(base.priceSets, "print");
   const embroiderySet = getPricingSetCode(base.priceSets, "embroidery");
   const [prints, embroidery] = await Promise.all([
-    supabase.from("uk_trade_print_price_tiers").select("*").eq("pricing_set_code", printSet ?? "").eq("is_active", true).lte("valid_from", effectiveDate).or(validToFilter).returns<UkTradePrintTierRow[]>(),
-    supabase.from("uk_trade_embroidery_pricing").select("*").eq("pricing_set_code", embroiderySet ?? "").eq("is_active", true).lte("valid_from", effectiveDate).or(validToFilter).returns<UkTradeEmbroideryTierRow[]>(),
+    supabase.from("uk_trade_print_price_tiers").select("pricing_set_code,position_code,colour_count,quantity_tier,unit_price,setup_screen_count_strategy").eq("pricing_set_code", printSet ?? "").eq("is_active", true).lte("valid_from", effectiveDate).or(validToFilter).returns<UkTradePrintTierRow[]>(),
+    supabase.from("uk_trade_embroidery_pricing").select("pricing_set_code,stitch_count,is_extra_1000_stitches,quantity_tier,unit_price").eq("pricing_set_code", embroiderySet ?? "").eq("is_active", true).lte("valid_from", effectiveDate).or(validToFilter).returns<UkTradeEmbroideryTierRow[]>(),
   ]);
   throwIfError(prints.error, "Failed to load UK print tiers"); throwIfError(embroidery.error, "Failed to load UK embroidery tiers");
   return { ...base, printTiers: (prints.data ?? []).map((row) => ({ pricingSetCode: row.pricing_set_code, positionCode: row.position_code as "STANDARD" | "NECK_PRINT_STANDARD" | "NECK_PRINT_TRANSFER", colourCount: row.colour_count, quantityTier: Number(row.quantity_tier), unitPrice: Number(row.unit_price), setupScreenCountStrategy: row.setup_screen_count_strategy as "colour_count" | "one" | "none" })), embroideryTiers: (embroidery.data ?? []).map((row) => ({ pricingSetCode: row.pricing_set_code, stitchCount: Number(row.stitch_count), isExtra1000Stitches: row.is_extra_1000_stitches, quantityTier: Number(row.quantity_tier), unitPrice: Number(row.unit_price) })) };
 }
 
 async function loadProfileBase(supabase: CalculatorSupabaseClient, code: "UK_TRADE", effectiveDate: string, validToFilter: string) {
-  const profileResponse = await supabase.from("calculator_profiles").select("*").eq("code", code).eq("is_active", true).maybeSingle();
+  const profileResponse = await supabase.from("calculator_profiles").select("id,code,name,region,currency_code,vat_rate,min_quantity,max_quantity,max_colours,tier_strategy,copy_formatter_code,supports_delivery,supports_pk_markup,supports_embroidery,supports_screen_setup,is_active,is_deferred").eq("code", code).eq("is_active", true).maybeSingle();
   throwIfError(profileResponse.error, "Failed to load calculator profile"); if (!profileResponse.data) throw new Error(`Calculator profile not found: ${code}`);
   const profile = mapCalculatorProfile(profileResponse.data as CalculatorProfileRow);
   const [sets, garments, fees] = await Promise.all([
-    supabase.from("calculator_profile_price_sets").select("*").eq("calculator_profile_id", profile.id).returns<CalculatorProfilePriceSetRow[]>(),
-    supabase.from("garments").select("*").eq("is_active", true).order("code").returns<GarmentRow[]>(),
-    supabase.from("calculator_fees").select("*").eq("calculator_profile_id", profile.id).eq("is_active", true).lte("valid_from", effectiveDate).or(validToFilter).returns<CalculatorFeeRow[]>(),
+    supabase.from("calculator_profile_price_sets").select("calculator_profile_id,price_kind,pricing_set_code,region,currency_code").eq("calculator_profile_id", profile.id).returns<CalculatorProfilePriceSetRow[]>(),
+    supabase.from("garments").select("id,code,alt_code,brand_name,name,colour,garment_type,eur_base_price,gbp_price,extra_size_cost,tags").eq("is_active", true).order("code").returns<GarmentRow[]>(),
+    supabase.from("calculator_fees").select("calculator_profile_id,fee_code,fee_label,amount,currency_code,applies_per,cost_side").eq("calculator_profile_id", profile.id).eq("is_active", true).lte("valid_from", effectiveDate).or(validToFilter).returns<CalculatorFeeRow[]>(),
   ]);
   throwIfError(sets.error, "Failed to load calculator price sets"); throwIfError(garments.error, "Failed to load garments"); throwIfError(fees.error, "Failed to load calculator fees");
   return { profile, priceSets: (sets.data ?? []).map(mapCalculatorProfilePriceSet), garments: (garments.data ?? []).map(mapGarment), fees: (fees.data ?? []).map(mapCalculatorFee) };

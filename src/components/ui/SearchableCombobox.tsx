@@ -3,6 +3,8 @@
 import { Check, ChevronDown, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
+import { cn } from "@/lib/utils";
+import { controlClassName } from "./styles";
 
 export type SearchableComboboxProps<T> = {
   items: T[];
@@ -82,13 +84,23 @@ export function SearchableCombobox<T>({
       const input = inputRef.current;
       if (!input) return;
       const rect = input.getBoundingClientRect();
+      const viewportPadding = 8;
       const gap = 6;
-      const below = Math.max(window.innerHeight - rect.bottom - gap, 0);
-      const above = Math.max(rect.top - gap, 0);
+      const width = Math.min(rect.width, Math.max(window.innerWidth - viewportPadding * 2, 0));
+      const left = Math.min(
+        Math.max(rect.left, viewportPadding),
+        Math.max(window.innerWidth - width - viewportPadding, viewportPadding),
+      );
+      const below = Math.max(window.innerHeight - rect.bottom - gap - viewportPadding, 0);
+      const above = Math.max(rect.top - gap - viewportPadding, 0);
       const openAbove = below < 160 && above > below;
-      const maxHeight = Math.max(96, Math.min(256, openAbove ? above : below));
-      const top = openAbove ? Math.max(gap, rect.top - gap - maxHeight) : rect.bottom + gap;
-      setMenuPosition({ left: rect.left, top, width: rect.width, maxHeight });
+      const maxHeight = Math.max(48, Math.min(256, openAbove ? above : below));
+      const preferredTop = openAbove ? rect.top - gap - maxHeight : rect.bottom + gap;
+      const top = Math.min(
+        Math.max(preferredTop, viewportPadding),
+        Math.max(window.innerHeight - maxHeight - viewportPadding, viewportPadding),
+      );
+      setMenuPosition({ left, top, width, maxHeight });
     };
 
     updatePosition();
@@ -141,7 +153,7 @@ export function SearchableCombobox<T>({
         <input
           ref={inputRef}
           type="text"
-          className="h-9 w-full min-w-0 rounded-[var(--hub-control-radius)] border border-input bg-background px-2.5 pr-16 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          className={cn(controlClassName, "h-9 px-2.5 pr-16")}
           placeholder={placeholder}
           value={inputValue}
           disabled={disabled}

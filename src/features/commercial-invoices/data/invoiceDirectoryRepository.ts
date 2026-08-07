@@ -24,4 +24,13 @@ export async function getActiveProductTypes() {
   return loadActiveProductTypes(supabase, organisationId);
 }
 
+export async function getInvoiceDirectory() {
+  const supabase = await createClient();
+  const organisationId = await resolveCanonicalInvoiceOrganisation(supabase);
+  return Promise.all([
+    loadActiveInvoiceCompanies(supabase, organisationId),
+    loadActiveProductTypes(supabase, organisationId),
+  ]);
+}
+
 export type { InvoiceDirectorySupabaseClient };

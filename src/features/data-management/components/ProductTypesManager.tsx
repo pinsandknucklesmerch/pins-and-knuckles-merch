@@ -40,7 +40,7 @@ function ProductTypeForm({ record, accessLevel, onClose }: { record: ProductType
   const [saveState, saveAction, pending] = useActionState(saveProductType, initialDataManagementActionState);
   const formId = record ? `product-type-${record.id}` : "new-product-type";
   useEffect(() => { if (!saveState.message) return; if (saveState.ok) feedback.success(record ? "Product Type updated" : "Product Type added"); else if (!isInlineValidation(saveState.message)) feedback.error(saveState.message); }, [record, saveState]);
-  return <Surface className="bg-card/80"><form id={formId} action={saveAction} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  return <Surface className="min-w-0 bg-card/80"><form id={formId} action={saveAction} className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-4">
     <input name="id" value={record?.id ?? ""} readOnly hidden />
     <label className="grid gap-1 text-sm"><span>Name</span><input required name="name" defaultValue={record?.name ?? ""} className={inputClass} /></label>
     <label className="grid gap-1 text-sm"><span>Commodity Code</span><input name="commodity_code" defaultValue={record?.commodityCode ?? ""} className={inputClass} /></label>

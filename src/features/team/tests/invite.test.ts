@@ -25,7 +25,9 @@ test("normalizes valid invite fields and rejects invalid email or enums", () => 
   assert.deepEqual(validateInviteInput(input({ email: "  MEMBER@EXAMPLE.COM ", full_name: "  Ada   Lovelace ", organisation_role: "admin", access_level: "admin" })), {
     email: "member@example.com", fullName: "Ada Lovelace", role: "admin", accessLevel: "admin", mondayMemberId: null,
   });
-  assert.equal(validateInviteInput(input({ email: "a@example.com", full_name: "Ada", organisation_role: "owner", access_level: "admin" })), null);
+  assert.deepEqual(validateInviteInput(input({ email: "a@example.com", full_name: "Ada", organisation_role: "owner", access_level: "admin" })), {
+    email: "a@example.com", fullName: "Ada", role: "owner", accessLevel: "admin", mondayMemberId: null,
+  });
   assert.equal(validateInviteInput(input({ email: "a@example.com", full_name: "Ada", organisation_role: "admin", access_level: "admin", monday_member_id: "29869326" }))?.mondayMemberId, "29869326");
   assert.equal(validateInviteInput(input({ email: "not-email", full_name: "Ada", organisation_role: "admin", access_level: "admin" })), null);
   assert.equal(validateInviteInput(input({ email: "a@example.com", full_name: "Ada", organisation_role: "invalid", access_level: "admin" })), null);
@@ -37,11 +39,11 @@ test("maps email rate limits and hides raw provider failures", () => {
   assert.deepEqual(inviteFailureState({ message: "private Supabase failure" }), { status: "error", message: "Invitation could not be sent." });
 });
 
-test("only an owner with existing Pins Hub admin access can invite", () => {
+test("only an owner with effective Pins Hub admin access can invite", () => {
   assert.equal(canInviteMembers({ authenticated: true, accessLevel: "admin", membershipRole: "owner", organisationId: "org-1" }), true);
   assert.equal(canInviteMembers({ authenticated: true, accessLevel: "admin", membershipRole: "admin", organisationId: "org-1" }), false);
   assert.equal(canInviteMembers({ authenticated: true, accessLevel: "admin", membershipRole: "staff", organisationId: "org-1" }), false);
-  assert.equal(canInviteMembers({ authenticated: true, accessLevel: "read", membershipRole: "owner", organisationId: "org-1" }), false);
+  assert.equal(canInviteMembers({ authenticated: true, accessLevel: "read", membershipRole: "owner", organisationId: "org-1" }), true);
 });
 
 test("invite form visibility is limited to the resolved owner membership role", () => {

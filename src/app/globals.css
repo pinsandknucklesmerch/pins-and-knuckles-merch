@@ -88,7 +88,16 @@
   .hub-native-control,
   .hub-native-select {
     color-scheme: dark;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     caret-color: hsl(var(--foreground));
+  }
+
+  .hub-control::placeholder,
+  .hub-native-control::placeholder,
+  .hub-native-select::placeholder {
+    color: hsl(var(--muted-foreground));
+    opacity: 1;
   }
 
   .hub-native-control,
@@ -111,6 +120,7 @@
   .hub-native-select {
     height: 2.25rem;
     padding: 0 0.5rem 0 0.75rem;
+    appearance: auto;
   }
 
   .hub-native-control:hover,
@@ -156,6 +166,12 @@
     caret-color: hsl(var(--foreground));
   }
 
+  .hub-control:disabled,
+  .hub-native-control:disabled,
+  .hub-native-select:disabled {
+    color: hsl(var(--muted-foreground));
+  }
+
   .hub-free-entry-number::-webkit-inner-spin-button,
   .hub-free-entry-number::-webkit-outer-spin-button {
     margin: 0;
@@ -164,10 +180,6 @@
 
   .hub-free-entry-number {
     -moz-appearance: textfield;
-  }
-
-  input[type="date"].hub-native-control {
-    appearance: auto;
   }
 
   input[type="date"].hub-native-control::-webkit-calendar-picker-indicator {

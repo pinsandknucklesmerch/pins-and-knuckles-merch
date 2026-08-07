@@ -6,7 +6,7 @@ const money = (value: number) => new Intl.NumberFormat("en-GB", { style: "curren
 const printLabel = (position: string, colours: number | null) => position === "NECK_PRINT_STANDARD" ? "Neck print" : position === "NECK_PRINT_TRANSFER" ? "Neck transfer" : `${position.replaceAll("_", " ").toLowerCase().replace(/^\w/, (value) => value.toUpperCase())} (${colours ?? 1} col)`;
 
 function Row({ label, value, strong = false, valueClassName = "" }: { label: string; value: string; strong?: boolean; valueClassName?: string }) {
-  return <div className={`flex items-start justify-between gap-3 py-1.5 text-sm ${strong ? "font-semibold text-foreground" : "text-muted-foreground"}`}><dt>{label}</dt><dd className={`shrink-0 text-right font-medium tabular-nums text-foreground ${valueClassName}`}>{value}</dd></div>;
+  return <div className={`flex min-w-0 items-start justify-between gap-3 py-1.5 text-sm ${strong ? "font-semibold text-foreground" : "text-muted-foreground"}`}><dt className="min-w-0 break-words">{label}</dt><dd className={`min-w-0 break-words text-right font-medium tabular-nums text-foreground ${valueClassName}`}>{value}</dd></div>;
 }
 
 export function UkTradeBreakdown({ items, results }: { items: UkTradeItemInput[]; results: UkTradeItemResult[] }) {

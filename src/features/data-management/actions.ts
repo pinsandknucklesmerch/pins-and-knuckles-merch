@@ -1,7 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { canManagePinsHub, resolvePinsHubAccess } from "@/lib/access/pinsHubAccess";
+import { effectivePinsHubAccessLevel, resolvePinsHubAccess } from "@/lib/access/pinsHubAccess";
+import { hasPinsHubAccessLevel } from "@/lib/access/pinsHubRoles";
 import { createClient } from "@/lib/supabase/server";
 import { PRICING_CATEGORIES, type DataManagementActionState } from "./types";
 import { canDeactivateGarment, deactivateGarmentRecord } from "./lib/deactivateGarment";
@@ -26,12 +27,12 @@ function revalidateDataManagement() { PATHS.forEach((path) => revalidatePath(pat
 async function actionContext() {
   const supabase = await createClient();
   const access = await resolvePinsHubAccess(supabase);
-  return { supabase, accessLevel: access.access?.access_level ?? null };
+  return { supabase, accessLevel: effectivePinsHubAccessLevel(access) };
 }
 
 export async function saveProductType(_: DataManagementActionState, formData: FormData): Promise<DataManagementActionState> {
   const { supabase, accessLevel } = await actionContext();
-  if (!canManagePinsHub(accessLevel) && accessLevel !== "write") return state(false, "You do not have permission to change Product Types.");
+  if (!hasPinsHubAccessLevel(accessLevel, "write")) return state(false, "You do not have permission to change Product Types.");
   const id = nullable(formData.get("id"));
   const name = nullable(formData.get("name"));
   const commodityCode = nullable(formData.get("commodity_code"));
@@ -63,7 +64,7 @@ export async function saveProductType(_: DataManagementActionState, formData: Fo
 
 export async function deleteProductType(_: DataManagementActionState, formData: FormData): Promise<DataManagementActionState> {
   const { supabase, accessLevel } = await actionContext();
-  if (!canManagePinsHub(accessLevel)) return state(false, "You do not have permission to delete Product Types.");
+  if (!hasPinsHubAccessLevel(accessLevel, "admin")) return state(false, "You do not have permission to delete Product Types.");
   const id = nullable(formData.get("id"));
   if (!id) return state(false, "Product Type is required.");
   const { count, error: dependencyError } = await supabase.from("garments").select("id", { count: "exact", head: true }).eq("product_type_id", id);
@@ -77,7 +78,7 @@ export async function deleteProductType(_: DataManagementActionState, formData: 
 
 export async function saveGarment(_: DataManagementActionState, formData: FormData): Promise<DataManagementActionState> {
   const { supabase, accessLevel } = await actionContext();
-  if (!canManagePinsHub(accessLevel) && accessLevel !== "write") return state(false, "You do not have permission to change garments.");
+  if (!hasPinsHubAccessLevel(accessLevel, "write")) return state(false, "You do not have permission to change garments.");
   const id = nullable(formData.get("id"));
   const code = nullable(formData.get("code"));
   const name = nullable(formData.get("name"));

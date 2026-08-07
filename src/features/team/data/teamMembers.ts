@@ -37,15 +37,12 @@ export async function getTeamMembers(organisationId: string): Promise<TeamMember
   if (error || !rawMemberships) return [];
   const memberships = rawMemberships as MembershipRecord[];
 
-  const authUsers = await Promise.all(memberships.map(async (member) => {
-    if (!member.user_id) return null;
-    const { data } = await admin.auth.admin.getUserById(member.user_id);
-    return data.user ?? null;
-  }));
+  const { data: authUsersResponse } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+  const authUsers = new Map((authUsersResponse?.users ?? []).map((user) => [user.id, user]));
 
-  return memberships.map((member, index) => {
+  return memberships.map((member) => {
     const profile = Array.isArray(member.profiles) ? member.profiles[0] : member.profiles;
-    const authUser = authUsers[index];
+    const authUser = member.user_id ? authUsers.get(member.user_id) : null;
     const accessLevel = member.app_access?.find((item) => item.app_key === "pins_hub")?.access_level ?? null;
     const timestamps = [member.created_at, profile?.created_at, authUser?.invited_at, authUser?.created_at].filter((value): value is string => Boolean(value)).map((value) => new Date(value).getTime()).filter(Number.isFinite);
     const joinedDate = timestamps.length ? new Date(Math.min(...timestamps)).toISOString() : null;

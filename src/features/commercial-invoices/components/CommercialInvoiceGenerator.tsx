@@ -128,7 +128,7 @@ export function CommercialInvoiceGenerator({
 
   return (
     <div className="grid min-w-0 gap-4">
-      <div className="no-print flex flex-wrap gap-2">
+      <div className="no-print flex min-w-0 flex-wrap gap-2">
         <ActionMenu label="Export" pending={Boolean(exporting)} items={[{ label: "Export Excel", onSelect: () => void runExport("xlsx") }, { label: "Export PDF", onSelect: () => void runExport("pdf") }]} />
         <button type="button" onClick={reset} className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><RotateCcw className="size-4" />Reset</button>
       </div>
@@ -151,7 +151,7 @@ export function CommercialInvoiceGenerator({
 
       <section className="grid gap-3">
         <h2 className="text-sm font-semibold">Preview</h2>
-        <Surface className="overflow-x-auto bg-muted p-[var(--hub-compact-card-padding)] sm:p-[var(--hub-card-padding)]"><InvoicePreview invoice={calculated} /></Surface>
+        <Surface className="max-w-full overflow-x-auto bg-muted p-[var(--hub-compact-card-padding)] sm:p-[var(--hub-card-padding)]"><InvoicePreview invoice={calculated} /></Surface>
       </section>
     </div>
   );

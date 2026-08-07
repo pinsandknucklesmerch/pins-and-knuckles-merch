@@ -80,7 +80,7 @@ export function EuCalculatorResults({
       {showSummary ? <div className="grid min-w-0 gap-3 sm:grid-cols-2">
         <Panel className="border-border/90 bg-card p-4">
           <div className="text-xs font-medium text-muted-foreground">Production Costs</div>
-          <div className="mt-2 whitespace-nowrap text-2xl font-semibold tabular-nums text-foreground">{money(totals.productionSubtotalExVat)}</div>
+          <div className="mt-2 break-words text-2xl font-semibold tabular-nums text-foreground">{money(totals.productionSubtotalExVat)}</div>
           <div className="mt-1 text-xs text-muted-foreground">Excl. VAT</div>
         </Panel>
         <CopyableCard
@@ -93,7 +93,7 @@ export function EuCalculatorResults({
             <div className="text-xs font-medium text-accent">Pins Price (incl VAT)</div>
             {copyState === "copied" ? <Check className="size-4 text-accent" aria-hidden="true" /> : <Copy className="size-4 text-accent" aria-hidden="true" />}
           </div>
-          <div className="mt-2 whitespace-nowrap text-2xl font-semibold tabular-nums text-foreground">
+          <div className="mt-2 break-words text-2xl font-semibold tabular-nums text-foreground">
               <p className="text-2xl font-semibold text-red-500">
                   {money(totals.customerTotalIncVat)}
                   </p>

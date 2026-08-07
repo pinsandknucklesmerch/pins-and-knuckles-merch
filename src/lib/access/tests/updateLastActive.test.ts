@@ -61,3 +61,20 @@ test("tracking errors are swallowed so protected Hub rendering can continue", as
   await assert.doesNotReject(recordLastActive(client as never, now));
   assert.equal(writes.length, 1);
 });
+
+test("trusted access context skips the duplicate auth and profile reads", async () => {
+  let authReads = 0;
+  const writes: unknown[] = [];
+  const client = {
+    auth: { getUser: async () => { authReads += 1; throw new Error("duplicate auth read"); } },
+    from: () => ({
+      select: () => { throw new Error("duplicate profile read"); },
+      update: (values: Record<string, unknown>) => ({
+        eq: () => ({ or: async () => { writes.push(values); return { error: null }; } }),
+      }),
+    }),
+  };
+  await recordLastActive(client as never, now, { userId: "user-1", lastActiveAt: null });
+  assert.equal(authReads, 0);
+  assert.deepEqual(writes, [{ last_active_at: now.toISOString() }]);
+});

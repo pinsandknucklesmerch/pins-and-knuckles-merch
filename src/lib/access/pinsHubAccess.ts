@@ -29,11 +29,13 @@ export type PinsHubAccessResult = {
   error: string | null;
   queryError: string | null;
   accessDeniedReason: string | null;
+  profileLastActiveAt?: string | null;
 };
 
 type ProfileAccessRow = {
   id: string;
   email: string | null;
+  last_active_at: string | null;
   organisation_members: Array<Membership & {
     app_access: Array<{
       id: string;
@@ -46,8 +48,18 @@ type ProfileAccessRow = {
 
 export { canManagePinsHub } from "./pinsHubRoles";
 
+/** Resolve the access level a Pins Hub route or mutation should enforce. */
+export function effectivePinsHubAccessLevel(
+  access: Pick<PinsHubAccessResult, "access" | "membership"> | null | undefined,
+): PinsHubAccessLevel | null {
+  const storedLevel = access?.access?.access_level ?? null;
+  if (storedLevel === "developer") return "developer";
+  if (access?.membership?.role === "owner") return "admin";
+  return storedLevel;
+}
+
 export function hasAdminAccess(access: Pick<PinsHubAccessResult, "access" | "membership"> | null | undefined) {
-  return canManagePinsHub(access?.access?.access_level) || access?.membership?.role === "owner";
+  return canManagePinsHub(effectivePinsHubAccessLevel(access));
 }
 
 export function hasDeveloperAccess(access: Pick<PinsHubAccessResult, "access" | "membership"> | null | undefined) {
@@ -63,6 +75,7 @@ function createUnauthenticatedResult(): PinsHubAccessResult {
     error: null,
     queryError: null,
     accessDeniedReason: null,
+    profileLastActiveAt: null,
   };
 }
 
@@ -74,7 +87,7 @@ export async function resolvePinsHubAccess(
 
     const { data: profiles, error: accessQueryError } = await supabase
       .from("profiles")
-      .select("id,email,organisation_members!organisation_members_user_id_fkey(id,organisation_id,role,is_active,app_access(id,organisation_member_id,app_key,access_level))")
+      .select("id,email,last_active_at,organisation_members!organisation_members_user_id_fkey(id,organisation_id,role,is_active,app_access(id,organisation_member_id,app_key,access_level))")
       .returns<ProfileAccessRow[]>();
 
     if (accessQueryError) {
@@ -107,6 +120,7 @@ export async function resolvePinsHubAccess(
       error: null,
       queryError: null,
       accessDeniedReason: null,
+      profileLastActiveAt: profile.last_active_at,
     };
 
     if (!memberships.length) {

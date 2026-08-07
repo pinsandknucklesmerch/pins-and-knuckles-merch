@@ -1,7 +1,7 @@
 "use client";
 
 import { Copy } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { calculateEuDelivery, formatEuDeliveryCopy } from "../domain/euDeliveryHelper.ts";
 import type { DeliveryRate } from "../domain/types.ts";
 import { Select } from "@/components/ui/Select";
@@ -28,11 +28,13 @@ function Row({ label, value, strong = false }: { label: string; value: string; s
 }
 
 export function EuDeliveryHelper({ deliveryRates, deliveryRatesError, country, boxCount, markupEnabled, markupPerBox, onCountryChange, onBoxCountChange, onMarkupEnabledChange, onMarkupPerBoxChange }: EuDeliveryHelperProps) {
+  const [copying, setCopying] = useState(false);
   const delivery = useMemo(() => calculateEuDelivery({ country, boxCount, markupEnabled, markupPerBox }, deliveryRates, deliveryRatesError), [boxCount, country, deliveryRates, deliveryRatesError, markupEnabled, markupPerBox]);
 
   async function copyDelivery() {
-    if (!delivery.ok) return;
-    await copyText(formatEuDeliveryCopy(delivery));
+    if (!delivery.ok || copying) return;
+    setCopying(true);
+    try { await copyText(formatEuDeliveryCopy(delivery)); } finally { setCopying(false); }
   }
 
   return <Surface aria-label="Delivery helper" className="min-w-0">
@@ -47,7 +49,7 @@ export function EuDeliveryHelper({ deliveryRates, deliveryRatesError, country, b
         </div>
       </div>
       <Surface variant="compact" className="min-w-0 bg-background/55" aria-label="Delivery summary">
-        <div className="mb-3 flex min-w-0 flex-wrap items-start justify-between gap-3"><h2 className="min-w-0 break-words text-sm font-semibold text-foreground">Delivery Summary</h2><button type="button" onClick={copyDelivery} disabled={!delivery.ok} className="inline-flex max-w-full shrink-0 items-center gap-1.5 rounded-md border border-primary/60 px-2 py-1 text-xs text-primary transition-colors hover:bg-primary/10 disabled:opacity-50"><Copy className="size-3.5" />Copy Delivery Info</button></div>
+        <div className="mb-3 flex min-w-0 flex-wrap items-start justify-between gap-3"><h2 className="min-w-0 break-words text-sm font-semibold text-foreground">Delivery Summary</h2><button type="button" onClick={() => void copyDelivery()} disabled={!delivery.ok || copying} aria-label="Copy delivery information" className="inline-flex min-h-9 max-w-full shrink-0 items-center gap-1.5 rounded-md border border-primary/60 px-2 py-1 text-xs text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"><Copy className="size-3.5" aria-hidden="true" />{copying ? "Copying…" : "Copy Delivery Info"}</button></div>
         {delivery.ok ? <dl><Row label="Selected country" value={delivery.rate.country} /><Row label="Delivery time" value={delivery.rate.deliveryTime} /><Row label="Cost per box excl. VAT" value={money(delivery.rate.costPerBox)} /><Row label="Number of boxes" value={String(delivery.boxCount)} /><Row label="Delivery subtotal excl. VAT" value={money(delivery.deliverySubtotalExclVat)} /><Row label={`VAT (${delivery.rate.vatRate}%)`} value={money(delivery.deliveryVatAmount)} /><Row label="Total delivery cost incl. VAT" value={money(delivery.deliveryTotalInclVat)} strong /></dl> : <p role="alert" className="text-sm text-destructive">{delivery.error}</p>}
       </Surface>
     </div>
