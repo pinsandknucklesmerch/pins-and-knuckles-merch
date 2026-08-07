@@ -221,6 +221,7 @@ export default function Galaxy({
     if (!ctnDom.current) return;
     const ctn = ctnDom.current;
  const shouldReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if (shouldReduceMotion) return;
  const effectiveMouseInteraction = mouseInteraction && !shouldReduceMotion;
  const effectiveMouseRepulsion = mouseRepulsion && !shouldReduceMotion;
  const effectiveAutoCenterRepulsion = shouldReduceMotion ? 0 : autoCenterRepulsion;
@@ -313,9 +314,7 @@ export default function Galaxy({
   }
   renderer.render({ scene: mesh });
 
-  if (!shouldReduceMotion) {
-   animateId = requestAnimationFrame(update);
-  }
+  animateId = requestAnimationFrame(update);
  }
  update(0);
     ctn.appendChild(gl.canvas);

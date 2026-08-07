@@ -10,7 +10,8 @@ import styles from "./ExportMetricsButton.module.css";
 type ExportMetricsButtonProps = {
   rows: MetricExportRow[];
   targetRef: RefObject<HTMLElement | null>;
-  profitTargetRef: RefObject<HTMLElement | null>;
+  requestProfitReport: () => Promise<HTMLElement | null>;
+  releaseProfitReport: () => void;
   title: string;
   profitFilename: string;
 };
@@ -18,7 +19,8 @@ type ExportMetricsButtonProps = {
 export function ExportMetricsButton({
   rows,
   targetRef,
-  profitTargetRef,
+  requestProfitReport,
+  releaseProfitReport,
   title,
   profitFilename,
 }: ExportMetricsButtonProps) {
@@ -26,19 +28,24 @@ export function ExportMetricsButton({
 
   const downloadProfitReport = async () => {
     if (isExporting) return;
-    const report = profitTargetRef.current;
+    setIsExporting(true);
+    const report = await requestProfitReport();
     if (!report) {
       feedback.error("Could not export the profit PDF.");
+      releaseProfitReport();
+      setIsExporting(false);
       return;
     }
     const sections = Array.from(report.querySelectorAll<HTMLElement>("[data-profit-pdf-page]"));
     if (!sections.length) {
       feedback.error("Could not find the profit report sections.");
+      releaseProfitReport();
+      setIsExporting(false);
       return;
     }
 
-    setIsExporting(true);
     try {
+      await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
       const { default: html2canvas } = await import("html2canvas");
       const { jsPDF } = await import("jspdf");
       const margin = 8;
@@ -84,6 +91,7 @@ export function ExportMetricsButton({
       }
       feedback.error("Could not download the profit PDF.");
     } finally {
+      releaseProfitReport();
       setIsExporting(false);
     }
   };

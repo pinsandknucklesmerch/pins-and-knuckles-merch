@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { formatAnimatedMetricValue, getAccessibleMetricText, shouldAnimateMetricValue, type AnimatedMetricFormat } from "../lib/animatedMetricValue";
 
 type AnimatedMetricValueProps = {
@@ -13,13 +13,13 @@ type AnimatedMetricValueProps = {
 
 export function AnimatedMetricValue({ value, format, className, maximumFractionDigits, minimumFractionDigits }: AnimatedMetricValueProps) {
   const previousValue = useRef<number | null>(null);
-  const [animatedValue, setAnimatedValue] = useState<number | null>(value ?? null);
+  const visibleValueRef = useRef<HTMLSpanElement>(null);
   const finalText = getAccessibleMetricText(value, format, maximumFractionDigits, minimumFractionDigits);
 
   useEffect(() => {
     if (value === null || value === undefined || !Number.isFinite(value)) {
       previousValue.current = null;
-      setAnimatedValue(null);
+      if (visibleValueRef.current) visibleValueRef.current.textContent = "—";
       return;
     }
 
@@ -28,27 +28,27 @@ export function AnimatedMetricValue({ value, format, className, maximumFractionD
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!shouldAnimateMetricValue(from, value, reduceMotion)) {
-      setAnimatedValue(value);
+      if (visibleValueRef.current) visibleValueRef.current.textContent = formatAnimatedMetricValue(value, format, maximumFractionDigits, minimumFractionDigits);
       return;
     }
 
     let frame = 0;
     const duration = 700;
     const startedAt = performance.now();
-    setAnimatedValue(from);
+    if (visibleValueRef.current) visibleValueRef.current.textContent = formatAnimatedMetricValue(from, format, maximumFractionDigits, minimumFractionDigits);
     const animate = (now: number) => {
       const progress = Math.min(1, (now - startedAt) / duration);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setAnimatedValue(from + (value - from) * eased);
+      if (visibleValueRef.current) visibleValueRef.current.textContent = formatAnimatedMetricValue(from + (value - from) * eased, format, maximumFractionDigits, minimumFractionDigits);
       if (progress < 1) frame = requestAnimationFrame(animate);
     };
     frame = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(frame);
-  }, [value]);
+  }, [format, maximumFractionDigits, minimumFractionDigits, value]);
 
-  const visibleText = animatedValue === null || !Number.isFinite(animatedValue)
+  const visibleText = value === null || value === undefined || !Number.isFinite(value)
     ? "—"
-    : formatAnimatedMetricValue(animatedValue, format, maximumFractionDigits, minimumFractionDigits);
+    : formatAnimatedMetricValue(value, format, maximumFractionDigits, minimumFractionDigits);
 
-  return <span className={className} aria-label={finalText}><span aria-hidden="true">{visibleText}</span><span className="sr-only">{finalText}</span></span>;
+  return <span className={className} aria-label={finalText}><span ref={visibleValueRef} aria-hidden="true">{visibleText}</span><span className="sr-only">{finalText}</span></span>;
 }

@@ -97,9 +97,28 @@ export default function MagicBento({
     const timeouts: ReturnType<typeof setTimeout>[] = [];
     const dynamicNodes = new Set<HTMLElement>();
     const tweens: GsapTween[] = [];
+    const cardBounds = new Map<HTMLElement, DOMRect>();
+    let sectionBounds: DOMRect | null = null;
+    let boundsFrame = 0;
     const enterHandlers = new Map<HTMLElement, () => void>();
     const leaveHandlers = new Map<HTMLElement, () => void>();
     let spotlight: HTMLDivElement | null = null;
+
+    const refreshBounds = () => {
+      sectionBounds = section.getBoundingClientRect();
+      cards.forEach((card) => cardBounds.set(card, card.getBoundingClientRect()));
+    };
+    const scheduleBoundsRefresh = () => {
+      if (boundsFrame) return;
+      boundsFrame = requestAnimationFrame(() => {
+        boundsFrame = 0;
+        refreshBounds();
+      });
+    };
+    refreshBounds();
+    const resizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(scheduleBoundsRefresh);
+    resizeObserver?.observe(section);
+    cards.forEach((card) => resizeObserver?.observe(card));
 
     const createSpotlight = () => {
       if (!gsapApi || !active || !enableSpotlight || shouldDisableAnimations || spotlight) return;
@@ -162,12 +181,14 @@ export default function MagicBento({
 
     const handleMouseMove = (event: MouseEvent) => {
       if (shouldDisableAnimations) return;
-      const rect = section.getBoundingClientRect();
+      const rect = sectionBounds;
+      if (!rect) return;
       const inside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
       if (!inside) return;
 
       cards.forEach((card) => {
-        const cardRect = card.getBoundingClientRect();
+        const cardRect = cardBounds.get(card);
+        if (!cardRect) return;
         const centerX = cardRect.left + cardRect.width / 2;
         const centerY = cardRect.top + cardRect.height / 2;
         const distance = Math.max(0, Math.hypot(event.clientX - centerX, event.clientY - centerY) - Math.max(cardRect.width, cardRect.height) / 2);
@@ -251,6 +272,8 @@ export default function MagicBento({
 
     return () => {
       active = false;
+      resizeObserver?.disconnect();
+      if (boundsFrame) cancelAnimationFrame(boundsFrame);
       timeouts.forEach(clearTimeout);
       grid.removeEventListener("mousemove", handleMouseMove);
       grid.removeEventListener("mouseleave", handleMouseLeave);

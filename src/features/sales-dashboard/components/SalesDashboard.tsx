@@ -36,8 +36,9 @@ const DASHBOARD_TABS = [
 export function SalesDashboard({ data, year, month, isAdmin, initialDashboardView, tvMode = false, tvDurationSeconds = DEFAULT_TV_DURATION_SECONDS }: { data: SalesDashboardData; year: number; month: number; isAdmin: boolean; initialDashboardView: DashboardView; tvMode?: boolean; tvDurationSeconds?: number }) {
   const router = useRouter();
   const [activeDashboardView, setActiveDashboardView] = useState<DashboardView>(initialDashboardView);
+  const [profitReportMounted, setProfitReportMounted] = useState(false);
   const dashboardMetricsRef = useRef<HTMLDivElement>(null);
-  const profitReportRef = useRef<HTMLDivElement>(null);
+  const profitReportResolverRef = useRef<((element: HTMLElement | null) => void) | null>(null);
   const companyMetrics = useMemo(() => calculateCompanyMetrics(data.company, data.previousCompany, data.targets), [data.company, data.previousCompany, data.targets]);
   const monthlyProfitMetric = companyMetrics.find(
   (metric) => metric.code === "MONTHLY_PROFIT",);
@@ -65,6 +66,23 @@ if (!conversionRateMetric) {
   const enterTvMode = useCallback(() => {
     router.push(buildTvModeUrl({ year, month, durationSeconds: tvDurationSeconds }));
   }, [month, router, tvDurationSeconds, year]);
+  const requestProfitReport = useCallback(() => {
+    setProfitReportMounted(true);
+    return new Promise<HTMLElement | null>((resolve) => {
+      profitReportResolverRef.current = resolve;
+    });
+  }, []);
+  const releaseProfitReport = useCallback(() => {
+    profitReportResolverRef.current?.(null);
+    profitReportResolverRef.current = null;
+    setProfitReportMounted(false);
+  }, []);
+  const setProfitReportElement = useCallback((element: HTMLDivElement | null) => {
+    if (element) {
+      profitReportResolverRef.current?.(element);
+      profitReportResolverRef.current = null;
+    }
+  }, []);
 
   if (tvMode) return <MetricDashboardProvider><SalesDashboardTvView data={data} year={year} month={month} companyMetrics={companyMetrics} monthlyProfitMetric={monthlyProfitMetric} durationSeconds={tvDurationSeconds} /></MetricDashboardProvider>;
 
@@ -83,7 +101,8 @@ if (!conversionRateMetric) {
         <ExportMetricsButton
           rows={exportRows}
           targetRef={dashboardMetricsRef}
-          profitTargetRef={profitReportRef}
+          requestProfitReport={requestProfitReport}
+          releaseProfitReport={releaseProfitReport}
           title={exportTitle}
           profitFilename={`pins-profit-report-${DASHBOARD_MONTHS[month - 1].toLowerCase()}-${year}.pdf`}
         />
@@ -96,11 +115,11 @@ if (!conversionRateMetric) {
       <div className="min-w-0 max-w-full overflow-x-auto pb-1"><DashboardNav tabs={DASHBOARD_TABS} value={activeDashboardView} onChange={changeDashboardView} mode="tabs" /></div>
       {activeDashboardView === "snuggle" ? <SnuggleView data={data.snuggle} year={year} month={month} isAdmin={isAdmin} /> : activeDashboardView === "team-members" ? <TeamMembersTab data={data} year={year} month={month} /> : activeDashboardView === "overview" ? <CompanyKpiView current={data.company} metrics={companyMetrics} /> : activeDashboardView === "ytd" ? <YearToDateView data={data.yearToDate} /> : <YearComparisonChart comparison={data.yearComparison} />}
     </div>
-    <div
+    {profitReportMounted ? <div
       aria-hidden="true"
       className="pointer-events-none fixed left-[-12000px] top-0 w-[1100px]"
     >
-      <div ref={profitReportRef}>
+      <div ref={setProfitReportElement}>
         <ProfitPdfReport
           year={year}
           month={month}
@@ -110,7 +129,7 @@ if (!conversionRateMetric) {
           yearComparison={data.yearComparison}
         />
       </div>
-    </div>
+    </div> : null}
     
   </div></MetricDashboardProvider>;
 }

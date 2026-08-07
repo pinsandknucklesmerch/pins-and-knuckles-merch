@@ -59,18 +59,23 @@ export function BackgroundLayer({ variant }: BackgroundLayerProps) {
   const [Galaxy, setGalaxy] = useState<GalaxyComponent | null>(null);
 
   useEffect(() => {
-    if (!enabled) {
-      setGalaxy(null);
-      return;
-    }
-
     let active = true;
-    void import("./Galaxy").then((module) => {
-      if (active) setGalaxy(() => module.default as GalaxyComponent);
-    });
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const loadGalaxy = () => {
+      if (!enabled || motionQuery.matches) {
+        setGalaxy(null);
+        return;
+      }
+      void import("./Galaxy").then((module) => {
+        if (active && !motionQuery.matches) setGalaxy(() => module.default as GalaxyComponent);
+      });
+    };
+    loadGalaxy();
+    motionQuery.addEventListener("change", loadGalaxy);
 
     return () => {
       active = false;
+      motionQuery.removeEventListener("change", loadGalaxy);
     };
   }, [enabled]);
 

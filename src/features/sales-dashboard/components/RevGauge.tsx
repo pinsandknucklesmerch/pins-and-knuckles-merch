@@ -92,7 +92,8 @@ export function RevGauge({ value, target, max, progress, format, label, interact
   const targetRatio = zoneRatios.greenStart;
   const needleAngle = START_ANGLE + valueRatio * (END_ANGLE - START_ANGLE);
   const prefersReducedMotion = usePrefersReducedMotion();
-  const [renderedAngle, setRenderedAngle] = useState(interactive || animationKey !== undefined ? START_ANGLE : needleAngle);
+  const initialAngle = interactive || animationKey !== undefined ? START_ANGLE : needleAngle;
+  const needleRef = useRef<SVGLineElement>(null);
   const renderedAngleRef = useRef(interactive || animationKey !== undefined ? START_ANGLE : needleAngle);
   const animationFrameRef = useRef<number | null>(null);
   const animationTimerRef = useRef<number | null>(null);
@@ -116,7 +117,7 @@ export function RevGauge({ value, target, max, progress, format, label, interact
 
     if ((!interactive && animationKey === undefined) || prefersReducedMotion) {
       renderedAngleRef.current = destinationAngle;
-      setRenderedAngle(destinationAngle);
+      needleRef.current?.style.setProperty("--needle-angle", `${destinationAngle}deg`);
       animationFrameRef.current = null;
       return () => undefined;
     }
@@ -127,7 +128,7 @@ export function RevGauge({ value, target, max, progress, format, label, interact
 
     if (Math.abs(angleDelta) < 0.01) {
       renderedAngleRef.current = destinationAngle;
-      setRenderedAngle(destinationAngle);
+      needleRef.current?.style.setProperty("--needle-angle", `${destinationAngle}deg`);
       animationFrameRef.current = null;
       return () => undefined;
     }
@@ -137,7 +138,7 @@ export function RevGauge({ value, target, max, progress, format, label, interact
       const easedProgress = 1 - Math.pow(1 - progressRatio, 3);
       const nextAngle = fromAngle + angleDelta * easedProgress;
       renderedAngleRef.current = nextAngle;
-      setRenderedAngle(nextAngle);
+      needleRef.current?.style.setProperty("--needle-angle", `${nextAngle}deg`);
 
       if (progressRatio < 1) {
         animationFrameRef.current = requestAnimationFrame(animate);
@@ -165,7 +166,7 @@ export function RevGauge({ value, target, max, progress, format, label, interact
     previousAnimationKeyRef.current = animationKey;
     if (shouldReplay) {
       renderedAngleRef.current = START_ANGLE;
-      setRenderedAngle(START_ANGLE);
+      needleRef.current?.style.setProperty("--needle-angle", `${START_ANGLE}deg`);
       return startNeedleAnimation(START_ANGLE, needleAngle);
     }
     return startNeedleAnimation(renderedAngleRef.current, needleAngle);
@@ -174,7 +175,7 @@ export function RevGauge({ value, target, max, progress, format, label, interact
   const replayNeedle = useCallback(() => {
     if (!interactive || prefersReducedMotion) return;
     renderedAngleRef.current = START_ANGLE;
-    setRenderedAngle(START_ANGLE);
+    needleRef.current?.style.setProperty("--needle-angle", `${START_ANGLE}deg`);
     startNeedleAnimation(START_ANGLE, needleAngle);
   }, [interactive, needleAngle, prefersReducedMotion, startNeedleAnimation]);
 
@@ -219,12 +220,13 @@ export function RevGauge({ value, target, max, progress, format, label, interact
         <line className={styles.targetMarker} x1={targetInner.x} y1={targetInner.y} x2={targetOuter.x} y2={targetOuter.y} />
         <text className={styles.targetLabel} x={targetLabelPoint.x} y={targetLabelPoint.y} textAnchor="middle" dominantBaseline="middle">{targetText}</text>
         <line
+          ref={needleRef}
           className={styles.needle}
           x1={CENTER_X}
           y1={CENTER_Y}
           x2={CENTER_X}
           y2={CENTER_Y - NEEDLE_RADIUS}
-          style={{ "--needle-angle": `${renderedAngle}deg` } as CSSProperties}
+          style={{ "--needle-angle": `${initialAngle}deg` } as CSSProperties}
         />
         <circle className={styles.hubOuter} cx={CENTER_X} cy={CENTER_Y} r="8" />
         <circle className={styles.hubInner} cx={CENTER_X} cy={CENTER_Y} r="3" />
