@@ -1,6 +1,7 @@
 # Pins Hub — Canonical Project Context
 
-Reviewed against the current working tree and Git history on 2026-08-06. This
+Reviewed against the current working tree and remote Supabase schema on
+2026-08-11. This
 is the canonical repository context. Source code, migrations, `package-lock.json`,
 and configuration are authoritative for implementation. Static review cannot
 verify remote Supabase state, Vercel deployment state, scheduled execution, or
@@ -26,8 +27,9 @@ Sales Dashboard reporting, and team administration.
 ### Implemented and repository-verified
 
 - The App Router application, Supabase SSR/client/service-role separation,
-  Pins Hub access checks, feature modules, database types, and 31 forward-only
-  migrations are in the repository.
+  Pins Hub access checks, feature modules, database types, and 33 forward-only
+  migrations are in the repository. Generated database types were regenerated
+  from the current remote public schema on 2026-08-11.
 - The active calculators are EU Standard, EU US Clients, and UK Trade.
 - Sales Dashboard persistence, source-isolated Monday/EPCC ingestion,
   month-final values, TV mode/settings, member performance, and dashboard
@@ -37,25 +39,30 @@ Sales Dashboard reporting, and team administration.
   User Access Management, feedback, and diagnostics are implemented.
 - Current user activity is recorded at most once per 15 minutes on Hub-layout
   requests when the authenticated profile is eligible for update.
+- Cron observability is implemented for EPCC and Monday scheduled jobs. Each
+  run is persisted in `cron_run_history` (migration applied remotely);
+  Developer Diagnostics shows latest
+  status, reporting month, duration, errors, and overdue state. Overdue state
+  is read-time logic using the 08:05/08:15 UTC schedules plus a 30-minute
+  grace period.
 
 ### Implemented but not production-verified by this review
 
-- All migrations after the last historical remote-verification snapshot,
-  especially TV settings, invoice directories, global garment price updates,
-  User Access Management, last-active tracking, feedback, developer access,
-  and diagnostics.
 - Vercel cron execution, Gmail OAuth access, Monday API access, service-role
-  privileges, remote RLS policy state, and the remote/generated-type alignment.
+  privileges, and production run frequency remain operational verification
+  concerns. The current remote schema and generated type alignment are now
+  confirmed for this audit.
 - The cron routes and CLI tooling exist and are tested in source, but static
   review cannot confirm their configuration, calls, writes, or schedule runs.
 
 ### Planned or outstanding
 
-- Add operational failure alerting and durable run/outcome retention for EPCC
-  and Monday scheduled ingestion.
-- Resolve ownership/retention of the remote-only
-  `sales_kpi_profit_email_sources` drift before a type regeneration or schema
-  reconciliation migration.
+- Add external/operator alerting for failed EPCC and Monday scheduled runs;
+  durable run/outcome retention is implemented.
+- `sales_kpi_profit_email_sources` remains intentionally retained with its
+  historical July 2026 row. The obsolete RPC overload that wrote to it has
+  been retired remotely, no current application code depends on the table, and
+  eventual table cleanup is a separate retention decision.
 - Decide whether and when to remove/bound the historical Sales Dashboard
   fixture fallback as persistent KPI coverage is confirmed.
 - Review the deferred July Monday source delta before any bounded historical
@@ -172,10 +179,10 @@ loading/error files also exist for relevant data and dashboard routes.
 
 ## Supabase schema and migrations
 
-The repository has 31 migrations, from `20260709120000` through
-`20260806150000`. They are forward-only history; do not edit or remove applied
-migrations. `src/types/database.types.ts` is the checked-in generated type
-snapshot and must be reconciled deliberately after remote schema review.
+The repository has 33 migrations, from `20260709120000` through
+`20260811110000`. They are forward-only history; do not edit or remove applied
+migrations. `src/types/database.types.ts` is regenerated from the current
+remote public schema and includes the intentionally retained legacy table.
 
 ### Foundation and calculator data
 
@@ -224,11 +231,14 @@ snapshot and must be reconciled deliberately after remote schema review.
 
 ### Remote-state caveat
 
-Earlier documentation records a remote-only `sales_kpi_profit_email_sources`
-table not represented by migrations/types and not queried by current code. That
-is a schema-drift investigation, not a basis for adding a migration or replacing
-generated types. This review did not connect to Supabase, so it does not assert
-migration application, RLS parity, seeded data, or production values.
+The remote schema currently retains `sales_kpi_profit_email_sources` and its
+single historical July 2026 row for audit/retention purposes. The obsolete RPC
+overload that wrote to it has been retired, no current application code queries
+the table, and the generated types intentionally retain its table definition.
+Current EPCC writes use `sales_kpi_profit_email_ingestions`,
+`sales_kpi_member_months.epcc_source_metadata`, and the newer ingestion RPCs.
+The current public-schema type snapshot was regenerated from remote Supabase
+on 2026-08-11.
 
 ## Sales Dashboard
 
@@ -259,6 +269,10 @@ migration application, RLS parity, seeded data, or production values.
   totals, and writes through a service-role-only RPC. From July 2026 it is the
   authoritative monthly-profit source; it does not overwrite Monday-owned
   quote/order fields.
+- Current EPCC persistence uses `sales_kpi_profit_email_ingestions`,
+  `sales_kpi_member_months.epcc_source_metadata`, and
+  `sales_kpi_months.monthly_profit_source`; the active RPCs are
+  `ingest_epcc_monthly_profit` and `ingest_epcc_monthly_profit_and_members`.
 - The EPCC CLI is dry-run unless `--apply` is supplied. The scheduled EPCC route
   requires `Authorization: Bearer <CRON_SECRET>`, then invokes apply mode.
 - The Monday scheduled route is server-only, uses the same cron authentication
@@ -371,10 +385,10 @@ Recent commits confirm the direction of the current codebase:
 
 ## Recommended next work
 
-1. Establish production observability for the two scheduled ingestion routes:
-   alerting, retained outcomes, and approved remote verification.
-2. Resolve the remote-only profit-email-source drift before changing types or
-   migrations.
+1. Add operator-facing alerting for failed scheduled ingestion runs.
+2. Treat eventual removal of the retained legacy profit-email-source table as
+   a separate approved retention/cleanup decision; do not remove it as an
+   application defect.
 3. Add an actual complete test script and update any remaining documentation
    that claims one already exists.
 4. Confirm historical KPI persistence and then intentionally reduce the

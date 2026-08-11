@@ -2,6 +2,12 @@
 
 > Historical status record from July 2026. Its follow-up checklist and production notes are retained for context, not as current operational instructions. Use the verification process in `README.md` and `docs/ai-context/PROJECT_CONTEXT.md` for current work.
 
+> Subsequent resolution: the obsolete EPCC ingestion RPC overload was retired
+> remotely, current database types were regenerated on 2026-08-11, and cron
+> run history/Developer Diagnostics are implemented. The legacy
+> `sales_kpi_profit_email_sources` table remains intentionally retained with
+> its historical July 2026 row.
+
 ## Status
 
 The Sales/KPI Dashboard is production-ready, pending confirmation of the first unattended cron executions.
@@ -71,7 +77,8 @@ Vercel schedules are stored in UTC in `vercel.json`.
 - Failure alerts and operational notifications.
 - Audit-retention policy.
 - Live user RLS checks.
-- Classification of `sales_kpi_profit_email_sources`.
+- Final retention/cleanup decision for `sales_kpi_profit_email_sources` (the
+  obsolete RPC overload is retired; the table remains intentionally retained).
 - Mobile navigation.
 - Garment Directory scope.
 - Quick Reference scope.

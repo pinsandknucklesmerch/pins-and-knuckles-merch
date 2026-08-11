@@ -46,6 +46,13 @@ test("Monday cron rejects unauthorised calls and valid auth reaches the sync han
   assert.equal(calls, 1);
 });
 
+test("Monday cron preserves its 500 response when ingestion fails", async () => {
+  const handler = createMondaySalesSyncCronHandler(async () => { throw new Error("source unavailable"); }, () => true);
+  const response = await handler(new Request("https://example.test/api/cron/monday-sales-sync"));
+  assert.equal(response.status, 500);
+  assert.deepEqual(await response.json(), { error: "Monday sales sync failed" });
+});
+
 test("Monday cron scopes itself to the UTC current month and skips overlapping runs", async () => {
   const deps = dependencies(null, false);
   const result = await runMondaySalesCron({ ...deps, now: new Date("2026-07-28T10:15:00Z") });

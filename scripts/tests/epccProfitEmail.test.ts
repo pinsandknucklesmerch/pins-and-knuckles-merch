@@ -24,6 +24,14 @@ test("EPCC audit reader exposes only service-role metadata", async () => {
   assert.doesNotMatch(migration, /gmail_message_id|subject text|sender text/);
 });
 
+test("legacy EPCC source RPC cleanup drops only the obsolete overload", async () => {
+  const migration = await readFile("supabase/migrations/20260811110000_retire_legacy_epcc_profit_ingestion_rpc.sql", "utf8");
+  assert.match(migration, /drop function if exists public\.ingest_epcc_monthly_profit\(\s*uuid,\s*integer,\s*integer,\s*numeric,\s*text,\s*text,\s*text,\s*text,\s*timestamptz,\s*integer,\s*text\s*\);/i);
+  assert.doesNotMatch(migration, /drop table/i);
+  assert.doesNotMatch(migration, /ingest_epcc_monthly_profit_and_members/i);
+  assert.doesNotMatch(migration, /p_total_sales|p_total_profit|p_total_pk_tax/i);
+});
+
 test("parses the final overall Total row and ignores salesperson subtotals", async () => {
   const report = parseEpccProfitEmail(await fixture());
   assert.deepEqual({ sales: report.totalSales, profit: report.monthlyProfit, tax: report.totalPkTax }, {
