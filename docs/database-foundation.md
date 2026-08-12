@@ -1,10 +1,11 @@
 # Database Foundation
 
-> Historical foundation note: this document preserves the original schema and
-> access-model decisions. The migration instructions below are not a current
-> “apply when ready” task list. The foundation migration is part of the active
-> forward-only migration chain; consult [`PROJECT_CONTEXT.md`](ai-context/PROJECT_CONTEXT.md)
-> for current schema status.
+> Historical foundation/decision record. This document preserves the original
+> schema and access-model decisions; it does not represent the complete current
+> schema. The migration instructions below are not a current “apply when ready”
+> task list. Use `supabase/migrations/` and
+> [`PROJECT_CONTEXT.md`](ai-context/PROJECT_CONTEXT.md) for current schema
+> understanding.
 
 ## Tables
 

@@ -4,6 +4,13 @@ Source repository inspected: Legacy Pins Hub Next.js App Router app.
 
 This document is analysis only. It preserves observed behavior from source and does not propose Prisma for the rebuild.
 
+> Historical legacy research. This document describes legacy behavior and a
+> proposed migration architecture, not the current calculator implementation.
+> Verify current behavior against source code, tests, migrations, and
+> generated types. Legacy profile names and proposed schemas below are not
+> authoritative; current active profile codes are `EU_STANDARD`,
+> `EU_US_CLIENTS`, and `UK_TRADE`.
+
 > Historical legacy analysis: component names and trees in this document refer
 > to the earlier implementation/proposal. In particular, `GarmentSelector` is
 > not a current source module; the unreachable legacy modules were removed in

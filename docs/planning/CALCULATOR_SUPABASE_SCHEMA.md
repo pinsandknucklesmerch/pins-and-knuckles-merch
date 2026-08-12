@@ -1,17 +1,23 @@
 # Calculator Supabase Schema Reference
 
-Source of truth:
+> Supporting calculator-schema reference. This file began as a schema plan;
+> `supabase/migrations/` and `src/types/database.types.ts` are authoritative.
+> It is subordinate to the canonical
+> [`PROJECT_CONTEXT.md`](../ai-context/PROJECT_CONTEXT.md), current migrations,
+> and generated types. Proposed tables/checks below are historical unless
+> present in those sources.
 
-- `docs/ai-context/PROJECT_CONTEXT.md`
-- `docs/planning/CALCULATOR_MIGRATION_ANALYSIS.md`
-- `docs/planning/LEGACY_CALCULATOR_BEHAVIOUR_CONFIRMATION.md`
+The initial schema and seed data were implemented in
+`20260715120000_calculator_schema.sql` and
+`20260715130000_calculator_seed.sql`. Current active profile codes are
+`EU_STANDARD`, `EU_US_CLIENTS`, and `UK_TRADE`; EU Trade remains deferred.
 
-This document began as the calculator schema plan. The schema and seed data have since been implemented in `supabase/migrations/20260715120000_calculator_schema.sql` and `supabase/migrations/20260715130000_calculator_seed.sql`; treat the migrations and generated types as implementation truth.
-
-Current implementation also includes Product Types, the `OTHER` pricing
-category, invoice/customs fields, and normalized profile-specific markups.
+Current migrations also include Product Types, the `OTHER` pricing category,
+invoice/customs fields, and normalized profile-specific markups.
+`garment_type` remains transitional markup data; Product Type
+`pricing_category` is the active category source for new management flows.
 Some table/check recommendations below predate those changes and are retained
-as historical planning context, not as a complete current schema specification.
+as historical context, not as a complete current schema specification.
 
 ## Confirmed Migration Decisions
 

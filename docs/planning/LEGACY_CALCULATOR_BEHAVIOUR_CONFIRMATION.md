@@ -2,6 +2,11 @@
 
 Scope: direct inspection of the legacy Pins Hub calculator implementation. This document separates implemented behavior from likely bugs, stale documentation, and business decisions that cannot be recovered from code.
 
+> Historical business-rule evidence. Legacy behavior is not automatically
+> current behavior unless confirmed by current source code and tests. Current
+> implementation uses profiles `EU_STANDARD`, `EU_US_CLIENTS`, and `UK_TRADE`;
+> EU Trade remains deferred pending confirmed business rules.
+
 ## 1. EU Missing Pricing Tiers
 
 ### Confirmed Behaviour

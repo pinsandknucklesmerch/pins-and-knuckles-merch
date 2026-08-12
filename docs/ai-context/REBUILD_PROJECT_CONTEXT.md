@@ -1,5 +1,9 @@
-# Pins Hub Rebuild Context
+# Historical Pins Hub Rebuild Context
 
-Canonical project context now lives at `docs/ai-context/PROJECT_CONTEXT.md`.
+> Historical compatibility record. This file is retained only for old links to
+> the rebuild-context location; it does not describe current architecture,
+> implementation, or operational state.
 
-Use that file for the current rebuild strategy, stack, routes, Supabase state, calculator status, development workflow, known issues, and next recommended work.
+The sole canonical current context is
+[`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md). Use it for current routes, stack,
+access rules, migrations, integrations, calculator status, and deferred work.

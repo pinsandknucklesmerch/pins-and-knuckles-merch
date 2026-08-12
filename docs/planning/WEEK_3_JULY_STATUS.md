@@ -1,6 +1,9 @@
 # Pins Hub — Week 3 July Status
 
-> Historical status record from July 2026. Its follow-up checklist and production notes are retained for context, not as current operational instructions. Use the verification process in `README.md` and `docs/ai-context/PROJECT_CONTEXT.md` for current work.
+> Historical status snapshot from July 2026. Production, deployment, runtime,
+> and data assertions below are dated historical claims, not current repository
+> verification. The current canonical state is
+> [`docs/ai-context/PROJECT_CONTEXT.md`](../ai-context/PROJECT_CONTEXT.md).
 
 > Subsequent resolution: the obsolete EPCC ingestion RPC overload was retired
 > remotely, current database types were regenerated on 2026-08-11, and cron
@@ -14,7 +17,8 @@ The Sales/KPI Dashboard is production-ready, pending confirmation of the first u
 
 ## Completed This Week
 
-- Restored green automated tests and added the unified `npm test` command.
+- Restored green automated tests. The current package manifest does **not**
+  define a unified command for the full test suite.
 - Updated canonical project documentation.
 - Repaired EPCC remote schema drift with forward-only migrations.
 - Added the service-role-only EPCC ingestion audit reader.

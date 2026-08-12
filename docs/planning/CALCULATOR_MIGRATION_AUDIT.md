@@ -2,6 +2,11 @@
 
 This audit covers the legacy calculator behaviour found in the reference Pins Hub app and related planning notes. The legacy app is reference-only: preserve business rules and copy contracts, but do not copy its Prisma architecture, database design, or components into the rebuild.
 
+> Historical legacy research. The profile names and proposed schemas in this
+> audit are not current implementation authority. Verify current behavior
+> against source code, tests, migrations, and generated types. Current active
+> profile codes are `EU_STANDARD`, `EU_US_CLIENTS`, and `UK_TRADE`.
+
 ## Source Status
 
 | Calculator | Legacy status | Notes |

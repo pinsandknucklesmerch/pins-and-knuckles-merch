@@ -1,8 +1,10 @@
 # Sales Dashboard Plan
 
-> Historical planning document. The target structure, Monday lead architecture,
-> and implementation sequence below preserve earlier decisions; they are not a
-> description of the current source tree.
+> Historical Sales Dashboard design/planning record. The proposed live Monday
+> rendering, component/file architecture, and implementation sequence below
+> are not current implementation guidance. The current dashboard is
+> Supabase-first; see
+> [`PROJECT_CONTEXT.md`](ai-context/PROJECT_CONTEXT.md) for current behavior.
 
 ## Current state
 

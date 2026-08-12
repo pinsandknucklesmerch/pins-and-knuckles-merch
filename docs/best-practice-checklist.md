@@ -41,9 +41,11 @@
 
 - `npm run lint`
 - `npx tsc --noEmit`
-- `npm test`
 - `npm run build`
-- `git diff --check`
+
+> The package manifest does not currently define a unified full-suite test
+> command. Use the supported commands above; add a deterministic test command
+> in a separately approved change.
 
 > Historical dashboard guidance: date-range, lead-source, and salesperson-table
 > architecture from earlier planning is not current project architecture. Keep

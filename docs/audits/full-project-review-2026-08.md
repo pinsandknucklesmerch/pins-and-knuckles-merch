@@ -2,6 +2,12 @@
 
 Audit date: 2026-08-05
 
+> Historical dated audit. This reflects the repository at the time of the
+> audit; migration/test counts, file inventories, and recommendations may be
+> superseded. Completed recommendations must not be treated as outstanding.
+> The current state is
+> [`docs/ai-context/PROJECT_CONTEXT.md`](../ai-context/PROJECT_CONTEXT.md).
+
 Scope: current tracked Pins Hub application, configuration, migrations, scripts, tests, documentation, and public assets. The Next.js App Router and Supabase implementation are treated as authoritative. Legacy Prisma/Neon material was reviewed only as reference documentation and is not proposed for restoration.
 
 Method: route conventions, static imports/exports, dynamic imports, App Router entry points, package/configuration references, test references, script entry points, migrations, generated types, and documentation were cross-checked. This was a read-only review; the only repository output is this report. No applied migration is proposed for deletion or editing.
