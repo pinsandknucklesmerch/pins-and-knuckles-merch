@@ -976,6 +976,382 @@ export type Database = {
           },
         ]
       }
+      merchbuddy_customer_account_managers: {
+        Row: {
+          created_at: string
+          customer_id: string
+          is_primary: boolean
+          profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          is_primary?: boolean
+          profile_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          is_primary?: boolean
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchbuddy_customer_account_managers_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "merchbuddy_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_customer_account_managers_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchbuddy_customer_contacts: {
+        Row: {
+          created_at: string
+          customer_id: string
+          email: string | null
+          id: string
+          is_primary: boolean
+          name: string
+          phone: string | null
+          position: string | null
+          profile_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          email?: string | null
+          id?: string
+          is_primary?: boolean
+          name: string
+          phone?: string | null
+          position?: string | null
+          profile_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          email?: string | null
+          id?: string
+          is_primary?: boolean
+          name?: string
+          phone?: string | null
+          position?: string | null
+          profile_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchbuddy_customer_contacts_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "merchbuddy_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_customer_contacts_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchbuddy_customers: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          organisation_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          organisation_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          organisation_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchbuddy_customers_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_customers_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchbuddy_product_variants: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          product_id: string
+          sort_order: number
+          starting_quantity: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          product_id: string
+          sort_order?: number
+          starting_quantity?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          product_id?: string
+          sort_order?: number
+          starting_quantity?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchbuddy_product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "merchbuddy_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchbuddy_products: {
+        Row: {
+          created_at: string
+          id: string
+          image_path: string | null
+          is_active: boolean
+          name: string
+          sale_price: number | null
+          sku: string | null
+          sort_order: number
+          tour_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          is_active?: boolean
+          name: string
+          sale_price?: number | null
+          sku?: string | null
+          sort_order?: number
+          tour_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          is_active?: boolean
+          name?: string
+          sale_price?: number | null
+          sku?: string | null
+          sort_order?: number
+          tour_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchbuddy_products_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "merchbuddy_tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchbuddy_shows: {
+        Row: {
+          city: string
+          country: string
+          created_at: string
+          id: string
+          notes: string | null
+          postal_code: string | null
+          sell_type: string
+          set_type: string
+          show_date: string
+          street_address: string | null
+          tour_id: string
+          updated_at: string
+          venue_name: string
+        }
+        Insert: {
+          city: string
+          country: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          postal_code?: string | null
+          sell_type: string
+          set_type: string
+          show_date: string
+          street_address?: string | null
+          tour_id: string
+          updated_at?: string
+          venue_name: string
+        }
+        Update: {
+          city?: string
+          country?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          postal_code?: string | null
+          sell_type?: string
+          set_type?: string
+          show_date?: string
+          street_address?: string | null
+          tour_id?: string
+          updated_at?: string
+          venue_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchbuddy_shows_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "merchbuddy_tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchbuddy_tour_users: {
+        Row: {
+          created_at: string
+          profile_id: string
+          role: string
+          tour_id: string
+        }
+        Insert: {
+          created_at?: string
+          profile_id: string
+          role: string
+          tour_id: string
+        }
+        Update: {
+          created_at?: string
+          profile_id?: string
+          role?: string
+          tour_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchbuddy_tour_users_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_tour_users_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "merchbuddy_tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchbuddy_tours: {
+        Row: {
+          created_at: string
+          created_by: string
+          currency: string
+          customer_id: string
+          end_date: string | null
+          id: string
+          name: string
+          organisation_id: string
+          start_date: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          currency: string
+          customer_id: string
+          end_date?: string | null
+          id?: string
+          name: string
+          organisation_id: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          currency?: string
+          customer_id?: string
+          end_date?: string | null
+          id?: string
+          name?: string
+          organisation_id?: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchbuddy_tours_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_tours_customer_organisation_fkey"
+            columns: ["customer_id", "organisation_id"]
+            isOneToOne: false
+            referencedRelation: "merchbuddy_customers"
+            referencedColumns: ["id", "organisation_id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_tours_organisation_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organisation_members: {
         Row: {
           created_at: string | null
@@ -1719,6 +2095,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_access_merchbuddy_customer: {
+        Args: { target_customer_id: string }
+        Returns: boolean
+      }
+      can_access_merchbuddy_tour: {
+        Args: { target_tour_id: string }
+        Returns: boolean
+      }
+      can_manage_merchbuddy_tour: {
+        Args: { target_tour_id: string }
+        Returns: boolean
+      }
+      can_manage_merchbuddy_tour_definition: {
+        Args: { target_tour_id: string }
+        Returns: boolean
+      }
+      has_merchbuddy_access: {
+        Args: { required_access_level?: string }
+        Returns: boolean
+      }
+      has_merchbuddy_access_for_organisation: {
+        Args: { required_access_level?: string; target_organisation_id: string }
+        Returns: boolean
+      }
+      has_merchbuddy_admin_access: { Args: never; Returns: boolean }
+      has_merchbuddy_admin_access_for_organisation: {
+        Args: { target_organisation_id: string }
+        Returns: boolean
+      }
       has_pins_hub_access: {
         Args: { required_access_level?: string }
         Returns: boolean

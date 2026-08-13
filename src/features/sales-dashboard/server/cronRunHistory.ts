@@ -3,6 +3,11 @@ export type CronJobName = (typeof CRON_JOB_NAMES)[number];
 export type CronRunStatus = "running" | "success" | "failed";
 export type ReportingPeriod = { year: number; month: number };
 export type CronRunMetadata = Record<string, string | number | boolean | null>;
+export type CronHistoryClient = {
+  start: typeof startCronRun;
+  complete: typeof completeCronRun;
+  fail: typeof failCronRun;
+};
 
 export type CronRunHistoryRow = {
   id: string;
@@ -81,4 +86,40 @@ export async function failCronRun(input: { id: string; startedAt: string; error:
     summary: "Run failed", error_message: safeCronErrorMessage(input.error), metadata: safeCronMetadata(input.metadata),
   }).eq("id", input.id);
   if (error) throw new Error(`Could not fail cron run history: ${error.message}`);
+}
+
+export const cronRunHistory = { start: startCronRun, complete: completeCronRun, fail: failCronRun };
+
+/**
+ * Runs the ingestion independently of its audit trail.  Cron history is useful
+ * operational data, never a precondition for the source sync itself.
+ */
+export async function runWithCronHistory<Result>(input: {
+  jobName: CronJobName;
+  start: () => Promise<{ id: string; startedAt: string }>;
+  run: () => Promise<Result>;
+  complete: (historyRun: { id: string; startedAt: string }, result: Result) => Promise<void>;
+  fail: (historyRun: { id: string; startedAt: string }, error: unknown) => Promise<void>;
+}) {
+  let historyRun: { id: string; startedAt: string } | null = null;
+  try {
+    historyRun = await input.start();
+  } catch (error) {
+    console.error(`Could not start ${input.jobName} cron run history`, error);
+  }
+
+  try {
+    const result = await input.run();
+    if (historyRun) {
+      try { await input.complete(historyRun, result); }
+      catch (error) { console.error(`Could not complete ${input.jobName} cron run history`, error); }
+    }
+    return result;
+  } catch (error) {
+    if (historyRun) {
+      try { await input.fail(historyRun, error); }
+      catch (historyError) { console.error(`Could not fail ${input.jobName} cron run history`, historyError); }
+    }
+    throw error;
+  }
 }
