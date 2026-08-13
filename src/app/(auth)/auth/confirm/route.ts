@@ -2,14 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
-function getSafeNextPath(next: string | null) {
-  if (!next || !next.startsWith("/") || next.startsWith("//")) {
-    return "/auth/update-password";
-  }
-
-  return next;
-}
+import { getSafeAuthNextPath } from "@/features/auth/lib/recoveryConfirmation";
 
 function getVerifiedRedirectPath(type: EmailOtpType | null, next: string) {
   if (type === "invite") {
@@ -24,7 +17,7 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
-  const next = getSafeNextPath(searchParams.get("next"));
+  const next = getSafeAuthNextPath(searchParams.get("next"));
   const verifiedRedirectPath = getVerifiedRedirectPath(type, next);
   const supabase = await createClient();
 
