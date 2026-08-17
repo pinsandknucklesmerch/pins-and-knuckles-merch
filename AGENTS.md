@@ -43,6 +43,15 @@ rtk pip list            rtk pnpm install        rtk npm run <script>
 
 ## Pins Hub Project Rules
 
+## Current Stack & Integrations
+
+- Core application: Next.js App Router, React 19, TypeScript, Tailwind CSS, and Webpack-based local development (`npm run dev`).
+- Data and access: Supabase Auth with SSR cookies, Postgres, RLS, forward-only migrations, and generated database types. Deployments and scheduled jobs run on Vercel.
+- Server-only integrations: Monday.com sales synchronisation and Gmail/Google OAuth EPCC profit-report ingestion. `SUPABASE_SERVICE_ROLE_KEY`, `MONDAY_API_TOKEN`, Google OAuth values, `GMAIL_REPORT_ADDRESS`, and `CRON_SECRET` must remain server-only.
+- Shared libraries: Radix UI, Lucide, MetricUI, Sonner, GSAP, OGL, ExcelJS, html2canvas, jsPDF, and jsPDF-AutoTable.
+- The detailed, current source of truth for routes, data ownership, cron behaviour, and operational verification is `docs/ai-context/PROJECT_CONTEXT.md`.
+- Do not introduce Prisma, Neon, or legacy Hub architecture/patterns.
+
 - Use Next.js App Router, TypeScript, Tailwind CSS, and Supabase.
 - Do not add Prisma or expose service-role credentials in application code.
 - Keep external API credentials server-only. Never use `NEXT_PUBLIC_` for tokens, Monday API keys, or other secrets.
