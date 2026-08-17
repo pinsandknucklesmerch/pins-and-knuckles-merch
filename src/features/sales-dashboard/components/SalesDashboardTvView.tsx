@@ -18,7 +18,6 @@ import { YearComparisonChart } from "./YearComparisonChart";
 import { YearToDateView } from "./YearToDateView";
 import { TeamMembersTab } from "./TeamMembersTab";
 import { LiveZooCamSlide } from "./LiveZooCamSlide";
-import { CurrentMonthComparisonView } from "./CurrentMonthComparisonView";
 import styles from "./SalesDashboardTvView.module.css";
 
 const VIEW_LABELS: Record<TvSlide, string> = {
@@ -28,7 +27,6 @@ const VIEW_LABELS: Record<TvSlide, string> = {
   snuggle: "Snuggle",
   team_members: "Team Members",
   "live-zoo-cam": "Live Zoo Cam",
-  "current-month-comparison": "Current Month Comparison",
 };
 
 type SalesDashboardTvViewProps = {
@@ -159,9 +157,8 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
     if (activeView === "snuggle") return <SnuggleView data={data.snuggle} year={year} month={month} tvMode />;
     if (activeView === "ytd") return <YearToDateView data={data.yearToDate} tvMode />;
     if (activeView === "year_comparison") return <YearComparisonChart comparison={data.yearComparison} showControls={false} tvMode />;
-    if (activeView === "team_members") return <TeamMembersTab data={data} year={year} month={month} />;
+    if (activeView === "team_members") return <TeamMembersTab data={data} year={year} month={month} tvMode />;
     if (activeView === "live-zoo-cam") return <LiveZooCamSlide />;
-    if (activeView === "current-month-comparison") return <CurrentMonthComparisonView comparison={data.yearComparison} month={month} />;
     return <EmptyState title="No dashboard view" />;
   }, [activeView, companyMetrics, cycleKey, data, month, monthLabel, monthlyProfitMetric, year]);
 

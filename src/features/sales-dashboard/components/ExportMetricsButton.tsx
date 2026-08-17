@@ -110,7 +110,7 @@ export function ExportMetricsButton({
           disabled={isExporting}
         >
           <span aria-hidden="true">{isExporting ? "…" : "⇩"}</span>
-          {isExporting ? "Exporting…" : "EPCC Profit Report"}
+          {isExporting ? "Exporting…" : "EPCC Report"}
         </button>
       </div>
     </div>

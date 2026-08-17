@@ -186,7 +186,7 @@ test("visibility helpers expose exactly the approved normal and administrative s
     { teamMemberKey: "johan", memberClassification: "admin_hidden" as const },
     { teamMemberKey: "other_non_dashboard", memberClassification: "other_non_dashboard" as const },
   ];
-  assert.deepEqual(normalDashboardMembers(rows).map((row) => row.teamMemberKey), ["hardus", "justin", "bux"]);
+  assert.deepEqual(normalDashboardMembers(rows).map((row) => row.teamMemberKey), ["hardus", "justin", "bux", "johan"]);
   assert.deepEqual(adminVisibleMembers(rows).map((row) => row.teamMemberKey), ["hardus", "justin", "bux", "shannon", "johan", "other_non_dashboard"]);
   assert.deepEqual(reconciliationMembers(rows).map((row) => row.teamMemberKey), ["other_non_dashboard"]);
 });

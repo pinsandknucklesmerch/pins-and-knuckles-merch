@@ -9,9 +9,10 @@ type AnimatedMetricValueProps = {
   className?: string;
   maximumFractionDigits?: number;
   minimumFractionDigits?: number;
+  tvKpiValue?: boolean;
 };
 
-export function AnimatedMetricValue({ value, format, className, maximumFractionDigits, minimumFractionDigits }: AnimatedMetricValueProps) {
+export function AnimatedMetricValue({ value, format, className, maximumFractionDigits, minimumFractionDigits, tvKpiValue = false }: AnimatedMetricValueProps) {
   const previousValue = useRef<number | null>(null);
   const [animatedValue, setAnimatedValue] = useState<number | null>(value ?? null);
   const finalText = getAccessibleMetricText(value, format, maximumFractionDigits, minimumFractionDigits);
@@ -50,5 +51,5 @@ export function AnimatedMetricValue({ value, format, className, maximumFractionD
     ? "—"
     : formatAnimatedMetricValue(animatedValue, format, maximumFractionDigits, minimumFractionDigits);
 
-  return <span className={className} aria-label={finalText}><span aria-hidden="true">{visibleText}</span><span className="sr-only">{finalText}</span></span>;
+  return <span className={className} data-tv-kpi-value={tvKpiValue ? "true" : undefined} aria-label={finalText}><span aria-hidden="true">{visibleText}</span><span className="sr-only">{finalText}</span></span>;
 }

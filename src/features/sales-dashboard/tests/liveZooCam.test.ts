@@ -6,7 +6,7 @@ import { LIVE_ZOO_CAM_SOURCES, MONTEREY_OPEN_SEA_CAM } from "../lib/liveZooCam.t
 import { DEFAULT_TV_SETTINGS, TV_SLIDE_KEYS } from "../lib/tvSettings.ts";
 
 test("Live Zoo Cam is registered alongside the existing TV slides", () => {
-  assert.deepEqual(TV_SLIDE_KEYS, ["overview", "ytd", "year_comparison", "snuggle", "team_members", "live-zoo-cam", "current-month-comparison"]);
+  assert.deepEqual(TV_SLIDE_KEYS, ["overview", "ytd", "year_comparison", "snuggle", "live-zoo-cam", "team_members"]);
   assert.equal(DEFAULT_TV_SETTINGS.find((slide) => slide.slideKey === "live-zoo-cam")?.isEnabled, true);
   assert.ok(TV_SLIDE_KEYS.includes("overview"));
   assert.ok(TV_SLIDE_KEYS.includes("team_members"));

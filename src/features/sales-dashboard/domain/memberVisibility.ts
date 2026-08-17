@@ -3,7 +3,7 @@ import type { TeamMemberKpiMonth } from "./types.ts";
 type ClassifiedMember = Pick<TeamMemberKpiMonth, "memberClassification">;
 
 export function normalDashboardMembers<T extends ClassifiedMember>(members: T[]) {
-  return members.filter((member) => member.memberClassification === "dashboard_account_manager");
+  return members.filter((member) => member.memberClassification === "dashboard_account_manager" || ("teamMemberKey" in member && member.teamMemberKey === "johan"));
 }
 
 export function adminVisibleMembers<T extends ClassifiedMember>(members: T[]) {

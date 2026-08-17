@@ -65,7 +65,11 @@ test("company dashboard keeps monthly content separate from year to date", () =>
   assert.doesNotMatch(dashboard, /TeamMemberKpiView|<Select[^>]+name="view"|name="member"/);
   assert.match(dashboard, /useState<DashboardView>\(initialDashboardView\)/);
   assert.match(dashboard, /activeDashboardView === "overview"[\s\S]*<CompanyKpiView[\s\S]*activeDashboardView === "ytd"[\s\S]*<YearToDateView[\s\S]*<YearComparisonChart/);
-  assert.match(dashboard, /sales-dashboard-actions" className="flex min-w-0 flex-wrap/);
+  assert.match(dashboard, /data-testid="sales-dashboard-actions"/);
+  assert.match(dashboard, /<legend>Period<\/legend>/);
+  assert.match(dashboard, /<legend>Dashboard<\/legend>/);
+  assert.match(dashboard, /<legend>Actions<\/legend>/);
+  assert.match(dashboard, />TV Mode<\/ActionButton>/);
   assert.match(dashboard, /isAdmin \? <MonthlyKpiFinals/);
   assert.doesNotMatch(company, /MonthlyKpiFinals/);
 });

@@ -10,6 +10,7 @@ const rows: MemberDashboardRow[] = [
   { teamMemberKey: "hardus", teamMemberName: "Hardus", memberClassification: "dashboard_account_manager", year: 2026, month: 7, quotesDone: 4, ordersProcessed: 1, salesInboxEnquiries: null, converted: null, profit: 1250, pkTax: 0, snuggleProfit: 9, mondaySourceMetadata: null, epccSourceMetadata: null, source: "monday", conversionRate: 25, previousYear: null },
   { teamMemberKey: "bux", teamMemberName: "Bux", memberClassification: "dashboard_account_manager", year: 2026, month: 7, quotesDone: null, ordersProcessed: null, salesInboxEnquiries: null, converted: null, profit: null, pkTax: null, snuggleProfit: null, mondaySourceMetadata: null, epccSourceMetadata: null, source: "monday", conversionRate: 0, previousYear: null },
   { teamMemberKey: "shannon", teamMemberName: "Shannon", memberClassification: "admin_hidden", year: 2026, month: 7, quotesDone: 2, ordersProcessed: 1, salesInboxEnquiries: null, converted: null, profit: 10, pkTax: 1, snuggleProfit: null, mondaySourceMetadata: null, epccSourceMetadata: null, source: "monday", conversionRate: 50, previousYear: null },
+  { teamMemberKey: "johan", teamMemberName: "Johan", memberClassification: "admin_hidden", year: 2026, month: 7, quotesDone: 3, ordersProcessed: 2, salesInboxEnquiries: null, converted: null, profit: 20, pkTax: 2, snuggleProfit: null, mondaySourceMetadata: null, epccSourceMetadata: null, source: "monday", conversionRate: 66.7, previousYear: null },
   { teamMemberKey: "reconciliation", teamMemberName: "Reconciliation", memberClassification: "other_non_dashboard", year: 2026, month: 7, quotesDone: 2, ordersProcessed: 1, salesInboxEnquiries: null, converted: null, profit: 10, pkTax: 1, snuggleProfit: null, mondaySourceMetadata: null, epccSourceMetadata: null, source: "monday", conversionRate: 50, previousYear: null },
 ];
 
@@ -19,7 +20,7 @@ test("Team Members remains a dashboard tab and uses the selected dashboard perio
   assert.match(dashboard, /Team Members/);
   assert.match(dashboard, /<TeamMembersTab data=\{data\} year=\{year\} month=\{month\}/);
   assert.doesNotMatch(component, /Select|select|member dropdown|MemberKpiHistoryTable/);
-  assert.match(component, /return <Panel><div/);
+  assert.match(component, /return <Panel/);
   assert.doesNotMatch(component, /Panel title="Team Members"/);
   assert.match(component, /visibleMembers\.map/);
   assert.match(component, /flex flex-col gap-5/);
@@ -28,8 +29,8 @@ test("Team Members remains a dashboard tab and uses the selected dashboard perio
 });
 
 test("Team Members renders every visible account manager and excludes hidden members", () => {
-  assert.deepEqual(getVisibleTeamMembers(rows).map((row) => row.teamMemberKey), ["hardus", "bux"]);
-  assert.deepEqual(normalDashboardMembers(rows).map((row) => row.teamMemberKey), ["hardus", "bux"]);
+  assert.deepEqual(getVisibleTeamMembers(rows).map((row) => row.teamMemberKey), ["hardus", "bux", "johan"]);
+  assert.deepEqual(normalDashboardMembers(rows).map((row) => row.teamMemberKey), ["hardus", "bux", "johan"]);
   const component = readFileSync(new URL("../components/TeamMembersTab.tsx", import.meta.url), "utf8");
   assert.match(component, /<MemberSummaryCard/);
   const presentation = readFileSync(new URL("../components/MemberKpiPresentation.tsx", import.meta.url), "utf8");

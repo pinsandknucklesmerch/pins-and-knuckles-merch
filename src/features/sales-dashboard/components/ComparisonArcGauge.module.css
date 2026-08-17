@@ -26,6 +26,8 @@
   animation-delay: var(--arc-animation-delay, 0ms);
 }
 
+.tvAnimated { animation-duration: 520ms; }
+
 @keyframes inbox-arc {
   from { stroke-dasharray: 0 100; }
   to { stroke-dasharray: var(--arc-progress) 100; }

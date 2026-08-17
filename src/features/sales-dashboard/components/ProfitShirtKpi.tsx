@@ -19,11 +19,11 @@ export function ProfitShirtKpi({ metric, tvMode = false }: { metric: MetricResul
   const comparisonState = previousYearComparisonState(metric.value, metric.previousYear);
 
   return (
-    <Surface variant="metric" className={`${styles.card} ${tvMode ? styles.tvCard : ""}`}>
+    <Surface variant="metric" className={`${styles.card} ${tvMode ? styles.tvCard : ""}`} data-tv-kpi={tvMode ? "true" : undefined}>
       <div className={styles.label}>Monthly Profit</div>
-      <AnimatedMetricValue value={metric.value} format="currency" maximumFractionDigits={2} className={styles.value} />
+      <AnimatedMetricValue value={metric.value} format="currency" maximumFractionDigits={2} className={styles.value} tvKpiValue={tvMode} />
       <div className={styles.progress}>{progress === null ? "—" : `${(progress * 100).toFixed(1)}% of ${currency(target)}`}</div>
-      <div className={styles.shirt}><MonthlyProfitTshirt value={metric.value} target={target} tvMode={tvMode} /></div>
+      <div className={styles.shirt} data-tv-kpi-visual={tvMode ? "true" : undefined}><MonthlyProfitTshirt value={metric.value} target={target} tvMode={tvMode} /></div>
       {isAboveTarget ? <span className={styles.aboveTarget}>+{((progress - 1) * 100).toFixed(1)}%</span> : null}
       <div className={styles.comparison}>
         {metric.previousYear === null ? <span>No previous-year comparison</span> : <><span>Last year <strong>{currency(metric.previousYear)}</strong></span><ComparisonBadge percentageChange={metric.percentageChange} state={comparisonState} /></>}

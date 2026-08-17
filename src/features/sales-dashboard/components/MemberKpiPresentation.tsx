@@ -4,23 +4,24 @@ import { KpiCard } from "metricui";
 import { DASHBOARD_MONTHS } from "../types";
 import { formatMemberKpiValue, getMemberKpiHistory, getMemberKpiMetrics, getMemberKpiSnapshot, type MemberKpiMetric } from "../domain/memberKpis";
 import type { TeamMemberKpiMonth } from "../domain/types";
+import type { CSSProperties } from "react";
 
 function MemberMetricValue({ metric }: { metric: MemberKpiMetric }) {
   return <span className="tabular-nums">{formatMemberKpiValue(metric.value, metric.format)}</span>;
 }
 
-export function MemberKpiCards({ rows, memberKey, year, month }: { rows: TeamMemberKpiMonth[]; memberKey: string; year: number; month: number }) {
+export function MemberKpiCards({ rows, memberKey, year, month, tvMode = false }: { rows: TeamMemberKpiMonth[]; memberKey: string; year: number; month: number; tvMode?: boolean }) {
   const snapshot = getMemberKpiSnapshot(rows, memberKey, year, month);
-  return <div data-testid="member-kpi-cards" className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
+  return <div data-testid="member-kpi-cards" data-tv-kpi={tvMode ? "true" : undefined} className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
     {getMemberKpiMetrics(snapshot).map((metric) => <KpiCard key={metric.key} data-testid="member-kpi-metric" title={metric.label} value={metric.value} format={metric.format === "currency" ? { style: "currency", currency: "GBP", compact: false, precision: 0 } : metric.format === "percent" ? { style: "percent", precision: 1 } : { style: "number", compact: false, precision: 0 }} nullDisplay="dash" animate className="min-w-0" />)}
   </div>;
 }
 
-export function MemberSummaryCard({ rows, memberKey, year, month }: { rows: TeamMemberKpiMonth[]; memberKey: string; year: number; month: number }) {
+export function MemberSummaryCard({ rows, memberKey, year, month, tvMode = false, animationIndex = 0 }: { rows: TeamMemberKpiMonth[]; memberKey: string; year: number; month: number; tvMode?: boolean; animationIndex?: number }) {
   const snapshot = getMemberKpiSnapshot(rows, memberKey, year, month);
-  return <section data-testid="member-summary-card" data-period={`${year}-${month}`} className="grid w-full gap-3 border-b border-border pb-5 text-left last:border-b-0 last:pb-0">
-    <h2 className="font-medium text-foreground">{snapshot.memberName}</h2>
-    <MemberKpiCards rows={rows} memberKey={memberKey} year={year} month={month} />
+  return <section data-testid="member-summary-card" data-period={`${year}-${month}`} data-tv-group={tvMode ? "member-summary" : undefined} style={tvMode ? { "--tv-enter-index": animationIndex } as CSSProperties : undefined} className="grid w-full gap-3 border-b border-border pb-5 text-left last:border-b-0 last:pb-0">
+    <h2 className={tvMode ? "text-xl font-semibold text-foreground" : "font-medium text-foreground"}>{snapshot.memberName}</h2>
+    <MemberKpiCards rows={rows} memberKey={memberKey} year={year} month={month} tvMode={tvMode} />
   </section>;
 }
 

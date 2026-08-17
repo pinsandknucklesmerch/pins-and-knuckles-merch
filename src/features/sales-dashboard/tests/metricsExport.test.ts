@@ -151,15 +151,17 @@ test("export dropdown is outside the filter form and cannot submit it", () => {
   const metricUi = readFileSync(new URL("../../../../node_modules/metricui/dist/index.js", import.meta.url), "utf8");
   const formStart = dashboard.indexOf('<form data-testid="sales-dashboard-filter-form"');
   const formEnd = dashboard.indexOf("</form>", formStart);
-  const actionsStart = dashboard.indexOf('<div data-testid="sales-dashboard-actions"');
+  const actionsStart = dashboard.indexOf('data-testid="sales-dashboard-actions"');
+  const managementStart = dashboard.indexOf('data-testid="sales-dashboard-management-group"');
   const filterForm = dashboard.slice(formStart, formEnd);
 
   assert.ok(formStart >= 0 && formEnd > formStart);
-  assert.ok(actionsStart > formEnd);
+  assert.ok(actionsStart > managementStart && managementStart > formEnd);
   assert.equal(filterForm.match(/<button /g)?.length, 1);
   assert.match(filterForm, /<button[^>]*type="submit">Apply<\/button>/);
   assert.doesNotMatch(filterForm, /ExportMetricsButton|ManualKpiEntry/);
-  assert.match(dashboard.slice(actionsStart), /<ManualKpiEntry[\s\S]*<ExportMetricsButton/);
+  assert.match(dashboard.slice(managementStart, actionsStart), /<ManualKpiEntry[\s\S]*<MonthlyKpiFinals/);
+  assert.match(dashboard.slice(actionsStart), /<ExportMetricsButton[\s\S]*<ActionButton onClick=\{enterTvMode\}>TV Mode/);
 
   assert.match(metricUi, /createPortal\(/);
   for (const option of ["Save as image", "Download CSV", "Copy to clipboard"]) assert.match(metricUi, new RegExp(option));

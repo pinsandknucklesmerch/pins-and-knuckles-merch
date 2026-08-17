@@ -62,7 +62,7 @@ test("final values are admin-only and isolated from ingestion payloads", async (
 
 test("final-value management is compact and keeps the modal accessible", async () => {
   const component = await readFile("src/features/sales-dashboard/components/MonthlyKpiFinals.tsx", "utf8");
-  assert.match(component, />Manage final values</);
+  assert.match(component, />Final Values</);
   assert.match(component, /aria-labelledby="manage-final-values-title"/);
   assert.match(component, /max-h-\[calc\(100dvh-2rem\)\].*overflow-y-auto/);
   assert.match(component, /event\.key === "Escape"/);

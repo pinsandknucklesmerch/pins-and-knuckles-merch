@@ -23,6 +23,7 @@ import { ProfitPdfReport } from "./ProfitPdfReport";
 import { SalesDashboardTvView } from "./SalesDashboardTvView";
 import { TeamMembersTab } from "./TeamMembersTab";
 import { buildTvModeUrl, DEFAULT_TV_DURATION_SECONDS } from "../lib/tvMode";
+import styles from "./SalesDashboard.module.css";
 
 
 const DASHBOARD_TABS = [
@@ -69,27 +70,36 @@ if (!conversionRateMetric) {
   if (tvMode) return <MetricDashboardProvider><SalesDashboardTvView data={data} year={year} month={month} companyMetrics={companyMetrics} monthlyProfitMetric={monthlyProfitMetric} durationSeconds={tvDurationSeconds} /></MetricDashboardProvider>;
 
   return <MetricDashboardProvider><div className="grid min-w-0 gap-3">
-    <Panel><div className="flex min-w-0 flex-wrap items-end gap-3">
-      <form data-testid="sales-dashboard-filter-form" className="flex min-w-0 flex-wrap items-end gap-3" method="get" action="/hub/sales-dashboard">
-        <label className="grid min-w-[5.5rem] gap-1 text-xs font-medium text-muted-foreground">Year<Select className="min-w-[5.5rem]" name="year" defaultValue={String(year)}>{data.availableYears.map((value) => <option key={value} value={String(value)}>{value}</option>)}</Select></label>
-        <label className="grid min-w-[8rem] gap-1 text-xs font-medium text-muted-foreground">Month<Select className="min-w-[8rem]" name="month" defaultValue={String(month)}>{DASHBOARD_MONTHS.map((name, index) => <option key={name} value={String(index + 1)}>{name}</option>)}</Select></label>
-        <input name="dashboardView" type="hidden" value={activeDashboardView} />
-        <button className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground" type="submit">Apply</button>
-      </form>
-      <div data-testid="sales-dashboard-actions" className="flex min-w-0 flex-wrap items-center gap-3">
-        {isAdmin ? <ManualKpiEntry year={year} month={month} targets={data.targets} /> : null}
-        {isAdmin ? <MonthlyKpiFinals metrics={companyMetrics} year={year} month={month} isAdmin={isAdmin} /> : null}
-
-        <ExportMetricsButton
-          rows={exportRows}
-          targetRef={dashboardMetricsRef}
-          profitTargetRef={profitReportRef}
-          title={exportTitle}
-          profitFilename={`pins-profit-report-${DASHBOARD_MONTHS[month - 1].toLowerCase()}-${year}.pdf`}
-        />
-        <ActionButton onClick={enterTvMode}>TV Mode</ActionButton>
-
-      </div>
+    <Panel><div className={styles.controlSurface}>
+      <fieldset className={styles.controlGroup} data-testid="sales-dashboard-period-group">
+        <legend>Period</legend>
+        <form data-testid="sales-dashboard-filter-form" className={styles.periodForm} method="get" action="/hub/sales-dashboard">
+          <label className="grid min-w-[5.5rem] gap-1 text-xs font-medium text-muted-foreground">Year<Select className="min-w-[5.5rem]" name="year" defaultValue={String(year)}>{data.availableYears.map((value) => <option key={value} value={String(value)}>{value}</option>)}</Select></label>
+          <label className="grid min-w-[8rem] gap-1 text-xs font-medium text-muted-foreground">Month<Select className="min-w-[8rem]" name="month" defaultValue={String(month)}>{DASHBOARD_MONTHS.map((name, index) => <option key={name} value={String(index + 1)}>{name}</option>)}</Select></label>
+          <input name="dashboardView" type="hidden" value={activeDashboardView} />
+          <button className={styles.applyButton} type="submit">Apply</button>
+        </form>
+      </fieldset>
+      <fieldset className={styles.controlGroup} data-testid="sales-dashboard-management-group">
+        <legend>Dashboard</legend>
+        <div className={styles.groupControls}>
+          {isAdmin ? <ManualKpiEntry year={year} month={month} targets={data.targets} /> : null}
+          {isAdmin ? <MonthlyKpiFinals metrics={companyMetrics} year={year} month={month} isAdmin={isAdmin} /> : null}
+        </div>
+      </fieldset>
+      <fieldset className={styles.controlGroup} data-testid="sales-dashboard-actions">
+        <legend>Actions</legend>
+        <div className={styles.groupControls}>
+          <ExportMetricsButton
+            rows={exportRows}
+            targetRef={dashboardMetricsRef}
+            profitTargetRef={profitReportRef}
+            title={exportTitle}
+            profitFilename={`pins-profit-report-${DASHBOARD_MONTHS[month - 1].toLowerCase()}-${year}.pdf`}
+          />
+          <ActionButton onClick={enterTvMode}>TV Mode</ActionButton>
+        </div>
+      </fieldset>
     </div></Panel>
     <div ref={dashboardMetricsRef} data-testid="sales-dashboard-export-content" className="grid gap-3">
       {data.setupIssue ? <p role="alert" className="text-sm text-destructive">{data.setupIssue}</p> : null}

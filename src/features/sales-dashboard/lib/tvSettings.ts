@@ -5,9 +5,8 @@ export const TV_SLIDE_KEYS = [
   "ytd",
   "year_comparison",
   "snuggle",
-  "team_members",
   "live-zoo-cam",
-  "current-month-comparison",
+  "team_members",
 ] as const;
 
 export type TvSlideKey = (typeof TV_SLIDE_KEYS)[number];
@@ -38,7 +37,7 @@ export const DEFAULT_TV_SETTINGS: readonly TvSlideSetting[] = TV_SLIDE_KEYS.map(
 // but exclude it from TV playback until settings persistence is repaired.
 export const TV_RUNTIME_FALLBACK_SETTINGS: readonly TvSlideSetting[] = DEFAULT_TV_SETTINGS.map((slide) => ({
   ...slide,
-  isEnabled: slide.slideKey !== "team_members",
+  isEnabled: true,
 }));
 
 const APPROVED_SLIDE_KEYS = new Set<string>(TV_SLIDE_KEYS);

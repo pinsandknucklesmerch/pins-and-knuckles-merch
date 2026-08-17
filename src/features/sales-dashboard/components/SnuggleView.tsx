@@ -23,7 +23,7 @@ export function SnuggleView({ data, year, month, tvMode = false }: { data: Snugg
   return <div className="grid gap-3" data-tv-view={tvMode ? "snuggle" : undefined}>
     <WarningSummary data={data} tvMode={tvMode} />
     {!history.length ? <EmptyState title="No completed Snuggle profit" /> : <>
-      <div data-tv-group={tvMode ? "snuggle-summary" : undefined} style={tvMode ? { "--tv-enter-index": 0 } as CSSProperties : undefined}>
+      <div data-tv-group={tvMode ? "snuggle-summary" : undefined} data-tv-kpi={tvMode ? "true" : undefined} style={tvMode ? { "--tv-enter-index": 0 } as CSSProperties : undefined}>
         <KpiCard
           title={monthName({ year, month, total: 0 })}
           value={selected?.total ?? null}

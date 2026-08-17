@@ -17,13 +17,13 @@ export function SalesInboxKpi({ enquiries, conversionRate, animationKey, animati
   const hasEnquiriesComparison = enquiriesRatio !== null;
 
   return (
-    <Surface variant="metric" className={`${styles.card} ${tvMode ? styles.tvCard : ""}`}>
+    <Surface variant="metric" className={`${styles.card} ${tvMode ? styles.tvCard : ""}`} data-tv-kpi={tvMode ? "true" : undefined}>
       <h2 className={styles.heading}>Sales Inbox</h2>
       <section className={styles.enquiries} aria-labelledby="sales-inbox-enquiries">
         <h3 id="sales-inbox-enquiries" className={styles.label}>Enquiries</h3>
-        <AnimatedMetricValue value={enquiries.value} format="number" className={styles.enquiriesValue} />
-        <div className={styles.arc}>
-          <ComparisonArcGauge current={enquiries.value} previousYear={enquiries.previousYear} animationKey={animationKey} animationDelayMs={animationDelayMs} />
+        <AnimatedMetricValue value={enquiries.value} format="number" className={styles.enquiriesValue} tvKpiValue={tvMode} />
+        <div className={styles.arc} data-tv-kpi-visual={tvMode ? "true" : undefined}>
+          <ComparisonArcGauge current={enquiries.value} previousYear={enquiries.previousYear} animationKey={animationKey} animationDelayMs={animationDelayMs} tvMode={tvMode} />
         </div>
         <div className={styles.comparison}>
           {hasEnquiriesComparison ? <div className={styles.reference}>Last year {number(enquiries.previousYear)}</div> : <div className={styles.reference}>No previous-year comparison</div>}
@@ -32,7 +32,7 @@ export function SalesInboxKpi({ enquiries, conversionRate, animationKey, animati
       </section>
       <section className={styles.conversion} aria-labelledby="sales-inbox-conversion-rate">
         <h3 id="sales-inbox-conversion-rate" className={styles.label}>Conversion Rate</h3>
-        <AnimatedMetricValue value={conversionRate.value} format="percent" className={styles.conversionValue} />
+        <AnimatedMetricValue value={conversionRate.value} format="percent" className={styles.conversionValue} tvKpiValue={tvMode} />
         <div className={styles.comparison}>
           {conversionRate.previousYear === null ? (
             <div className={styles.reference}>No previous-year comparison</div>

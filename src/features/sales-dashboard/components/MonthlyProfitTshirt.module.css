@@ -47,6 +47,9 @@
   animation: monthly-profit-wave-secondary 5.6s linear infinite reverse;
 }
 
+.tvVisual .wavePrimary,
+.tvVisual .waveSecondary { animation: none; }
+
 .shirtArtwork {
   object-fit: contain;
   mix-blend-mode: screen;
