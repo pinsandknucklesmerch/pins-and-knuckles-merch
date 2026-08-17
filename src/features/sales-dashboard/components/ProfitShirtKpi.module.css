@@ -61,3 +61,9 @@
 }
 
 .comparison strong { color: hsl(var(--foreground)); font-weight: 600; }
+
+.tvCard { padding: 1.5rem; }
+.tvCard .value { font-size: 2.25rem; }
+.tvCard .label { font-size: 0.8125rem; }
+.tvCard .progress,
+.tvCard .comparison { font-size: 0.8125rem; }

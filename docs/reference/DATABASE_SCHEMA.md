@@ -67,6 +67,16 @@ defaults but keeps invoice drafts themselves in memory.
 - `developer_diagnostic_issues`: persisted Snuggle diagnostic issues, status,
   occurrence/detection lifecycle, and developer notes.
 
+## MerchBuddy foundation
+
+The Pins Hub Supabase project contains the Phase 1 MerchBuddy data foundation:
+organisation-scoped customers, contacts, account managers, tours, tour users,
+products, variants, and shows. Its migration also adds MerchBuddy access and
+tour-management helper functions, indexes/triggers, RLS policies, and
+authenticated grants. This repository does not contain MerchBuddy application
+screens or mobile code; the Expo/React Native application is maintained in a
+separate repository.
+
 ## Significant application-facing functions
 
 - `has_pins_hub_access` and `has_pins_hub_access_for_organisation`: access

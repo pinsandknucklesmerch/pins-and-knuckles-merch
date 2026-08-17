@@ -8,20 +8,21 @@ import styles from "./MonthlyProfitTshirt.module.css";
 type MonthlyProfitTshirtProps = {
   value: number | null;
   target: number | null;
+  tvMode?: boolean;
 };
 
 const SHIRT_VIEW_BOX = "0 0 1536 1024";
 const SHIRT_FILL_BOTTOM = 930;
 const SHIRT_FILL_RANGE = 850;
 
-export function MonthlyProfitTshirt({ value, target }: MonthlyProfitTshirtProps) {
+export function MonthlyProfitTshirt({ value, target, tvMode = false }: MonthlyProfitTshirtProps) {
   const clipId = `monthly-profit-tshirt-${useId().replace(/:/g, "")}`;
   const { fillPercent, tone } = monthlyProfitTshirtFillState(value, target);
   const fillOffset = SHIRT_FILL_BOTTOM - (fillPercent / 100) * SHIRT_FILL_RANGE;
   const label = `Monthly profit is ${fillPercent.toFixed(1)}% of target.`;
 
   return (
-    <div className={styles.visual} role="img" aria-label={label}>
+    <div className={`${styles.visual} ${tvMode ? styles.tvVisual : ""}`} role="img" aria-label={label}>
       <svg className={`${styles.liquid} ${tone === "green" ? styles.targetMet : styles.belowTarget}`} viewBox={SHIRT_VIEW_BOX} aria-hidden="true" focusable="false">
         <defs>
           <clipPath id={clipId} clipPathUnits="userSpaceOnUse">

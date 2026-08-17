@@ -6,6 +6,8 @@ export const TV_SLIDE_KEYS = [
   "year_comparison",
   "snuggle",
   "team_members",
+  "live-zoo-cam",
+  "current-month-comparison",
 ] as const;
 
 export type TvSlideKey = (typeof TV_SLIDE_KEYS)[number];
@@ -42,7 +44,7 @@ export const TV_RUNTIME_FALLBACK_SETTINGS: readonly TvSlideSetting[] = DEFAULT_T
 const APPROVED_SLIDE_KEYS = new Set<string>(TV_SLIDE_KEYS);
 
 export function validateTvSettings(rows: readonly TvSlideSetting[]): string | null {
-  if (rows.length !== TV_SLIDE_KEYS.length) return "All five TV slides are required.";
+  if (rows.length !== TV_SLIDE_KEYS.length) return "All TV slides are required.";
   const keys = new Set<string>();
   const orders = new Set<number>();
   for (const row of rows) {
@@ -54,7 +56,7 @@ export function validateTvSettings(rows: readonly TvSlideSetting[]): string | nu
     keys.add(row.slideKey);
     orders.add(row.displayOrder);
   }
-  if (keys.size !== TV_SLIDE_KEYS.length || TV_SLIDE_KEYS.some((key) => !keys.has(key))) return "All five approved TV slides are required.";
+  if (keys.size !== TV_SLIDE_KEYS.length || TV_SLIDE_KEYS.some((key) => !keys.has(key))) return "All approved TV slides are required.";
   if (!rows.some((row) => row.isEnabled)) return "At least one TV slide must remain enabled.";
   return null;
 }

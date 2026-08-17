@@ -8,7 +8,7 @@ import { feedback } from "@/components/ui/feedback";
 import { resetSalesDashboardTvSettings, saveSalesDashboardTvSettings } from "../actions";
 import { TV_SLIDE_KEYS, type TvSettingsActionState, type TvSlideKey, type TvSlideSetting } from "../lib/tvSettings";
 
-const LABELS: Record<TvSlideKey, string> = { overview: "Overview", ytd: "YTD", year_comparison: "Year Comparison", snuggle: "Snuggle", team_members: "Team Members" };
+const LABELS: Record<TvSlideKey, string> = { overview: "Overview", ytd: "YTD", year_comparison: "Year Comparison", snuggle: "Snuggle", team_members: "Team Members", "live-zoo-cam": "Live Zoo Cam", "current-month-comparison": "Current Month Comparison" };
 const initialState: TvSettingsActionState = { ok: false, message: "" };
 
 export function TvSettingsForm({ settings }: { settings: TvSlideSetting[] }) {

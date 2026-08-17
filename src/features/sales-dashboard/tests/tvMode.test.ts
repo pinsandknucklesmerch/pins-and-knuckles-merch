@@ -11,9 +11,9 @@ test("TV mode activates only for tv=1", () => {
 });
 
 test("TV slide registry wraps in both directions", () => {
-  assert.deepEqual(TV_VIEWS, ["overview", "ytd", "year_comparison", "snuggle", "team_members"]);
-  assert.equal(nextTvView("team_members"), "overview");
-  assert.equal(previousTvView("overview"), "team_members");
+  assert.deepEqual(TV_VIEWS, ["overview", "ytd", "year_comparison", "snuggle", "team_members", "live-zoo-cam", "current-month-comparison"]);
+  assert.equal(nextTvView("live-zoo-cam"), "current-month-comparison");
+  assert.equal(previousTvView("overview"), "current-month-comparison");
   assert.equal(nextTvView("overview", ["overview", "snuggle"]), "snuggle");
   assert.equal(previousTvView("overview", ["overview", "snuggle"]), "snuggle");
 });
@@ -27,16 +27,22 @@ test("TV URL helpers preserve reporting context and duration fallback", () => {
   assert.equal(buildNormalModeUrl({ month: 8, year: 2026 }), "/hub/sales-dashboard?month=8&year=2026");
 });
 
-test("TV controller uses the safe four-slide fallback, skips Team Members, and pauses hidden tabs", () => {
+test("TV controller uses the safe six-slide fallback, skips Team Members, and pauses hidden tabs", () => {
   const component = readFileSync(new URL("../components/SalesDashboardTvView.tsx", import.meta.url), "utf8");
-  assert.deepEqual(TV_RUNTIME_FALLBACK_SETTINGS.filter((slide) => slide.isEnabled).map((slide) => slide.slideKey), ["overview", "ytd", "year_comparison", "snuggle"]);
+  assert.deepEqual(TV_RUNTIME_FALLBACK_SETTINGS.filter((slide) => slide.isEnabled).map((slide) => slide.slideKey), ["overview", "ytd", "year_comparison", "snuggle", "live-zoo-cam", "current-month-comparison"]);
   assert.equal(TV_RUNTIME_FALLBACK_SETTINGS.find((slide) => slide.slideKey === "team_members")?.isEnabled, false);
   assert.match(component, /safeTvSettings\(\)\.slides\.filter/);
   assert.match(component, /durationSeconds/);
   assert.match(component, /setManualPaused/);
   assert.match(component, /visibilitychange/);
+  assert.match(component, /<LiveZooCamSlide/);
+  assert.match(component, /<CurrentMonthComparisonView/);
+  assert.match(component, /styles\.tvEnter/);
+  assert.match(component, /if \(nextView === activeView\) return/);
   assert.doesNotMatch(component, /sales-dashboard\/tv\/settings|<Settings|>Settings</);
   const styles = readFileSync(new URL("../components/SalesDashboardTvView.module.css", import.meta.url), "utf8");
+  assert.match(styles, /@keyframes tv-enter/);
+  assert.match(styles, /scale\(0\.99\)/);
   assert.match(styles, /prefers-reduced-motion/);
 });
 

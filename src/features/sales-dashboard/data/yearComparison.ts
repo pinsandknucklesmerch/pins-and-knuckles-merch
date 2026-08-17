@@ -23,6 +23,12 @@ export function buildYearComparison(selectedYear: number, selected: CompanyKpiMo
   return { selectedYear, previousYear: selectedYear - 1, selected: selected.map(point), previous: previous.map(point) };
 }
 
+export function selectCurrentMonthComparison(comparison: YearComparisonData, month: number) {
+  const selected = comparison.selected.find((point) => point.month === month);
+  const previous = comparison.previous.find((point) => point.month === month);
+  return selected && previous ? { selected, previous } : null;
+}
+
 export function yearComparisonValue(point: YearComparisonPoint, metric: YearComparisonMetric) {
   switch (metric) {
     case "MONTHLY_PROFIT": return point.monthlyProfit;

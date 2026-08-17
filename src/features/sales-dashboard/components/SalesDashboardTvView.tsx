@@ -17,6 +17,8 @@ import { SnuggleView } from "./SnuggleView";
 import { YearComparisonChart } from "./YearComparisonChart";
 import { YearToDateView } from "./YearToDateView";
 import { TeamMembersTab } from "./TeamMembersTab";
+import { LiveZooCamSlide } from "./LiveZooCamSlide";
+import { CurrentMonthComparisonView } from "./CurrentMonthComparisonView";
 import styles from "./SalesDashboardTvView.module.css";
 
 const VIEW_LABELS: Record<TvSlide, string> = {
@@ -25,6 +27,8 @@ const VIEW_LABELS: Record<TvSlide, string> = {
   year_comparison: "Year Comparison",
   snuggle: "Snuggle",
   team_members: "Team Members",
+  "live-zoo-cam": "Live Zoo Cam",
+  "current-month-comparison": "Current Month Comparison",
 };
 
 type SalesDashboardTvViewProps = {
@@ -64,10 +68,11 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
 
   const changeView = useCallback((nextView: TvSlide) => {
     if (!rotationKeys.includes(nextView)) return;
+    if (nextView === activeView) return;
     setActiveView(nextView);
     setCycleKey((current) => current + 1);
     setProgressKey((current) => current + 1);
-  }, [rotationKeys]);
+  }, [activeView, rotationKeys]);
 
   const moveNext = useCallback(() => { if (rotationKeys.length) changeView(nextTvView(activeView, rotationKeys)); }, [activeView, changeView, rotationKeys]);
   const movePrevious = useCallback(() => { if (rotationKeys.length) changeView(previousTvView(activeView, rotationKeys)); }, [activeView, changeView, rotationKeys]);
@@ -146,8 +151,8 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
       return <section className={styles.overviewSlide} data-tv-view="overview">
       <div className={styles.slideHeading} data-tv-group="profit-heading" style={{ "--tv-enter-index": 0 } as CSSProperties}><h2>{VIEW_LABELS[activeView]}</h2><span>{monthLabel} {year}</span></div>
       <div className={styles.overviewGrid}>
-        <div className={styles.overviewProfit} data-tv-group="profit-card" style={{ "--tv-enter-index": 1 } as CSSProperties}><ProfitShirtKpi metric={monthlyProfitMetric} animationKey={cycleKey} animationDelayMs={160} /></div>
-        <div className={styles.overviewInbox} data-tv-group="inbox-card" style={{ "--tv-enter-index": 2 } as CSSProperties}><SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} animationKey={cycleKey} animationDelayMs={240} /></div>
+        <div className={styles.overviewProfit} data-tv-group="profit-card" style={{ "--tv-enter-index": 1 } as CSSProperties}><ProfitShirtKpi metric={monthlyProfitMetric} animationKey={cycleKey} animationDelayMs={160} tvMode /></div>
+        <div className={styles.overviewInbox} data-tv-group="inbox-card" style={{ "--tv-enter-index": 2 } as CSSProperties}><SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} animationKey={cycleKey} animationDelayMs={240} tvMode /></div>
       </div>
     </section>;
     }
@@ -155,6 +160,8 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
     if (activeView === "ytd") return <YearToDateView data={data.yearToDate} tvMode />;
     if (activeView === "year_comparison") return <YearComparisonChart comparison={data.yearComparison} showControls={false} tvMode />;
     if (activeView === "team_members") return <TeamMembersTab data={data} year={year} month={month} />;
+    if (activeView === "live-zoo-cam") return <LiveZooCamSlide />;
+    if (activeView === "current-month-comparison") return <CurrentMonthComparisonView comparison={data.yearComparison} month={month} />;
     return <EmptyState title="No dashboard view" />;
   }, [activeView, companyMetrics, cycleKey, data, month, monthLabel, monthlyProfitMetric, year]);
 

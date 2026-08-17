@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { getFixtureCompanyMonth } from "../data/mappers.ts";
-import { buildYearComparison, formatYearComparisonValue, yearComparisonValue } from "../data/yearComparison.ts";
+import { buildYearComparison, formatYearComparisonValue, selectCurrentMonthComparison, yearComparisonValue } from "../data/yearComparison.ts";
 import { historicalSalesDashboardFixture } from "../data/workbookFixture.ts";
 
 function year(year: number) {
@@ -34,6 +34,15 @@ test("trend metric mapping uses canonical fields without mixing conversion metri
   assert.equal(yearComparisonValue(point, "SALES_INBOX_ENQUIRIES"), point.salesInboxEnquiries);
   assert.equal(yearComparisonValue(point, "SALES_INBOX_CONVERSION_RATE"), point.salesInboxConversionRate);
   assert.equal(yearComparisonValue(point, "LEADS"), null);
+});
+
+test("current-month comparison selects the same month from selected and prior years", () => {
+  const comparison = buildYearComparison(2025, year(2025), year(2024));
+  const selected = selectCurrentMonthComparison(comparison, 8);
+  assert.equal(selected?.selected.label, "Aug");
+  assert.equal(selected?.selected.monthlyProfit, 143714);
+  assert.equal(selected?.previous.monthlyProfit, 129997);
+  assert.equal(selectCurrentMonthComparison(comparison, 13), null);
 });
 
 test("trend values format as GBP, integers, and percentage points", () => {

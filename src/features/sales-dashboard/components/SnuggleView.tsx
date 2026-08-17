@@ -34,7 +34,7 @@ export function SnuggleView({ data, year, month, tvMode = false }: { data: Snugg
           className="min-h-[7.25rem]"
         />
       </div>
-      <SnuggleMonthlyChart months={history} />
+      <SnuggleMonthlyChart months={history} tvMode={tvMode} />
     </>}
   </div>;
 }

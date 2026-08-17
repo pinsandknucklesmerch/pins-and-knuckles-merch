@@ -42,6 +42,7 @@
 }
 
 .stage {
+  display: grid;
   min-height: 0;
   overflow: auto;
   outline: none;
@@ -51,18 +52,19 @@
 .activitySlide {
   display: grid;
   align-content: center;
-  gap: 1.25rem;
-  width: min(100%, 78rem);
+  gap: 1.75rem;
+  width: min(100%, 108rem);
   min-height: 100%;
   margin: 0 auto;
+  padding: 1rem 1.5rem;
 }
 
 .overviewGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: stretch;
-  gap: 1.25rem;
-  width: min(100%, 78rem);
+  gap: 1.75rem;
+  width: min(100%, 108rem);
   margin: 0 auto;
 }
 
@@ -98,17 +100,18 @@
 }
 
 .view {
-  animation: tv-fade 320ms ease both;
+  min-height: 100%;
+  animation: tv-fade 280ms ease-out both;
 }
 
 .tvEnter {
-  animation: tv-enter 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: tv-enter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .tvEnter :global([data-tv-group]) {
   opacity: 0;
-  animation: tv-enter-item 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--tv-enter-index, 0) * 80ms);
+  animation: tv-enter-item 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--tv-enter-index, 0) * 55ms);
 }
 
 .footer {
@@ -229,12 +232,12 @@
 }
 
 @keyframes tv-enter {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0; transform: translateY(12px) scale(0.99); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes tv-enter-item {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -261,7 +264,7 @@
   .buttonGroup { width: 100%; }
   .controlButton { flex: 1; }
   .overviewSlide,
-  .activitySlide { gap: 0.75rem; }
+  .activitySlide { gap: 0.75rem; padding: 0.5rem 0; }
 }
 
 @media (max-width: 899px) {

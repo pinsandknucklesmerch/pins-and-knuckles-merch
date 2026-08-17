@@ -12,18 +12,18 @@ function currency(value: number | null) {
   return value === null ? "—" : new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 }
 
-export function ProfitShirtKpi({ metric }: { metric: MetricResult; animationKey?: string | number; animationDelayMs?: number }) {
+export function ProfitShirtKpi({ metric, tvMode = false }: { metric: MetricResult; animationKey?: string | number; animationDelayMs?: number; tvMode?: boolean }) {
   const target = metric.target;
   const progress = target === null ? null : profitProgress(metric.value, target);
   const isAboveTarget = progress !== null && progress > 1;
   const comparisonState = previousYearComparisonState(metric.value, metric.previousYear);
 
   return (
-    <Surface variant="metric" className={styles.card}>
+    <Surface variant="metric" className={`${styles.card} ${tvMode ? styles.tvCard : ""}`}>
       <div className={styles.label}>Monthly Profit</div>
       <AnimatedMetricValue value={metric.value} format="currency" maximumFractionDigits={2} className={styles.value} />
       <div className={styles.progress}>{progress === null ? "—" : `${(progress * 100).toFixed(1)}% of ${currency(target)}`}</div>
-      <div className={styles.shirt}><MonthlyProfitTshirt value={metric.value} target={target} /></div>
+      <div className={styles.shirt}><MonthlyProfitTshirt value={metric.value} target={target} tvMode={tvMode} /></div>
       {isAboveTarget ? <span className={styles.aboveTarget}>+{((progress - 1) * 100).toFixed(1)}%</span> : null}
       <div className={styles.comparison}>
         {metric.previousYear === null ? <span>No previous-year comparison</span> : <><span>Last year <strong>{currency(metric.previousYear)}</strong></span><ComparisonBadge percentageChange={metric.percentageChange} state={comparisonState} /></>}

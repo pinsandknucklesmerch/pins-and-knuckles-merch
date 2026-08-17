@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { buildSnuggleChartData, formatSnuggleChartMonth, resolveSelectedSnuggleMonth, sortSnuggleMonthsChronologically } from "../lib/snuggleChart.ts";
 
@@ -27,4 +28,13 @@ test("Snuggle MetricUI chart data preserves exact values and does not invent mon
 test("Snuggle headline resolves the exact selected month, including zero", () => {
   assert.equal(resolveSelectedSnuggleMonth([{ year: 2026, month: 8, total: 0 }], 2026, 8)?.total, 0);
   assert.equal(resolveSelectedSnuggleMonth([{ year: 2026, month: 7, total: 120 }], 2026, 8), null);
+});
+
+test("Snuggle TV chart reserves chart height and does not clip x-axis labels", () => {
+  const chart = readFileSync(new URL("../components/SnuggleMonthlyChart.tsx", import.meta.url), "utf8");
+  assert.match(chart, /dense=\{false\}/);
+  assert.match(chart, /className="overflow-hidden"/);
+  assert.match(chart, /className="min-w-0 overflow-x-auto"/);
+  assert.match(chart, /xAxisLabel=" "/);
+  assert.match(chart, /height=\{tvMode \? 340 : 280\}/);
 });

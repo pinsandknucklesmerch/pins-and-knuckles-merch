@@ -67,3 +67,11 @@
   justify-items: center;
   gap: 0.25rem;
 }
+
+.tvCard { padding: 1.5rem; }
+.tvCard .enquiriesValue,
+.tvCard .conversionValue { font-size: 2rem; }
+.tvCard .heading,
+.tvCard .label { font-size: 0.8125rem; }
+.tvCard .reference { font-size: 0.8125rem; }
+.tvCard .arc { transform: scale(1.16); margin-block: 0.25rem; }

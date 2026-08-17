@@ -1,0 +1,77 @@
+.slide {
+  display: grid;
+  align-content: center;
+  gap: 1.5rem;
+  min-height: 100%;
+  width: min(100%, 96rem);
+  margin: 0 auto;
+}
+
+.slide h2 {
+  margin: 0;
+  color: hsl(var(--foreground));
+  font-size: 1.5rem;
+  font-weight: 650;
+  text-align: center;
+}
+
+.periodGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.periodCard {
+  display: grid;
+  gap: 1.25rem;
+  min-height: 22rem;
+  padding: 2rem;
+  border: 1px solid hsl(var(--border) / 0.85);
+  border-radius: var(--hub-panel-radius);
+  background: hsl(var(--card) / 0.78);
+}
+
+.periodCard h3 {
+  margin: 0;
+  color: hsl(var(--foreground));
+  font-size: 2rem;
+  font-weight: 650;
+  text-align: center;
+}
+
+.periodCard dl {
+  display: grid;
+  align-content: center;
+  gap: 1rem;
+  margin: 0;
+}
+
+.periodCard dl > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid hsl(var(--border) / 0.65);
+  padding-top: 1rem;
+}
+
+.periodCard dt {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+}
+
+.periodCard dd {
+  margin: 0;
+  color: hsl(var(--foreground));
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  text-align: right;
+}
+
+@media (max-width: 639px) {
+  .periodGrid { grid-template-columns: minmax(0, 1fr); }
+  .periodCard { min-height: auto; padding: 1.25rem; }
+  .periodCard h3 { font-size: 1.5rem; }
+  .periodCard dd { font-size: 1.25rem; }
+}

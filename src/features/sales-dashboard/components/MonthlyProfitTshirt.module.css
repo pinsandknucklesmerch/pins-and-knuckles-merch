@@ -6,6 +6,8 @@
   isolation: isolate;
 }
 
+.tvVisual { width: min(17rem, 100%); }
+
 .liquid,
 .shirtArtwork {
   position: absolute;

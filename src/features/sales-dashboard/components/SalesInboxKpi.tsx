@@ -12,12 +12,12 @@ function number(value: number | null) {
   return value === null ? "—" : value.toLocaleString("en-GB");
 }
 
-export function SalesInboxKpi({ enquiries, conversionRate, animationKey, animationDelayMs = 0 }: { enquiries: MetricResult; conversionRate: MetricResult; animationKey?: string | number; animationDelayMs?: number }) {
+export function SalesInboxKpi({ enquiries, conversionRate, animationKey, animationDelayMs = 0, tvMode = false }: { enquiries: MetricResult; conversionRate: MetricResult; animationKey?: string | number; animationDelayMs?: number; tvMode?: boolean }) {
   const enquiriesRatio = comparisonArcRatio(enquiries.value, enquiries.previousYear);
   const hasEnquiriesComparison = enquiriesRatio !== null;
 
   return (
-    <Surface variant="metric" className={styles.card}>
+    <Surface variant="metric" className={`${styles.card} ${tvMode ? styles.tvCard : ""}`}>
       <h2 className={styles.heading}>Sales Inbox</h2>
       <section className={styles.enquiries} aria-labelledby="sales-inbox-enquiries">
         <h3 id="sales-inbox-enquiries" className={styles.label}>Enquiries</h3>
