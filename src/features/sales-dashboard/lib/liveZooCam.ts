@@ -9,14 +9,16 @@ export type OfficialZooCamSource = {
 
 /**
  * Only an official, independently verified embeddable player URL may be set
- * here. The Smithsonian page itself returns X-Frame-Options: SAMEORIGIN.
+ * here. The YouTube video ID is the current association published by the
+ * official cam page and can be updated if that page changes its stream.
  */
-export const SMITHSONIAN_PANDA_CAM: OfficialZooCamSource = {
-  id: "smithsonian-panda",
-  name: "Giant Panda Cam",
-  provider: "Smithsonian’s National Zoo",
-  officialPageUrl: "https://nationalzoo.si.edu/webcams/panda-cam",
-  embeddablePlayerUrl: null,
+export const MONTEREY_OPEN_SEA_CAM: OfficialZooCamSource = {
+  id: "monterey-open-sea",
+  name: "Open Sea Cam",
+  provider: "Monterey Bay Aquarium",
+  officialPageUrl: "https://www.montereybayaquarium.org/cams-videos/live-cams/open-sea-cam",
+  embeddablePlayerUrl: "https://www.youtube.com/embed/n_GpVsz4nHU?autoplay=1&mute=1",
+  iframeAllow: "autoplay; encrypted-media; fullscreen; picture-in-picture",
 };
 
-export const LIVE_ZOO_CAM_SOURCES = [SMITHSONIAN_PANDA_CAM] as const;
+export const LIVE_ZOO_CAM_SOURCES = [MONTEREY_OPEN_SEA_CAM] as const;

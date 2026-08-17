@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { SMITHSONIAN_PANDA_CAM, type OfficialZooCamSource } from "../lib/liveZooCam";
+import { MONTEREY_OPEN_SEA_CAM, type OfficialZooCamSource } from "../lib/liveZooCam";
 import styles from "./LiveZooCamSlide.module.css";
 
 type LiveZooCamSlideProps = {
@@ -11,7 +11,7 @@ type LiveZooCamSlideProps = {
 
 type ZooCamStatus = "loading" | "live" | "fallback";
 
-export function LiveZooCamSlide({ source = SMITHSONIAN_PANDA_CAM }: LiveZooCamSlideProps) {
+export function LiveZooCamSlide({ source = MONTEREY_OPEN_SEA_CAM }: LiveZooCamSlideProps) {
   const [status, setStatus] = useState<ZooCamStatus>(source.embeddablePlayerUrl ? "loading" : "fallback");
   const canEmbed = Boolean(source.embeddablePlayerUrl) && status !== "fallback";
 

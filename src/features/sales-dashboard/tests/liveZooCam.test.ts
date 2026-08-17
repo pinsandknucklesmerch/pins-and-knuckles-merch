@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { LIVE_ZOO_CAM_SOURCES, SMITHSONIAN_PANDA_CAM } from "../lib/liveZooCam.ts";
+import { LIVE_ZOO_CAM_SOURCES, MONTEREY_OPEN_SEA_CAM } from "../lib/liveZooCam.ts";
 import { DEFAULT_TV_SETTINGS, TV_SLIDE_KEYS } from "../lib/tvSettings.ts";
 
 test("Live Zoo Cam is registered alongside the existing TV slides", () => {
@@ -12,18 +12,20 @@ test("Live Zoo Cam is registered alongside the existing TV slides", () => {
   assert.ok(TV_SLIDE_KEYS.includes("team_members"));
 });
 
-test("Smithsonian source is attributed and uses only the official page while no official embed is verified", () => {
-  assert.deepEqual(LIVE_ZOO_CAM_SOURCES, [SMITHSONIAN_PANDA_CAM]);
-  assert.deepEqual(SMITHSONIAN_PANDA_CAM, {
-    id: "smithsonian-panda",
-    name: "Giant Panda Cam",
-    provider: "Smithsonian’s National Zoo",
-    officialPageUrl: "https://nationalzoo.si.edu/webcams/panda-cam",
-    embeddablePlayerUrl: null,
+test("Monterey source uses the official page and verified YouTube embed", () => {
+  assert.deepEqual(LIVE_ZOO_CAM_SOURCES, [MONTEREY_OPEN_SEA_CAM]);
+  assert.deepEqual(MONTEREY_OPEN_SEA_CAM, {
+    id: "monterey-open-sea",
+    name: "Open Sea Cam",
+    provider: "Monterey Bay Aquarium",
+    officialPageUrl: "https://www.montereybayaquarium.org/cams-videos/live-cams/open-sea-cam",
+    embeddablePlayerUrl: "https://www.youtube.com/embed/n_GpVsz4nHU?autoplay=1&mute=1",
+    iframeAllow: "autoplay; encrypted-media; fullscreen; picture-in-picture",
   });
+  assert.match(MONTEREY_OPEN_SEA_CAM.embeddablePlayerUrl ?? "", /^https:\/\/www\.youtube\.com\/embed\/[A-Za-z0-9_-]+\?autoplay=1&mute=1$/);
 });
 
-test("the Zoo Cam component falls back to the official page and keeps embed loading stable", () => {
+test("the Live Cam component renders an approved embed and retains the official fallback", () => {
   const component = readFileSync(new URL("../components/LiveZooCamSlide.tsx", import.meta.url), "utf8");
   assert.match(component, /Live from \{source\.provider\}/);
   assert.match(component, /href=\{source\.officialPageUrl\}/);
@@ -32,6 +34,8 @@ test("the Zoo Cam component falls back to the official page and keeps embed load
   assert.match(component, /status !== "fallback"/);
   assert.doesNotMatch(component, /useEffect|setInterval|setTimeout/);
   assert.match(component, /referrerPolicy="strict-origin-when-cross-origin"/);
+  assert.match(component, /src=\{source\.embeddablePlayerUrl \?\? undefined\}/);
+  assert.match(component, /allowFullScreen/);
 });
 
 test("TV settings migration preserves existing settings and adds the Zoo Cam slide", () => {
