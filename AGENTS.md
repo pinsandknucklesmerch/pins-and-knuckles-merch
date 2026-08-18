@@ -62,4 +62,13 @@ rtk pip list            rtk pnpm install        rtk npm run <script>
 - Reuse shared components from `src/components/ui`, `src/components/layout`, and feature component folders instead of repeating JSX and Tailwind classes.
 - Every data surface must handle loading, empty, and error states with existing shared state components where practical.
 - Keep UI compact, dark, and operational. Do not add descriptions, subtitles, helper paragraphs, decorative badges, hero sections, or marketing copy unless explicitly requested.
+
+## Data Management table actions
+
+- Put the action column first/left-most; never place Edit or Manage actions at the far right.
+- Use a standard `Edit` button for rows with one available action. Use the shared `ActionMenu` with a `Manage` trigger for rows with multiple actions such as Edit, Activate/Deactivate, or Delete.
+- Preserve existing destructive styling and confirmation behaviour for destructive actions.
+- Reuse shared buttons, menus, dropdowns, tables, and action components. Add or extend reusable behaviour in the common UI layer rather than duplicating it inside a feature.
+- Keep action controls consistently sized, spaced, aligned, and interactive across Data Management tables.
+
 - Before handing off code changes, run `npm run lint`, `npx tsc --noEmit`, and `npm run build`.

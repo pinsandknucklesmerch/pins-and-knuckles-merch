@@ -11,6 +11,10 @@ export type ValidatedProductTypeInvoiceValues = Omit<ProductTypeInvoiceValues, "
   invoiceCurrencyCode: "GBP" | "EUR" | null;
 };
 
+export function normaliseCommodityCode(value: string) {
+  return value.replace(/\s+/g, "");
+}
+
 export function validateProductTypeInvoiceFields(values: ProductTypeInvoiceValues) {
   const errors: Record<string, string> = {};
   const costText = values.defaultInvoiceCost.trim();

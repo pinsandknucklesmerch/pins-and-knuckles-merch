@@ -6,7 +6,7 @@ import { hasPinsHubAccessLevel } from "@/lib/access/pinsHubRoles";
 import { createClient } from "@/lib/supabase/server";
 import { PRICING_CATEGORIES, type DataManagementActionState } from "./types";
 import { canDeactivateGarment, deactivateGarmentRecord } from "./lib/deactivateGarment";
-import { validateProductTypeInvoiceFields } from "./lib/productTypeValidation";
+import { normaliseCommodityCode, validateProductTypeInvoiceFields } from "./lib/productTypeValidation";
 
 const PATHS = ["/hub/data", "/hub/data/garments", "/hub/data/product-types", "/hub/calculators", "/hub/calculators/eu/standard", "/hub/calculators/eu/us-clients", "/hub/calculators/uk/trade"];
 const normalise = (value: string | null | undefined) => (value ?? "").trim().replace(/\s+/g, " ").toLowerCase();
@@ -35,9 +35,9 @@ export async function saveProductType(_: DataManagementActionState, formData: Fo
   if (!hasPinsHubAccessLevel(accessLevel, "write")) return state(false, "You do not have permission to change Product Types.");
   const id = nullable(formData.get("id"));
   const name = nullable(formData.get("name"));
-  const commodityCode = nullable(formData.get("commodity_code"));
+  const commodityCode = normaliseCommodityCode(nullable(formData.get("commodity_code")) ?? "");
   const invoiceFields = validateProductTypeInvoiceFields({
-    commodityCode: commodityCode ?? "",
+    commodityCode,
     countryOfOrigin: String(formData.get("country_of_origin") ?? "").trim(),
     invoiceDescription: String(formData.get("invoice_description") ?? "").trim(),
     defaultInvoiceCost: String(formData.get("default_invoice_cost") ?? ""),
@@ -55,7 +55,7 @@ export async function saveProductType(_: DataManagementActionState, formData: Fo
     if (error) return state(false, "Product Type dependencies could not be checked.");
     if ((count ?? 0) > 0) return state(false, `Cannot deactivate: ${count} active garment${count === 1 ? "" : "s"} still reference this Product Type.`);
   }
-  const payload = { name, commodity_code: commodityCode ?? "", country_of_origin: invoiceFields.values.countryOfOrigin, invoice_description: invoiceFields.values.invoiceDescription, default_invoice_cost: invoiceFields.values.defaultInvoiceCost, invoice_currency_code: invoiceFields.values.invoiceCurrencyCode, pricing_category: pricingCategory, is_active: isActive };
+  const payload = { name, commodity_code: commodityCode, country_of_origin: invoiceFields.values.countryOfOrigin, invoice_description: invoiceFields.values.invoiceDescription, default_invoice_cost: invoiceFields.values.defaultInvoiceCost, invoice_currency_code: invoiceFields.values.invoiceCurrencyCode, pricing_category: pricingCategory, is_active: isActive };
   const result = id ? await supabase.from("product_types").update(payload).eq("id", id) : await supabase.from("product_types").insert(payload);
   if (result.error) return state(false, "Product Type could not be saved.");
   revalidateDataManagement();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useCallback, useEffect, useState } from "react";
 import { Dialog } from "@/components/ui/Dialog";
 import { feedback } from "@/components/ui/feedback";
 import { initialDataManagementActionState, type DataManagementActionState } from "../types";
@@ -13,15 +13,26 @@ export function InvoiceDirectoryLifecycleDialog({
   active,
   action,
   mode = "status",
+  open: controlledOpen,
+  onOpenChange,
+  hideTrigger = false,
 }: {
   id: string;
   label: string;
   active?: boolean;
   action: LifecycleAction;
   mode?: "status" | "delete";
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hideTrigger?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const [state, formAction, pending] = useActionState(action, initialDataManagementActionState);
+  const open = controlledOpen ?? uncontrolledOpen;
+  const setOpen = useCallback((nextOpen: boolean) => {
+    if (controlledOpen === undefined) setUncontrolledOpen(nextOpen);
+    onOpenChange?.(nextOpen);
+  }, [controlledOpen, onOpenChange]);
 
   useEffect(() => {
     if (!state.message) return;
@@ -31,14 +42,14 @@ export function InvoiceDirectoryLifecycleDialog({
     } else if (!state.fieldErrors) {
       feedback.error(state.message);
     }
-  }, [state]);
+  }, [setOpen, state]);
 
   const isDelete = mode === "delete";
   const actionLabel = isDelete ? "Delete" : active ? "Deactivate" : "Reactivate";
   const title = isDelete ? `Delete ${label}` : `${active ? "Deactivate" : "Reactivate"} ${label}`;
 
   return <>
-    <button type="button" onClick={() => setOpen(true)} className={isDelete ? "inline-flex min-h-8 items-center rounded-md px-2 text-destructive hover:bg-destructive/10 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" : active ? "inline-flex min-h-8 items-center rounded-md px-2 text-destructive hover:bg-destructive/10 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" : "inline-flex min-h-8 items-center rounded-md px-2 text-primary hover:bg-primary/10 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"}>{actionLabel}</button>
+    {!hideTrigger ? <button type="button" onClick={() => setOpen(true)} className={isDelete ? "inline-flex min-h-8 items-center rounded-md px-2 text-destructive hover:bg-destructive/10 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" : active ? "inline-flex min-h-8 items-center rounded-md px-2 text-destructive hover:bg-destructive/10 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" : "inline-flex min-h-8 items-center rounded-md px-2 text-primary hover:bg-primary/10 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"}>{actionLabel}</button> : null}
     <Dialog open={open} onClose={() => setOpen(false)} title={title} description={isDelete ? "This record will be permanently removed." : active ? "This record will no longer appear in invoice selectors." : "This record will become available in invoice selectors again."} className="max-w-md">
       <form action={formAction} className="grid gap-4">
         <input hidden name="id" value={id} readOnly />

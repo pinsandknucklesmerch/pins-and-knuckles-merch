@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useMemo, useState } from "react";
 import { ActionButton } from "@/components/ui/ActionButton";
+import { ActionMenu } from "@/components/ui/ActionMenu";
 import { Surface } from "@/components/ui/Surface";
 import { feedback } from "@/components/ui/feedback";
 import { canManagePinsHub, hasPinsHubAccessLevel } from "@/lib/access/pinsHubRoles";
@@ -29,9 +30,22 @@ export function InvoiceCompaniesManager({ companies, accessLevel }: { companies:
     </div>
     {selected ? <InvoiceCompanyForm key={selected.id || "new"} record={selected.id ? selected : null} onClose={() => setSelected(null)} /> : null}
     <Surface className="overflow-x-auto bg-card/70 p-0">
-      <table className="min-w-[950px] text-left text-sm"><thead className="bg-secondary/60 text-xs text-muted-foreground"><tr><th className="px-4 py-3">Label</th><th className="px-4 py-3">Company</th><th className="px-4 py-3">Country</th><th className="px-4 py-3">EORI</th><th className="px-4 py-3">VAT</th><th className="px-4 py-3">Email</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Actions</th></tr></thead><tbody>{visible.length ? visible.map((company) => <tr key={company.id} className="border-t border-border/70"><td className="px-4 py-3 font-medium">{company.label}</td><td className="px-4 py-3">{company.companyName}</td><td className="px-4 py-3">{company.country || "—"}</td><td className="px-4 py-3 font-mono text-xs">{company.eori || "—"}</td><td className="px-4 py-3 font-mono text-xs">{company.vatNumber || "—"}</td><td className="max-w-56 truncate px-4 py-3">{company.email || "—"}</td><td className="px-4 py-3">{company.isActive ? "Active" : "Inactive"}</td><td className="px-4 py-3"><div className="flex flex-wrap gap-3">{canWrite ? <button type="button" onClick={() => setSelected(company)} className="text-primary hover:underline">Edit</button> : null}{canAdmin ? <><InvoiceDirectoryLifecycleDialog id={company.id} label="invoice company" active={company.isActive} action={setInvoiceCompanyActiveAction} /><InvoiceDirectoryLifecycleDialog id={company.id} label="invoice company" mode="delete" action={deleteInvoiceCompanyAction} /></> : null}{!canWrite ? "—" : null}</div></td></tr>) : <tr><td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">No Invoice Companies.</td></tr>}</tbody></table>
+      <table className="min-w-[820px] text-left text-sm"><thead className="bg-secondary/60 text-xs text-muted-foreground"><tr><th className="px-4 py-3">Manage</th><th className="px-4 py-3">Label</th><th className="px-4 py-3">Company</th><th className="px-4 py-3">Country</th><th className="px-4 py-3">EORI</th><th className="px-4 py-3">VAT</th><th className="px-4 py-3">Email</th></tr></thead><tbody>{visible.length ? visible.map((company) => <tr key={company.id} className="border-t border-border/70"><td className="px-4 py-3">{canWrite ? <InvoiceCompanyManageMenu company={company} canAdmin={canAdmin} onEdit={() => setSelected(company)} /> : "—"}</td><td className="px-4 py-3 font-medium">{company.label}</td><td className="px-4 py-3">{company.companyName}</td><td className="px-4 py-3">{company.country || "—"}</td><td className="px-4 py-3 font-mono text-xs">{company.eori || "—"}</td><td className="px-4 py-3 font-mono text-xs">{company.vatNumber || "—"}</td><td className="max-w-56 truncate px-4 py-3">{company.email || "—"}</td></tr>) : <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">No Invoice Companies.</td></tr>}</tbody></table>
     </Surface>
   </div>;
+}
+
+function InvoiceCompanyManageMenu({ company, canAdmin, onEdit }: { company: InvoiceCompanyRecord; canAdmin: boolean; onEdit: () => void }) {
+  const [lifecycleMode, setLifecycleMode] = useState<"status" | "delete" | null>(null);
+  const closeLifecycleDialog = (open: boolean) => { if (!open) setLifecycleMode(null); };
+  return <><ActionMenu label="Manage" items={[
+    { label: "Edit", onSelect: onEdit },
+    ...(canAdmin ? [{ label: company.isActive ? "Deactivate" : "Reactivate", onSelect: () => setLifecycleMode("status"), destructive: company.isActive }] : []),
+    ...(canAdmin ? [{ label: "Delete", onSelect: () => setLifecycleMode("delete"), destructive: true }] : []),
+  ]} />
+    <InvoiceDirectoryLifecycleDialog id={company.id} label="invoice company" active={company.isActive} action={setInvoiceCompanyActiveAction} open={lifecycleMode === "status"} onOpenChange={closeLifecycleDialog} hideTrigger />
+    <InvoiceDirectoryLifecycleDialog id={company.id} label="invoice company" mode="delete" action={deleteInvoiceCompanyAction} open={lifecycleMode === "delete"} onOpenChange={closeLifecycleDialog} hideTrigger />
+  </>;
 }
 
 function InvoiceCompanyForm({ record, onClose }: { record: InvoiceCompanyRecord | null; onClose: () => void }) {
