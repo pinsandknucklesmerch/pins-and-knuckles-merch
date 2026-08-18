@@ -26,6 +26,7 @@ test("defines one level of child routes for grouped navigation", () => {
     { label: "EU Standard", href: "/hub/calculators/eu/standard" },
     { label: "EU US Clients", href: "/hub/calculators/eu/us-clients" },
     { label: "UK Trade", href: "/hub/calculators/uk/trade" },
+    { label: "UK Standard", href: "/hub/calculators/uk/standard" },
   ]);
   assert.deepEqual(data?.children?.map(({ label, href }) => ({ label, href })), [
     { label: "Garments", href: "/hub/data/garments" },

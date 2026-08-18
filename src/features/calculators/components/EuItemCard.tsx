@@ -1,12 +1,11 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
-import { Panel } from "@/components/ui/Panel";
 import type { EuCalculatorItemInput, Garment } from "../domain/types.ts";
 import { CalculatorErrors } from "./CalculatorErrors";
+import { CalculatorItemCard } from "./CalculatorItemCard";
+import { CalculatorQuantityField } from "./CalculatorQuantityField";
 import { EmbroideryControls } from "./EmbroideryControls";
 import { GarmentCombobox } from "./GarmentCombobox";
-import { EditableItemHeading } from "./EditableItemHeading";
 import { PrintPositionControls } from "./PrintPositionControls";
 import type { CalculatorValidationError } from "../domain/types.ts";
 import { normaliseEuPkMarkupInput } from "../domain/euCalculatorInteractions.ts";
@@ -35,47 +34,14 @@ export function EuItemCard({
 }: EuItemCardProps) {
   const [pkMarkupDraft, setPkMarkupDraft] = useState(String(item.pkMarkupPerUnit ?? 0));
   return (
-    <Panel className="border-border/90 bg-card">
-      <div className="grid min-w-0 gap-4">
-        <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
-          <EditableItemHeading
-            index={index}
-            value={item.itemLabel ?? ""}
-            onChange={(itemLabel) => onChange({ ...item, itemLabel })}
-            onBlur={(itemLabel) => onChange({ ...item, itemLabel })}
-          />
-          <button
-            type="button"
-            disabled={!canRemove}
-            onClick={onRemove}
-            className="inline-flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
-            aria-label={`Remove item ${index + 1}`}
-          >
-            <Trash2 className="size-4" />
-          </button>
-        </div>
-
+    <CalculatorItemCard index={index} itemLabel={item.itemLabel ?? ""} canRemove={canRemove} onItemLabelChange={(itemLabel) => onChange({ ...item, itemLabel })} onItemLabelBlur={(itemLabel) => onChange({ ...item, itemLabel })} onRemove={onRemove}>
         <div className="grid min-w-0 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,140px)]">
           <GarmentCombobox
             garments={garments}
             value={item.garmentId}
             onChange={(garmentId) => onChange({ ...item, garmentId })}
           />
-          <div className="grid gap-2">
-            <label className="text-xs font-medium text-muted-foreground">
-              Quantity
-            </label>
-            <input
-              className="hub-native-control"
-              min={50}
-              max={2000}
-              type="number"
-              value={item.quantity}
-              onChange={(event) =>
-                onChange({ ...item, quantity: Number(event.target.value) })
-              }
-            />
-          </div>
+          <CalculatorQuantityField min={50} max={2000} type="number" value={item.quantity} onChange={(event) => onChange({ ...item, quantity: Number(event.target.value) })} />
         </div>
 
         <PrintPositionControls
@@ -129,7 +95,6 @@ export function EuItemCard({
         </div>
 
         <CalculatorErrors errors={errors} />
-      </div>
-    </Panel>
+    </CalculatorItemCard>
   );
 }

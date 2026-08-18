@@ -5,6 +5,7 @@ import test from "node:test";
 const component = readFileSync(new URL("../components/EuCalculator.tsx", import.meta.url), "utf8");
 const helper = readFileSync(new URL("../components/EuDeliveryHelper.tsx", import.meta.url), "utf8");
 const item = readFileSync(new URL("../components/EuItemCard.tsx", import.meta.url), "utf8");
+const itemCard = readFileSync(new URL("../components/CalculatorItemCard.tsx", import.meta.url), "utf8");
 
 test("delivery is disabled by default and only renders after the checkbox is enabled", () => {
   assert.match(component, /useState\(false\)/);
@@ -40,7 +41,8 @@ test("EU calculator controls use wrapping and min-width-safe layouts", () => {
   const item = readFileSync(new URL("../components/EuItemCard.tsx", import.meta.url), "utf8");
   const results = readFileSync(new URL("../components/EuCalculatorResults.tsx", import.meta.url), "utf8");
   assert.match(item, /grid min-w-0 gap-4 md:grid-cols-\[minmax\(0,1fr\)_minmax\(0,140px\)\]/);
-  assert.match(item, /flex min-w-0 flex-wrap items-center/);
+  assert.match(item, /<CalculatorItemCard/);
+  assert.match(itemCard, /flex min-w-0 flex-wrap items-center/);
   assert.match(results, /grid-cols-\[minmax\(0,1fr\)_auto\]/);
   assert.match(results, /whitespace-nowrap/);
   assert.match(results, /min-w-0 break-words text-sm font-semibold/);

@@ -217,6 +217,18 @@ export async function loadUkTradeCalculatorReferenceData(supabase: CalculatorSup
   return { ...base, printTiers: (prints.data ?? []).map((row) => ({ pricingSetCode: row.pricing_set_code, positionCode: row.position_code as "STANDARD" | "NECK_PRINT_STANDARD" | "NECK_PRINT_TRANSFER", colourCount: row.colour_count, quantityTier: Number(row.quantity_tier), unitPrice: Number(row.unit_price), setupScreenCountStrategy: row.setup_screen_count_strategy as "colour_count" | "one" | "none" })), embroideryTiers: (embroidery.data ?? []).map((row) => ({ pricingSetCode: row.pricing_set_code, stitchCount: Number(row.stitch_count), isExtra1000Stitches: row.is_extra_1000_stitches, quantityTier: Number(row.quantity_tier), unitPrice: Number(row.unit_price) })) };
 }
 
+export async function loadUkStandardCalculatorReferenceData(supabase: CalculatorSupabaseClient) {
+  const garmentsResponse = await supabase
+    .from("garments")
+    .select("id,code,alt_code,brand_name,name,colour,garment_type,eur_base_price,gbp_price,extra_size_cost,tags")
+    .eq("is_active", true)
+    .order("code", { ascending: true })
+    .returns<GarmentRow[]>();
+
+  throwIfError(garmentsResponse.error, "Failed to load garments");
+  return { garments: (garmentsResponse.data ?? []).map(mapGarment) };
+}
+
 async function loadProfileBase(supabase: CalculatorSupabaseClient, code: "UK_TRADE", effectiveDate: string, validToFilter: string) {
   const profileResponse = await supabase.from("calculator_profiles").select("id,code,name,region,currency_code,vat_rate,min_quantity,max_quantity,max_colours,tier_strategy,copy_formatter_code,supports_delivery,supports_pk_markup,supports_embroidery,supports_screen_setup,is_active,is_deferred").eq("code", code).eq("is_active", true).maybeSingle();
   throwIfError(profileResponse.error, "Failed to load calculator profile"); if (!profileResponse.data) throw new Error(`Calculator profile not found: ${code}`);

@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Trash2 } from "lucide-react";
+import { Copy } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Panel } from "@/components/ui/Panel";
 import { copyText } from "@/components/ui/copyText";
@@ -8,8 +8,9 @@ import { calculateUkTradeItem } from "../domain/ukTradePricingEngine.ts";
 import type { UkTradeItemInput, UkTradeReferenceData } from "../domain/types.ts";
 import { formatUkTradeQuote } from "../domain/ukTradeQuoteFormatter.ts";
 import { CalculatorErrors } from "./CalculatorErrors";
+import { CalculatorItemCard } from "./CalculatorItemCard";
+import { CalculatorQuantityField } from "./CalculatorQuantityField";
 import { CalculatorToolbar } from "./CalculatorToolbar";
-import { EditableItemHeading } from "./EditableItemHeading";
 import { GarmentCombobox } from "./GarmentCombobox";
 import { UkTradeBreakdown } from "./UkTradeBreakdown";
 import { UkTradeDecorationControls } from "./UkTradeDecorationControls";
@@ -41,18 +42,14 @@ export function UkTradeCalculator({ referenceData }: { referenceData: UkTradeRef
       <div className="grid min-w-0 content-start gap-4">
         {items.map((item, index) => {
           const itemErrors = results[index].errors.filter((error) => error.code !== "MISSING_GARMENT" || decorationAttempts[item.id]);
-          return <Panel key={item.id} className="grid content-start gap-4 border-border/90 bg-card">
-            <div className="flex items-center justify-between gap-3">
-              <EditableItemHeading index={index} value={item.itemLabel ?? ""} onChange={(itemLabel) => update({ ...item, itemLabel })} onBlur={(itemLabel) => update({ ...item, itemLabel })} />
-              <button type="button" disabled={items.length === 1} onClick={() => removeItem(item.id)} className="inline-flex size-8 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40" aria-label={`Remove item ${index + 1}`}><Trash2 className="size-4" /></button>
-            </div>
+          return <CalculatorItemCard key={item.id} index={index} itemLabel={item.itemLabel ?? ""} canRemove={items.length > 1} onItemLabelChange={(itemLabel) => update({ ...item, itemLabel })} onItemLabelBlur={(itemLabel) => update({ ...item, itemLabel })} onRemove={() => removeItem(item.id)}>
             <div className="grid gap-4 md:grid-cols-[1fr_140px]">
               <GarmentCombobox garments={referenceData.garments} value={item.garmentId} onChange={(garmentId) => update({ ...item, garmentId })} />
-              <label className="grid gap-2 text-xs font-medium text-muted-foreground">Quantity<input min={50} max={10000} type="number" value={item.quantity} onChange={(event) => update({ ...item, quantity: Number(event.target.value) })} className="hub-native-control" /></label>
+              <CalculatorQuantityField min={50} max={10000} type="number" value={item.quantity} onChange={(event) => update({ ...item, quantity: Number(event.target.value) })} />
             </div>
             <UkTradeDecorationControls printPositions={item.printPositions} embroideryStitches={item.embroideryStitches} onPrintPositionsChange={(printPositions) => update({ ...item, printPositions })} onEmbroideryChange={(embroideryStitches) => update({ ...item, embroideryStitches })} onDecorationSelect={() => setDecorationAttempts((current) => ({ ...current, [item.id]: true }))} />
             <CalculatorErrors errors={itemErrors} />
-          </Panel>;
+          </CalculatorItemCard>;
         })}
       </div>
       {hasValidItems ? <Panel className="grid min-w-0 content-start gap-4 p-3 xl:row-span-2">

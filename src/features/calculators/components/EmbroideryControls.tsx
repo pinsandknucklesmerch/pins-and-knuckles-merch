@@ -2,6 +2,7 @@
 
 import type { EuEmbroiderySelection, EuEmbroiderySize } from "../domain/types.ts";
 import { Select } from "@/components/ui/Select";
+import { CalculatorPositionToggle } from "./CalculatorPositionToggle";
 
 type EmbroideryControlsProps = {
   value: EuEmbroiderySelection[];
@@ -34,7 +35,7 @@ export function EmbroideryControls({ value, onChange }: EmbroideryControlsProps)
         {[0, 1, 2].map((index) => {
           const selected = Boolean(value[index]);
           const unavailable = index > value.length;
-          return <button key={index} type="button" aria-pressed={selected} disabled={unavailable} onClick={() => setItem(index, selected ? "" : "small")} className={`min-h-9 rounded-md border px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${selected ? "border-primary bg-primary/15 text-foreground" : "border-border bg-background text-muted-foreground hover:bg-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"}`}>Embroidery {index + 1}</button>;
+          return <CalculatorPositionToggle key={index} label={`Embroidery ${index + 1}`} selected={selected} disabled={unavailable} onClick={() => setItem(index, selected ? "" : "small")} />;
         })}
       </div>
       <div className="grid gap-2 sm:grid-cols-3">

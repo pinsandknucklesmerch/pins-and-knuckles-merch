@@ -63,10 +63,11 @@ test("UK Trade breakdown keeps setup and VAT there and marks only unit-price val
 
 test("UK Trade colour controls use editable numeric text inputs without changing the colour limit", () => {
   const controls = readFileSync(new URL("../components/UkTradeDecorationControls.tsx", import.meta.url), "utf8");
-  assert.match(controls, /aria-label=\{`\$\{position\.label\} colours`\}[^]*type="text"/);
-  assert.match(controls, /inputMode="numeric"/);
-  assert.match(controls, /pattern="\[0-9\]\*"/);
+  const colourInput = readFileSync(new URL("../components/PrintColourCountInput.tsx", import.meta.url), "utf8");
+  assert.match(controls, /<PrintColourCountInput[^>]*ariaLabel=\{`\$\{position\.label\} colours`\}/);
+  assert.match(colourInput, /inputMode="numeric"/);
+  assert.match(colourInput, /pattern="\[0-9\]\*"/);
   assert.match(controls, /max=\{10\}/);
   assert.match(controls, /colourCount: value \? Number\(value\) : undefined/);
-  assert.doesNotMatch(controls, /aria-label=\{`\$\{position\.label\} colours`\}[^>\n]*type="number"/);
+  assert.doesNotMatch(colourInput, /type="number"/);
 });

@@ -16,6 +16,7 @@
 
   position: relative;
   display: flex;
+  min-width: 0;
   width: 100%;
   flex-direction: column;
   justify-content: space-between;
@@ -57,8 +58,8 @@
   --glow-enabled: 1;
 }
 
-.hubCard { min-height: 7.25rem; }
-.indexCard { min-height: 6.375rem; }
+.hubCard,
+.indexCard { min-height: 7.25rem; }
 
 @media (hover: hover) and (pointer: fine) {
   .magicBentoCard:hover {
@@ -102,6 +103,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem;
+  min-height: 1.25rem;
 }
 
 .cardContent {
@@ -179,8 +181,8 @@
     grid-template-columns: 1fr;
   }
 
-  .hubCard { min-height: 6rem; }
-  .indexCard { min-height: 5.625rem; }
+  .hubCard,
+  .indexCard { min-height: 6rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

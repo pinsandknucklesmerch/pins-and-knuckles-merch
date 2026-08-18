@@ -38,9 +38,11 @@ test("EU PK markup accepts signed decimal edit states and strips malformed chara
 test("EU print and PK inputs use text controls without browser number spinners", async () => {
   const { readFile } = await import("node:fs/promises");
   const controls = await readFile(new URL("../components/PrintPositionControls.tsx", import.meta.url), "utf8");
+  const colourInput = await readFile(new URL("../components/PrintColourCountInput.tsx", import.meta.url), "utf8");
   const itemCard = await readFile(new URL("../components/EuItemCard.tsx", import.meta.url), "utf8");
-  assert.match(controls, /type="text"[\s\S]*inputMode="numeric"[\s\S]*pattern="\[0-9\]\*"/);
-  assert.doesNotMatch(controls, /aria-label=\{`\$\{position\.label\} colours`\}[^>\n]*type="number"/);
+  assert.match(controls, /<PrintColourCountInput/);
+  assert.match(colourInput, /type="text"[\s\S]*inputMode="numeric"[\s\S]*pattern="\[0-9\]\*"/);
+  assert.doesNotMatch(colourInput, /type="number"/);
   assert.match(itemCard, /type="text"[\s\S]*inputMode="decimal"/);
   assert.doesNotMatch(itemCard, /PK markup[\s\S]*type="number"/);
 });

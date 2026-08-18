@@ -24,6 +24,7 @@ export const hubFeatureNavigation: HubFeatureNavigationItem[] = [
       { label: "EU Standard", href: "/hub/calculators/eu/standard" },
       { label: "EU US Clients", href: "/hub/calculators/eu/us-clients" },
       { label: "UK Trade", href: "/hub/calculators/uk/trade" },
+      { label: "UK Standard", href: "/hub/calculators/uk/standard" },
     ],
   },
   { href: "/hub/pk-tax", label: "PK Tax", icon: Landmark },

@@ -3,6 +3,8 @@
 import type { EuPrintPosition, EuPrintSelection } from "../domain/types.ts";
 import { normaliseEuPrintColourInput } from "../domain/euCalculatorInteractions.ts";
 import { useState } from "react";
+import { CalculatorPositionToggle } from "./CalculatorPositionToggle";
+import { PrintColourCountInput } from "./PrintColourCountInput";
 
 const PRINT_POSITIONS: Array<{ value: EuPrintPosition; label: string }> = [
   { value: "FRONT", label: "Front" },
@@ -68,15 +70,7 @@ export function PrintPositionControls({
           const enabled = Boolean(selection);
 
           return (
-            <button
-              key={position.value}
-              type="button"
-              aria-pressed={enabled}
-              onClick={() => setPositionEnabled(position.value, !enabled)}
-              className={`min-h-9 rounded-md border px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${enabled ? "border-primary bg-primary/15 text-foreground" : "border-border bg-background text-muted-foreground hover:bg-secondary hover:text-foreground"}`}
-            >
-              {position.label}
-            </button>
+            <CalculatorPositionToggle key={position.value} label={position.label} selected={enabled} onClick={() => setPositionEnabled(position.value, !enabled)} />
           );
         })}
       </div>
@@ -91,24 +85,14 @@ export function PrintPositionControls({
                   className="flex items-center justify-between gap-3 rounded-md border border-border/70 bg-background/55 px-3 py-2 text-xs text-muted-foreground"
                 >
                   {position.label} colours
-                  <input
-                  aria-label={`${position.label} colours`}
-                  className="h-8 w-16 rounded-md border border-input bg-card px-2 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring"
-                  max={9}
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={draftValue}
-                  onChange={(event) => {
-                    const nextValue = event.target.value;
+                  <PrintColourCountInput ariaLabel={`${position.label} colours`} max={9} value={draftValue} onValueChange={(nextValue) => {
                     const normalisedValue = normaliseEuPrintColourInput(nextValue);
                     setDraftColourCounts((current) => ({
                       ...current,
                       [position.value]: normalisedValue,
                     }));
                     setColourCount(position.value, normalisedValue ? Number(normalisedValue) : undefined);
-                  }}
-                />
+                  }} />
                 </label>
           );
         })}

@@ -23,6 +23,11 @@ const ukCalculators: MagicBentoItem[] = [
     title: "UK Trade",
     href: "/hub/calculators/uk/trade",
   },
+  {
+    id: "uk-standard",
+    title: "UK Standard",
+    href: "/hub/calculators/uk/standard",
+  },
 ];
 
 export default function CalculatorsPage() {
