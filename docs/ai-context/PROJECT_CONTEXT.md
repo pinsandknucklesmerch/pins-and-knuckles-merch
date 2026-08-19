@@ -24,8 +24,8 @@ legacy Hub architecture are not part of this application.
 - `npm run dev` deliberately uses Webpack. `next.config.ts` enables
   `cacheComponents`, hides dev indicators, and permits `192.168.3.34` as a
   development origin.
-- There are 35 migrations, from `20260709120000_foundation_auth_access.sql`
-  through `20260813100000_fix_cron_run_history_service_role_grants.sql`.
+- There are 38 migrations, from `20260709120000_foundation_auth_access.sql`
+  through `20260817120000_remove_current_month_comparison_tv_slide.sql`.
 - Feature code belongs under `src/features/`; routes remain thin. Initial data
   loading is predominantly server-side, while forms, exports, TV mode, and
   calculator interaction are client-side.
@@ -95,7 +95,7 @@ rows, effective targets, final-value overrides, TV settings, trends, and years;
 it never calls Monday or Gmail during a page request. Views are Overview, YTD,
 Year Comparison, Snuggle, and Team Members. It supports active-data exports,
 including metrics exports and the profit PDF path. TV mode is dashboard query
-state; admins manage five persisted slides (enabled state, order, and 10–300
+state; admins manage six persisted slides (enabled state, order, and 10–300
 second duration) in the TV settings route.
 
 - `sales_kpi_months`, `sales_kpi_member_months`, and `sales_kpi_targets` hold
@@ -237,6 +237,11 @@ disposable/local target and may require `RESTORE_ADMIN_DATABASE_URL` for
 `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 `SUPABASE_SERVICE_ROLE_KEY`, `MONDAY_API_TOKEN`, Google OAuth values,
 `GMAIL_REPORT_ADDRESS`, and `CRON_SECRET` remain server-only.
+
+Snuggle remains subject to a known data-quality diagnostic: Monday can return
+invalid `FormulaValue` responses. The server warns, excludes invalid values
+from attribution, and Developer Diagnostics persists the resulting issue; do
+not treat it as resolved without repository and operational confirmation.
 
 Before handing off code changes run:
 

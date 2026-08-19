@@ -43,32 +43,20 @@ rtk pip list            rtk pnpm install        rtk npm run <script>
 
 ## Pins Hub Project Rules
 
-## Current Stack & Integrations
+Read [`docs/ai-context/PROJECT_CONTEXT.md`](docs/ai-context/PROJECT_CONTEXT.md) before implementation. It is the current architecture, product, source-ownership, and operational-context authority. Then read the relevant standards:
 
-- Core application: Next.js App Router, React 19, TypeScript, Tailwind CSS, and Webpack-based local development (`npm run dev`).
-- Data and access: Supabase Auth with SSR cookies, Postgres, RLS, forward-only migrations, and generated database types. Deployments and scheduled jobs run on Vercel.
-- Server-only integrations: Monday.com sales synchronisation and Gmail/Google OAuth EPCC profit-report ingestion. `SUPABASE_SERVICE_ROLE_KEY`, `MONDAY_API_TOKEN`, Google OAuth values, `GMAIL_REPORT_ADDRESS`, and `CRON_SECRET` must remain server-only.
-- Shared libraries: Radix UI, Lucide, MetricUI, Sonner, GSAP, OGL, ExcelJS, html2canvas, jsPDF, and jsPDF-AutoTable.
-- The detailed, current source of truth for routes, data ownership, cron behaviour, and operational verification is `docs/ai-context/PROJECT_CONTEXT.md`.
-- Do not introduce Prisma, Neon, or legacy Hub architecture/patterns.
+- [`docs/development/ENGINEERING_STANDARDS.md`](docs/development/ENGINEERING_STANDARDS.md)
+- [`docs/development/UI_STANDARDS.md`](docs/development/UI_STANDARDS.md)
+- [`docs/development/COMPONENT_CATALOG.md`](docs/development/COMPONENT_CATALOG.md) when selecting a reusable control
 
-- Use Next.js App Router, TypeScript, Tailwind CSS, and Supabase.
-- Do not add Prisma or expose service-role credentials in application code.
-- Keep external API credentials server-only. Never use `NEXT_PUBLIC_` for tokens, Monday API keys, or other secrets.
-- Preserve existing Supabase Auth, SSR cookie handling, migrations, and Pins Hub access control unless the user explicitly approves a change.
-- Place feature work under `src/features/<feature-name>/` with `components/`, `data/`, `lib/`, and `types.ts` as needed.
-- Keep business logic, API clients, data mapping, and KPI calculations out of page files and presentational UI components.
-- Prefer server components for initial data loading where practical; keep client components for forms and interactive controls.
-- Reuse shared components from `src/components/ui`, `src/components/layout`, and feature component folders instead of repeating JSX and Tailwind classes.
-- Every data surface must handle loading, empty, and error states with existing shared state components where practical.
-- Keep UI compact, dark, and operational. Do not add descriptions, subtitles, helper paragraphs, decorative badges, hero sections, or marketing copy unless explicitly requested.
+Before changing code, inspect the relevant existing feature and search for an equivalent component, hook, helper, formatter, validation rule, or domain function. Reuse or extend established abstractions where practical; do not duplicate business logic or create one-off UI patterns for minor visual differences.
 
-## Data Management table actions
-
-- Put the action column first/left-most; never place Edit or Manage actions at the far right.
-- Use a standard `Edit` button for rows with one available action. Use the shared `ActionMenu` with a `Manage` trigger for rows with multiple actions such as Edit, Activate/Deactivate, or Delete.
-- Preserve existing destructive styling and confirmation behaviour for destructive actions.
-- Reuse shared buttons, menus, dropdowns, tables, and action components. Add or extend reusable behaviour in the common UI layer rather than duplicating it inside a feature.
-- Keep action controls consistently sized, spaced, aligned, and interactive across Data Management tables.
+- Use the existing Next.js App Router, TypeScript, Tailwind, Supabase Auth SSR-cookie, RLS, and feature-based architecture. Do not introduce Prisma, Neon, or legacy Hub patterns.
+- Keep routes thin; place feature work under `src/features/<feature-name>/`. Keep business logic, API clients, mappings, and KPI calculations out of pages and presentational components.
+- Preserve behavior outside the requested scope and preserve existing user changes in a dirty worktree.
+- Keep types strong; avoid unnecessary `any`, validate at boundaries, and use established server/data-access patterns.
+- Keep authorization and sensitive access enforcement server/database-side. Use forward-only versioned migrations for schema changes. Keep service-role and external credentials server-only; never expose tokens through `NEXT_PUBLIC_` variables.
+- Use `public/reference-assets/` for implementation screenshots or visual references supplied by the user.
+- Keep the Hub compact, dark, and operational; follow the UI standards for tables, forms, actions, and states.
 
 - Before handing off code changes, run `npm run lint`, `npx tsc --noEmit`, and `npm run build`.

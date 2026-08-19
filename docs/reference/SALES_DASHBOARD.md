@@ -41,8 +41,8 @@ including metric exports and a profit-report PDF path.
 
 TV mode is query-state on the dashboard rather than a separate TV route. The
 separate `/hub/sales-dashboard/tv/settings` route manages admin-only slide
-settings. The configured five slides are Overview, YTD, Year Comparison,
-Snuggle, and Team Members; repository validation requires enabled slides,
+settings. The configured six slides are Overview, YTD, Year Comparison,
+Snuggle, Live Zoo Cam, and Team Members; repository validation requires enabled slides,
 valid ordering, and bounded durations.
 
 ## Member and profile performance

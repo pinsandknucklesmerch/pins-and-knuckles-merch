@@ -7,6 +7,9 @@
 - `docs/ai-context/PROJECT_CONTEXT.md`: sole current architecture and project
   status authority. It must distinguish repository facts from remote/runtime
   verification.
+- `docs/development/ENGINEERING_STANDARDS.md` and
+  `docs/development/UI_STANDARDS.md`: current implementation standards.
+  `docs/development/COMPONENT_CATALOG.md` is a concise component-routing aid.
 
 ## Operational documentation
 

@@ -41,27 +41,11 @@ rtk pip list            rtk pnpm install        rtk npm run <script>
 - `rtk proxy <cmd>` runs command without filtering but tracks usage
 <!-- /headroom:rtk-instructions -->
 
-## Shared Hub UI
+## Documentation authority
 
-- Reuse existing shared UI components before creating feature-specific equivalents; use shared Surface variants before feature-specific cards.
-- Do not add helper text, subtitles, explanatory copy, or descriptive labels unless explicitly requested.
-- Optional labels default to empty; never auto-generate or auto-fill them, and do not render empty optional labels.
-- Minimise unnecessary whitespace. Use shared spacing, radius, padding, borders, focus, and disabled treatments.
-- Use `ActionMenu` for grouped related actions such as export formats; preserve destructive styling and confirmation behaviour for destructive actions.
-- Use `CopyableCard` for whole-card copy only when copying is the card's primary action; cards with competing actions must not be fully clickable.
-- Use Magic Bento only for navigation, actionable, KPI/metric, or interaction-benefiting result cards. Do not use it for forms, tables, dialogs, loading/error states, or dense breakdowns; keep motion and glow restrained and preserve keyboard and reduced-motion support.
-- Native dropdowns/select controls must use the shared Select component.
-- Do not use direct form `<select>` elements when the shared Select component is suitable. Searchable comboboxes may remain specialised shared components.
-- Editable calculator item names use the shared editable-heading pattern where applicable.
-- Sidebar sections with child routes use collapsible navigation groups.
-
-## Data Management tables
-
-- Put the action column first/left-most; never place Edit or Manage actions at the far right.
-- Use a standard `Edit` button when a row has one available action. Use the shared `ActionMenu` with a `Manage` trigger when a row has multiple actions (for example Edit, Activate/Deactivate, or Delete).
-- Preserve the existing destructive styling and confirmation behaviour for destructive menu actions.
-- Reuse shared buttons, menus, dropdowns, tables, and action components. If a new reusable behaviour is needed, extend or add it in the common UI layer instead of duplicating it in a page feature.
-- Keep action controls consistently sized, spaced, aligned, and interactive across all Data Management tables.
+Use the root [`AGENTS.md`](../AGENTS.md) and the linked project context and
+development standards. This file intentionally does not restate engineering or
+UI rules.
 
 ## Route Structure
 
