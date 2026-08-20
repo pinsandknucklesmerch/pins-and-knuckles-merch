@@ -2,6 +2,7 @@
   display: grid;
   height: 100%;
   align-content: start;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
   gap: var(--sales-kpi-layer-gap);
   padding: var(--sales-kpi-card-padding);
   text-align: center;
@@ -17,6 +18,8 @@
 
 .shirt {
   display: flex;
+  min-height: 0;
+  align-items: center;
   justify-content: center;
   margin: -0.25rem 0 -0.5rem;
 }
@@ -35,35 +38,7 @@
   line-height: 1.125rem;
 }
 
-.aboveTarget {
-  align-self: center;
-  justify-self: center;
-  border: 1px solid hsl(var(--primary) / 0.55);
-  border-radius: 999px;
-  color: hsl(var(--foreground));
-  font-size: 0.6875rem;
-  font-weight: 600;
-  line-height: 1;
-  padding: 0.25rem 0.375rem;
-}
-
-.comparison {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-top: 0;
-  padding-top: var(--sales-kpi-layer-gap);
-  border-top: 1px solid hsl(var(--border) / 0.8);
-  color: hsl(var(--muted-foreground));
-  font-size: 0.6875rem;
-  line-height: 1rem;
-  text-align: left;
-}
-
-.comparison strong { color: hsl(var(--foreground)); font-weight: 600; }
-
 .tvCard { padding: 1.5rem; }
 .tvCard .value { font-size: 2.25rem; }
 .tvCard .label { font-size: 0.8125rem; }
-.tvCard .progress,
-.tvCard .comparison { font-size: 0.8125rem; }
+.tvCard .progress { font-size: 0.8125rem; }
