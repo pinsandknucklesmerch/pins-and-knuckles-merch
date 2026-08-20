@@ -1,9 +1,8 @@
 export type GaugeZoneRatios = {
-  neutralEnd: number;
   redEnd: number;
   orangeEnd: number;
-  amberEnd: number;
   greenStart: number;
+  targetRatio: number;
 };
 
 function clampRatio(value: number) {
@@ -14,10 +13,9 @@ export function gaugeZoneRatios(target: number, max: number): GaugeZoneRatios {
   const targetRatio = clampRatio(target / max);
 
   return {
-    neutralEnd: clampRatio((target * 0.25) / max),
-    redEnd: clampRatio((target * 0.5) / max),
-    orangeEnd: clampRatio((target * 0.75) / max),
-    amberEnd: targetRatio,
-    greenStart: targetRatio,
+    redEnd: 1 / 3,
+    orangeEnd: 2 / 3,
+    greenStart: 2 / 3,
+    targetRatio,
   };
 }

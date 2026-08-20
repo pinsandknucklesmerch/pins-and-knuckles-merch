@@ -88,15 +88,19 @@ test("uses percentage points and keeps zero-denominator comparisons relative-fre
   assert.deepEqual(comparisonBadgeDetails({ percentagePointChange: 56.9, percentageChange: null, state: "positive" }), { icon: "↑", values: ["56.9 pts"], accessibleLabel: "Up 56.9 percentage points versus last year" });
 });
 
-test("target bullet maps actuals, targets, and below/at/above colours", () => {
+test("target bullet uses a fixed 150% target scale and maps below/at/above colours", () => {
   const belowTarget = targetBullet(150, 300);
   assert.ok(belowTarget);
   assert.equal(belowTarget.value, 150);
   assert.equal(belowTarget.target, 300);
-  assert.ok(Math.abs(belowTarget.max - 336) < 1e-12);
+  assert.equal(belowTarget.max, 450);
   assert.equal(belowTarget.measureColor, "#d9474b");
   assert.equal(targetBullet(300, 300)?.measureColor, "#6fc49a");
+  assert.equal(targetBullet(350, 300)?.max, 450);
   assert.equal(targetBullet(350, 300)?.measureColor, "#6fc49a");
+  assert.equal(targetBullet(250, 250)?.max, 375);
+  assert.equal(targetBullet(150, 150)?.max, 225);
+  assert.equal(targetBullet(60, 60)?.max, 90);
   assert.equal(targetBullet(150, null), null);
   assert.equal(targetBullet(null, 300), null);
 });

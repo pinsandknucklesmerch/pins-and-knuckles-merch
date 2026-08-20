@@ -42,7 +42,9 @@ export function targetBullet(value: number | null, target: number | null): Targe
   return {
     value,
     target,
-    max: Math.max(value, target) * 1.12,
+    // The target belongs at the two-thirds point: the green zone begins at
+    // the real target and the final third shows performance up to 150%.
+    max: target * 1.5,
     measureColor: targetState(value, target) === "target-met" ? "#6fc49a" : "#d9474b",
   };
 }

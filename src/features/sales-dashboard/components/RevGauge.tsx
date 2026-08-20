@@ -24,7 +24,7 @@ const CENTER_X = 120;
 const CENTER_Y = 118;
 const ARC_RADIUS = 88;
 const NEEDLE_RADIUS = 76;
-const TICK_RATIOS = [0, 0.25, 0.5, 0.75, 1];
+const TICK_RATIOS = [0, 1 / 3, 2 / 3, 1];
 const TICK_INNER_RADIUS = ARC_RADIUS - 8;
 const TICK_OUTER_RADIUS = ARC_RADIUS + 5;
 const TICK_LABEL_RADIUS = ARC_RADIUS + 19;
@@ -89,7 +89,7 @@ function usePrefersReducedMotion() {
 export function RevGauge({ value, target, max, progress, format, label, interactive = true, animationKey, animationDelayMs = 0, tvMode = false }: RevGaugeProps) {
   const valueRatio = clampRatio(value / max);
   const zoneRatios = gaugeZoneRatios(target, max);
-  const targetRatio = zoneRatios.greenStart;
+  const targetRatio = zoneRatios.targetRatio;
   const needleAngle = START_ANGLE + valueRatio * (END_ANGLE - START_ANGLE);
   const prefersReducedMotion = usePrefersReducedMotion();
   const [renderedAngle, setRenderedAngle] = useState(interactive || animationKey !== undefined ? START_ANGLE : needleAngle);
@@ -104,10 +104,8 @@ export function RevGauge({ value, target, max, progress, format, label, interact
   const status = statusFor(progress);
   const currentText = formatValue(value, format);
   const targetText = formatValue(target, format);
-  const neutralEndAngle = START_ANGLE + zoneRatios.neutralEnd * (END_ANGLE - START_ANGLE);
   const redEndAngle = START_ANGLE + zoneRatios.redEnd * (END_ANGLE - START_ANGLE);
   const orangeEndAngle = START_ANGLE + zoneRatios.orangeEnd * (END_ANGLE - START_ANGLE);
-  const amberEndAngle = START_ANGLE + zoneRatios.amberEnd * (END_ANGLE - START_ANGLE);
   const greenStartAngle = START_ANGLE + zoneRatios.greenStart * (END_ANGLE - START_ANGLE);
 
   const startNeedleAnimation = useCallback((fromAngle: number, destinationAngle: number) => {
@@ -194,10 +192,8 @@ export function RevGauge({ value, target, max, progress, format, label, interact
     >
       <svg className={styles.svg} viewBox="0 0 240 180" aria-hidden="true" focusable="false">
         <path className={styles.arcTrack} d={arcPath(START_ANGLE, END_ANGLE)} />
-        <path className={styles.arcZoneNeutral} d={arcPath(START_ANGLE, neutralEndAngle)} />
-        <path className={styles.arcZoneYellow} d={arcPath(neutralEndAngle, redEndAngle)} />
+        <path className={styles.arcZoneRed} d={arcPath(START_ANGLE, redEndAngle)} />
         <path className={styles.arcZoneOrange} d={arcPath(redEndAngle, orangeEndAngle)} />
-        <path className={styles.arcZoneRed} d={arcPath(orangeEndAngle, amberEndAngle)} />
         <path className={styles.arcZoneGreen} d={arcPath(greenStartAngle, END_ANGLE)} />
         {TICK_RATIOS.map((ratio, index) => {
           const angle = START_ANGLE + ratio * (END_ANGLE - START_ANGLE);
