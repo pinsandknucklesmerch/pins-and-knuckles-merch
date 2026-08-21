@@ -155,7 +155,7 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
     </section>;
     }
     if (activeView === "snuggle") return <SnuggleView data={data.snuggle} year={year} month={month} tvMode />;
-    if (activeView === "ytd") return <YearToDateView data={data.yearToDate} tvMode />;
+    if (activeView === "ytd") return <YearToDateView data={data.yearToDate} comparison={data.yearComparison} tvMode />;
     if (activeView === "year_comparison") return <YearComparisonChart comparison={data.yearComparison} showControls={false} tvMode />;
     if (activeView === "team_members") return <TeamMembersTab data={data} year={year} month={month} tvMode />;
     if (activeView === "live-zoo-cam") return <LiveZooCamSlide />;

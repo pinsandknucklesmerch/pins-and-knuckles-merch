@@ -34,7 +34,7 @@ The repository selects organisation rows before global rows where both exist.
 
 ## Views and controls
 
-Available views are Overview, YTD, Year Comparison, Snuggle, and Team Members.
+Available views are Overview, Company Profit, YTD, Snuggle, and Team Members.
 Year/month controls submit route query state. Admins can manage targets and
 month-final values. Exports are generated from the active dashboard data,
 including metric exports and a profit-report PDF path.
@@ -44,6 +44,21 @@ separate `/hub/sales-dashboard/tv/settings` route manages admin-only slide
 settings. The configured six slides are Overview, YTD, Year Comparison,
 Snuggle, Live Zoo Cam, and Team Members; repository validation requires enabled slides,
 valid ordering, and bounded durations.
+
+## Overview KPI presentation
+
+The Monthly Profit card is a compact, full-height peer of Sales Inbox in the
+Overview row. It displays the Monthly Profit label, current value, target
+progress, and enlarged liquid shirt visual only. It intentionally has no
+previous-year comparison, comparison badge, or lower comparison divider.
+
+Quotes Done, Orders Processed, and Conversion Rate use the shared `RevGauge`.
+Its red, orange, and green arc bands are equal thirds. The maximum is 150% of
+the real target, placing the target marker and label at the start of the green
+band (two-thirds of the gauge); the needle remains based on the real current
+value against that maximum. Target labels are visually stronger than the other
+scale labels. These are presentation conventions only and do not change KPI
+calculations, targets, comparisons elsewhere, or source ownership.
 
 ## Member and profile performance
 

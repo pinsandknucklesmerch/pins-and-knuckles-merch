@@ -1,35 +1,144 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { AreaChart, MetricProvider, type FormatOption } from "metricui";
-import { Surface } from "@/components/ui/Surface";
+import { BadgeCheck, ClipboardList, Mail, Percent, PoundSterling, ShoppingCart } from "lucide-react";
+import { calculatePreviousDifference, calculatePreviousPercentageChange } from "../domain/calculateDashboardKpis";
+import type { YearComparisonData, YearComparisonMetric, YearToDateData } from "../domain/types";
+import { yearComparisonValue } from "../data/yearComparison";
+import { chartValue } from "../lib/chartValue";
+import { comparisonBadgeDetails } from "../lib/comparisonBadge";
+import { previousYearComparisonState } from "../lib/metricDisplay";
+import { sumYearComparisonMetric, ytdComparisonValue, type YtdComparisonMetric } from "../lib/ytdComparison";
 import { DASHBOARD_MONTHS } from "../types";
-import type { YearToDateData } from "../domain/types";
 import { AnimatedMetricValue } from "./AnimatedMetricValue";
+import { YtdBarComparisonChart, YtdProfitAreaChart, YtdRateComparisonChart, type YtdChartFormat, type YtdChartPoint } from "./YtdComparisonCharts";
 import styles from "./YearToDateView.module.css";
 
-const currency: FormatOption = { style: "currency", currency: "GBP", compact: false, precision: 0 };
-const gbp = (value: number | null) => value === null ? "—" : new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(value);
+type MetricDefinition = {
+  code: YtdComparisonMetric;
+  label: string;
+  format: Exclude<YtdChartFormat, "currency">;
+  chart: "bar" | "line";
+  icon: typeof ClipboardList;
+  tone: "blue" | "green" | "purple" | "amber" | "cyan" | "violet";
+};
 
-export function YearToDateView({ data, showHeading = true, tvMode = false }: { data: YearToDateData; showHeading?: boolean; tvMode?: boolean }) {
-  const varianceStatus = data.variance === null ? "—" : `${data.variance >= 0 ? "Ahead" : "Behind"} ${gbp(Math.abs(data.variance))}`;
-  const metrics: Array<{ label: string; value: number | string | null; format?: "currency" | "percent" }> = [
-    { label: "YTD Profit", value: data.ytdActual, format: "currency" },
-    { label: "YTD Target", value: data.ytdTarget, format: "currency" },
-    { label: "Status", value: varianceStatus },
-    { label: "Target Achievement", value: data.achievementRate, format: "percent" },
-    { label: "Projected Year End", value: data.projectedYearEnd, format: "currency" },
-    { label: "Annual Target", value: data.annualTarget, format: "currency" },
-  ];
-  const actual = [{ id: "Cumulative actual", data: data.cumulativeActualByMonth.map((value, index) => ({ x: DASHBOARD_MONTHS[index].slice(0, 3), y: value })) }];
-  const target = [{ id: "Cumulative target", data: data.cumulativeTargetByMonth.map((value, index) => ({ x: DASHBOARD_MONTHS[index].slice(0, 3), y: value })) }];
-  return <section className="grid gap-2.5" aria-labelledby={showHeading ? "year-to-date-title" : undefined} data-tv-view={tvMode ? "ytd" : undefined}>
-    <div className="flex items-center gap-2" data-tv-group={tvMode ? "ytd-summary" : undefined} style={tvMode ? { "--tv-enter-index": 0 } as CSSProperties : undefined}>{showHeading ? <h2 id="year-to-date-title" className="text-sm font-semibold">Year to Date</h2> : null}{!data.isComplete ? <details className="text-xs text-amber-600 dark:text-amber-300"><summary className="cursor-pointer">Incomplete data</summary><span>{data.missingMonths.map((month) => DASHBOARD_MONTHS[month - 1]).join(", ")}</span></details> : null}</div>
-    <div className={styles.metricGrid} data-tv-group={tvMode ? "ytd-metrics" : undefined} style={tvMode ? { "--tv-enter-index": 1 } as CSSProperties : undefined}>{metrics.map(({ label, value, format }, index) => {
-      const metricValue = typeof value === "number" && Number.isFinite(value) ? value : null;
-      const maximumFractionDigits = format === "percent" ? 1 : 0;
-      return <Surface key={label} variant="metric" magic data-tv-kpi={tvMode ? "true" : undefined} style={tvMode ? { "--tv-enter-index": index + 1 } as CSSProperties : undefined} className={label === "Status" && data.variance !== null ? (data.variance >= 0 ? styles.ahead : styles.behind) : ""}><div className="text-xs text-muted-foreground">{label}</div>{format ? <AnimatedMetricValue value={metricValue} format={format} maximumFractionDigits={maximumFractionDigits} className="mt-1 text-lg font-semibold tabular-nums" tvKpiValue={tvMode} /> : <div data-tv-kpi-value={tvMode ? "true" : undefined} className="mt-1 text-lg font-semibold tabular-nums">{value}</div>}</Surface>;
-    })}</div>
-    <div className={styles.chart} data-tv-group={tvMode ? "ytd-chart" : undefined} style={tvMode ? { "--tv-enter-index": 2 } as CSSProperties : undefined}><MetricProvider dense={false}><AreaChart data={actual} comparisonData={target} seriesStyles={{ "Cumulative actual": { color: "#059669", lineWidth: 2.5 }, "Cumulative target": { color: "#4f8cff", lineWidth: 2 } }} format={currency} height={300} gradient={false} areaOpacity={0.08} curve="monotoneX" enablePoints enableGridX={false} enableGridY legend chartNullMode="gap" /></MetricProvider></div>
+const METRICS: MetricDefinition[] = [
+  { code: "QUOTES_DONE", label: "Quotes Done", format: "number", chart: "bar", icon: ClipboardList, tone: "blue" },
+  { code: "ORDERS_PROCESSED", label: "Orders Processed", format: "number", chart: "bar", icon: ShoppingCart, tone: "green" },
+  { code: "CONVERTED", label: "Converted", format: "number", chart: "bar", icon: BadgeCheck, tone: "purple" },
+  { code: "CONVERSION_RATE", label: "Conversion Rate", format: "percent", chart: "line", icon: Percent, tone: "amber" },
+  { code: "SALES_INBOX_ENQUIRIES", label: "Sales Inbox Enquiries", format: "number", chart: "bar", icon: Mail, tone: "cyan" },
+  { code: "SALES_INBOX_CONVERSION_RATE", label: "Sales Inbox Conversion Rate", format: "percent", chart: "line", icon: Percent, tone: "violet" },
+];
+
+function formatValue(value: number | null, format: YtdChartFormat) {
+  if (value === null || !Number.isFinite(value)) return "—";
+  if (format === "percent") return `${value.toFixed(1)}%`;
+  if (format === "currency") return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(value);
+  return value.toLocaleString("en-GB", { maximumFractionDigits: 0 });
+}
+
+function chartPoints(comparison: YearComparisonData, cutoffMonth: number, code: YearComparisonMetric): YtdChartPoint[] {
+  return comparison.selected.map((point) => {
+    const previousPoint = comparison.previous.find((candidate) => candidate.month === point.month);
+    return {
+      label: point.label,
+      current: chartValue(point.month <= cutoffMonth ? yearComparisonValue(point, code) : null),
+      previous: chartValue(previousPoint ? yearComparisonValue(previousPoint, code) : null),
+    };
+  });
+}
+
+function ChartLegend({ selectedYear, previousYear }: { selectedYear: number; previousYear: number }) {
+  return <ul className={styles.legend} aria-label={`${selectedYear} current year and ${previousYear} previous year`}>
+    <li><span className={styles.currentSwatch} aria-hidden="true" />{selectedYear}</li>
+    <li><span className={styles.previousSwatch} aria-hidden="true" />{previousYear}</li>
+  </ul>;
+}
+
+function ComparisonLine({ current, previous, previousYear, format }: { current: number | null; previous: number | null; previousYear: number; format: YtdChartFormat }) {
+  const absoluteChange = calculatePreviousDifference(current, previous);
+  const percentageChange = calculatePreviousPercentageChange(current, previous);
+  const state = previousYearComparisonState(current, previous);
+  const details = comparisonBadgeDetails({
+    absoluteChange: format === "percent" ? null : absoluteChange,
+    percentagePointChange: format === "percent" ? absoluteChange : null,
+    percentageChange,
+    absoluteFormat: format === "currency" ? "currency" : "number",
+    state,
+  });
+  if (!details) return <div className={styles.comparisonUnavailable}>Previous YTD unavailable</div>;
+  const values = details.values.map((value) => value.replace(" pts", "pp"));
+  return <div className={`${styles.comparisonLine} ${styles[state]}`} aria-label={`${details.accessibleLabel}; versus ${previousYear} year to date`}>
+    <span className={styles.comparisonValue}><span aria-hidden="true">{details.icon}</span> {values.join(" · ")}</span>
+    <span className={styles.comparisonContext}>vs {previousYear} YTD</span>
+  </div>;
+}
+
+function YtdProfitSummary({ data, comparison, previousProfit }: { data: YearToDateData; comparison: YearComparisonData; previousProfit: number | null }) {
+  const variance = data.variance === null ? null : Math.abs(data.variance);
+  const varianceLabel = data.variance === null ? null : data.variance >= 0 ? "Above target" : "Below target";
+  return <article className={styles.profitCard}>
+    <div className={styles.metricTitle}><span className={`${styles.iconTile} ${styles.profitIcon}`}><PoundSterling aria-hidden="true" /></span><h3>YTD Profit</h3></div>
+    <AnimatedMetricValue value={data.ytdActual} format="currency" maximumFractionDigits={0} className={styles.profitValue} />
+    <ComparisonLine current={data.ytdActual} previous={previousProfit} previousYear={comparison.previousYear} format="currency" />
+    <div className={styles.profitLower}>
+      <div><span>{comparison.previousYear} YTD</span><strong>{formatValue(previousProfit, "currency")}</strong></div>
+      <div><span>YTD Target</span><strong>{formatValue(data.ytdTarget, "currency")}</strong></div>
+    </div>
+    {varianceLabel && variance !== null ? <div className={`${styles.targetVariance} ${data.variance !== null && data.variance >= 0 ? styles.positive : styles.negative}`}>{varianceLabel} <strong>{formatValue(variance, "currency")}</strong></div> : null}
+  </article>;
+}
+
+function YtdMonthlyProfitChart({ comparison, cutoffMonth }: { comparison: YearComparisonData; cutoffMonth: number }) {
+  const points = chartPoints(comparison, cutoffMonth, "MONTHLY_PROFIT");
+  return <article className={styles.profitChartCard}>
+    <header className={styles.chartHeader}><div><h3>Monthly Profit</h3><span>{comparison.selectedYear} vs {comparison.previousYear}</span></div><ChartLegend selectedYear={comparison.selectedYear} previousYear={comparison.previousYear} /></header>
+    <div className={styles.profitChartFrame}><YtdProfitAreaChart points={points} label={`Monthly Profit, ${comparison.selectedYear} compared with ${comparison.previousYear}, January through December`} /></div>
+  </article>;
+}
+
+function YtdComparisonCard({ comparison, cutoffMonth, definition }: { comparison: YearComparisonData; cutoffMonth: number; definition: MetricDefinition }) {
+  const currentPeriod = comparison.selected.filter((point) => point.month <= cutoffMonth);
+  const previousPeriod = comparison.previous.filter((point) => point.month <= cutoffMonth);
+  const current = ytdComparisonValue(currentPeriod, definition.code);
+  const previous = ytdComparisonValue(previousPeriod, definition.code);
+  const points = chartPoints(comparison, cutoffMonth, definition.code);
+  const Icon = definition.icon;
+  const chartLabel = `${definition.label}, monthly ${comparison.selectedYear} compared with ${comparison.previousYear}`;
+  return <article className={styles.comparisonCard}>
+    <div className={styles.cardSummary}>
+      <div className={styles.metricTitle}><span className={styles.iconTile} data-tone={definition.tone}><Icon aria-hidden="true" /></span><h3>{definition.label}</h3></div>
+      <AnimatedMetricValue value={current} format={definition.format} maximumFractionDigits={definition.format === "percent" ? 1 : 0} className={styles.cardValue} />
+      <ComparisonLine current={current} previous={previous} previousYear={comparison.previousYear} format={definition.format} />
+      <div className={styles.previousBlock}><span>{comparison.previousYear} YTD</span><strong>{formatValue(previous, definition.format)}</strong></div>
+    </div>
+    <div className={styles.cardChart}>
+      <ChartLegend selectedYear={comparison.selectedYear} previousYear={comparison.previousYear} />
+      <div className={styles.cardChartFrame}>{definition.chart === "bar"
+        ? <YtdBarComparisonChart points={points} format="number" label={chartLabel} />
+        : <YtdRateComparisonChart points={points} label={chartLabel} />}</div>
+    </div>
+  </article>;
+}
+
+export function YearToDateView({ data, comparison, showHeading = true, tvMode = false }: { data: YearToDateData; comparison: YearComparisonData; showHeading?: boolean; tvMode?: boolean }) {
+  const previousProfit = sumYearComparisonMetric(comparison.previous.filter((point) => point.month <= data.cutoffMonth), "MONTHLY_PROFIT");
+  const periodLabel = `${DASHBOARD_MONTHS[data.cutoffMonth - 1]} ${comparison.selectedYear}`;
+  return <section className={`${styles.panel} ${showHeading ? "" : styles.panelWithoutHeader}`} aria-labelledby={showHeading ? "year-to-date-title" : undefined} data-tv-view={tvMode ? "ytd" : undefined}>
+    {showHeading ? <header className={styles.panelHeader} data-tv-group={tvMode ? "ytd-summary" : undefined} style={tvMode ? { "--tv-enter-index": 0 } as CSSProperties : undefined}>
+      <div><h2 id="year-to-date-title">Year to Date</h2><span>{comparison.selectedYear} vs {comparison.previousYear}</span></div>
+      <div className={styles.periodContext}><span>Data shown: YTD vs same period last year</span><strong>Through {periodLabel}</strong>{!data.isComplete ? <em>Incomplete data</em> : null}</div>
+    </header> : null}
+    <div className={styles.panelBody}>
+      <div className={styles.heroGrid} data-tv-group={tvMode ? "ytd-primary" : undefined} style={tvMode ? { "--tv-enter-index": 1 } as CSSProperties : undefined}>
+        <YtdProfitSummary data={data} comparison={comparison} previousProfit={previousProfit} />
+        <YtdMonthlyProfitChart comparison={comparison} cutoffMonth={data.cutoffMonth} />
+      </div>
+      <div className={styles.comparisonGrid} data-tv-group={tvMode ? "ytd-metrics" : undefined} style={tvMode ? { "--tv-enter-index": 2 } as CSSProperties : undefined}>
+        {METRICS.map((definition) => <YtdComparisonCard key={definition.code} comparison={comparison} cutoffMonth={data.cutoffMonth} definition={definition} />)}
+      </div>
+    </div>
   </section>;
 }

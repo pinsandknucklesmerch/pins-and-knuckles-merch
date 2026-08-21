@@ -56,7 +56,7 @@ export function ProfitPdfReport({
 
       <section data-profit-pdf-page="true" className={`${reportPageClass} profit-report-page`}>
         <ReportPageHeader month={month} year={year} title="Year to Date" />
-        <YearToDateView data={yearToDate} showHeading={false} />
+        <YearToDateView data={yearToDate} comparison={yearComparison} showHeading={false} />
       </section>
 
       <section data-profit-pdf-page="true" className={`${reportPageClass} profit-report-page`}>

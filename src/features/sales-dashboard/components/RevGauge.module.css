@@ -15,6 +15,8 @@
   overflow: visible;
 }
 
+.gauge[data-size="large"] .svg { width: min(100%, 22rem); }
+
 .gauge[data-tv="true"] .svg { width: min(100%, 16rem); }
 
 .arcTrack,

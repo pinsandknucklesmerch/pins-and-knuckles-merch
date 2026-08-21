@@ -16,6 +16,7 @@ type RevGaugeProps = {
   animationKey?: string | number;
   animationDelayMs?: number;
   tvMode?: boolean;
+  size?: "default" | "large";
 };
 
 const START_ANGLE = -120;
@@ -86,7 +87,7 @@ function usePrefersReducedMotion() {
   return prefersReducedMotion;
 }
 
-export function RevGauge({ value, target, max, progress, format, label, interactive = true, animationKey, animationDelayMs = 0, tvMode = false }: RevGaugeProps) {
+export function RevGauge({ value, target, max, progress, format, label, interactive = true, animationKey, animationDelayMs = 0, tvMode = false, size = "default" }: RevGaugeProps) {
   const valueRatio = clampRatio(value / max);
   const zoneRatios = gaugeZoneRatios(target, max);
   const targetRatio = zoneRatios.targetRatio;
@@ -182,6 +183,7 @@ export function RevGauge({ value, target, max, progress, format, label, interact
       data-status={status}
       data-interactive={interactive ? "true" : "false"}
       data-tv={tvMode ? "true" : "false"}
+      data-size={size}
       role="img"
       tabIndex={interactive ? 0 : undefined}
       onPointerEnter={interactive && !prefersReducedMotion ? replayNeedle : undefined}

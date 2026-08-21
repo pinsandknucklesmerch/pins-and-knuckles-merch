@@ -4,7 +4,8 @@ import test from "node:test";
 import { parseDashboardView } from "../lib/dashboardView.ts";
 
 test("dashboard view query parsing is stable", () => {
-  assert.equal(parseDashboardView("year-comparison"), "year-comparison");
+  assert.equal(parseDashboardView("year-comparison"), "overview");
+  assert.equal(parseDashboardView("company-profit"), "company-profit");
   assert.equal(parseDashboardView("ytd"), "ytd");
   assert.equal(parseDashboardView("overview"), "overview");
   assert.equal(parseDashboardView("team-members"), "team-members");
@@ -29,6 +30,8 @@ test("server query state initializes the dashboard without a mount reconciliatio
   const page = readFileSync(new URL("../../../app/(hub)/hub/sales-dashboard/page.tsx", import.meta.url), "utf8");
   assert.match(page, /parseDashboardView\(first\(params\.dashboardView\)\)/);
   assert.match(page, /initialDashboardView=\{dashboardView\}/);
+  assert.match(page, /<AppShell tvMode=\{tvMode\} wideContent>/);
+  assert.doesNotMatch(page, /PageHeader/);
 });
 
 test("Sales Dashboard no longer carries the redundant Company/Team Member selector state", () => {
@@ -57,19 +60,28 @@ test("dashboard trend and available-year reads retain separate query bounds", ()
 test("company dashboard keeps monthly content separate from year to date", () => {
   const dashboard = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
   const company = readFileSync(new URL("../components/CompanyKpiView.tsx", import.meta.url), "utf8");
+  const styles = readFileSync(new URL("../components/SalesDashboard.module.css", import.meta.url), "utf8");
 
   assert.match(dashboard, /\{ value: "overview", label: "Overview" \}/);
+  assert.match(dashboard, /\{ value: "company-profit", label: "Company Profit" \}/);
   assert.match(dashboard, /\{ value: "ytd", label: "YTD" \}/);
-  assert.match(dashboard, /\{ value: "year-comparison", label: "Year Comparison" \}/);
+  assert.doesNotMatch(dashboard, /\{ value: "year-comparison"|activeDashboardView === "year-comparison"|<YearComparisonChart/);
   assert.match(dashboard, /\{ value: "team-members", label: "Team Members" \}/);
   assert.doesNotMatch(dashboard, /TeamMemberKpiView|<Select[^>]+name="view"|name="member"/);
   assert.match(dashboard, /useState<DashboardView>\(initialDashboardView\)/);
-  assert.match(dashboard, /activeDashboardView === "overview"[\s\S]*<CompanyKpiView[\s\S]*activeDashboardView === "ytd"[\s\S]*<YearToDateView[\s\S]*<YearComparisonChart/);
+  assert.match(dashboard, /activeDashboardView === "company-profit"[\s\S]*<CompanyProfitView[\s\S]*activeDashboardView === "ytd"[\s\S]*<YearToDateView[\s\S]*<CompanyKpiView/);
   assert.match(dashboard, /data-testid="sales-dashboard-actions"/);
-  assert.match(dashboard, /<legend>Period<\/legend>/);
-  assert.match(dashboard, /<legend>Dashboard<\/legend>/);
-  assert.match(dashboard, /<legend>Actions<\/legend>/);
+  assert.match(dashboard, /<header className=\{styles\.dashboardHeader\}>[\s\S]*<h1>Sales Dashboard<\/h1>[\s\S]*<DashboardNav[\s\S]*<\/header>/);
+  assert.match(dashboard, /const isOverviewView = activeDashboardView === "overview"/);
+  assert.match(dashboard, /<\/header>[\s\S]*\{isOverviewView \? <Panel><div className=\{styles\.controlSurface\}>[\s\S]*<\/div><\/Panel> : null\}[\s\S]*ref=\{dashboardMetricsRef\}/);
+  assert.doesNotMatch(dashboard, /\{isOverviewView \?[\s\S]*<DashboardNav/);
+  assert.match(dashboard, /role="group" aria-labelledby="sales-dashboard-period-label"/);
+  assert.match(dashboard, /role="group" aria-labelledby="sales-dashboard-management-label"/);
+  assert.match(dashboard, /role="group" aria-labelledby="sales-dashboard-actions-label"/);
   assert.match(dashboard, />TV Mode<\/ActionButton>/);
   assert.match(dashboard, /isAdmin \? <MonthlyKpiFinals/);
   assert.doesNotMatch(company, /MonthlyKpiFinals/);
+  assert.match(styles, /\.dashboardTabs \{[\s\S]*overflow-x: visible/);
+  assert.match(styles, /@media \(max-width: 639px\) \{[\s\S]*\.dashboardTabs \{[\s\S]*overflow-x: auto[\s\S]*scrollbar-width: none/);
+  assert.match(styles, /\.dashboardTabs::\-webkit-scrollbar \{[\s\S]*display: none/);
 });

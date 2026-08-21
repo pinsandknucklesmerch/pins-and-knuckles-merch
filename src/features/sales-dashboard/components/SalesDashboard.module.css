@@ -1,26 +1,59 @@
+.dashboardRoot,
+.ytdRoot {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  gap: 0.625rem;
+}
+
+.ytdRoot {
+  height: calc(100dvh - 2rem);
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.dashboardHeader {
+  display: grid;
+  min-width: 0;
+  gap: 0.625rem;
+  border-bottom: 1px solid hsl(var(--border) / 0.82);
+  padding-bottom: 0.125rem;
+}
+
+.dashboardHeader h1 {
+  margin: 0;
+  flex: 0 0 auto;
+  color: hsl(var(--foreground));
+  font-size: 1.5rem;
+  font-weight: 650;
+  line-height: 2.25rem;
+}
+
 .controlSurface {
   display: flex;
   min-width: 0;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 0.75rem;
   justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .controlGroup {
   display: flex;
   min-width: 0;
-  flex: 0 1 auto;
-  flex-wrap: wrap;
-  align-items: flex-end;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: 0.5rem;
-  border: 1px solid hsl(var(--border) / 0.72);
-  border-radius: 0.5rem;
-  padding: 0.375rem 0.5rem 0.5rem;
 }
 
-.controlGroup legend {
-  padding: 0 0.25rem;
+.controlGroup + .controlGroup {
+  padding-left: 0.75rem;
+  border-left: 1px solid hsl(var(--border) / 0.72);
+}
+
+.groupLabel {
+  flex: 0 0 auto;
   color: hsl(var(--muted-foreground));
   font-size: 0.625rem;
   font-weight: 650;
@@ -29,21 +62,24 @@
   text-transform: uppercase;
 }
 
+.fieldLabel {
+  display: none;
+}
+
 .periodForm,
 .groupControls {
   display: flex;
   min-width: 0;
-  flex-wrap: wrap;
-  align-items: flex-end;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: 0.5rem;
 }
 
-.periodForm {
-  flex: 0 1 auto;
-}
-
-.groupControls {
+.periodForm > label {
+  display: flex;
+  min-width: 0;
   align-items: center;
+  white-space: nowrap;
 }
 
 .applyButton {
@@ -68,16 +104,135 @@
   outline-offset: 2px;
 }
 
+.dashboardContent,
+.ytdDashboardContent {
+  min-width: 0;
+  min-height: 0;
+  gap: 0.625rem;
+}
+
+.dashboardContent {
+  display: grid;
+  grid-template-rows: auto auto;
+}
+
+.ytdDashboardContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboardNotices {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.dashboardTabs {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: visible;
+}
+
+.dashboardNav {
+  width: max-content;
+  max-width: 100%;
+}
+
+.dashboardNav :global([role="tablist"]) {
+  width: max-content;
+}
+
+.dashboardNav :global([data-nav-tab]) {
+  white-space: nowrap;
+}
+
+.dashboardView {
+  min-width: 0;
+  min-height: 0;
+}
+
+.ytdDashboardContent .dashboardView {
+  flex: 1 1 auto;
+}
+
+.dashboardContent .dashboardView {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
 @media (max-width: 899px) {
-  .controlSurface { justify-content: flex-start; }
-  .controlGroup { flex: 1 1 auto; }
+  .ytdRoot {
+    height: auto;
+    overflow: visible;
+  }
+
+  .controlSurface {
+    justify-content: flex-start;
+  }
+
+  .controlGroup {
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    border: 1px solid hsl(var(--border) / 0.72);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .controlGroup + .controlGroup {
+    padding-left: 0.5rem;
+    border-left: 1px solid hsl(var(--border) / 0.72);
+  }
+
+  .periodForm,
+  .groupControls {
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .periodForm > label {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .fieldLabel {
+    display: inline;
+  }
+
 }
 
 @media (max-width: 639px) {
+  .dashboardHeader h1 {
+    font-size: 1.25rem;
+  }
+
   .controlGroup,
   .periodForm,
-  .groupControls { width: 100%; }
-  .periodForm > label { flex: 1 1 8rem; }
-  .periodForm > .applyButton { flex: 0 0 auto; }
-  .groupControls { justify-content: flex-start; }
+  .groupControls {
+    width: 100%;
+  }
+
+  .periodForm > label {
+    flex: 1 1 8rem;
+  }
+
+  .periodForm > .applyButton {
+    flex: 0 0 auto;
+  }
+
+  .dashboardTabs {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+  }
+
+  .dashboardTabs::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (min-width: 900px) and (max-height: 799px) {
+  .ytdRoot {
+    height: auto;
+    overflow: visible;
+  }
 }

@@ -120,14 +120,15 @@ test("image capture excludes filter options and the export toolbar", () => {
   const dashboard = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
   const filterPanel = dashboard.indexOf('<form data-testid="sales-dashboard-filter-form"');
   const exportControl = dashboard.indexOf("<ExportMetricsButton");
-  const filterPanelEnd = dashboard.indexOf("</div></Panel>", filterPanel);
+  const filterPanelEnd = dashboard.indexOf("</Panel>", filterPanel);
   const captureTarget = dashboard.indexOf('<div ref={dashboardMetricsRef} data-testid="sales-dashboard-export-content"');
-  const tabs = dashboard.indexOf("<DashboardNav", captureTarget);
+  const tabs = dashboard.indexOf("<DashboardNav");
+  const headerEnd = dashboard.indexOf("</header>", tabs);
   const metrics = dashboard.indexOf("<CompanyKpiView", captureTarget);
 
   assert.ok(filterPanel >= 0 && exportControl > filterPanel);
-  assert.ok(filterPanelEnd > exportControl && captureTarget > filterPanelEnd);
-  assert.ok(tabs > captureTarget && metrics > tabs);
+  assert.ok(tabs >= 0 && headerEnd > tabs && filterPanel > headerEnd);
+  assert.ok(filterPanelEnd > exportControl && captureTarget > filterPanelEnd && metrics > captureTarget);
   assert.doesNotMatch(dashboard.slice(captureTarget), /sales-dashboard-filter-form|<ExportMetricsButton|<ManualKpiEntry/);
 });
 

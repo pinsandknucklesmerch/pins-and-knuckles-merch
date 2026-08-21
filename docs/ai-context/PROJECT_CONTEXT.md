@@ -92,8 +92,8 @@ token exchange or abandoned implicit approaches.
 
 The dashboard is Supabase-first: rendering reads persisted company/member KPI
 rows, effective targets, final-value overrides, TV settings, trends, and years;
-it never calls Monday or Gmail during a page request. Views are Overview, YTD,
-Year Comparison, Snuggle, and Team Members. It supports active-data exports,
+it never calls Monday or Gmail during a page request. Views are Overview,
+Company Profit, YTD, Snuggle, and Team Members. It supports active-data exports,
 including metrics exports and the profit PDF path. TV mode is dashboard query
 state; admins manage six persisted slides (enabled state, order, and 10–300
 second duration) in the TV settings route.
@@ -105,6 +105,11 @@ second duration) in the TV settings route.
   PK Tax, Quotes Done, and Orders Processed. They are persisted in
   `sales_kpi_month_final_values` with editor/timestamp metadata and never
   rewrite source-owned values.
+- The Overview Monthly Profit card deliberately shows only the current value,
+  target progress, and shirt visual; it shares the Sales Inbox card's row
+  height and has no prior-year comparison. Quotes Done, Orders Processed, and
+  Conversion Rate share a three-band gauge whose target marks the green-band
+  threshold. See `docs/reference/SALES_DASHBOARD.md` for presentation details.
 - Member performance is shared by the Team Members view and profile feature.
   It merges organisation rows over global rows and then uses the retained
   historical workbook fixture only for missing periods. Dashboard query errors

@@ -1,12 +1,10 @@
 import { Suspense } from "react";
 import { AppShell } from "@/components/layout/AppShell";
-import { PageHeader } from "@/components/layout/PageHeader";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { getCurrentPinsHubAccess, hasAdminAccess } from "@/lib/access/pinsHubAccess";
 import { SalesDashboard } from "@/features/sales-dashboard/components/SalesDashboard";
 import { loadSalesDashboard } from "@/features/sales-dashboard/data/salesDashboardRepository";
 import { loadSalesDashboardStaleWarnings } from "@/features/sales-dashboard/data/cronStaleWarning";
-import { SalesDashboardStaleWarning } from "@/features/sales-dashboard/components/SalesDashboardStaleWarning";
 import { parseDashboardView } from "@/features/sales-dashboard/lib/dashboardView";
 import { isTvMode, parseTvDuration } from "@/features/sales-dashboard/lib/tvMode";
 
@@ -30,5 +28,5 @@ async function SalesDashboardPageContent({ searchParams }: Props) {
   const isAdmin = hasAdminAccess(access);
   const organisationId = access.membership?.organisation_id ?? null;
   const [data, staleWarnings] = await Promise.all([loadSalesDashboard(year, month, organisationId), isAdmin ? loadSalesDashboardStaleWarnings(organisationId, year, month, now) : Promise.resolve([])]);
-  return <AppShell tvMode={tvMode}>{tvMode ? null : <PageHeader title="Sales Dashboard" />}{tvMode ? null : <SalesDashboardStaleWarning warnings={staleWarnings} />}<SalesDashboard data={data} year={year} month={month} isAdmin={isAdmin} initialDashboardView={dashboardView} tvMode={tvMode} tvDurationSeconds={tvDurationSeconds} /></AppShell>;
+  return <AppShell tvMode={tvMode} wideContent><SalesDashboard data={data} year={year} month={month} isAdmin={isAdmin} initialDashboardView={dashboardView} staleWarnings={staleWarnings} tvMode={tvMode} tvDurationSeconds={tvDurationSeconds} /></AppShell>;
 }
