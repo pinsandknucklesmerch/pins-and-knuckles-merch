@@ -18,7 +18,7 @@ export function SalesInboxKpi({ enquiries, conversionRate, animationKey, animati
 
   return (
     <Surface variant="metric" className={`${styles.card} ${tvMode ? styles.tvCard : ""}`} data-tv-kpi={tvMode ? "true" : undefined}>
-      <h2 className={styles.heading}>Sales Inbox</h2>
+      <h2 className={styles.heading}>Active Marketing</h2>
       <section className={styles.enquiries} aria-labelledby="sales-inbox-enquiries">
         <h3 id="sales-inbox-enquiries" className={styles.label}>Enquiries</h3>
         <AnimatedMetricValue value={enquiries.value} format="number" className={styles.enquiriesValue} tvKpiValue={tvMode} />

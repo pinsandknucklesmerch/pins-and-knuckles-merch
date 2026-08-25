@@ -35,7 +35,7 @@ test("dashboard export includes all seven dashboard KPIs", () => {
     "Quotes Done",
     "Orders Processed",
     "PK Tax",
-    "Sales Inbox Enquiries",
+    "Active Marketing Enquiries",
     "Conversion Rate",
     "Sales Inbox Conversion Rate",
   ]);
@@ -216,25 +216,30 @@ test("EPCC report keeps the requested profit and performance comparisons without
   const reportStyles = readFileSync(new URL("../components/ProfitPdfReport.module.css", import.meta.url), "utf8");
 
   assert.equal(report.match(/data-profit-pdf-page="true"/g)?.length, 2);
-  assert.ok(report.indexOf('title="Profit Summary"') < report.indexOf('title="Performance Comparison"'));
+  assert.ok(report.indexOf('title="Company Profit"') < report.indexOf('title="Year to Date"'));
   assert.match(report, /<ProfitReportMonthlyProfit metric=\{monthlyProfitMetric\}/);
-  assert.match(report, /<ProfitReportYtdSummary data=\{yearToDate\} comparison=\{yearComparison\}/);
+  assert.match(report, /<ProfitReportYtdSummary data=\{yearToDate\} comparison=\{yearComparison\} monthlyProfitMetric=\{monthlyProfitMetric\}/);
   assert.match(report, /<ProfitReportMonthlyComparison data=\{yearToDate\} comparison=\{yearComparison\}/);
   assert.match(report, /<ProfitReportPerformanceKpis data=\{yearToDate\} comparison=\{yearComparison\}/);
   assert.doesNotMatch(report, /YearComparisonChart|ProfitReportCompanyProfit|ProfitReportYtdKpis/);
   assert.match(monthly, /companyProfitPresentation/);
   assert.match(monthly, /<CompanyProfitGauge/);
-  for (const label of ["Monthly Profit", "Target Profit", "Profit Above Target"]) assert.match(monthly, new RegExp(label));
+  for (const label of ["Monthly Profit", "Target", "Profit Above Target"]) assert.match(monthly, new RegExp(label));
   assert.doesNotMatch(monthly, /Bonus Profit/);
-  for (const code of ["ORDERS_PROCESSED", "CONVERSION_RATE"]) assert.match(ytd, new RegExp(code));
-  for (const code of ["QUOTES_DONE", "CONVERTED", "SALES_INBOX_ENQUIRIES", "SALES_INBOX_CONVERSION_RATE"]) assert.doesNotMatch(ytd, new RegExp(code));
+  assert.doesNotMatch(monthly, /hasReachedTarget \?/);
+  assert.match(ytd, /companyProfitPresentation\(monthlyProfitMetric\)\.current/);
+  assert.match(ytd, /Monthly Profit/);
+  assert.match(ytd, /\+" : "-"/);
+  for (const code of ["ORDERS_PROCESSED", "SALES_INBOX_ENQUIRIES", "CONVERSION_RATE"]) assert.match(ytd, new RegExp(code));
+  for (const code of ["QUOTES_DONE", "CONVERTED", "SALES_INBOX_CONVERSION_RATE"]) assert.doesNotMatch(ytd, new RegExp(code));
   assert.match(ytd, /ytdChartPoints/);
   assert.match(ytd, /ytdComparisonValue/);
   assert.match(ytd, /YtdProfitAreaChart/);
   assert.match(ytd, /YtdBarComparisonChart/);
   assert.match(ytd, /YtdRateComparisonChart/);
-  assert.match(reportStyles, /profitSummary/);
-  assert.match(reportStyles, /performanceComparison/);
+  assert.match(reportStyles, /companyProfit/);
+  assert.match(reportStyles, /yearToDate/);
+  assert.match(reportStyles, /yearToDatePrimary/);
   assert.match(reportStyles, /performanceKpis/);
 });
 

@@ -15,10 +15,10 @@ export function ComparisonArcGauge({ current, previousYear, animationKey, animat
   const fillPercent = comparisonArcFillPercent(current, previousYear);
   const trend = ratio !== null && ratio > 1 ? styles.above : styles.below;
   const label = current === null
-    ? "Sales Inbox Enquiries is unavailable."
+    ? "Active Marketing Enquiries is unavailable."
     : ratio === null
-      ? `Sales Inbox Enquiries is ${current}. No previous-year comparison is available.`
-      : `Sales Inbox Enquiries is ${current}, ${fillPercent.toFixed(1)}% of last year's ${previousYear}.`;
+      ? `Active Marketing Enquiries is ${current}. No previous-year comparison is available.`
+      : `Active Marketing Enquiries is ${current}, ${fillPercent.toFixed(1)}% of last year's ${previousYear}.`;
 
   return (
     <svg className={styles.gauge} viewBox="0 0 180 108" role="img" aria-label={label}>

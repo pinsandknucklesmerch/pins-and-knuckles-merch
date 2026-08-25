@@ -17,7 +17,7 @@ const METRICS: ChartMetric[] = [
   { code: "ORDERS_PROCESSED", label: "Orders Processed", format: "number" },
   { code: "CONVERTED", label: "Converted", format: "number" },
   { code: "CONVERSION_RATE", label: "Conversion Rate", format: "percent" },
-  { code: "SALES_INBOX_ENQUIRIES", label: "Sales Inbox Enquiries", format: "number" },
+  { code: "SALES_INBOX_ENQUIRIES", label: "Active Marketing Enquiries", format: "number" },
   { code: "SALES_INBOX_CONVERSION_RATE", label: "Sales Inbox Conversion Rate", format: "percent" },
 ];
 

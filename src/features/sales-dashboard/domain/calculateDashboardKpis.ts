@@ -56,7 +56,7 @@ export function calculateCompanyMetrics(
     { ...metric("QUOTES_DONE", "Quotes Done", currentQuotes, previousQuotes, targets.QUOTES_DONE ?? null, "number"), calculatedValue: current.quotesDone, finalValue: current.finalValues?.QUOTES_DONE?.value, isFinal: current.finalValues?.QUOTES_DONE !== undefined },
     { ...metric("ORDERS_PROCESSED", "Orders Processed", currentOrders, previousOrders, targets.ORDERS_PROCESSED ?? null, "number"), calculatedValue: current.ordersProcessed, finalValue: current.finalValues?.ORDERS_PROCESSED?.value, isFinal: current.finalValues?.ORDERS_PROCESSED !== undefined },
     { ...metric("PK_TAX" as FinalisableSalesKpiCode, "PK Tax", effectiveCompanyKpiValue(current, "PK_TAX"), previous ? effectiveCompanyKpiValue(previous, "PK_TAX") : null, null, "currency"), calculatedValue: current.monthlyPkTax ?? null, finalValue: current.finalValues?.PK_TAX?.value, isFinal: current.finalValues?.PK_TAX !== undefined },
-    metric("SALES_INBOX_ENQUIRIES", "Sales Inbox Enquiries", current.salesInboxEnquiries, previous?.salesInboxEnquiries ?? null, null, "number"),
+    metric("SALES_INBOX_ENQUIRIES", "Active Marketing Enquiries", current.salesInboxEnquiries, previous?.salesInboxEnquiries ?? null, null, "number"),
     metric("CONVERSION_RATE", "Conversion Rate", currentConversion, previousConversion, targets.CONVERSION_RATE ?? null, "percent"),
     metric("SALES_INBOX_CONVERSION_RATE", "Sales Inbox Conversion Rate", currentInboxConversion, previousInboxConversion, null, "percent"),
   ];

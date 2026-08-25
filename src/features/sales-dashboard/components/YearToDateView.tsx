@@ -4,7 +4,6 @@ import type { CSSProperties } from "react";
 import { BadgeCheck, ClipboardList, Mail, Percent, PoundSterling, ShoppingCart } from "lucide-react";
 import { calculatePreviousDifference, calculatePreviousPercentageChange } from "../domain/calculateDashboardKpis";
 import type { YearComparisonData, YearToDateData } from "../domain/types";
-import { yearComparisonValue } from "../data/yearComparison";
 import { comparisonBadgeDetails } from "../lib/comparisonBadge";
 import { previousYearComparisonState } from "../lib/metricDisplay";
 import { sumYearComparisonMetric, ytdComparisonValue, type YtdComparisonMetric } from "../lib/ytdComparison";
@@ -27,7 +26,7 @@ const METRICS: MetricDefinition[] = [
   { code: "ORDERS_PROCESSED", label: "Orders Processed", format: "number", chart: "bar", icon: ShoppingCart, tone: "green" },
   { code: "CONVERTED", label: "Converted", format: "number", chart: "bar", icon: BadgeCheck, tone: "purple" },
   { code: "CONVERSION_RATE", label: "Conversion Rate", format: "percent", chart: "line", icon: Percent, tone: "amber" },
-  { code: "SALES_INBOX_ENQUIRIES", label: "Sales Inbox Enquiries", format: "number", chart: "bar", icon: Mail, tone: "cyan" },
+  { code: "SALES_INBOX_ENQUIRIES", label: "Active Marketing Enquiries", format: "number", chart: "bar", icon: Mail, tone: "cyan" },
   { code: "SALES_INBOX_CONVERSION_RATE", label: "Sales Inbox Conversion Rate", format: "percent", chart: "line", icon: Percent, tone: "violet" },
 ];
 

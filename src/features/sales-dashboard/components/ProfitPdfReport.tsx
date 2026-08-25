@@ -24,16 +24,18 @@ function ReportPageHeader({ month, year, title }: { month: number; year: number;
 export function ProfitPdfReport({ year, month, monthlyProfitMetric, yearToDate, yearComparison }: ProfitPdfReportProps) {
   return <div data-export-subtree="epcc-profit" className="grid gap-8 bg-[#111114] text-foreground">
     <section data-profit-pdf-page="true" className={reportPageClass}>
-      <ReportPageHeader month={month} year={year} title="Profit Summary" />
-      <div className={styles.profitSummary}>
+      <ReportPageHeader month={month} year={year} title="Company Profit" />
+      <div className={styles.companyProfit}>
         <ProfitReportMonthlyProfit metric={monthlyProfitMetric} />
-        <ProfitReportYtdSummary data={yearToDate} comparison={yearComparison} />
       </div>
     </section>
     <section data-profit-pdf-page="true" className={reportPageClass}>
-      <ReportPageHeader month={month} year={year} title="Performance Comparison" />
-      <div className={styles.performanceComparison}>
-        <ProfitReportMonthlyComparison data={yearToDate} comparison={yearComparison} />
+      <ReportPageHeader month={month} year={year} title="Year to Date" />
+      <div className={styles.yearToDate}>
+        <div className={styles.yearToDatePrimary}>
+          <ProfitReportYtdSummary data={yearToDate} comparison={yearComparison} monthlyProfitMetric={monthlyProfitMetric} />
+          <ProfitReportMonthlyComparison data={yearToDate} comparison={yearComparison} />
+        </div>
         <ProfitReportPerformanceKpis data={yearToDate} comparison={yearComparison} />
       </div>
     </section>
