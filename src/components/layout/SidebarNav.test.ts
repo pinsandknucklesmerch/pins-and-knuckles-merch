@@ -21,3 +21,13 @@ test("app shell keeps page width constrained without clipping intentional surfac
   assert.doesNotMatch(source, /overflow-x-clip/);
   assert.match(source, /h-\[100dvh\]/);
 });
+
+test("navigation skips prefetch only for its current route", async () => {
+  const source = await readFile(new URL("./SidebarNav.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /const prefetchFor = \(href: string\) => pathname === href \? false : undefined/);
+  assert.match(source, /prefetch=\{prefetchFor\(item\.href\)\}/);
+  assert.match(source, /prefetch=\{prefetchFor\(child\.href\)\}/);
+  assert.match(source, /prefetch=\{prefetchFor\("\/hub\/team"\)\}/);
+  assert.match(source, /prefetch=\{prefetchFor\(hubProfileNavigation\.href\)\}/);
+});

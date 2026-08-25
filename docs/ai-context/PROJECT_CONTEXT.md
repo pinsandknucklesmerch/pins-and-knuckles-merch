@@ -35,7 +35,9 @@ legacy Hub architecture are not part of this application.
 - Auth: `/`, `/login`, `/auth/confirm`, `/auth/error`,
   `/auth/forgot-password`, `/auth/invite`, `/auth/recovery-confirm`,
   `/auth/recovery-confirm/verify`, and `/auth/update-password`.
-- Hub: `/hub`, `/hub/profile`, User Access Management at `/hub/team`,
+- Hub: `/hub`, `/hub/profile`, Analytics at `/hub/analytics` with Overview,
+  Website, and Social Media views (Google Analytics 4 and Meta integrations
+  remain unconfigured), User Access Management at `/hub/team`,
   `/hub/team/add`, and `/hub/team/[membershipId]`.
 - Sales Dashboard: `/hub/sales-dashboard` and
   `/hub/sales-dashboard/tv/settings`.

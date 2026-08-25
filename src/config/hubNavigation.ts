@@ -1,6 +1,7 @@
 import {
   Calculator,
   ChartNoAxesColumnIncreasing,
+  ChartNoAxesCombined,
   FileText,
   Landmark,
   Database,
@@ -18,6 +19,7 @@ export type HubFeatureNavigationItem = {
 
 export const hubFeatureNavigation: HubFeatureNavigationItem[] = [
   { href: "/hub/sales-dashboard", label: "Sales Dashboard", icon: ChartNoAxesColumnIncreasing },
+  { href: "/hub/analytics", label: "Analytics", icon: ChartNoAxesCombined },
   {
     href: "/hub/calculators", label: "Calculators", icon: Calculator,
     children: [

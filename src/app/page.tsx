@@ -1,26 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense } from "react";
-import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { GalaxyPageBackground } from "@/components/backgrounds/GalaxyPageBackground";
 import { Panel } from "@/components/ui/Panel";
-import { LoadingState } from "@/components/ui/LoadingState";
 import { createClient } from "@/lib/supabase/server";
 
-// async function LandingPanel() {
-//   await connection();
-
-//   const supabase = await createClient();
-//   const {
-//     data: { user },
-//   } = await supabase.auth.getUser();
-
-//   return <LoginPanel isAuthenticated={Boolean(user)} />;
-// }
 async function LandingPanel() {
-  await connection();
-
   const supabase = await createClient();
   const {
     data: { user },
@@ -30,23 +15,10 @@ async function LandingPanel() {
     redirect("/hub");
   }
 
-  return <LoginPanel isAuthenticated={false} />;
+  return <LoginPanel />;
 }
 
-function LoginPanel({ isAuthenticated }: { isAuthenticated: boolean }) {
-  if (isAuthenticated) {
-    return (
-      <Panel className="border-white/15 bg-card/95 shadow-xl shadow-black/30 backdrop-blur">
-        <Link
-          href="/hub"
-          className="inline-flex h-9 w-full items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          Open Pins Hub
-        </Link>
-      </Panel>
-    );
-  }
-
+function LoginPanel() {
   return (
     <Panel className="border-white/15 bg-card/95 shadow-xl shadow-black/30 backdrop-blur">
       <div className="grid gap-3">
@@ -77,7 +49,9 @@ function LoginPanel({ isAuthenticated }: { isAuthenticated: boolean }) {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const landingPanel = await LandingPanel();
+
   return (
     <GalaxyPageBackground>
       <div className="flex min-h-screen items-center justify-center px-6 py-10">
@@ -94,9 +68,7 @@ export default function Home() {
             {/* <h1 className="text-3xl font-semibold text-[#f4f0d0]">Pins Hub</h1> */}
           </div>
 
-          <Suspense fallback={<LoadingState label="Loading Pins Hub" />}>
-            <LandingPanel />
-          </Suspense>
+          {landingPanel}
         </section>
       </div>
     </GalaxyPageBackground>

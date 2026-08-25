@@ -8,6 +8,7 @@ test("defines every Hub feature card from shared navigation", () => {
     hubFeatureNavigation.map(({ label, href }) => ({ label, href })),
     [
       { label: "Sales Dashboard", href: "/hub/sales-dashboard" },
+      { label: "Analytics", href: "/hub/analytics" },
       { label: "Calculators", href: "/hub/calculators" },
       { label: "PK Tax", href: "/hub/pk-tax" },
       {
