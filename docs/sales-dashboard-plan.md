@@ -1,5 +1,8 @@
 # Sales Dashboard Plan
 
+> Maintenance note (2026-08-25): the fixture-era `KpiCard.tsx`, `fixtures.ts`,
+> and `calculateKpis.ts` listed below have been removed after reference audit.
+
 > Historical Sales Dashboard design/planning record. The proposed live Monday
 > rendering, component/file architecture, and implementation sequence below
 > are not current implementation guidance. The current dashboard is

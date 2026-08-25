@@ -100,7 +100,7 @@ All items below were checked for imports, App Router convention use, dynamic loo
 - **Missing test — PK Tax UI and copy/export integration:** Pure PK Tax calculations are well tested, but there is no focused rendered/UI test for validation/reset/copy action integration.
 - **Missing test — commercial-invoice directory action authorization:** Domain and mapper tests exist; add server-action tests for organisation mismatch, read/write/admin boundaries, and soft lifecycle behaviour.
 - **Brittle tests:** Source-string tests in calculator visibility/results, dashboard navigation/TV/export/final-value surfaces, team submission, and script migration tests are useful as temporary guardrails but are coupled to filenames, Tailwind classes, and JSX text. Gradually replace UI source assertions with behaviour tests; retain migration-text tests for immutable historical contracts where runtime integration is not available.
-- **Intentionally retained / do not remove:** `workbookFixture.ts`, `fixtures.ts`, Gmail `.eml` fixtures, and generated source reconciliation fixtures are test/runtime evidence. `workbookFixture.ts` is also a live fallback in `salesDashboardRepository.ts`, not test-only data.
+- **Intentionally retained / do not remove:** `workbookFixture.ts`, Gmail `.eml` fixtures, and generated source reconciliation fixtures are test/runtime evidence. `workbookFixture.ts` is also a live fallback in `salesDashboardRepository.ts`, not test-only data. The disconnected fixture-era `fixtures.ts` was removed in the subsequent maintenance audit.
 
 ## Migration and Schema Findings
 

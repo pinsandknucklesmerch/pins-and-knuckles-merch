@@ -1,101 +1,34 @@
 # Sales Dashboard Reference
 
-This is a repository-verified implementation reference. The canonical
-high-level context is [PROJECT_CONTEXT.md](../ai-context/PROJECT_CONTEXT.md);
-ingestion operations are documented in
-[INGESTIONS_AND_CRONS.md](../operations/INGESTIONS_AND_CRONS.md).
+This is a repository-verified implementation reference. The high-level authority is [PROJECT_CONTEXT.md](../ai-context/PROJECT_CONTEXT.md); operational ingestion detail is in [INGESTIONS_AND_CRONS.md](../operations/INGESTIONS_AND_CRONS.md).
 
-## Route and page rendering
+## Data and route boundary
 
-`/hub/sales-dashboard` accepts `year`, `month`, `dashboardView`, `tv`, and
-`duration` query state. Invalid/missing year and month values fall back to the
-current server year/month. The route loads `loadSalesDashboard()` and renders
-through the Hub shell.
+`/hub/sales-dashboard` accepts `year`, `month`, `dashboardView`, `tv`, and `duration` query state. It loads persisted dashboard data through `src/features/sales-dashboard/data/salesDashboardRepository.ts`; it never fetches Monday or Gmail during a page request. Scheduled jobs and manual scripts validate and persist snapshots for later rendering.
 
-Dashboard page rendering is Supabase-first. It reads persisted KPI data through
-`src/features/sales-dashboard/data/salesDashboardRepository.ts`; it does not
-directly query Monday or Gmail. Scheduled ingestion and manual operational
-scripts fetch external systems, persist validated snapshots, then later page
-requests render those persisted rows.
+The dashboard uses `sales_kpi_months`, `sales_kpi_member_months`, effective-dated `sales_kpi_targets`, independent `sales_kpi_month_final_values`, and organisation-scoped `sales_dashboard_tv_settings`. Organisation rows take precedence over global rows.
 
-## Persistence model
+## Views and shared calculations
 
-- `sales_kpi_months`: company KPI months, including quotes, orders, monthly
-  profit, source/provenance fields, and notes.
-- `sales_kpi_member_months`: per-member KPI months. Monday and EPCC write
-  distinct owned fields and metadata to the same member identity row.
-- `sales_kpi_targets`: effective-dated KPI targets.
-- `sales_kpi_month_final_values`: admin-managed month-final display overrides
-  with editor/timestamp metadata.
-- `sales_dashboard_tv_settings`: organisation-scoped slide enablement, order,
-  and duration settings.
+Views are Overview, Company Profit, YTD, Snuggle, and Team Members. `calculateDashboardKpis.ts` is the company KPI calculation authority; `calculateYearToDate.ts`, `yearComparison.ts`, and `ytdComparison.ts` provide the shared YTD and comparison values. Presentation components consume those values rather than recreating KPI formulas.
 
-The repository selects organisation rows before global rows where both exist.
+- Overview shows the compact Monthly Profit, Sales Inbox, and performance KPIs. The user-facing enquiry metric is **Active Marketing Enquiries**.
+- Company Profit uses the dedicated `CompanyProfitView` and `CompanyProfitGauge`: Monthly Profit, Target Profit, Profit Above Target, and Progress. It is distinct from the shared 150%-scale KPI gauge.
+- YTD uses the shared comparison series and aggregate rate logic. Its report-relevant metrics are YTD Profit, Monthly Profit, Monthly Profit Comparison, Orders Processed, Active Marketing Enquiries, and Conversion Rate.
 
-## Views and controls
+## EPCC profit PDF
 
-Available views are Overview, Company Profit, YTD, Snuggle, and Team Members.
-Year/month controls submit route query state. Admins can manage targets and
-month-final values. Exports are generated from the active dashboard data,
-including metric exports and a profit-report PDF path.
+The active export renders a fixed-width off-screen React subtree (`ProfitPdfReport`) and rasterizes its two `data-profit-pdf-page` sections into landscape A4 PDF pages. It is presentation-only and reuses `companyProfitPresentation`, `ytdChartPoints`, `ytdComparisonValue`, and the existing `CompanyProfitGauge`.
 
-TV mode is query-state on the dashboard rather than a separate TV route. The
-separate `/hub/sales-dashboard/tv/settings` route manages admin-only slide
-settings. The configured six slides are Overview, YTD, Year Comparison,
-Snuggle, Live Zoo Cam, and Team Members; repository validation requires enabled slides,
-valid ordering, and bounded durations.
+1. **Company Profit**: Monthly Profit, Target, Profit Above Target, and the Company Profit gauge.
+2. **Year to Date**: YTD Profit, Monthly Profit, Monthly Profit Comparison, Orders Processed, Active Marketing Enquiries, and Conversion Rate.
 
-## Overview KPI presentation
+## TV and access
 
-The Monthly Profit card is a compact, full-height peer of Sales Inbox in the
-Overview row. It displays the Monthly Profit label, current value, target
-progress, and enlarged liquid shirt visual only. It intentionally has no
-previous-year comparison, comparison badge, or lower comparison divider.
+TV mode is dashboard query state. Administrators configure six persisted slides—Overview, YTD, Year Comparison, Snuggle, Live Zoo Cam, and Team Members—at `/hub/sales-dashboard/tv/settings`, with enabled state, order, and 10–300 second durations.
 
-Quotes Done, Orders Processed, and Conversion Rate use the shared `RevGauge`.
-Its red, orange, and green arc bands are equal thirds. The maximum is 150% of
-the real target, placing the target marker and label at the start of the green
-band (two-thirds of the gauge); the needle remains based on the real current
-value against that maximum. Target labels are visually stronger than the other
-scale labels. These are presentation conventions only and do not change KPI
-calculations, targets, comparisons elsewhere, or source ownership.
-
-## Member and profile performance
-
-Dashboard member KPI rows use canonical member identities. The profile feature
-reuses member-performance repository data for the authenticated member; admins
-can view a non-owner member profile. This reuse does not create a separate
-profile-performance store.
-
-## Source ownership
-
-From July 2026 onward:
-
-- Monday owns Quotes Done and Orders Processed, including their company/member
-  provenance.
-- EPCC/NetSuite owns monthly Profit.
-- EPCC member ingestion owns member Profit and PK Tax.
-- Final Values are independent display overrides; they do not overwrite
-  source-owned persisted fields.
-
-Monday sync payloads omit EPCC-owned profit fields. EPCC payloads omit
-Monday-owned quote/order fields. Source ownership is enforced in write payloads
-as well as being a reporting rule.
-
-## Historical fallback and limitations
-
-`workbookFixture.ts` supplies historical company/member data when a persisted
-period is missing or dashboard persistence queries fail. This keeps historical
-views available but is technical debt: it should be deliberately bounded or
-removed only after persisted KPI coverage is verified.
-
-The dashboard route currently starts dashboard data loading before the Hub shell
-renders its access-denied result. RLS remains the database boundary, but moving
-access checks before feature data loading is a potential hardening/performance
-improvement.
+From July 2026, Monday owns Quotes Done, Orders Processed, sales-inbox/conversion fields, and associated provenance; EPCC/NetSuite owns company monthly Profit and member Profit/PK Tax. Final values are display overrides and never overwrite source-owned values. Historical workbook fallback remains intentional technical debt until persisted coverage is confirmed.
 
 ## Operational boundary
 
-The repository verifies ingestion code, schedules, locks, and persistence
-contracts. It cannot verify Vercel execution, Monday/Gmail credentials and data,
-remote Supabase policies/RPCs, or actual persisted production rows.
+The repository verifies code, persistence contracts, and scheduled configuration. It cannot verify Vercel execution, external credentials, remote Supabase policy/RPC parity, or production KPI rows.

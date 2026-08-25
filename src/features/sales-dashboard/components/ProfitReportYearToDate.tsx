@@ -18,10 +18,7 @@ const PERFORMANCE_METRICS: Definition[] = [
 ];
 
 function format(value: number | null, kind: "currency" | "number" | "percent") {
-  if (value === null || !Number.isFinite(value)) return "—";
-  if (kind === "currency") return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(value);
-  if (kind === "percent") return `${value.toFixed(1)}%`;
-  return value.toLocaleString("en-GB", { maximumFractionDigits: 0 });
+  return formatAnimatedMetricValue(value, kind, kind === "percent" ? 1 : 0);
 }
 
 function Legend({ comparison }: { comparison: YearComparisonData }) {

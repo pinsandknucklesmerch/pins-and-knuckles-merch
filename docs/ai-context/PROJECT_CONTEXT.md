@@ -96,9 +96,13 @@ The dashboard is Supabase-first: rendering reads persisted company/member KPI
 rows, effective targets, final-value overrides, TV settings, trends, and years;
 it never calls Monday or Gmail during a page request. Views are Overview,
 Company Profit, YTD, Snuggle, and Team Members. It supports active-data exports,
-including metrics exports and the profit PDF path. TV mode is dashboard query
-state; admins manage six persisted slides (enabled state, order, and 10–300
-second duration) in the TV settings route.
+including metrics exports and the two-page EPCC profit PDF path. The report
+reuses Sales Dashboard/domain presentation helpers: Company Profit contains
+Monthly Profit, Target, Profit Above Target, and its dedicated gauge; Year to
+Date contains YTD Profit, Monthly Profit, Monthly Profit Comparison, Orders
+Processed, Active Marketing Enquiries, and Conversion Rate. TV mode is
+dashboard query state; admins manage six persisted slides (enabled state,
+order, and 10–300 second duration) in the TV settings route.
 
 - `sales_kpi_months`, `sales_kpi_member_months`, and `sales_kpi_targets` hold
   KPI/snapshot and effective-dated target data. Organisation rows take
