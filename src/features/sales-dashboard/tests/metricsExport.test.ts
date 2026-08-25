@@ -223,10 +223,13 @@ test("EPCC report keeps the requested profit and performance comparisons without
   assert.match(report, /<ProfitReportPerformanceKpis data=\{yearToDate\} comparison=\{yearComparison\}/);
   assert.doesNotMatch(report, /YearComparisonChart|ProfitReportCompanyProfit|ProfitReportYtdKpis/);
   assert.match(monthly, /companyProfitPresentation/);
-  assert.match(monthly, /<CompanyProfitGauge/);
+  assert.match(monthly, /<MonthlyProfitTshirt/);
+  assert.match(monthly, /target=\{presentation\.target\}/);
+  assert.match(monthly, /tvMode/);
+  assert.match(monthly, /presentation\.hasReachedTarget \? styles\.aboveTargetSuccess/);
+  assert.doesNotMatch(monthly, /<CompanyProfitGauge/);
   for (const label of ["Monthly Profit", "Target", "Profit Above Target"]) assert.match(monthly, new RegExp(label));
   assert.doesNotMatch(monthly, /Bonus Profit/);
-  assert.doesNotMatch(monthly, /hasReachedTarget \?/);
   assert.match(ytd, /companyProfitPresentation\(monthlyProfitMetric\)\.current/);
   assert.match(ytd, /Monthly Profit/);
   assert.match(ytd, /\+" : "-"/);

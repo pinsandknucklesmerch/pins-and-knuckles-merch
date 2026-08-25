@@ -1,7 +1,7 @@
 import type { MetricResult } from "../domain/types";
 import { formatAnimatedMetricValue } from "../lib/animatedMetricValue";
 import { companyProfitPresentation } from "../lib/companyProfitPresentation";
-import { CompanyProfitGauge } from "./CompanyProfitGauge";
+import { MonthlyProfitTshirt } from "./MonthlyProfitTshirt";
 import styles from "./ProfitPdfReport.module.css";
 
 function currency(value: number | null, fractionDigits = 0) {
@@ -17,9 +17,9 @@ export function ProfitReportMonthlyProfit({ metric }: { metric: MetricResult }) 
       <strong>{currency(presentation.current, 2)}</strong>
       <dl>
         <div><dt>Target</dt><dd>{currency(presentation.target)}</dd></div>
-        <div className={styles.aboveTarget}><dt>Profit Above Target</dt><dd>{currency(presentation.bonus)}</dd></div>
+        <div className={styles.aboveTarget}><dt>Profit Above Target</dt><dd className={presentation.hasReachedTarget ? styles.aboveTargetSuccess : undefined}>{currency(presentation.bonus)}</dd></div>
       </dl>
     </div>
-    <div className={styles.monthlyGauge}><CompanyProfitGauge value={presentation.current} target={presentation.target} remaining={presentation.remaining} bonus={presentation.bonus} /></div>
+    <div className={styles.monthlyGauge}><MonthlyProfitTshirt value={presentation.current} target={presentation.target} tvMode /></div>
   </article>;
 }
