@@ -9,20 +9,24 @@ const gaugeStyles = readFileSync(new URL("../components/CompanyProfitGauge.modul
 
 test("Company Profit view uses the source metric with its dedicated progress gauge", () => {
   assert.match(component, /<CompanyProfitGauge/);
-  assert.match(component, /Math\.max\(current - target, 0\)/);
-  assert.match(component, /Math\.max\(target - current, 0\)/);
+  assert.match(component, /companyProfitPresentation/);
+  assert.doesNotMatch(component, /className=\{styles\.details\}/);
   assert.match(component, /Company Profit/);
   assert.match(component, /Target Profit/);
-  assert.match(component, /Bonus Profit/);
+  assert.match(component, /Profit Above Target/);
+  assert.doesNotMatch(component, /Bonus Profit/);
   assert.match(component, /Progress/);
   assert.match(gauge, /value \/ target/);
   assert.doesNotMatch(gauge, /target \* 1\.5/);
   assert.match(gauge, /className=\{styles\.marker\}/);
-  assert.match(gauge, /Target exceeded/);
+  assert.match(gauge, /Profit above target/);
+  assert.doesNotMatch(gauge, /Bonus profit|Target exceeded/);
   assert.match(gauge, /pathLength="100"/);
   assert.match(gauge, /const TARGET_POSITION = 0\.5/);
   assert.match(gauge, /const completedArc = progress \* TARGET_POSITION \* 100/);
   assert.match(gauge, /strokeDasharray=\{`\$\{completedArc\} 100`\}/);
+  assert.match(gauge, /viewBox="0 0 620 346"/);
+  assert.match(gauge, /y1="38" x2="310" y2="52"/);
 });
 
 test("Company Profit view has a compact responsive gauge and metric layout", () => {

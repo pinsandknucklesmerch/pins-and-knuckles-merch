@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import type { YearComparisonPoint } from "../domain/types.ts";
 import { chartValue } from "../lib/chartValue.ts";
+import { ytdChartPoints } from "../lib/ytdPresentation.ts";
 import { sumYearComparisonMetric, ytdComparisonValue } from "../lib/ytdComparison.ts";
 
 const component = readFileSync(new URL("../components/YearToDateView.tsx", import.meta.url), "utf8");
@@ -77,10 +78,22 @@ test("YTD chart values preserve finite zeroes and turn invalid values into gaps"
   assert.equal(chartValue(Number.NEGATIVE_INFINITY), null);
 });
 
+test("shared YTD chart builder keeps the selected period bounded and previous year complete", () => {
+  const comparison = {
+    selectedYear: 2026,
+    previousYear: 2025,
+    selected: [point({ month: 1, monthlyProfit: 100 }), point({ month: 2, label: "Feb", monthlyProfit: 200 })],
+    previous: [point({ month: 1, monthlyProfit: 80 }), point({ month: 2, label: "Feb", monthlyProfit: 160 })],
+  };
+  assert.deepEqual(ytdChartPoints(comparison, 1, "MONTHLY_PROFIT"), [
+    { label: "Jan", current: 100, previous: 80 },
+    { label: "Feb", current: null, previous: 160 },
+  ]);
+});
+
 test("YTD panel owns its heading and distributes available desktop height", () => {
   assert.match(component, /<h2 id="year-to-date-title">Year to Date<\/h2>/);
-  assert.match(component, /Data shown: YTD vs same period last year/);
-  assert.match(component, /Through \{periodLabel\}/);
+  assert.doesNotMatch(component, /Data shown: YTD vs same period last year|Through \{periodLabel\}|vs \{previousYear\} YTD/);
   assert.match(styles, /height: 100%/);
   assert.match(styles, /grid-template-rows: minmax\(13\.5rem, 0\.86fr\) minmax\(19rem, 1\.14fr\)/);
   assert.doesNotMatch(styles, /100vw|max-content|translateX|margin[^:]*:\s*-/);

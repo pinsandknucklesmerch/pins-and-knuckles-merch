@@ -1,15 +1,13 @@
-import { DASHBOARD_MONTHS } from "../types";
 import type { MetricResult, YearComparisonData, YearToDateData } from "../domain/types";
-import { ProfitShirtKpi } from "./ProfitShirtKpi";
-import { YearComparisonChart } from "./YearComparisonChart";
-import { YearToDateView } from "./YearToDateView";
-import { MetricKpiCard } from "./MetricKpiCard";
+import { DASHBOARD_MONTHS } from "../types";
+import { ProfitReportMonthlyProfit } from "./ProfitReportMonthlyProfit";
+import { ProfitReportMonthlyComparison, ProfitReportPerformanceKpis, ProfitReportYtdSummary } from "./ProfitReportYearToDate";
+import styles from "./ProfitPdfReport.module.css";
 
 type ProfitPdfReportProps = {
   year: number;
   month: number;
   monthlyProfitMetric: MetricResult;
-  conversionRateMetric: MetricResult;
   yearToDate: YearToDateData;
   yearComparison: YearComparisonData;
 };
@@ -18,51 +16,26 @@ const reportPageClass = "box-border flex min-h-[793px] w-[1120px] flex-col gap-6
 
 function ReportPageHeader({ month, year, title }: { month: number; year: number; title: string }) {
   return <header className="flex shrink-0 items-end justify-between border-b border-white/10 pb-4">
-    <div className="grid gap-1">
-      <p className="text-base font-semibold">Pins & Knuckles Profit Report</p>
-      <p className="text-sm text-muted-foreground">{DASHBOARD_MONTHS[month - 1]} {year}</p>
-    </div>
+    <div className="grid gap-1"><p className="text-base font-semibold">Pins & Knuckles Profit Report</p><p className="text-sm text-muted-foreground">{DASHBOARD_MONTHS[month - 1]} {year}</p></div>
     <h1 className="text-lg font-semibold">{title}</h1>
   </header>;
 }
 
-export function ProfitPdfReport({
-  year,
-  month,
-  monthlyProfitMetric,
-  conversionRateMetric,
-  yearToDate,
-  yearComparison,
-}: ProfitPdfReportProps) {
-  return (
-    <div data-export-subtree="epcc-profit" className="grid gap-8 bg-[#111114] text-foreground">
-      <section data-profit-pdf-page="true" className={reportPageClass}>
-        <ReportPageHeader month={month} year={year} title="Monthly Profit" />
-          {/* <div className="flex flex-1 items-start justify-center pt-6">
-            <div className="w-[760px]">
-              <ProfitShirtKpi metric={monthlyProfitMetric} />
-            </div>
-          </div> */}
-          <div className="flex flex-1 flex-col items-center gap-6 pt-6">
-  <div className="w-[760px]">
-    <ProfitShirtKpi metric={monthlyProfitMetric} />
-  </div>
-
-  <div className="w-[760px]">
-    <MetricKpiCard metric={conversionRateMetric} />
-  </div>
-</div>
-      </section>
-
-      <section data-profit-pdf-page="true" className={`${reportPageClass} profit-report-page`}>
-        <ReportPageHeader month={month} year={year} title="Year to Date" />
-        <YearToDateView data={yearToDate} comparison={yearComparison} showHeading={false} />
-      </section>
-
-      <section data-profit-pdf-page="true" className={`${reportPageClass} profit-report-page`}>
-        <ReportPageHeader month={month} year={year} title="Year Comparison" />
-        <YearComparisonChart comparison={yearComparison} showControls={false} />
-      </section>
-    </div>
-  );
+export function ProfitPdfReport({ year, month, monthlyProfitMetric, yearToDate, yearComparison }: ProfitPdfReportProps) {
+  return <div data-export-subtree="epcc-profit" className="grid gap-8 bg-[#111114] text-foreground">
+    <section data-profit-pdf-page="true" className={reportPageClass}>
+      <ReportPageHeader month={month} year={year} title="Profit Summary" />
+      <div className={styles.profitSummary}>
+        <ProfitReportMonthlyProfit metric={monthlyProfitMetric} />
+        <ProfitReportYtdSummary data={yearToDate} comparison={yearComparison} />
+      </div>
+    </section>
+    <section data-profit-pdf-page="true" className={reportPageClass}>
+      <ReportPageHeader month={month} year={year} title="Performance Comparison" />
+      <div className={styles.performanceComparison}>
+        <ProfitReportMonthlyComparison data={yearToDate} comparison={yearComparison} />
+        <ProfitReportPerformanceKpis data={yearToDate} comparison={yearComparison} />
+      </div>
+    </section>
+  </div>;
 }

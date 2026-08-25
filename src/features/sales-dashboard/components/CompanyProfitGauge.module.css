@@ -7,7 +7,7 @@
 .targetAmount, .targetLabel { text-anchor: middle; }
 .targetAmount { fill: #d6c486; font-size: 16px; font-weight: 760; }
 .targetLabel, .minimum { fill: hsl(var(--muted-foreground)); font-size: 12px; font-weight: 650; }
-.centre { position: absolute; top: 47%; right: 21%; left: 21%; display: grid; justify-items: center; gap: .15rem; text-align: center; }
+.centre { position: absolute; top: 50%; right: 21%; left: 21%; display: grid; justify-items: center; gap: .15rem; text-align: center; }
 .centre strong { color: hsl(var(--foreground)); font-size: clamp(1.45rem, 2.2vw, 2rem); font-weight: 750; letter-spacing: -.035em; line-height: 1; }
 .centre span { color: hsl(var(--muted-foreground)); font-size: .8rem; line-height: 1.1; }
 .centre em { color: #d6c486; font-size: .72rem; font-style: normal; font-weight: 650; line-height: 1.15; }

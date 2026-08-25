@@ -1,8 +1,8 @@
 import { useId } from "react";
+import type { YtdChartPoint } from "../lib/ytdPresentation";
 import styles from "./YtdComparisonCharts.module.css";
 
 export type YtdChartFormat = "currency" | "number" | "percent";
-export type YtdChartPoint = { label: string; current: number | null; previous: number | null };
 
 type ChartBox = { width: number; height: number; left: number; right: number; top: number; bottom: number };
 

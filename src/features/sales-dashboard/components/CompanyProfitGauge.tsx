@@ -21,23 +21,23 @@ export function CompanyProfitGauge({ value, target, remaining, bonus }: CompanyP
   const completedArc = progress * TARGET_POSITION * 100;
   const isBonus = bonus !== null && bonus > 0;
   const centreValue = isBonus ? bonus : remaining;
-  const centreLabel = isBonus ? "Bonus profit" : "to target";
+  const centreLabel = isBonus ? "Profit above target" : "to target";
 
   return <div className={styles.gauge} role="img" aria-label={`Monthly company profit ${currency(value)}, target ${currency(target)}`}>
-    <svg viewBox="0 0 620 326" className={styles.svg} aria-hidden="true" focusable="false">
-      <path className={styles.track} d="M 76 270 A 234 234 0 0 1 544 270" pathLength="100" />
-      <path className={styles.fill} d="M 76 270 A 234 234 0 0 1 544 270" pathLength="100" strokeDasharray={`${completedArc} 100`} />
+    <svg viewBox="0 0 620 346" className={styles.svg} aria-hidden="true" focusable="false">
+      <path className={styles.track} d="M 76 288 A 234 234 0 0 1 544 288" pathLength="100" />
+      <path className={styles.fill} d="M 76 288 A 234 234 0 0 1 544 288" pathLength="100" strokeDasharray={`${completedArc} 100`} />
       {validTarget ? <>
-        <line className={styles.marker} x1="310" y1="42" x2="310" y2="82" />
-        <text className={styles.targetAmount} x="310" y="22">{currency(target)}</text>
-        <text className={styles.targetLabel} x="310" y="38">Target</text>
+        <text className={styles.targetAmount} x="310" y="16">{currency(target)}</text>
+        <text className={styles.targetLabel} x="310" y="31">Target</text>
+        <line className={styles.marker} x1="310" y1="38" x2="310" y2="52" />
       </> : null}
-      <text className={styles.minimum} x="61" y="301">£0</text>
+      <text className={styles.minimum} x="61" y="319">£0</text>
     </svg>
     <div className={styles.centre}>
       <strong>{currency(centreValue)}</strong>
       <span>{centreLabel}</span>
-      {isBonus ? <em>Target exceeded</em> : null}
+      {isBonus ? <em>Above target</em> : null}
     </div>
   </div>;
 }

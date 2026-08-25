@@ -209,6 +209,35 @@ test("EPCC PDF export normalizes modern MetricUI colors only in html2canvas clon
   assert.match(report, /data-export-subtree="epcc-profit"/);
 });
 
+test("EPCC report keeps the requested profit and performance comparisons without duplicate report pages", () => {
+  const report = readFileSync(new URL("../components/ProfitPdfReport.tsx", import.meta.url), "utf8");
+  const monthly = readFileSync(new URL("../components/ProfitReportMonthlyProfit.tsx", import.meta.url), "utf8");
+  const ytd = readFileSync(new URL("../components/ProfitReportYearToDate.tsx", import.meta.url), "utf8");
+  const reportStyles = readFileSync(new URL("../components/ProfitPdfReport.module.css", import.meta.url), "utf8");
+
+  assert.equal(report.match(/data-profit-pdf-page="true"/g)?.length, 2);
+  assert.ok(report.indexOf('title="Profit Summary"') < report.indexOf('title="Performance Comparison"'));
+  assert.match(report, /<ProfitReportMonthlyProfit metric=\{monthlyProfitMetric\}/);
+  assert.match(report, /<ProfitReportYtdSummary data=\{yearToDate\} comparison=\{yearComparison\}/);
+  assert.match(report, /<ProfitReportMonthlyComparison data=\{yearToDate\} comparison=\{yearComparison\}/);
+  assert.match(report, /<ProfitReportPerformanceKpis data=\{yearToDate\} comparison=\{yearComparison\}/);
+  assert.doesNotMatch(report, /YearComparisonChart|ProfitReportCompanyProfit|ProfitReportYtdKpis/);
+  assert.match(monthly, /companyProfitPresentation/);
+  assert.match(monthly, /<CompanyProfitGauge/);
+  for (const label of ["Monthly Profit", "Target Profit", "Profit Above Target"]) assert.match(monthly, new RegExp(label));
+  assert.doesNotMatch(monthly, /Bonus Profit/);
+  for (const code of ["ORDERS_PROCESSED", "CONVERSION_RATE"]) assert.match(ytd, new RegExp(code));
+  for (const code of ["QUOTES_DONE", "CONVERTED", "SALES_INBOX_ENQUIRIES", "SALES_INBOX_CONVERSION_RATE"]) assert.doesNotMatch(ytd, new RegExp(code));
+  assert.match(ytd, /ytdChartPoints/);
+  assert.match(ytd, /ytdComparisonValue/);
+  assert.match(ytd, /YtdProfitAreaChart/);
+  assert.match(ytd, /YtdBarComparisonChart/);
+  assert.match(ytd, /YtdRateComparisonChart/);
+  assert.match(reportStyles, /profitSummary/);
+  assert.match(reportStyles, /performanceComparison/);
+  assert.match(reportStyles, /performanceKpis/);
+});
+
 test("EPCC PDF export cleans up after success or failure and emits a non-empty image", () => {
   const button = readFileSync(new URL("../components/ExportMetricsButton.tsx", import.meta.url), "utf8");
   assert.match(button, /finally\s*\{[\s\S]*setIsExporting\(false\)/);

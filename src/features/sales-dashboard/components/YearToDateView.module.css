@@ -17,14 +17,7 @@
   grid-template-rows: minmax(0, 1fr);
 }
 
-.panelHeader {
-  display: flex;
-  min-width: 0;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0 0.25rem;
-}
+.panelHeader { display: flex; min-width: 0; align-items: flex-start; padding: 0 0.25rem; }
 
 .panelHeader > div:first-child {
   display: grid;
@@ -39,29 +32,12 @@
   line-height: 1.5rem;
 }
 
-.panelHeader span,
-.periodContext {
+.panelHeader span {
   color: hsl(var(--muted-foreground));
   font-size: 0.75rem;
   line-height: 1rem;
 }
 
-.periodContext {
-  display: grid;
-  justify-items: end;
-  gap: 0.0625rem;
-  text-align: right;
-}
-
-.periodContext strong {
-  color: hsl(var(--foreground) / 0.88);
-  font-weight: 500;
-}
-
-.periodContext em {
-  color: hsl(var(--mu-color-warning));
-  font-style: normal;
-}
 
 .panelBody {
   display: grid;
@@ -168,7 +144,6 @@
   white-space: nowrap;
 }
 
-.comparisonContext,
 .comparisonUnavailable {
   color: hsl(var(--muted-foreground));
   font-size: 0.6875rem;
@@ -391,11 +366,6 @@
   .panelHeader,
   .chartHeader {
     flex-direction: column;
-  }
-
-  .periodContext {
-    justify-items: start;
-    text-align: left;
   }
 
   .heroGrid {
