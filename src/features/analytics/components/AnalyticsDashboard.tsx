@@ -39,7 +39,7 @@ function AnalyticsTabs({ activeView, period }: { activeView: AnalyticsView; peri
 }
 
 function WebsiteView({ period, report, error }: { period: WebsiteAnalyticsPeriod; report: Ga4WebsiteAnalyticsReport | null; error: "configuration" | "unavailable" | null }) {
-  return <div className="grid gap-3">
+  return <div className="grid gap-2">
     <nav aria-label="Website analytics period" className="overflow-x-auto">
       <div className="flex min-w-max gap-1">
         {[7, 30, 90].map((days) => <Link key={days} href={`/hub/analytics?view=website&period=${days}`} aria-current={period === days ? "page" : undefined} className={`flex h-9 items-center rounded-md px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${period === days ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}>Last {days} days</Link>)}
@@ -66,7 +66,7 @@ function SocialMediaView() {
 
 export function AnalyticsDashboard({ activeView, period, websiteReport, websiteError }: { activeView: AnalyticsView; period: WebsiteAnalyticsPeriod; websiteReport: Ga4WebsiteAnalyticsReport | null; websiteError: "configuration" | "unavailable" | null }) {
   return (
-    <div className="grid min-w-0 gap-4">
+    <div className="grid min-w-0 gap-3">
       <AnalyticsTabs activeView={activeView} period={period} />
       {activeView === "website" ? <WebsiteView period={period} report={websiteReport} error={websiteError} /> : null}
       {activeView === "social-media" ? <SocialMediaView /> : null}
