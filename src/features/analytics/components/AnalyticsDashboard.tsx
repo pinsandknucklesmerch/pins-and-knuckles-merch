@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { Panel } from "@/components/ui/Panel";
-import type { AnalyticsView } from "../types";
+import type { Ga4WebsiteAnalyticsReport } from "../server/ga4";
+import type { AnalyticsView, WebsiteAnalyticsPeriod } from "../types";
+import { WebsiteAnalyticsView } from "./WebsiteAnalyticsView";
 
 const ANALYTICS_TABS: Array<{ view: AnalyticsView; label: string }> = [
   { view: "overview", label: "Overview" },
@@ -9,11 +12,11 @@ const ANALYTICS_TABS: Array<{ view: AnalyticsView; label: string }> = [
   { view: "social-media", label: "Social Media" },
 ];
 
-function viewHref(view: AnalyticsView) {
-  return view === "overview" ? "/hub/analytics" : `/hub/analytics?view=${view}`;
+function viewHref(view: AnalyticsView, period: WebsiteAnalyticsPeriod) {
+  return view === "overview" ? "/hub/analytics" : view === "website" ? `/hub/analytics?view=website&period=${period}` : `/hub/analytics?view=${view}`;
 }
 
-function AnalyticsTabs({ activeView }: { activeView: AnalyticsView }) {
+function AnalyticsTabs({ activeView, period }: { activeView: AnalyticsView; period: WebsiteAnalyticsPeriod }) {
   return (
     <nav aria-label="Analytics views" className="overflow-x-auto">
       <div className="flex min-w-max gap-1">
@@ -22,7 +25,7 @@ function AnalyticsTabs({ activeView }: { activeView: AnalyticsView }) {
           return (
             <Link
               key={tab.view}
-              href={viewHref(tab.view)}
+              href={viewHref(tab.view, period)}
               aria-current={active ? "page" : undefined}
               className={`flex h-9 items-center rounded-md px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}
             >
@@ -35,15 +38,17 @@ function AnalyticsTabs({ activeView }: { activeView: AnalyticsView }) {
   );
 }
 
-function WebsiteView() {
-  return (
-    <Panel title="Website analytics">
-      <EmptyState
-        title="Google Analytics 4 is not connected"
-        description="Website reporting will be available after Google Analytics 4 is connected."
-      />
-    </Panel>
-  );
+function WebsiteView({ period, report, error }: { period: WebsiteAnalyticsPeriod; report: Ga4WebsiteAnalyticsReport | null; error: "configuration" | "unavailable" | null }) {
+  return <div className="grid gap-3">
+    <nav aria-label="Website analytics period" className="overflow-x-auto">
+      <div className="flex min-w-max gap-1">
+        {[7, 30, 90].map((days) => <Link key={days} href={`/hub/analytics?view=website&period=${days}`} aria-current={period === days ? "page" : undefined} className={`flex h-9 items-center rounded-md px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${period === days ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}>Last {days} days</Link>)}
+      </div>
+    </nav>
+    {error === "configuration" ? <Panel><ErrorState title="Website Analytics is not configured" message="GA4 reporting is unavailable until its server configuration is complete." /></Panel> : null}
+    {error === "unavailable" ? <Panel><ErrorState title="Website Analytics is temporarily unavailable" message="Please try again shortly." /></Panel> : null}
+    {report ? <WebsiteAnalyticsView report={report} /> : null}
+  </div>;
 }
 
 function SocialMediaView() {
@@ -59,11 +64,11 @@ function SocialMediaView() {
   );
 }
 
-export function AnalyticsDashboard({ activeView }: { activeView: AnalyticsView }) {
+export function AnalyticsDashboard({ activeView, period, websiteReport, websiteError }: { activeView: AnalyticsView; period: WebsiteAnalyticsPeriod; websiteReport: Ga4WebsiteAnalyticsReport | null; websiteError: "configuration" | "unavailable" | null }) {
   return (
     <div className="grid min-w-0 gap-4">
-      <AnalyticsTabs activeView={activeView} />
-      {activeView === "website" ? <WebsiteView /> : null}
+      <AnalyticsTabs activeView={activeView} period={period} />
+      {activeView === "website" ? <WebsiteView period={period} report={websiteReport} error={websiteError} /> : null}
       {activeView === "social-media" ? <SocialMediaView /> : null}
       {activeView === "overview" ? (
         <Panel>

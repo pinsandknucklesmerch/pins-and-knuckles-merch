@@ -1,8 +1,9 @@
 import "server-only";
 
-import { BetaAnalyticsDataClient } from "@google-analytics/data";
+import { BetaAnalyticsDataClient, type protos } from "@google-analytics/data";
 import { getVercelOidcToken } from "@vercel/oidc";
 import { ExternalAccountClient, GoogleAuth } from "google-auth-library";
+import type { WebsiteAnalyticsPeriod } from "../types";
 
 const ANALYTICS_READONLY_SCOPE = "https://www.googleapis.com/auth/analytics.readonly";
 const SUBJECT_TOKEN_TYPE = "urn:ietf:params:oauth:token-type:jwt";
@@ -22,6 +23,26 @@ export type Ga4LastSevenDaysReport = {
   activeUsers: number;
   sessions: number;
   pageViews: number;
+};
+
+export type Ga4WebsiteAnalyticsReport = {
+  periodDays: WebsiteAnalyticsPeriod;
+  metrics: {
+    activeUsers: number;
+    sessions: number;
+    pageViews: number;
+    engagementRate: number;
+  };
+  previousMetrics: {
+    activeUsers: number;
+    sessions: number;
+    pageViews: number;
+    engagementRate: number;
+  } | null;
+  dailyTraffic: Array<{ date: string; sessions: number; activeUsers: number }>;
+  acquisitionChannels: Array<{ channel: string; sessions: number }>;
+  topPages: Array<{ title: string; path: string | null; pageViews: number }>;
+  hasData: boolean;
 };
 
 export class Ga4ConfigurationError extends Error {
@@ -108,6 +129,25 @@ function metricValue(value: string | null | undefined, metric: string) {
   return parsed;
 }
 
+function reportMetrics(values: protos.google.analytics.data.v1beta.IMetricValue[] | null | undefined) {
+  return {
+    activeUsers: metricValue(values?.[0]?.value, "activeUsers"),
+    sessions: metricValue(values?.[1]?.value, "sessions"),
+    pageViews: metricValue(values?.[2]?.value, "screenPageViews"),
+    engagementRate: metricValue(values?.[3]?.value, "engagementRate"),
+  };
+}
+
+function dateRange(days: number, previous = false) {
+  if (!previous) return { startDate: `${days - 1}daysAgo`, endDate: "today" };
+  return { startDate: `${(days * 2) - 1}daysAgo`, endDate: `${days}daysAgo` };
+}
+
+function formatGa4Date(value: string | null | undefined) {
+  if (!value || !/^\d{8}$/.test(value)) return value ?? "";
+  return `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`;
+}
+
 /** Retrieves the aggregate website metrics used by the first GA4 connectivity check. */
 export async function getGa4LastSevenDaysReport(): Promise<Ga4LastSevenDaysReport> {
   const configuration = ga4Configuration();
@@ -127,6 +167,42 @@ export async function getGa4LastSevenDaysReport(): Promise<Ga4LastSevenDaysRepor
       activeUsers: metricValue(values[0]?.value, "activeUsers"),
       sessions: metricValue(values[1]?.value, "sessions"),
       pageViews: metricValue(values[2]?.value, "screenPageViews"),
+    };
+  } finally {
+    await client.close();
+  }
+}
+
+/** Retrieves normalized live GA4 website reporting for the authenticated Hub page. */
+export async function getGa4WebsiteAnalyticsReport(periodDays: WebsiteAnalyticsPeriod): Promise<Ga4WebsiteAnalyticsReport> {
+  const configuration = ga4Configuration();
+  const client = new BetaAnalyticsDataClient({ auth: googleAuth(configuration) });
+  const property = `properties/${configuration.propertyId}`;
+  const currentRange = dateRange(periodDays);
+
+  try {
+    const [currentResponse, previousResponse, trendResponse, acquisitionResponse, pagesResponse] = await Promise.all([
+      client.runReport({ property, dateRanges: [currentRange], metrics: [{ name: "activeUsers" }, { name: "sessions" }, { name: "screenPageViews" }, { name: "engagementRate" }] }),
+      client.runReport({ property, dateRanges: [dateRange(periodDays, true)], metrics: [{ name: "activeUsers" }, { name: "sessions" }, { name: "screenPageViews" }, { name: "engagementRate" }] }),
+      client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "date" }], metrics: [{ name: "sessions" }, { name: "activeUsers" }], orderBys: [{ dimension: { dimensionName: "date" } }] }),
+      client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "sessionDefaultChannelGroup" }], metrics: [{ name: "sessions" }], orderBys: [{ metric: { metricName: "sessions" }, desc: true }], limit: 6 }),
+      client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "pageTitle" }, { name: "pagePath" }], metrics: [{ name: "screenPageViews" }], orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }], limit: 10 }),
+    ]);
+
+    const currentRows = currentResponse[0].rows ?? [];
+    const previousRows = previousResponse[0].rows ?? [];
+    const trendRows = trendResponse[0].rows ?? [];
+    const acquisitionRows = acquisitionResponse[0].rows ?? [];
+    const pageRows = pagesResponse[0].rows ?? [];
+
+    return {
+      periodDays,
+      metrics: reportMetrics(currentRows[0]?.metricValues),
+      previousMetrics: previousRows[0] ? reportMetrics(previousRows[0].metricValues) : null,
+      dailyTraffic: trendRows.map((row) => ({ date: formatGa4Date(row.dimensionValues?.[0]?.value), sessions: metricValue(row.metricValues?.[0]?.value, "sessions"), activeUsers: metricValue(row.metricValues?.[1]?.value, "activeUsers") })),
+      acquisitionChannels: acquisitionRows.map((row) => ({ channel: row.dimensionValues?.[0]?.value?.trim() || "Unassigned", sessions: metricValue(row.metricValues?.[0]?.value, "sessions") })),
+      topPages: pageRows.map((row) => ({ title: row.dimensionValues?.[0]?.value?.trim() || "Untitled page", path: row.dimensionValues?.[1]?.value?.trim() || null, pageViews: metricValue(row.metricValues?.[0]?.value, "screenPageViews") })),
+      hasData: currentRows.length > 0 || trendRows.length > 0 || acquisitionRows.length > 0 || pageRows.length > 0,
     };
   } finally {
     await client.close();

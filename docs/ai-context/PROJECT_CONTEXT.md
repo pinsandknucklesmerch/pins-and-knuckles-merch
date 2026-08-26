@@ -36,8 +36,8 @@ legacy Hub architecture are not part of this application.
   `/auth/forgot-password`, `/auth/invite`, `/auth/recovery-confirm`,
   `/auth/recovery-confirm/verify`, and `/auth/update-password`.
 - Hub: `/hub`, `/hub/profile`, Analytics at `/hub/analytics` with Overview,
-  Website, and Social Media views (Google Analytics 4 and Meta integrations
-  remain unconfigured), User Access Management at `/hub/team`,
+  Website, and Social Media views. Website reads live GA4 reporting; Meta and
+  social integrations remain pending. User Access Management at `/hub/team`,
   `/hub/team/add`, and `/hub/team/[membershipId]`.
 - Sales Dashboard: `/hub/sales-dashboard` and
   `/hub/sales-dashboard/tv/settings`.
@@ -250,10 +250,10 @@ disposable/local target and may require `RESTORE_ADMIN_DATABASE_URL` for
 `GMAIL_REPORT_ADDRESS`, and `CRON_SECRET` remain server-only. GA4 uses Vercel
 OIDC to Google Workload Identity Federation, then impersonates its dedicated
 read-only GA4 service account; no long-lived Google service-account key is
-used. Production currently has the authorised Vercel workload identity. The
-developer-only `GET /api/developer/analytics/ga4-connectivity` check reads the
-last seven days of `activeUsers`, `sessions`, and `screenPageViews` without
-persistence.
+used. Production GA4 connectivity is verified. Website Analytics reads live
+GA4 data without persistence, while Meta/social integration remains pending.
+The developer-only `GET /api/developer/analytics/ga4-connectivity` check reads
+the last seven days of `activeUsers`, `sessions`, and `screenPageViews`.
 
 Snuggle remains subject to a known data-quality diagnostic: Monday can return
 invalid `FormulaValue` responses. The server warns, excludes invalid values

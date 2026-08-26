@@ -1,0 +1,19 @@
+.root { display: grid; gap: 0.75rem; min-width: 0; }
+.kpis { display: grid; gap: 0.75rem; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.kpi:global([data-component="KpiCard"]) { min-height: 0; padding: 0.75rem; }
+.chart:global([data-component="AreaChart"]) { min-width: 34rem; }
+.lower { display: grid; gap: 0.75rem; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); }
+.breakdown { display: grid; gap: 0; }
+.breakdown li { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid hsl(var(--border) / 0.7); padding: 0.6rem 0; font-size: 0.875rem; }
+.breakdown li:first-child { padding-top: 0; }
+.breakdown li:last-child { border-bottom: 0; padding-bottom: 0; }
+.breakdown strong { font-variant-numeric: tabular-nums; font-weight: 600; }
+.pages { width: 100%; min-width: 28rem; border-collapse: collapse; font-size: 0.875rem; }
+.pages th { border-bottom: 1px solid hsl(var(--border)); padding: 0 0.5rem 0.5rem; color: hsl(var(--muted-foreground)); font-size: 0.75rem; font-weight: 500; text-align: left; }
+.pages td { border-bottom: 1px solid hsl(var(--border) / 0.7); padding: 0.55rem 0.5rem; }
+.pages td:first-child { min-width: 0; }
+.pages tbody tr:last-child td { border-bottom: 0; padding-bottom: 0; }
+.pages span, .pages small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pages small { margin-top: 0.125rem; color: hsl(var(--muted-foreground)); font-size: 0.75rem; }
+@media (max-width: 1023px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 639px) { .lower { grid-template-columns: minmax(0, 1fr); } }
