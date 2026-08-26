@@ -26,7 +26,7 @@ export function ProfitPdfReport({ year, month, monthlyProfitMetric, yearToDate, 
     <section data-profit-pdf-page="true" className={reportPageClass}>
       <ReportPageHeader month={month} year={year} title="Company Profit" />
       <div className={styles.companyProfit}>
-        <ProfitReportMonthlyProfit metric={monthlyProfitMetric} ytdProfit={yearToDate.ytdActual} reportMonth={month} />
+        <ProfitReportMonthlyProfit metric={monthlyProfitMetric} />
       </div>
     </section>
     <section data-profit-pdf-page="true" className={reportPageClass}>

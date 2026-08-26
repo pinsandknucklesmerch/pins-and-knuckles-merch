@@ -217,7 +217,7 @@ test("EPCC report keeps the requested profit and performance comparisons without
 
   assert.equal(report.match(/data-profit-pdf-page="true"/g)?.length, 2);
   assert.ok(report.indexOf('title="Company Profit"') < report.indexOf('title="Year to Date"'));
-  assert.match(report, /<ProfitReportMonthlyProfit metric=\{monthlyProfitMetric\} ytdProfit=\{yearToDate\.ytdActual\} reportMonth=\{month\}/);
+  assert.match(report, /<ProfitReportMonthlyProfit metric=\{monthlyProfitMetric\} \/>/);
   assert.doesNotMatch(report, /<ProfitReportYtdSummary[\s\S]*reportMonth/);
   assert.match(report, /<ProfitReportYtdSummary data=\{yearToDate\} comparison=\{yearComparison\} \/>/);
   assert.match(report, /<ProfitReportMonthlyComparison data=\{yearToDate\} comparison=\{yearComparison\}/);
@@ -229,11 +229,12 @@ test("EPCC report keeps the requested profit and performance comparisons without
   assert.match(monthly, /tvMode/);
   assert.doesNotMatch(monthly, /<CompanyProfitGauge/);
   assert.match(monthly, /<strong>\{currency\(presentation\.current, 2\)\}<\/strong>/);
-  assert.match(monthly, /YTD Bonus Profit/);
-  assert.match(monthly, /calculateYtdBonusProfit/);
-  assert.match(monthly, /styles\.ytdBonusProfitValue/);
-  assert.match(monthly, /currency\(ytdBonusProfit, 2\)/);
-  assert.match(reportStyles, /\.monthlySummary \.ytdBonusProfitValue/);
+  for (const label of ["Monthly Profit", "Bonus Profit"]) assert.match(monthly, new RegExp(label));
+  assert.match(monthly, /calculateBonusProfit/);
+  assert.match(monthly, /styles\.bonusProfitValue/);
+  assert.match(monthly, /currency\(bonusProfit, 2\)/);
+  assert.match(monthly, /bonusProfit !== null && bonusProfit > 0 \? styles\.positive/);
+  assert.match(reportStyles, /\.monthlySummary \.bonusProfitValue/);
   assert.match(reportStyles, /\.monthlySummary \.positive/);
   for (const label of ["YTD Target", "Above target", "Monthly Profit"]) assert.match(ytd, new RegExp(label));
   assert.doesNotMatch(ytd, /Bonus Profit/);

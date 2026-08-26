@@ -4,6 +4,8 @@ import { useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Panel } from "@/components/ui/Panel";
 import type { Ga4WebsiteAnalyticsReport } from "../server/ga4";
+import { MAX_TRAFFIC_INVESTIGATION_BUCKET_DAYS } from "../lib/trafficInvestigation";
+import { AnalyticsTrafficInvestigation } from "./AnalyticsTrafficInvestigation";
 import styles from "./AnalyticsTrafficOverview.module.css";
 
 type TrafficMetric = "sessions" | "activeUsers" | "pageViews";
@@ -21,7 +23,7 @@ function comparison(current: number, previous: number | undefined) {
 }
 
 function aggregateTraffic(report: Ga4WebsiteAnalyticsReport, metric: TrafficMetric): TrafficPoint[] {
-  const bucketSize = report.periodDays === 90 ? 3 : 1;
+  const bucketSize = report.periodDays === 90 ? MAX_TRAFFIC_INVESTIGATION_BUCKET_DAYS : 1;
   return Array.from({ length: Math.ceil(report.dailyTraffic.length / bucketSize) }, (_, bucketIndex) => {
     const start = bucketIndex * bucketSize;
     const currentBucket = report.dailyTraffic.slice(start, start + bucketSize);
@@ -36,9 +38,10 @@ function tickIndexes(length: number) {
 }
 
 export function AnalyticsTrafficOverview({ report }: { report: Ga4WebsiteAnalyticsReport }) {
-  const [metricKey, setMetricKey] = useState<TrafficMetric>("sessions");
+  const [metricKey, setMetricKey] = useState<TrafficMetric>("pageViews");
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [hoveredPosition, setHoveredPosition] = useState<number | null>(null);
+  const [selectedBucket, setSelectedBucket] = useState<{ startDate: string; endDate: string } | null>(null);
   const metric = METRICS.find((candidate) => candidate.key === metricKey) ?? METRICS[0];
   const points = aggregateTraffic(report, metricKey);
   const maximum = Math.max(1, ...points.flatMap((point) => [point.current, point.previous ?? 0]));
@@ -63,8 +66,9 @@ export function AnalyticsTrafficOverview({ report }: { report: Ga4WebsiteAnalyti
     setHoveredPosition(svgBounds?.width ? ((targetBounds.left + targetBounds.width / 2 - svgBounds.left) / svgBounds.width) * 100 : null);
   };
   const clearHoveredBucket = () => { setHoveredIndex(null); setHoveredPosition(null); };
+  const selectBucket = (point: TrafficPoint) => setSelectedBucket({ startDate: point.date, endDate: point.endDate });
 
-  return <Panel className={styles.panel}>
+  return <><Panel className={styles.panel}>
     <header className={styles.header}>
       <div><h2>Traffic Summary</h2><div className={styles.summary}><strong>{formatNumber(currentTotal)}</strong><span className={totalChange === null ? styles.neutral : totalChange > 0 ? styles.positive : totalChange < 0 ? styles.negative : styles.neutral}>{totalChange === null ? "—" : `${totalChange > 0 ? "+" : ""}${totalChange.toFixed(1)}%`}</span></div></div>
       <div className={styles.metricTabs} role="tablist" aria-label="Traffic metric">{METRICS.map((option) => <button key={option.key} type="button" role="tab" aria-selected={option.key === metricKey} className={option.key === metricKey ? styles.activeTab : undefined} onClick={() => { setMetricKey(option.key); clearHoveredBucket(); }}>{option.label}</button>)}</div>
@@ -75,10 +79,10 @@ export function AnalyticsTrafficOverview({ report }: { report: Ga4WebsiteAnalyti
         <text className={styles.yLabel} x={BOX.width - BOX.right} y={BOX.top + 3} textAnchor="end">{formatCompactNumber(yMaximum)}</text>
         {points.map((point, index) => <g key={`${point.date}-${index}`}>{point.previous !== null ? <rect className={styles.previousBar} x={x(index) - previousWidth - 1} y={y(point.previous)} width={previousWidth} height={Math.max(0, BOX.top + plotHeight - y(point.previous))} rx="1" /> : null}<rect className={styles.currentBar} x={x(index) + 1} y={y(point.current)} width={currentWidth} height={Math.max(0, BOX.top + plotHeight - y(point.current))} rx="1.5" /></g>)}
         {hoveredIndex !== null ? <rect className={styles.hoverBand} x={BOX.left + groupWidth * hoveredIndex} y={BOX.top} width={groupWidth} height={plotHeight} /> : null}
-        {points.map((point, index) => <rect key={`target-${point.date}-${index}`} className={styles.hoverTarget} x={BOX.left + groupWidth * index} y={BOX.top} width={groupWidth} height={plotHeight} onPointerEnter={(event) => setHoveredBucket(index, event.currentTarget)} />)}
+        {points.map((point, index) => <rect key={`target-${point.date}-${index}`} className={styles.hoverTarget} x={BOX.left + groupWidth * index} y={BOX.top} width={groupWidth} height={plotHeight} role="button" tabIndex={0} aria-label={`Investigate ${point.endDate !== point.date ? `${formatDate(point.date)} to ${formatDate(point.endDate)}` : formatDate(point.date)}`} onPointerEnter={(event) => setHoveredBucket(index, event.currentTarget)} onClick={() => selectBucket(point)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); selectBucket(point); } }} />)}
         {tickIndexes(points.length).map((index) => <text key={points[index].date} className={styles.dateLabel} x={x(index)} y={BOX.height - 10}>{formatDate(points[index].date)}</text>)}
       </svg>
       {hovered ? <div className={styles.tooltip} style={{ left: `${Math.min(88, Math.max(12, hoveredPosition ?? (x(hoveredIndex ?? 0) / BOX.width) * 100))}%` }}><strong>{dateRangeLabel}</strong><span>Current <b>{formatNumber(hovered.current)}</b></span><span>Previous <b>{hovered.previous === null ? "—" : formatNumber(hovered.previous)}</b></span>{hoverChange !== null ? <span className={hoverChange > 0 ? styles.positive : hoverChange < 0 ? styles.negative : styles.neutral}>{hoverChange > 0 ? "+" : ""}{hoverChange.toFixed(1)}%</span> : null}</div> : null}
     </div> : <EmptyState title="No daily traffic data" />}
-  </Panel>;
+  </Panel><AnalyticsTrafficInvestigation selection={selectedBucket} onClose={() => setSelectedBucket(null)} /></>;
 }

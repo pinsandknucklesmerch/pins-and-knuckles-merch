@@ -4,6 +4,7 @@ import { BetaAnalyticsDataClient, type protos } from "@google-analytics/data";
 import { getVercelOidcToken } from "@vercel/oidc";
 import { ExternalAccountClient, GoogleAuth } from "google-auth-library";
 import type { WebsiteAnalyticsPeriod } from "../types";
+import { compareTraffic, parseTrafficInvestigationRange, rankPositiveContributors, type TrafficInvestigation, type TrafficInvestigationRange, type TrafficInvestigationRow } from "../lib/trafficInvestigation";
 
 const ANALYTICS_READONLY_SCOPE = "https://www.googleapis.com/auth/analytics.readonly";
 const SUBJECT_TOKEN_TYPE = "urn:ietf:params:oauth:token-type:jwt";
@@ -221,6 +222,69 @@ export async function getGa4WebsiteAnalyticsReport(periodDays: WebsiteAnalyticsP
       acquisitionChannels: acquisitionRows.map((row) => ({ channel: row.dimensionValues?.[0]?.value?.trim() || "Unassigned", sessions: metricValue(row.metricValues?.[0]?.value, "sessions") })),
       topPages: pageRows.map((row) => ({ title: row.dimensionValues?.[0]?.value?.trim() || "Untitled page", path: row.dimensionValues?.[1]?.value?.trim() || null, pageViews: metricValue(row.metricValues?.[0]?.value, "screenPageViews") })),
       hasData: currentRows.length > 0 || trendRows.length > 0 || geographyRows.length > 0 || acquisitionRows.length > 0 || pageRows.length > 0,
+    };
+  } finally {
+    await client.close();
+  }
+}
+
+function investigationSummary(values: protos.google.analytics.data.v1beta.IMetricValue[] | null | undefined) {
+  return {
+    sessions: metricValue(values?.[0]?.value, "sessions"),
+    activeUsers: metricValue(values?.[1]?.value, "activeUsers"),
+    pageViews: metricValue(values?.[2]?.value, "screenPageViews"),
+  };
+}
+
+function investigationRows(selectedRows: protos.google.analytics.data.v1beta.IRow[], baselineRows: protos.google.analytics.data.v1beta.IRow[], range: TrafficInvestigationRange, country = false): TrafficInvestigationRow[] {
+  const baseline = new Map(baselineRows.map((row) => [row.dimensionValues?.[0]?.value?.trim() || "Unassigned", metricValue(row.metricValues?.[0]?.value, "sessions")]));
+  const selected = new Map(selectedRows.map((row) => [row.dimensionValues?.[0]?.value?.trim() || "Unassigned", { sessions: metricValue(row.metricValues?.[0]?.value, "sessions"), countryId: country ? row.dimensionValues?.[1]?.value?.trim() || null : undefined }]));
+  return Array.from(new Set([...baseline.keys(), ...selected.keys()])).map((label) => {
+    const current = selected.get(label);
+    return { label, countryId: current?.countryId, sessions: compareTraffic(current?.sessions ?? 0, baseline.get(label) ?? 0, range.baselineDays) };
+  }).sort((left, right) => right.sessions.difference - left.sessions.difference || right.sessions.selected - left.sessions.selected);
+}
+
+/** Retrieves a lazy, normalized drill-down for one rendered traffic bucket. */
+export async function getGa4TrafficInvestigation(startDate: string | null, endDate: string | null): Promise<TrafficInvestigation | null> {
+  const range = parseTrafficInvestigationRange(startDate, endDate);
+  if (!range) return null;
+  const configuration = ga4Configuration();
+  const client = new BetaAnalyticsDataClient({ auth: googleAuth(configuration) });
+  const property = `properties/${configuration.propertyId}`;
+  const selectedRange = { startDate: range.startDate, endDate: range.endDate };
+  const baselineRange = { startDate: range.baselineStartDate, endDate: range.baselineEndDate };
+  const summaryMetrics = [{ name: "sessions" }, { name: "activeUsers" }, { name: "screenPageViews" }];
+  const categoryReport = (dateRanges: Array<{ startDate: string; endDate: string }>, dimensions: Array<{ name: string }>) => client.runReport({ property, dateRanges, dimensions, metrics: [{ name: "sessions" }], orderBys: [{ metric: { metricName: "sessions" }, desc: true }], limit: 50 });
+
+  try {
+    const [selectedSummaryResponse, baselineSummaryResponse, selectedAcquisitionResponse, baselineAcquisitionResponse, selectedLandingResponse, baselineLandingResponse, selectedGeographyResponse, baselineGeographyResponse, selectedDeviceResponse, baselineDeviceResponse] = await Promise.all([
+      client.runReport({ property, dateRanges: [selectedRange], metrics: summaryMetrics }),
+      client.runReport({ property, dateRanges: [baselineRange], metrics: summaryMetrics }),
+      categoryReport([selectedRange], [{ name: "sessionDefaultChannelGroup" }]),
+      categoryReport([baselineRange], [{ name: "sessionDefaultChannelGroup" }]),
+      categoryReport([selectedRange], [{ name: "landingPagePlusQueryString" }]),
+      categoryReport([baselineRange], [{ name: "landingPagePlusQueryString" }]),
+      categoryReport([selectedRange], [{ name: "country" }, { name: "countryId" }]),
+      categoryReport([baselineRange], [{ name: "country" }, { name: "countryId" }]),
+      categoryReport([selectedRange], [{ name: "deviceCategory" }]),
+      categoryReport([baselineRange], [{ name: "deviceCategory" }]),
+    ]);
+    const selectedSummary = investigationSummary(selectedSummaryResponse[0].rows?.[0]?.metricValues);
+    const baselineSummary = investigationSummary(baselineSummaryResponse[0].rows?.[0]?.metricValues);
+    const acquisition = investigationRows(selectedAcquisitionResponse[0].rows ?? [], baselineAcquisitionResponse[0].rows ?? [], range);
+    return {
+      range,
+      summary: {
+        sessions: compareTraffic(selectedSummary.sessions, baselineSummary.sessions, range.baselineDays),
+        activeUsers: compareTraffic(selectedSummary.activeUsers, baselineSummary.activeUsers, range.baselineDays),
+        pageViews: compareTraffic(selectedSummary.pageViews, baselineSummary.pageViews, range.baselineDays),
+      },
+      contributors: rankPositiveContributors(acquisition),
+      acquisition,
+      landingPages: investigationRows(selectedLandingResponse[0].rows ?? [], baselineLandingResponse[0].rows ?? [], range),
+      geography: investigationRows(selectedGeographyResponse[0].rows ?? [], baselineGeographyResponse[0].rows ?? [], range, true),
+      devices: investigationRows(selectedDeviceResponse[0].rows ?? [], baselineDeviceResponse[0].rows ?? [], range),
     };
   } finally {
     await client.close();
