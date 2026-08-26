@@ -39,7 +39,8 @@ export type Ga4WebsiteAnalyticsReport = {
     pageViews: number;
     engagementRate: number;
   } | null;
-  dailyTraffic: Array<{ date: string; sessions: number; activeUsers: number }>;
+  dailyTraffic: Array<{ date: string; sessions: number; activeUsers: number; pageViews: number }>;
+  previousDailyTraffic: Array<{ date: string; sessions: number; activeUsers: number; pageViews: number }>;
   acquisitionChannels: Array<{ channel: string; sessions: number }>;
   topPages: Array<{ title: string; path: string | null; pageViews: number }>;
   hasData: boolean;
@@ -148,6 +149,15 @@ function formatGa4Date(value: string | null | undefined) {
   return `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`;
 }
 
+function dailyTraffic(rows: protos.google.analytics.data.v1beta.IRow[]) {
+  return rows.map((row) => ({
+    date: formatGa4Date(row.dimensionValues?.[0]?.value),
+    sessions: metricValue(row.metricValues?.[0]?.value, "sessions"),
+    activeUsers: metricValue(row.metricValues?.[1]?.value, "activeUsers"),
+    pageViews: metricValue(row.metricValues?.[2]?.value, "screenPageViews"),
+  }));
+}
+
 /** Retrieves the aggregate website metrics used by the first GA4 connectivity check. */
 export async function getGa4LastSevenDaysReport(): Promise<Ga4LastSevenDaysReport> {
   const configuration = ga4Configuration();
@@ -181,10 +191,11 @@ export async function getGa4WebsiteAnalyticsReport(periodDays: WebsiteAnalyticsP
   const currentRange = dateRange(periodDays);
 
   try {
-    const [currentResponse, previousResponse, trendResponse, acquisitionResponse, pagesResponse] = await Promise.all([
+    const [currentResponse, previousResponse, trendResponse, previousTrendResponse, acquisitionResponse, pagesResponse] = await Promise.all([
       client.runReport({ property, dateRanges: [currentRange], metrics: [{ name: "activeUsers" }, { name: "sessions" }, { name: "screenPageViews" }, { name: "engagementRate" }] }),
       client.runReport({ property, dateRanges: [dateRange(periodDays, true)], metrics: [{ name: "activeUsers" }, { name: "sessions" }, { name: "screenPageViews" }, { name: "engagementRate" }] }),
-      client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "date" }], metrics: [{ name: "sessions" }, { name: "activeUsers" }], orderBys: [{ dimension: { dimensionName: "date" } }] }),
+      client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "date" }], metrics: [{ name: "sessions" }, { name: "activeUsers" }, { name: "screenPageViews" }], orderBys: [{ dimension: { dimensionName: "date" } }] }),
+      client.runReport({ property, dateRanges: [dateRange(periodDays, true)], dimensions: [{ name: "date" }], metrics: [{ name: "sessions" }, { name: "activeUsers" }, { name: "screenPageViews" }], orderBys: [{ dimension: { dimensionName: "date" } }] }),
       client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "sessionDefaultChannelGroup" }], metrics: [{ name: "sessions" }], orderBys: [{ metric: { metricName: "sessions" }, desc: true }], limit: 6 }),
       client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "pageTitle" }, { name: "pagePath" }], metrics: [{ name: "screenPageViews" }], orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }], limit: 10 }),
     ]);
@@ -192,6 +203,7 @@ export async function getGa4WebsiteAnalyticsReport(periodDays: WebsiteAnalyticsP
     const currentRows = currentResponse[0].rows ?? [];
     const previousRows = previousResponse[0].rows ?? [];
     const trendRows = trendResponse[0].rows ?? [];
+    const previousTrendRows = previousTrendResponse[0].rows ?? [];
     const acquisitionRows = acquisitionResponse[0].rows ?? [];
     const pageRows = pagesResponse[0].rows ?? [];
 
@@ -199,7 +211,8 @@ export async function getGa4WebsiteAnalyticsReport(periodDays: WebsiteAnalyticsP
       periodDays,
       metrics: reportMetrics(currentRows[0]?.metricValues),
       previousMetrics: previousRows[0] ? reportMetrics(previousRows[0].metricValues) : null,
-      dailyTraffic: trendRows.map((row) => ({ date: formatGa4Date(row.dimensionValues?.[0]?.value), sessions: metricValue(row.metricValues?.[0]?.value, "sessions"), activeUsers: metricValue(row.metricValues?.[1]?.value, "activeUsers") })),
+      dailyTraffic: dailyTraffic(trendRows),
+      previousDailyTraffic: dailyTraffic(previousTrendRows),
       acquisitionChannels: acquisitionRows.map((row) => ({ channel: row.dimensionValues?.[0]?.value?.trim() || "Unassigned", sessions: metricValue(row.metricValues?.[0]?.value, "sessions") })),
       topPages: pageRows.map((row) => ({ title: row.dimensionValues?.[0]?.value?.trim() || "Untitled page", path: row.dimensionValues?.[1]?.value?.trim() || null, pageViews: metricValue(row.metricValues?.[0]?.value, "screenPageViews") })),
       hasData: currentRows.length > 0 || trendRows.length > 0 || acquisitionRows.length > 0 || pageRows.length > 0,
