@@ -41,6 +41,7 @@ export type Ga4WebsiteAnalyticsReport = {
   } | null;
   dailyTraffic: Array<{ date: string; sessions: number; activeUsers: number; pageViews: number; engagementRate: number }>;
   previousDailyTraffic: Array<{ date: string; sessions: number; activeUsers: number; pageViews: number; engagementRate: number }>;
+  geography: Array<{ country: string; countryId: string | null; sessions: number; activeUsers: number }>;
   acquisitionChannels: Array<{ channel: string; sessions: number }>;
   topPages: Array<{ title: string; path: string | null; pageViews: number }>;
   hasData: boolean;
@@ -192,11 +193,12 @@ export async function getGa4WebsiteAnalyticsReport(periodDays: WebsiteAnalyticsP
   const currentRange = dateRange(periodDays);
 
   try {
-    const [currentResponse, previousResponse, trendResponse, previousTrendResponse, acquisitionResponse, pagesResponse] = await Promise.all([
+    const [currentResponse, previousResponse, trendResponse, previousTrendResponse, geographyResponse, acquisitionResponse, pagesResponse] = await Promise.all([
       client.runReport({ property, dateRanges: [currentRange], metrics: [{ name: "activeUsers" }, { name: "sessions" }, { name: "screenPageViews" }, { name: "engagementRate" }] }),
       client.runReport({ property, dateRanges: [dateRange(periodDays, true)], metrics: [{ name: "activeUsers" }, { name: "sessions" }, { name: "screenPageViews" }, { name: "engagementRate" }] }),
       client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "date" }], metrics: [{ name: "sessions" }, { name: "activeUsers" }, { name: "screenPageViews" }, { name: "engagementRate" }], orderBys: [{ dimension: { dimensionName: "date" } }] }),
       client.runReport({ property, dateRanges: [dateRange(periodDays, true)], dimensions: [{ name: "date" }], metrics: [{ name: "sessions" }, { name: "activeUsers" }, { name: "screenPageViews" }, { name: "engagementRate" }], orderBys: [{ dimension: { dimensionName: "date" } }] }),
+      client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "country" }, { name: "countryId" }], metrics: [{ name: "sessions" }, { name: "activeUsers" }], orderBys: [{ metric: { metricName: "sessions" }, desc: true }] }),
       client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "sessionDefaultChannelGroup" }], metrics: [{ name: "sessions" }], orderBys: [{ metric: { metricName: "sessions" }, desc: true }], limit: 6 }),
       client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "pageTitle" }, { name: "pagePath" }], metrics: [{ name: "screenPageViews" }], orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }], limit: 10 }),
     ]);
@@ -205,6 +207,7 @@ export async function getGa4WebsiteAnalyticsReport(periodDays: WebsiteAnalyticsP
     const previousRows = previousResponse[0].rows ?? [];
     const trendRows = trendResponse[0].rows ?? [];
     const previousTrendRows = previousTrendResponse[0].rows ?? [];
+    const geographyRows = geographyResponse[0].rows ?? [];
     const acquisitionRows = acquisitionResponse[0].rows ?? [];
     const pageRows = pagesResponse[0].rows ?? [];
 
@@ -214,9 +217,10 @@ export async function getGa4WebsiteAnalyticsReport(periodDays: WebsiteAnalyticsP
       previousMetrics: previousRows[0] ? reportMetrics(previousRows[0].metricValues) : null,
       dailyTraffic: dailyTraffic(trendRows),
       previousDailyTraffic: dailyTraffic(previousTrendRows),
+      geography: geographyRows.map((row) => ({ country: row.dimensionValues?.[0]?.value?.trim() || "Unassigned", countryId: row.dimensionValues?.[1]?.value?.trim() || null, sessions: metricValue(row.metricValues?.[0]?.value, "sessions"), activeUsers: metricValue(row.metricValues?.[1]?.value, "activeUsers") })),
       acquisitionChannels: acquisitionRows.map((row) => ({ channel: row.dimensionValues?.[0]?.value?.trim() || "Unassigned", sessions: metricValue(row.metricValues?.[0]?.value, "sessions") })),
       topPages: pageRows.map((row) => ({ title: row.dimensionValues?.[0]?.value?.trim() || "Untitled page", path: row.dimensionValues?.[1]?.value?.trim() || null, pageViews: metricValue(row.metricValues?.[0]?.value, "screenPageViews") })),
-      hasData: currentRows.length > 0 || trendRows.length > 0 || acquisitionRows.length > 0 || pageRows.length > 0,
+      hasData: currentRows.length > 0 || trendRows.length > 0 || geographyRows.length > 0 || acquisitionRows.length > 0 || pageRows.length > 0,
     };
   } finally {
     await client.close();

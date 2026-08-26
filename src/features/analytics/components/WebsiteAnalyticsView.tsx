@@ -1,6 +1,7 @@
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Panel } from "@/components/ui/Panel";
 import { AnalyticsAcquisitionBreakdown } from "./AnalyticsAcquisitionBreakdown";
+import { AnalyticsLocations } from "./AnalyticsLocations";
 import { AnalyticsMetricCard } from "./AnalyticsMetricCard";
 import { AnalyticsTopPages } from "./AnalyticsTopPages";
 import { AnalyticsTrafficOverview } from "./AnalyticsTrafficOverview";
@@ -38,6 +39,7 @@ export function WebsiteAnalyticsView({ report }: { report: Ga4WebsiteAnalyticsRe
   return <div className={styles.root}>
     <section className={styles.kpis} aria-label="Website metrics">{metrics.map((metric) => <AnalyticsMetricCard key={metric.key} label={metric.label} value={formatMetric(metric.value, metric.format)} change={comparison(metric.value, metric.previous)} trend={report.dailyTraffic.map((point) => point[metric.key])} />)}</section>
     <AnalyticsTrafficOverview report={report} />
+    <AnalyticsLocations countries={report.geography} />
     <div className={styles.lower}><AnalyticsAcquisitionBreakdown channels={report.acquisitionChannels} /><AnalyticsTopPages pages={report.topPages} /></div>
   </div>;
 }

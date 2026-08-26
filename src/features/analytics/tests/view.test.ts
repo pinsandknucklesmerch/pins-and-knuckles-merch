@@ -3,11 +3,11 @@ import test from "node:test";
 import { parseWebsiteAnalyticsPeriod } from "../lib/period.ts";
 import { parseAnalyticsView } from "../lib/view.ts";
 
-test("parses supported Analytics views and falls back to Overview", () => {
+test("parses supported Analytics views and falls back to Website", () => {
   assert.equal(parseAnalyticsView("website"), "website");
   assert.equal(parseAnalyticsView("social-media"), "social-media");
-  assert.equal(parseAnalyticsView("unknown"), "overview");
-  assert.equal(parseAnalyticsView(undefined), "overview");
+  assert.equal(parseAnalyticsView("unknown"), "website");
+  assert.equal(parseAnalyticsView(undefined), "website");
 });
 
 test("parses supported Website Analytics periods and defaults to 30 days", () => {

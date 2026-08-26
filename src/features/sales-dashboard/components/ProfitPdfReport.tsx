@@ -26,14 +26,14 @@ export function ProfitPdfReport({ year, month, monthlyProfitMetric, yearToDate, 
     <section data-profit-pdf-page="true" className={reportPageClass}>
       <ReportPageHeader month={month} year={year} title="Company Profit" />
       <div className={styles.companyProfit}>
-        <ProfitReportMonthlyProfit metric={monthlyProfitMetric} />
+        <ProfitReportMonthlyProfit metric={monthlyProfitMetric} ytdProfit={yearToDate.ytdActual} reportMonth={month} />
       </div>
     </section>
     <section data-profit-pdf-page="true" className={reportPageClass}>
       <ReportPageHeader month={month} year={year} title="Year to Date" />
       <div className={styles.yearToDate}>
         <div className={styles.yearToDatePrimary}>
-          <ProfitReportYtdSummary data={yearToDate} comparison={yearComparison} monthlyProfitMetric={monthlyProfitMetric} />
+          <ProfitReportYtdSummary data={yearToDate} comparison={yearComparison} />
           <ProfitReportMonthlyComparison data={yearToDate} comparison={yearComparison} />
         </div>
         <ProfitReportPerformanceKpis data={yearToDate} comparison={yearComparison} />

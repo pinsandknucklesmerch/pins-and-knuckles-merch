@@ -38,6 +38,7 @@ function tickIndexes(length: number) {
 export function AnalyticsTrafficOverview({ report }: { report: Ga4WebsiteAnalyticsReport }) {
   const [metricKey, setMetricKey] = useState<TrafficMetric>("sessions");
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [hoveredPosition, setHoveredPosition] = useState<number | null>(null);
   const metric = METRICS.find((candidate) => candidate.key === metricKey) ?? METRICS[0];
   const points = aggregateTraffic(report, metricKey);
   const maximum = Math.max(1, ...points.flatMap((point) => [point.current, point.previous ?? 0]));
@@ -55,21 +56,29 @@ export function AnalyticsTrafficOverview({ report }: { report: Ga4WebsiteAnalyti
   const totalChange = comparison(currentTotal, previousTotal);
   const hoverChange = hovered ? comparison(hovered.current, hovered.previous ?? undefined) : null;
   const dateRangeLabel = hovered?.endDate && hovered.endDate !== hovered.date ? `${formatDate(hovered.date)}–${formatDate(hovered.endDate)}` : hovered ? formatDate(hovered.date) : "";
+  const setHoveredBucket = (index: number, target: SVGRectElement) => {
+    const svgBounds = target.ownerSVGElement?.getBoundingClientRect();
+    const targetBounds = target.getBoundingClientRect();
+    setHoveredIndex(index);
+    setHoveredPosition(svgBounds?.width ? ((targetBounds.left + targetBounds.width / 2 - svgBounds.left) / svgBounds.width) * 100 : null);
+  };
+  const clearHoveredBucket = () => { setHoveredIndex(null); setHoveredPosition(null); };
 
   return <Panel className={styles.panel}>
     <header className={styles.header}>
       <div><h2>Traffic Summary</h2><div className={styles.summary}><strong>{formatNumber(currentTotal)}</strong><span className={totalChange === null ? styles.neutral : totalChange > 0 ? styles.positive : totalChange < 0 ? styles.negative : styles.neutral}>{totalChange === null ? "—" : `${totalChange > 0 ? "+" : ""}${totalChange.toFixed(1)}%`}</span></div></div>
-      <div className={styles.metricTabs} role="tablist" aria-label="Traffic metric">{METRICS.map((option) => <button key={option.key} type="button" role="tab" aria-selected={option.key === metricKey} className={option.key === metricKey ? styles.activeTab : undefined} onClick={() => { setMetricKey(option.key); setHoveredIndex(null); }}>{option.label}</button>)}</div>
+      <div className={styles.metricTabs} role="tablist" aria-label="Traffic metric">{METRICS.map((option) => <button key={option.key} type="button" role="tab" aria-selected={option.key === metricKey} className={option.key === metricKey ? styles.activeTab : undefined} onClick={() => { setMetricKey(option.key); clearHoveredBucket(); }}>{option.label}</button>)}</div>
     </header>
     {points.length ? <div className={styles.chartFrame}>
-      <svg className={styles.chart} viewBox={`0 0 ${BOX.width} ${BOX.height}`} role="img" aria-label={`${metric.label} for the selected period compared with the previous equivalent period`} onPointerMove={(event) => { const rect = event.currentTarget.getBoundingClientRect(); const svgX = ((event.clientX - rect.left) / rect.width) * BOX.width; setHoveredIndex(Math.max(0, Math.min(points.length - 1, Math.floor((svgX - BOX.left) / groupWidth)))); }} onPointerLeave={() => setHoveredIndex(null)}>
+      <svg className={styles.chart} viewBox={`0 0 ${BOX.width} ${BOX.height}`} role="img" aria-label={`${metric.label} for the selected period compared with the previous equivalent period`} onPointerLeave={clearHoveredBucket}>
         {[0.5, 1].map((ratio) => <line key={ratio} className={styles.gridLine} x1={BOX.left} x2={BOX.width - BOX.right} y1={BOX.top + plotHeight * ratio} y2={BOX.top + plotHeight * ratio} />)}
         <text className={styles.yLabel} x={BOX.width - BOX.right} y={BOX.top + 3} textAnchor="end">{formatCompactNumber(yMaximum)}</text>
         {points.map((point, index) => <g key={`${point.date}-${index}`}>{point.previous !== null ? <rect className={styles.previousBar} x={x(index) - previousWidth - 1} y={y(point.previous)} width={previousWidth} height={Math.max(0, BOX.top + plotHeight - y(point.previous))} rx="1" /> : null}<rect className={styles.currentBar} x={x(index) + 1} y={y(point.current)} width={currentWidth} height={Math.max(0, BOX.top + plotHeight - y(point.current))} rx="1.5" /></g>)}
         {hoveredIndex !== null ? <rect className={styles.hoverBand} x={BOX.left + groupWidth * hoveredIndex} y={BOX.top} width={groupWidth} height={plotHeight} /> : null}
+        {points.map((point, index) => <rect key={`target-${point.date}-${index}`} className={styles.hoverTarget} x={BOX.left + groupWidth * index} y={BOX.top} width={groupWidth} height={plotHeight} onPointerEnter={(event) => setHoveredBucket(index, event.currentTarget)} />)}
         {tickIndexes(points.length).map((index) => <text key={points[index].date} className={styles.dateLabel} x={x(index)} y={BOX.height - 10}>{formatDate(points[index].date)}</text>)}
       </svg>
-      {hovered ? <div className={styles.tooltip} style={{ left: `${Math.min(88, Math.max(12, (x(hoveredIndex ?? 0) / BOX.width) * 100))}%` }}><strong>{dateRangeLabel}</strong><span>Current <b>{formatNumber(hovered.current)}</b></span><span>Previous <b>{hovered.previous === null ? "—" : formatNumber(hovered.previous)}</b></span>{hoverChange !== null ? <span className={hoverChange > 0 ? styles.positive : hoverChange < 0 ? styles.negative : styles.neutral}>{hoverChange > 0 ? "+" : ""}{hoverChange.toFixed(1)}%</span> : null}</div> : null}
+      {hovered ? <div className={styles.tooltip} style={{ left: `${Math.min(88, Math.max(12, hoveredPosition ?? (x(hoveredIndex ?? 0) / BOX.width) * 100))}%` }}><strong>{dateRangeLabel}</strong><span>Current <b>{formatNumber(hovered.current)}</b></span><span>Previous <b>{hovered.previous === null ? "—" : formatNumber(hovered.previous)}</b></span>{hoverChange !== null ? <span className={hoverChange > 0 ? styles.positive : hoverChange < 0 ? styles.negative : styles.neutral}>{hoverChange > 0 ? "+" : ""}{hoverChange.toFixed(1)}%</span> : null}</div> : null}
     </div> : <EmptyState title="No daily traffic data" />}
   </Panel>;
 }

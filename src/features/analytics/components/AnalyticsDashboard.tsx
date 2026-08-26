@@ -7,13 +7,12 @@ import type { AnalyticsView, WebsiteAnalyticsPeriod } from "../types";
 import { WebsiteAnalyticsView } from "./WebsiteAnalyticsView";
 
 const ANALYTICS_TABS: Array<{ view: AnalyticsView; label: string }> = [
-  { view: "overview", label: "Overview" },
   { view: "website", label: "Website" },
   { view: "social-media", label: "Social Media" },
 ];
 
 function viewHref(view: AnalyticsView, period: WebsiteAnalyticsPeriod) {
-  return view === "overview" ? "/hub/analytics" : view === "website" ? `/hub/analytics?view=website&period=${period}` : `/hub/analytics?view=${view}`;
+  return view === "website" ? `/hub/analytics?view=website&period=${period}` : `/hub/analytics?view=${view}`;
 }
 
 function AnalyticsTabs({ activeView, period }: { activeView: AnalyticsView; period: WebsiteAnalyticsPeriod }) {
@@ -70,14 +69,6 @@ export function AnalyticsDashboard({ activeView, period, websiteReport, websiteE
       <AnalyticsTabs activeView={activeView} period={period} />
       {activeView === "website" ? <WebsiteView period={period} report={websiteReport} error={websiteError} /> : null}
       {activeView === "social-media" ? <SocialMediaView /> : null}
-      {activeView === "overview" ? (
-        <Panel>
-          <EmptyState
-            title="Analytics sources are not connected"
-            description="Connect Google Analytics 4, Instagram, and Facebook to begin reporting."
-          />
-        </Panel>
-      ) : null}
     </div>
   );
 }
