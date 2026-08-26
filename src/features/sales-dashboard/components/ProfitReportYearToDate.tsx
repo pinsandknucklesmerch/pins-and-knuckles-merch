@@ -45,7 +45,7 @@ export function ProfitReportYtdSummary({ data, comparison }: { data: YearToDateD
     <strong>{format(data.ytdActual, "currency")}</strong>
     <Comparison current={data.ytdActual} previous={previousProfit} format="currency" previousYear={comparison.previousYear} />
     <div className={styles.ytdProfitLower}><div><span>{comparison.previousYear} YTD</span><strong>{format(previousProfit, "currency")}</strong></div><div><span>YTD Target</span><strong>{format(data.ytdTarget, "currency")}</strong></div></div>
-    {varianceLabel && variance !== null ? <div className={`${styles.ytdTargetVariance} ${data.variance >= 0 ? styles.positive : styles.negative}`}>{varianceLabel} <strong>{format(variance, "currency")}</strong></div> : null}
+    {varianceLabel && variance !== null ? <div className={`${styles.ytdTargetVariance} ${variance >= 0 ? styles.positive : styles.negative}`}>{varianceLabel} <strong>{format(variance, "currency")}</strong></div> : null}
   </article>;
 }
 
