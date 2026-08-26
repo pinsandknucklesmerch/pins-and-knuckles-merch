@@ -39,8 +39,8 @@ export type Ga4WebsiteAnalyticsReport = {
     pageViews: number;
     engagementRate: number;
   } | null;
-  dailyTraffic: Array<{ date: string; sessions: number; activeUsers: number; pageViews: number }>;
-  previousDailyTraffic: Array<{ date: string; sessions: number; activeUsers: number; pageViews: number }>;
+  dailyTraffic: Array<{ date: string; sessions: number; activeUsers: number; pageViews: number; engagementRate: number }>;
+  previousDailyTraffic: Array<{ date: string; sessions: number; activeUsers: number; pageViews: number; engagementRate: number }>;
   acquisitionChannels: Array<{ channel: string; sessions: number }>;
   topPages: Array<{ title: string; path: string | null; pageViews: number }>;
   hasData: boolean;
@@ -155,6 +155,7 @@ function dailyTraffic(rows: protos.google.analytics.data.v1beta.IRow[]) {
     sessions: metricValue(row.metricValues?.[0]?.value, "sessions"),
     activeUsers: metricValue(row.metricValues?.[1]?.value, "activeUsers"),
     pageViews: metricValue(row.metricValues?.[2]?.value, "screenPageViews"),
+    engagementRate: metricValue(row.metricValues?.[3]?.value, "engagementRate"),
   }));
 }
 
@@ -194,8 +195,8 @@ export async function getGa4WebsiteAnalyticsReport(periodDays: WebsiteAnalyticsP
     const [currentResponse, previousResponse, trendResponse, previousTrendResponse, acquisitionResponse, pagesResponse] = await Promise.all([
       client.runReport({ property, dateRanges: [currentRange], metrics: [{ name: "activeUsers" }, { name: "sessions" }, { name: "screenPageViews" }, { name: "engagementRate" }] }),
       client.runReport({ property, dateRanges: [dateRange(periodDays, true)], metrics: [{ name: "activeUsers" }, { name: "sessions" }, { name: "screenPageViews" }, { name: "engagementRate" }] }),
-      client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "date" }], metrics: [{ name: "sessions" }, { name: "activeUsers" }, { name: "screenPageViews" }], orderBys: [{ dimension: { dimensionName: "date" } }] }),
-      client.runReport({ property, dateRanges: [dateRange(periodDays, true)], dimensions: [{ name: "date" }], metrics: [{ name: "sessions" }, { name: "activeUsers" }, { name: "screenPageViews" }], orderBys: [{ dimension: { dimensionName: "date" } }] }),
+      client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "date" }], metrics: [{ name: "sessions" }, { name: "activeUsers" }, { name: "screenPageViews" }, { name: "engagementRate" }], orderBys: [{ dimension: { dimensionName: "date" } }] }),
+      client.runReport({ property, dateRanges: [dateRange(periodDays, true)], dimensions: [{ name: "date" }], metrics: [{ name: "sessions" }, { name: "activeUsers" }, { name: "screenPageViews" }, { name: "engagementRate" }], orderBys: [{ dimension: { dimensionName: "date" } }] }),
       client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "sessionDefaultChannelGroup" }], metrics: [{ name: "sessions" }], orderBys: [{ metric: { metricName: "sessions" }, desc: true }], limit: 6 }),
       client.runReport({ property, dateRanges: [currentRange], dimensions: [{ name: "pageTitle" }, { name: "pagePath" }], metrics: [{ name: "screenPageViews" }], orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }], limit: 10 }),
     ]);

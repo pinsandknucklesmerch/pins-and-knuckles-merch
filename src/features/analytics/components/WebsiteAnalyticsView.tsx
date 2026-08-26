@@ -1,10 +1,11 @@
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Panel } from "@/components/ui/Panel";
+import { AnalyticsMetricCard } from "./AnalyticsMetricCard";
 import { AnalyticsTrafficOverview } from "./AnalyticsTrafficOverview";
 import type { Ga4WebsiteAnalyticsReport } from "../server/ga4";
 import styles from "./WebsiteAnalyticsView.module.css";
 
-type WebsiteMetric = { label: string; value: number; previous: number | undefined; format: "number" | "percent" };
+type WebsiteMetric = { key: "activeUsers" | "sessions" | "pageViews" | "engagementRate"; label: string; value: number; previous: number | undefined; format: "number" | "percent" };
 
 function formatNumber(value: number) {
   return new Intl.NumberFormat("en-GB", { maximumFractionDigits: 0 }).format(value);
@@ -20,15 +21,6 @@ function comparison(current: number, previous: number | undefined) {
   const change = ((current - previous) / Math.abs(previous)) * 100;
   if (!Number.isFinite(change)) return null;
   return { value: `${change > 0 ? "+" : ""}${change.toFixed(1)}%`, tone: change > 0 ? "positive" : change < 0 ? "negative" : "neutral" } as const;
-}
-
-function MetricCard({ metric }: { metric: WebsiteMetric }) {
-  const change = comparison(metric.value, metric.previous);
-  return <article className={styles.metricCard}>
-    <span>{metric.label}</span>
-    <strong>{formatMetric(metric.value, metric.format)}</strong>
-    <small className={change ? styles[change.tone] : undefined}>{change?.value ?? "—"}</small>
-  </article>;
 }
 
 function Acquisition({ report }: { report: Ga4WebsiteAnalyticsReport }) {
@@ -47,14 +39,14 @@ export function WebsiteAnalyticsView({ report }: { report: Ga4WebsiteAnalyticsRe
   if (!report.hasData) return <Panel><EmptyState title="No website analytics data" description="GA4 did not return data for this period." /></Panel>;
   const previous = report.previousMetrics;
   const metrics: WebsiteMetric[] = [
-    { label: "Active Users", value: report.metrics.activeUsers, previous: previous?.activeUsers, format: "number" },
-    { label: "Sessions", value: report.metrics.sessions, previous: previous?.sessions, format: "number" },
-    { label: "Page Views", value: report.metrics.pageViews, previous: previous?.pageViews, format: "number" },
-    { label: "Engagement Rate", value: report.metrics.engagementRate, previous: previous?.engagementRate, format: "percent" },
+    { key: "activeUsers", label: "Active Users", value: report.metrics.activeUsers, previous: previous?.activeUsers, format: "number" },
+    { key: "sessions", label: "Sessions", value: report.metrics.sessions, previous: previous?.sessions, format: "number" },
+    { key: "pageViews", label: "Page Views", value: report.metrics.pageViews, previous: previous?.pageViews, format: "number" },
+    { key: "engagementRate", label: "Engagement Rate", value: report.metrics.engagementRate, previous: previous?.engagementRate, format: "percent" },
   ];
 
   return <div className={styles.root}>
-    <section className={styles.kpis} aria-label="Website metrics">{metrics.map((metric) => <MetricCard key={metric.label} metric={metric} />)}</section>
+    <section className={styles.kpis} aria-label="Website metrics">{metrics.map((metric) => <AnalyticsMetricCard key={metric.key} label={metric.label} value={formatMetric(metric.value, metric.format)} change={comparison(metric.value, metric.previous)} trend={report.dailyTraffic.map((point) => point[metric.key])} />)}</section>
     <AnalyticsTrafficOverview report={report} />
     <div className={styles.lower}><Acquisition report={report} /><TopPages report={report} /></div>
   </div>;

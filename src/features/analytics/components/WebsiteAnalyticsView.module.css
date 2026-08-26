@@ -1,13 +1,6 @@
-.root { display: grid; min-width: 0; gap: 0.625rem; }
-.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.625rem; }
-.metricCard { display: grid; min-width: 0; gap: 0.2rem; padding: 0.7rem 0.8rem; border: 1px solid hsl(var(--border) / 0.9); border-radius: var(--hub-panel-radius); background: hsl(var(--card)); }
-.metricCard > span { overflow: hidden; color: hsl(var(--muted-foreground)); font-size: 0.75rem; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
-.metricCard > strong { font-size: 1.35rem; font-variant-numeric: tabular-nums; line-height: 1.2; }
-.metricCard > small { min-height: 1rem; color: hsl(var(--muted-foreground)); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
-.positive { color: #6fc49a !important; }
-.negative { color: hsl(var(--destructive)); }
-.neutral { color: hsl(var(--muted-foreground)); }
-.lower { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); align-items: start; gap: 0.625rem; }
+.root { display: grid; min-width: 0; gap: 0.875rem; }
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; }
+.lower { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); align-items: start; gap: 0.75rem; }
 .acquisitionPanel { align-self: start; }
 .breakdown { display: grid; }
 .breakdown li { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; border-bottom: 1px solid hsl(var(--border) / 0.7); padding: 0.45rem 0; font-size: 0.8125rem; }
@@ -22,4 +15,4 @@
 .pages span, .pages small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pages small { margin-top: 0.0625rem; color: hsl(var(--muted-foreground)); font-size: 0.75rem; }
 @media (max-width: 899px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 639px) { .lower { grid-template-columns: minmax(0, 1fr); } .pages { min-width: 22rem; } }
+@media (max-width: 639px) { .kpis { grid-template-columns: minmax(0, 1fr); } .lower { grid-template-columns: minmax(0, 1fr); } .pages { min-width: 22rem; } }

@@ -1,0 +1,7 @@
+.card { display: flex; min-width: 0; min-height: 9.5rem; flex-direction: column; justify-content: space-between; overflow: hidden; padding: 0.8rem 0.85rem 0.5rem; border: 1px solid hsl(var(--border) / 0.88); border-radius: var(--hub-panel-radius); background: hsl(var(--card) / 0.82); }
+.summary { display: grid; gap: 0.16rem; }
+.summary > span { overflow: hidden; color: hsl(var(--muted-foreground)); font-size: 0.75rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.summary > strong { font-size: 1.55rem; font-variant-numeric: tabular-nums; letter-spacing: -0.025em; line-height: 1.16; }
+.summary > small { min-height: 1rem; color: hsl(var(--muted-foreground)); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+.positive { color: #6fc49a !important; }.negative { color: hsl(var(--destructive)) !important; }.neutral { color: hsl(var(--muted-foreground)) !important; }
+.sparkline { height: 2.9rem; margin: 0.65rem -0.12rem -0.08rem; color: hsl(var(--primary)); }.sparkline svg { display: block; width: 100%; height: 100%; overflow: visible; }
