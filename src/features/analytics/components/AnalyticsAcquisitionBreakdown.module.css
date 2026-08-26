@@ -1,0 +1,9 @@
+.panel { align-self: start; min-width: 0; }
+.list { display: grid; gap: 0.7rem; }
+.item { display: grid; min-width: 0; gap: 0.28rem; }
+.labelRow, .barRow { display: flex; min-width: 0; align-items: center; gap: 0.65rem; }
+.labelRow > span { min-width: 0; flex: 1; overflow: hidden; color: hsl(var(--foreground)); font-size: 0.8125rem; text-overflow: ellipsis; white-space: nowrap; }
+.labelRow > strong { flex: 0 0 auto; font-size: 0.8125rem; font-variant-numeric: tabular-nums; font-weight: 600; }
+.track { height: 0.35rem; min-width: 0; flex: 1; overflow: hidden; border-radius: 999px; background: hsl(var(--muted)); }
+.bar { height: 100%; border-radius: inherit; background: hsl(var(--primary) / 0.82); }
+.barRow > small { width: 2.1rem; flex: 0 0 auto; color: hsl(var(--muted-foreground)); font-size: 0.75rem; font-variant-numeric: tabular-nums; text-align: right; }
