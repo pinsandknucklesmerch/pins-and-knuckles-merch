@@ -247,7 +247,13 @@ disposable/local target and may require `RESTORE_ADMIN_DATABASE_URL` for
 `.env.example` is the environment contract. Public values are
 `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 `SUPABASE_SERVICE_ROLE_KEY`, `MONDAY_API_TOKEN`, Google OAuth values,
-`GMAIL_REPORT_ADDRESS`, and `CRON_SECRET` remain server-only.
+`GMAIL_REPORT_ADDRESS`, and `CRON_SECRET` remain server-only. GA4 uses Vercel
+OIDC to Google Workload Identity Federation, then impersonates its dedicated
+read-only GA4 service account; no long-lived Google service-account key is
+used. Production currently has the authorised Vercel workload identity. The
+developer-only `GET /api/developer/analytics/ga4-connectivity` check reads the
+last seven days of `activeUsers`, `sessions`, and `screenPageViews` without
+persistence.
 
 Snuggle remains subject to a known data-quality diagnostic: Monday can return
 invalid `FormulaValue` responses. The server warns, excludes invalid values
