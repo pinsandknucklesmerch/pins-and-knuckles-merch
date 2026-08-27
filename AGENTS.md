@@ -16,4 +16,4 @@ Before changing code, inspect the relevant existing feature and search for an eq
 - Use `public/reference-assets/` for implementation screenshots or visual references supplied by the user.
 - Keep the Hub compact, dark, and operational; follow the UI standards for tables, forms, actions, and states.
 
-- Before handing off code changes, run `npm run lint`, `npx tsc --noEmit`, and `npm run build`.
+- Duncan runs the project's verification workflow separately after implementation. Codex/AI implementation work must not run routine lint, tests, typecheck, or build commands automatically; run verification commands only when Duncan explicitly requests them. The command definitions remain documented in the engineering standards and project context.

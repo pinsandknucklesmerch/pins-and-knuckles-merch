@@ -8,6 +8,7 @@ test("defines every Hub feature card from shared navigation", () => {
     hubFeatureNavigation.map(({ label, href }) => ({ label, href })),
     [
       { label: "Sales Dashboard", href: "/hub/sales-dashboard" },
+      { label: "Reporting", href: "/hub/reporting" },
       { label: "Analytics", href: "/hub/analytics" },
       { label: "Calculators", href: "/hub/calculators" },
       { label: "PK Tax", href: "/hub/pk-tax" },
@@ -23,6 +24,11 @@ test("defines every Hub feature card from shared navigation", () => {
 test("defines one level of child routes for grouped navigation", () => {
   const calculators = hubFeatureNavigation.find((item) => item.href === "/hub/calculators");
   const data = hubFeatureNavigation.find((item) => item.href === "/hub/data");
+  const reporting = hubFeatureNavigation.find((item) => item.href === "/hub/reporting");
+  assert.deepEqual(reporting?.children?.map(({ label, href }) => ({ label, href })), [
+    { label: "EPCC Report", href: "/hub/reporting/epcc" },
+    { label: "Export Metrics", href: "/hub/reporting/metrics" },
+  ]);
   assert.deepEqual(calculators?.children?.map(({ label, href }) => ({ label, href })), [
     { label: "EU Standard", href: "/hub/calculators/eu/standard" },
     { label: "EU US Clients", href: "/hub/calculators/eu/us-clients" },

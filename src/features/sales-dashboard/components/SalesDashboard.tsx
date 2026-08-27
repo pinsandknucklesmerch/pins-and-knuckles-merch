@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DashboardNav } from "metricui";
 import { ActionButton } from "@/components/ui/ActionButton";
@@ -9,17 +9,14 @@ import { Select } from "@/components/ui/Select";
 import { DASHBOARD_MONTHS } from "../types";
 import type { SalesDashboardData } from "../domain/types";
 import { calculateCompanyMetrics } from "../domain/calculateDashboardKpis";
-import { buildMetricExportRows } from "../lib/metricsExport";
 import { CompanyKpiView } from "./CompanyKpiView";
 import { CompanyProfitView } from "./CompanyProfitView";
 import { ManualKpiEntry } from "./ManualKpiEntry";
 import { MetricDashboardProvider } from "./MetricDashboardProvider";
 import { YearToDateView } from "./YearToDateView";
-import { ExportMetricsButton } from "./ExportMetricsButton";
 import { MonthlyKpiFinals } from "./MonthlyKpiFinals";
 import type { DashboardView } from "../lib/dashboardView";
 import { SnuggleView } from "./SnuggleView";
-import { ProfitPdfReport } from "./ProfitPdfReport";
 import { SalesDashboardTvView } from "./SalesDashboardTvView";
 import { TeamMembersTab } from "./TeamMembersTab";
 import { SalesDashboardStaleWarning } from "./SalesDashboardStaleWarning";
@@ -39,24 +36,16 @@ const DASHBOARD_TABS = [
 export function SalesDashboard({ data, year, month, isAdmin, initialDashboardView, staleWarnings = [], tvMode = false, tvDurationSeconds = DEFAULT_TV_DURATION_SECONDS }: { data: SalesDashboardData; year: number; month: number; isAdmin: boolean; initialDashboardView: DashboardView; staleWarnings?: StaleWarning[]; tvMode?: boolean; tvDurationSeconds?: number }) {
   const router = useRouter();
   const [activeDashboardView, setActiveDashboardView] = useState<DashboardView>(initialDashboardView);
-  const dashboardMetricsRef = useRef<HTMLDivElement>(null);
-  const profitReportRef = useRef<HTMLDivElement>(null);
   const companyMetrics = useMemo(() => calculateCompanyMetrics(data.company, data.previousCompany, data.targets), [data.company, data.previousCompany, data.targets]);
   const monthlyProfitMetric = companyMetrics.find(
   (metric) => metric.code === "MONTHLY_PROFIT",);
       if (!monthlyProfitMetric) {
         throw new Error("Monthly Profit metric is unavailable.");
       }
-        const exportRows = useMemo(() => buildMetricExportRows(
-          data.company,
-          companyMetrics,
-          { year, month },
-        ), [data.company, companyMetrics, year, month]);
   const changeDashboardView = useCallback((value: string) => {
     const nextView: DashboardView = value === "company-profit" ? "company-profit" : value === "ytd" ? "ytd" : value === "snuggle" ? "snuggle" : value === "team-members" ? "team-members" : "overview";
     setActiveDashboardView((currentView) => currentView === nextView ? currentView : nextView);
   }, []);
-  const exportTitle = `Pins Sales Metrics — ${DASHBOARD_MONTHS[month - 1]} ${year} — ${activeDashboardView === "company-profit" ? "Company Profit" : activeDashboardView === "ytd" ? "YTD" : activeDashboardView === "snuggle" ? "Snuggle" : activeDashboardView === "team-members" ? "Team Members" : "Overview"}`;
 
   const enterTvMode = useCallback(() => {
     router.push(buildTvModeUrl({ year, month, durationSeconds: tvDurationSeconds }));
@@ -91,36 +80,12 @@ export function SalesDashboard({ data, year, month, isAdmin, initialDashboardVie
       </div>
       <div className={styles.controlGroup} role="group" aria-labelledby="sales-dashboard-actions-label" data-testid="sales-dashboard-actions">
         <span className={styles.groupLabel} id="sales-dashboard-actions-label">Actions</span>
-        <div className={styles.groupControls}>
-          <ExportMetricsButton
-            rows={exportRows}
-            targetRef={dashboardMetricsRef}
-            profitTargetRef={profitReportRef}
-            title={exportTitle}
-            profitFilename={`pins-profit-report-${DASHBOARD_MONTHS[month - 1].toLowerCase()}-${year}.pdf`}
-          />
-          <ActionButton onClick={enterTvMode}>TV Mode</ActionButton>
-        </div>
+        <div className={styles.groupControls}><ActionButton onClick={enterTvMode}>TV Mode</ActionButton></div>
       </div>
       </div></Panel> : null}
-    <div ref={dashboardMetricsRef} data-testid="sales-dashboard-export-content" className={isYtdView ? styles.ytdDashboardContent : styles.dashboardContent}>
+    <div data-testid="sales-dashboard-export-content" className={isYtdView ? styles.ytdDashboardContent : styles.dashboardContent}>
       {staleWarnings.length || data.setupIssue ? <div className={styles.dashboardNotices}><SalesDashboardStaleWarning warnings={staleWarnings} />{data.setupIssue ? <p role="alert" className="text-sm text-destructive">{data.setupIssue}</p> : null}</div> : null}
       <div className={styles.dashboardView}>{activeDashboardView === "snuggle" ? <SnuggleView data={data.snuggle} year={year} month={month} isAdmin={isAdmin} /> : activeDashboardView === "team-members" ? <TeamMembersTab data={data} year={year} month={month} /> : activeDashboardView === "company-profit" ? <CompanyProfitView metric={monthlyProfitMetric} /> : activeDashboardView === "ytd" ? <YearToDateView data={data.yearToDate} comparison={data.yearComparison} /> : <CompanyKpiView current={data.company} metrics={companyMetrics} />}</div>
     </div>
-    <div
-      aria-hidden="true"
-      className="pointer-events-none fixed left-[-12000px] top-0 w-[1100px]"
-    >
-      <div ref={profitReportRef}>
-        <ProfitPdfReport
-          year={year}
-          month={month}
-          monthlyProfitMetric={monthlyProfitMetric}
-          yearToDate={data.yearToDate}
-          yearComparison={data.yearComparison}
-        />
-      </div>
-    </div>
-    
   </div></MetricDashboardProvider>;
 }

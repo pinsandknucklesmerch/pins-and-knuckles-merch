@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { calculateCompanyMetrics } from "../domain/calculateDashboardKpis.ts";
 import type { CompanyKpiMonth } from "../domain/types.ts";
+import { parseDashboardPeriod } from "../lib/dashboardPeriod.ts";
 import { buildMetricExportRows } from "../lib/metricsExport.ts";
 import { normalizeExportColors, shirtExportScale, shirtExportTransform } from "../lib/exportSafeColors.ts";
 
@@ -27,6 +28,12 @@ function rows(current = month()) {
   const metrics = calculateCompanyMetrics(current, null, {});
   return buildMetricExportRows(current, metrics, { year: 2025, month: 7 }, new Date("2026-07-24T00:00:00Z"));
 }
+
+test("shared dashboard period parsing accepts only valid report periods", () => {
+  const now = new Date("2026-08-27T10:00:00Z");
+  assert.deepEqual(parseDashboardPeriod({ year: "2025", month: "7" }, now), { year: 2025, month: 7 });
+  assert.deepEqual(parseDashboardPeriod({ year: "2019", month: "13" }, now), { year: 2026, month: 8 });
+});
 
 test("dashboard export includes all seven dashboard KPIs", () => {
   const output = rows();
@@ -79,18 +86,21 @@ test("limits export columns to public KPI values and comparison context", () => 
   ]);
 });
 
-test("renders one dashboard export control and no per-card export controls", () => {
+test("retains shared export components while Sales Dashboard exposes no duplicate export controls", () => {
   const dashboard = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
   const button = readFileSync(new URL("../components/ExportMetricsButton.tsx", import.meta.url), "utf8");
   const buttonStyles = readFileSync(new URL("../components/ExportMetricsButton.module.css", import.meta.url), "utf8");
+  const profitButton = readFileSync(new URL("../components/ProfitPdfExportButton.tsx", import.meta.url), "utf8");
   const provider = readFileSync(new URL("../components/MetricDashboardProvider.tsx", import.meta.url), "utf8");
   const cards = ["ProfitShirtKpi.tsx", "SalesInboxKpi.tsx", "CombinedKpiCard.tsx"]
     .map((file) => readFileSync(new URL(`../components/${file}`, import.meta.url), "utf8"))
     .join("\n");
 
-  assert.equal(dashboard.match(/<ExportMetricsButton/g)?.length, 1);
+  assert.equal(dashboard.match(/<ExportMetricsButton/g)?.length ?? 0, 0);
   assert.equal(button.match(/<ExportButton/g)?.length, 1);
   assert.equal(buttonStyles.match(/content: "Export Metrics"/g)?.length, 1);
+  assert.doesNotMatch(button, /ProfitPdfExportButton/);
+  assert.match(profitButton, /\[data-profit-pdf-page\]/);
   assert.doesNotMatch(provider, /\bexportable\b/);
   assert.doesNotMatch(cards, /CardShell|exportable|exportData|sales-kpi-export/);
 });
@@ -103,44 +113,32 @@ test("MetricUI dropdown exposes image, CSV, and clipboard export", () => {
   assert.match(metricUi, /import\('modern-screenshot'\)/);
 });
 
-test("MetricUI image export targets the visible dashboard metrics wrapper", () => {
-  const dashboard = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
+test("MetricUI image export remains available in the dedicated Reporting workspace", () => {
   const button = readFileSync(new URL("../components/ExportMetricsButton.tsx", import.meta.url), "utf8");
   const buttonStyles = readFileSync(new URL("../components/ExportMetricsButton.module.css", import.meta.url), "utf8");
-  assert.match(dashboard, /const dashboardMetricsRef = useRef<HTMLDivElement>\(null\)/);
-  assert.match(dashboard, /<div ref=\{dashboardMetricsRef\} data-testid="sales-dashboard-export-content"/);
-  assert.match(dashboard, /targetRef=\{dashboardMetricsRef\}/);
+  const workspace = readFileSync(new URL("../components/MetricExportWorkspace.tsx", import.meta.url), "utf8");
+  assert.match(workspace, /<ExportMetricsButton[\s\S]*targetRef=\{exportTargetRef\}/);
   assert.match(button, /<ExportButton[\s\S]*title=\{title\}[\s\S]*targetRef=\{targetRef\}[\s\S]*data=\{rows\}/);
-  assert.match(dashboard, /Pins Sales Metrics — \$\{DASHBOARD_MONTHS\[month - 1\]\} \$\{year\} —/);
+  assert.match(workspace, /Pins Sales Metrics — \$\{DASHBOARD_MONTHS\[month - 1\]\} \$\{year\}/);
   assert.match(button, /data-testid="sales-dashboard-export-control"/);
   assert.match(buttonStyles, /min-width:\s*10\.5rem/);
 });
 
 test("image capture excludes filter options and the export toolbar", () => {
   const dashboard = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
-  const filterPanel = dashboard.indexOf('<form data-testid="sales-dashboard-filter-form"');
-  const exportControl = dashboard.indexOf("<ExportMetricsButton");
-  const filterPanelEnd = dashboard.indexOf("</Panel>", filterPanel);
-  const captureTarget = dashboard.indexOf('<div ref={dashboardMetricsRef} data-testid="sales-dashboard-export-content"');
-  const tabs = dashboard.indexOf("<DashboardNav");
-  const headerEnd = dashboard.indexOf("</header>", tabs);
-  const metrics = dashboard.indexOf("<CompanyKpiView", captureTarget);
-
-  assert.ok(filterPanel >= 0 && exportControl > filterPanel);
-  assert.ok(tabs >= 0 && headerEnd > tabs && filterPanel > headerEnd);
-  assert.ok(filterPanelEnd > exportControl && captureTarget > filterPanelEnd && metrics > captureTarget);
-  assert.doesNotMatch(dashboard.slice(captureTarget), /sales-dashboard-filter-form|<ExportMetricsButton|<ManualKpiEntry/);
+  assert.doesNotMatch(dashboard, /<ExportMetricsButton|ProfitPdfExportButton|dashboardMetricsRef|profitReportRef/);
 });
 
-test("export trigger stays mounted with a fixed footprint during export", () => {
+test("EPCC PDF trigger stays mounted with a fixed footprint during export", () => {
   const button = readFileSync(new URL("../components/ExportMetricsButton.tsx", import.meta.url), "utf8");
-  const styles = readFileSync(new URL("../components/ExportMetricsButton.module.css", import.meta.url), "utf8");
+  const profitButton = readFileSync(new URL("../components/ProfitPdfExportButton.tsx", import.meta.url), "utf8");
+  const styles = readFileSync(new URL("../components/ProfitPdfExportButton.module.css", import.meta.url), "utf8");
   assert.match(button, /data-testid="sales-dashboard-export-control"/);
   assert.match(button, /<ExportButton/);
-  assert.match(button, /isExporting/);
+  assert.match(profitButton, /isExporting/);
   assert.match(styles, /width:\s*10\.5rem/);
   assert.match(styles, /height:\s*2\.25rem/);
-  assert.match(styles, /opacity:\s*1/);
+  assert.match(styles, /opacity:\s*0\.65/);
   assert.match(styles, /white-space:\s*nowrap/);
   assert.match(styles, /display:\s*inline-flex/);
   assert.match(styles, /gap:\s*0\.5rem/);
@@ -196,7 +194,7 @@ test("SalesDashboard memoizes the single export payload without navigation effec
 });
 
 test("EPCC PDF export normalizes modern MetricUI colors only in html2canvas clones", () => {
-  const button = readFileSync(new URL("../components/ExportMetricsButton.tsx", import.meta.url), "utf8");
+  const button = readFileSync(new URL("../components/ProfitPdfExportButton.tsx", import.meta.url), "utf8");
   const colors = readFileSync(new URL("../lib/exportSafeColors.ts", import.meta.url), "utf8");
   const report = readFileSync(new URL("../components/ProfitPdfReport.tsx", import.meta.url), "utf8");
 
@@ -217,9 +215,9 @@ test("EPCC report keeps the requested profit and performance comparisons without
 
   assert.equal(report.match(/data-profit-pdf-page="true"/g)?.length, 2);
   assert.ok(report.indexOf('title="Company Profit"') < report.indexOf('title="Year to Date"'));
-  assert.match(report, /<ProfitReportMonthlyProfit metric=\{monthlyProfitMetric\} \/>/);
+  assert.match(report, /<ProfitReportMonthlyProfit key=\{component\.id\} metric=\{monthlyProfitMetric\} label=\{component\.label\} bonusLabel=\{component\.labels\?\.bonus\} \/>/);
   assert.doesNotMatch(report, /<ProfitReportYtdSummary[\s\S]*reportMonth/);
-  assert.match(report, /<ProfitReportYtdSummary data=\{yearToDate\} comparison=\{yearComparison\} \/>/);
+  assert.match(report, /<ProfitReportYtdSummary key=\{component\.id\} data=\{yearToDate\} comparison=\{yearComparison\} label=\{component\.label\} \/>/);
   assert.match(report, /<ProfitReportMonthlyComparison data=\{yearToDate\} comparison=\{yearComparison\}/);
   assert.match(report, /<ProfitReportPerformanceKpis data=\{yearToDate\} comparison=\{yearComparison\}/);
   assert.doesNotMatch(report, /YearComparisonChart|ProfitReportCompanyProfit|ProfitReportYtdKpis/);
@@ -255,11 +253,27 @@ test("EPCC report keeps the requested profit and performance comparisons without
 });
 
 test("EPCC PDF export cleans up after success or failure and emits a non-empty image", () => {
-  const button = readFileSync(new URL("../components/ExportMetricsButton.tsx", import.meta.url), "utf8");
+  const button = readFileSync(new URL("../components/ProfitPdfExportButton.tsx", import.meta.url), "utf8");
   assert.match(button, /finally\s*\{[\s\S]*setIsExporting\(false\)/);
   assert.match(button, /canvas\.toDataURL\("image\/png"\)/);
   assert.match(button, /pdf\.save\(profitFilename\)/);
   assert.match(button, /feedback\.error\("Could not download the profit PDF\."\)/);
+});
+
+test("Reporting EPCC workspace reuses the dashboard data, calculations, report subtree, and PDF action", () => {
+  const page = readFileSync(new URL("../../../app/(hub)/hub/reporting/epcc/page.tsx", import.meta.url), "utf8");
+  const dashboardPage = readFileSync(new URL("../../../app/(hub)/hub/sales-dashboard/page.tsx", import.meta.url), "utf8");
+  const workspace = readFileSync(new URL("../components/EpccReportWorkspace.tsx", import.meta.url), "utf8");
+
+  assert.match(page, /loadSalesDashboard\(year, month, access\.membership\?\.organisation_id \?\? null\)/);
+  assert.match(page, /<EpccReportWorkspace data=\{data\} year=\{year\} month=\{month\} \/>/);
+  assert.match(page, /parseDashboardPeriod\(params\)/);
+  assert.match(dashboardPage, /parseDashboardPeriod\(params, now\)/);
+  assert.match(workspace, /calculateCompanyMetrics\(data\.company, data\.previousCompany, data\.targets\)/);
+  assert.match(workspace, /<ProfitPdfReport[\s\S]*year=\{year\}[\s\S]*month=\{month\}/);
+  assert.match(workspace, /<ProfitPdfExportButton[\s\S]*profitTargetRef=\{profitReportRef\}/);
+  assert.match(workspace, /name="year"/);
+  assert.match(workspace, /name="month"/);
 });
 
 test("export color normalization removes oklab/oklch values and applies the safe palette", () => {

@@ -18,6 +18,13 @@ Views are Overview, Company Profit, YTD, Snuggle, and Team Members. `calculateDa
 
 ## EPCC profit PDF
 
+The dedicated metric export workspace is `/hub/reporting/metrics`. It reuses `ExportMetricsButton`, `buildMetricExportRows`, shared metric definitions, period parsing, and the Sales Dashboard data pipeline. The duplicate Sales Dashboard export controls have been removed.
+Reporting is now the canonical location for both EPCC report generation and metric exports. The Sales Dashboard remains the operational KPI/dashboard view and no longer exposes duplicate export controls.
+
+The EPCC editor configures Monthly Profit, Bonus Profit, YTD Profit, Previous-year YTD, YTD Target, Target Variance, Monthly Profit Comparison, Active Marketing Enquiries, and Conversion Rate as independently enabled, ordered presentation components. Persisted templates are normalized against code-defined defaults; legacy nested label customizations migrate to promoted components. Page identity, gauges, chart internals, legends, values, and formulas remain fixed. Configuration remains presentation-only.
+
+The primary EPCC / Company Profit report workspace is `/hub/reporting/epcc`; metric exports remain at `/hub/reporting/metrics`. Both reuse the shared `ProfitPdfExportButton` and `ProfitPdfReport`. `ProfitPdfReport` accepts the typed `EpccReportTemplate`, whose canonical default preserves the existing two-page output and export targets. One organisation-scoped active template is persisted; editing is restricted to existing Pins Hub admins. Configuration controls presentation only, while authoritative Sales Dashboard/domain calculations remain unchanged. Missing or malformed stored configuration falls back safely to the code-defined default. Codex should not run routine verification; Duncan runs the documented verification commands separately unless explicitly requesting Codex to run them.
+
 The active export renders a fixed-width off-screen React subtree (`ProfitPdfReport`) and rasterizes its two `data-profit-pdf-page` sections into landscape A4 PDF pages. It is presentation-only and reuses `companyProfitPresentation`, `ytdChartPoints`, `ytdComparisonValue`, and the existing `CompanyProfitGauge`.
 
 1. **Company Profit**: Monthly Profit, Target, Profit Above Target, and the Company Profit gauge.

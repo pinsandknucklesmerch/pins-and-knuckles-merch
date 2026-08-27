@@ -73,7 +73,7 @@ test("company dashboard keeps monthly content separate from year to date", () =>
   assert.match(dashboard, /data-testid="sales-dashboard-actions"/);
   assert.match(dashboard, /<header className=\{styles\.dashboardHeader\}>[\s\S]*<h1>Sales Dashboard<\/h1>[\s\S]*<DashboardNav[\s\S]*<\/header>/);
   assert.match(dashboard, /const isOverviewView = activeDashboardView === "overview"/);
-  assert.match(dashboard, /<\/header>[\s\S]*\{isOverviewView \? <Panel><div className=\{styles\.controlSurface\}>[\s\S]*<\/div><\/Panel> : null\}[\s\S]*ref=\{dashboardMetricsRef\}/);
+  assert.match(dashboard, /<\/header>[\s\S]*\{isOverviewView \? <Panel><div className=\{styles\.controlSurface\}>[\s\S]*<\/div><\/Panel> : null\}/);
   assert.doesNotMatch(dashboard, /\{isOverviewView \?[\s\S]*<DashboardNav/);
   assert.match(dashboard, /role="group" aria-labelledby="sales-dashboard-period-label"/);
   assert.match(dashboard, /role="group" aria-labelledby="sales-dashboard-management-label"/);

@@ -31,4 +31,12 @@ Similar appearance alone is not a reason to duplicate a component. Conversely, d
 
 ## Verification
 
-For code changes, run `npm run lint`, `npx tsc --noEmit`, and `npm run build`. The repository has no deterministic full-suite command; run focused tests where relevant.
+Duncan runs the project's verification workflow separately after implementation. Codex/AI implementation work must not run routine verification automatically; Codex runs these commands only when Duncan explicitly requests them. The available commands are:
+
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+```
+
+The repository has no deterministic full-suite command; focused tests may be run when explicitly requested.

@@ -40,7 +40,7 @@ legacy Hub architecture are not part of this application.
   social integrations remain pending. User Access Management at `/hub/team`,
   `/hub/team/add`, and `/hub/team/[membershipId]`.
 - Sales Dashboard: `/hub/sales-dashboard` and
-  `/hub/sales-dashboard/tv/settings`.
+  `/hub/sales-dashboard/tv/settings`. Reporting routes: `/hub/reporting`, `/hub/reporting/epcc`, and `/hub/reporting/metrics`.
 - Calculators: EU Standard, EU US Clients, and UK Trade under
   `/hub/calculators`.
 - Operations: PK Tax, Commercial Invoice Generator, and Data Management for
@@ -90,7 +90,16 @@ then calls `updateUser({ password })`; recovery signs out and returns to login,
 while invitation mode enters the Hub. Do not reintroduce client-side recovery
 token exchange or abandoned implicit approaches.
 
-## Sales Dashboard
+## Sales Dashboard and Reporting
+
+Reporting is the canonical location for EPCC report generation and metric exports. The Sales Dashboard remains the operational KPI view and no longer exposes duplicate export actions; shared report and metric business logic remains reused by Reporting.
+
+The EPCC template editor independently controls meaningful report blocks including Bonus Profit, Previous-year YTD, YTD Target, and Target Variance, alongside the existing report cards. Persisted templates are forward-compatible through normalization/default merging and legacy-label migration; structural/chart elements remain fixed and calculations remain owned by the Sales Dashboard/domain pipeline.
+
+`/hub/reporting/metrics` is the dedicated metric export workspace. It reuses the Sales Dashboard loader, metric definitions, and authoritative KPI/calculation pipeline; the duplicate Sales Dashboard export entry point has been removed. No duplicate metric business logic exists.
+
+Reporting routes are `/hub/reporting`, `/hub/reporting/epcc`, and `/hub/reporting/metrics`. The EPCC workspace at `/hub/reporting/epcc` is the main place to view and export the Company Profit report; it shares the Sales Dashboard loader and authoritative KPI/calculation pipeline. `ProfitPdfReport` accepts a typed `EpccReportTemplate`; the canonical default preserves the existing two-page report, labels, ordering, sizing, and `[data-profit-pdf-page]` export targets. Template configuration controls presentation only; KPI and domain calculations remain authoritative elsewhere. The active template is persisted as one organisation-scoped configuration; malformed or missing data falls back to the canonical default.
+Reporting routes are `/hub/reporting`, `/hub/reporting/epcc`, and `/hub/reporting/metrics`. The EPCC workspace at `/hub/reporting/epcc` is the main place to view and export the Company Profit report; it shares the Sales Dashboard loader and authoritative KPI/calculation pipeline. `ProfitPdfReport` accepts a typed `EpccReportTemplate`; the canonical default preserves the existing two-page report, labels, ordering, sizing, and `[data-profit-pdf-page]` export targets. Template configuration controls presentation only; KPI and domain calculations remain authoritative elsewhere. The active template is now persisted as one organisation-scoped configuration, editable only by existing Pins Hub admins; malformed or missing data falls back to the canonical default.
 
 The dashboard is Supabase-first: rendering reads persisted company/member KPI
 rows, effective targets, final-value overrides, TV settings, trends, and years;
@@ -260,7 +269,7 @@ invalid `FormulaValue` responses. The server warns, excludes invalid values
 from attribution, and Developer Diagnostics persists the resulting issue; do
 not treat it as resolved without repository and operational confirmation.
 
-Before handing off code changes run:
+Before handing off code changes, Duncan runs the project's verification workflow separately. Codex/AI implementation work must not run routine verification automatically; Codex runs verification commands only when Duncan explicitly requests them. The available commands are:
 
 ```bash
 npm run lint

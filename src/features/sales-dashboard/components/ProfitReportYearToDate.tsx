@@ -4,6 +4,7 @@ import { formatAnimatedMetricValue } from "../lib/animatedMetricValue";
 import { comparisonBadgeDetails } from "../lib/comparisonBadge";
 import { previousYearComparisonState } from "../lib/metricDisplay";
 import { ytdChartPoints } from "../lib/ytdPresentation";
+import type { EpccReportTemplateComponent } from "../lib/epccReportTemplate";
 import { sumYearComparisonMetric, ytdComparisonValue, type YtdComparisonMetric } from "../lib/ytdComparison";
 import { YtdBarComparisonChart, YtdProfitAreaChart, YtdRateComparisonChart } from "./YtdComparisonCharts";
 import styles from "./ProfitPdfReport.module.css";
@@ -36,32 +37,34 @@ function Comparison({ current, previous, format: kind, previousYear }: { current
   return <span className={`${styles.comparison} ${styles[state]}`}>{values.join(" · ")} <em>vs {previousYear}</em></span>;
 }
 
-export function ProfitReportYtdSummary({ data, comparison }: { data: YearToDateData; comparison: YearComparisonData }) {
+export function ProfitReportYtdSummary({ data, comparison, label = "YTD Profit", previousYearLabel = "YTD", targetLabel = "YTD Target", varianceAboveLabel = "Above target", varianceBelowLabel = "Below target", showPreviousYear = true, showTarget = true, showVariance = true }: { data: YearToDateData; comparison: YearComparisonData; label?: string; previousYearLabel?: string; targetLabel?: string; varianceAboveLabel?: string; varianceBelowLabel?: string; showPreviousYear?: boolean; showTarget?: boolean; showVariance?: boolean }) {
   const previousProfit = sumYearComparisonMetric(comparison.previous.filter((point) => point.month <= data.cutoffMonth), "MONTHLY_PROFIT");
   const variance = data.variance === null ? null : Math.abs(data.variance);
   const varianceLabel = data.variance === null ? null : data.variance >= 0 ? "Above target" : "Below target";
   return <article className={styles.ytdProfitCard}>
-    <p className={styles.kicker}>YTD Profit</p>
+    <p className={styles.kicker}>{label}</p>
     <strong>{format(data.ytdActual, "currency")}</strong>
     <Comparison current={data.ytdActual} previous={previousProfit} format="currency" previousYear={comparison.previousYear} />
-    <div className={styles.ytdProfitLower}><div><span>{comparison.previousYear} YTD</span><strong>{format(previousProfit, "currency")}</strong></div><div><span>YTD Target</span><strong>{format(data.ytdTarget, "currency")}</strong></div></div>
-    {varianceLabel && variance !== null ? <div className={`${styles.ytdTargetVariance} ${variance >= 0 ? styles.positive : styles.negative}`}>{varianceLabel} <strong>{format(variance, "currency")}</strong></div> : null}
+    {showPreviousYear || showTarget ? <div className={styles.ytdProfitLower}>{showPreviousYear ? <div><span>{comparison.previousYear} {previousYearLabel}</span><strong>{format(previousProfit, "currency")}</strong></div> : null}{showTarget ? <div><span>{targetLabel}</span><strong>{format(data.ytdTarget, "currency")}</strong></div> : null}</div> : null}
+    {showVariance && varianceLabel && variance !== null ? <div className={`${styles.ytdTargetVariance} ${variance >= 0 ? styles.positive : styles.negative}`}>{variance >= 0 ? varianceAboveLabel : varianceBelowLabel} <strong>{format(variance, "currency")}</strong></div> : null}
   </article>;
 }
 
-export function ProfitReportMonthlyComparison({ data, comparison }: { data: YearToDateData; comparison: YearComparisonData }) {
+export function ProfitReportMonthlyComparison({ data, comparison, label = "Monthly Profit" }: { data: YearToDateData; comparison: YearComparisonData; label?: string }) {
   const points = ytdChartPoints(comparison, data.cutoffMonth, "MONTHLY_PROFIT");
-  return <article className={styles.profitChartCard}><header><div><h2>Monthly Profit</h2><span>{comparison.selectedYear} vs {comparison.previousYear}</span></div><Legend comparison={comparison} /></header><div className={styles.profitChart}><YtdProfitAreaChart points={points} label={`Monthly Profit, ${comparison.selectedYear} compared with ${comparison.previousYear}, January through December`} /></div></article>;
+  return <article className={styles.profitChartCard}><header><div><h2>{label}</h2><span>{comparison.selectedYear} vs {comparison.previousYear}</span></div><Legend comparison={comparison} /></header><div className={styles.profitChart}><YtdProfitAreaChart points={points} label={`${label}, monthly ${comparison.selectedYear} compared with ${comparison.previousYear}, January through December`} /></div></article>;
 }
 
-export function ProfitReportPerformanceKpis({ data, comparison }: { data: YearToDateData; comparison: YearComparisonData }) {
+export function ProfitReportPerformanceKpis({ data, comparison, components }: { data: YearToDateData; comparison: YearComparisonData; components: EpccReportTemplateComponent[] }) {
   const currentPoints = comparison.selected.filter((point) => point.month <= data.cutoffMonth);
   const previousPoints = comparison.previous.filter((point) => point.month <= data.cutoffMonth);
-  return <div className={styles.performanceKpis}>{PERFORMANCE_METRICS.map((definition) => {
+  return <div className={styles.performanceKpis}>{components.map((component) => {
+    const definition = PERFORMANCE_METRICS.find((candidate) => candidate.code === (component.type === "active-marketing-enquiries" ? "SALES_INBOX_ENQUIRIES" : "CONVERSION_RATE"));
+    if (!definition) return null;
     const current = ytdComparisonValue(currentPoints, definition.code);
     const previous = ytdComparisonValue(previousPoints, definition.code);
     const points = ytdChartPoints(comparison, data.cutoffMonth, definition.code as YearComparisonMetric);
-    const chart = definition.chart === "bar" ? <YtdBarComparisonChart points={points} format="number" label={`${definition.label}, monthly ${comparison.selectedYear} compared with ${comparison.previousYear}`} /> : <YtdRateComparisonChart points={points} label={`${definition.label}, monthly ${comparison.selectedYear} compared with ${comparison.previousYear}`} />;
-    return <article className={styles.ytdKpi} key={definition.code}><header><div><h2>{definition.label}</h2><strong>{format(current, definition.format)}</strong><Comparison current={current} previous={previous} format={definition.format} previousYear={comparison.previousYear} /></div><Legend comparison={comparison} /></header><div className={styles.kpiChart}>{chart}</div></article>;
+    const chart = definition.chart === "bar" ? <YtdBarComparisonChart points={points} format="number" label={`${component.label}, monthly ${comparison.selectedYear} compared with ${comparison.previousYear}`} /> : <YtdRateComparisonChart points={points} label={`${component.label}, monthly ${comparison.selectedYear} compared with ${comparison.previousYear}`} />;
+    return <article className={styles.ytdKpi} key={component.id}><header><div><h2>{component.label}</h2><strong>{format(current, definition.format)}</strong><Comparison current={current} previous={previous} format={definition.format} previousYear={comparison.previousYear} /></div><Legend comparison={comparison} /></header><div className={styles.kpiChart}>{chart}</div></article>;
   })}</div>;
 }

@@ -5,6 +5,7 @@ import { getCurrentPinsHubAccess, hasAdminAccess } from "@/lib/access/pinsHubAcc
 import { SalesDashboard } from "@/features/sales-dashboard/components/SalesDashboard";
 import { loadSalesDashboard } from "@/features/sales-dashboard/data/salesDashboardRepository";
 import { loadSalesDashboardStaleWarnings } from "@/features/sales-dashboard/data/cronStaleWarning";
+import { parseDashboardPeriod } from "@/features/sales-dashboard/lib/dashboardPeriod";
 import { parseDashboardView } from "@/features/sales-dashboard/lib/dashboardView";
 import { isTvMode, parseTvDuration } from "@/features/sales-dashboard/lib/tvMode";
 
@@ -18,10 +19,7 @@ export default function SalesDashboardPage({ searchParams }: Props) {
 async function SalesDashboardPageContent({ searchParams }: Props) {
   const [params, access] = await Promise.all([searchParams, getCurrentPinsHubAccess()]);
   const now = new Date();
-  const parsedYear = Number(first(params.year));
-  const parsedMonth = Number(first(params.month));
-  const year = Number.isInteger(parsedYear) && parsedYear >= 2020 ? parsedYear : now.getFullYear();
-  const month = Number.isInteger(parsedMonth) && parsedMonth >= 1 && parsedMonth <= 12 ? parsedMonth : now.getMonth() + 1;
+  const { year, month } = parseDashboardPeriod(params, now);
   const dashboardView = parseDashboardView(first(params.dashboardView));
   const tvMode = isTvMode(params.tv);
   const tvDurationSeconds = parseTvDuration(params.duration);
