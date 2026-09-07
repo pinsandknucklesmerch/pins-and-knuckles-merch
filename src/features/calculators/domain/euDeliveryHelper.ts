@@ -13,6 +13,7 @@ export type EuDeliveryCalculation =
       rate: DeliveryRate;
       boxCount: number;
       markupPerBox: number;
+      deliveryCostPerBoxExclVat: number;
       deliveryBaseExclVat: number;
       deliveryMarkupExclVat: number;
       deliverySubtotalExclVat: number;
@@ -42,6 +43,7 @@ export function calculateEuDelivery(
   const deliveryBaseExclVat = input.boxCount * rate.costPerBox;
   const deliveryMarkupExclVat = input.boxCount * markupPerBox;
   const deliverySubtotalExclVat = deliveryBaseExclVat + deliveryMarkupExclVat;
+  const deliveryCostPerBoxExclVat = deliverySubtotalExclVat / input.boxCount;
   const deliveryVatAmount = deliverySubtotalExclVat * (rate.vatRate / 100);
 
   return {
@@ -49,6 +51,7 @@ export function calculateEuDelivery(
     rate,
     boxCount: input.boxCount,
     markupPerBox,
+    deliveryCostPerBoxExclVat,
     deliveryBaseExclVat,
     deliveryMarkupExclVat,
     deliverySubtotalExclVat,

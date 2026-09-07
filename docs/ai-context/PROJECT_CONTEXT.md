@@ -1,5 +1,13 @@
 # Pins Hub — Canonical Project Context
 
+## Current shared schema status (2026-09-02)
+
+The three previously pending migrations are now applied to project `vggajzzagwzgmddnytle`: TV cleanup, EPCC report templates, and MerchBuddy inventory counts. Pins Hub remains the authoritative migration repository; its generated types include both new tables.
+
+## Shared Supabase ownership status (2026-09-02)
+
+Pins Hub is the authoritative owner of the shared Supabase migration history for project `vggajzzagwzgmddnytle`. The inventory migration is prepared here as `supabase/migrations/20260902000000_create_merchbuddy_show_inventory_counts.sql`; it is not yet applied. Pins Merch App is a schema/type consumer and must not independently run `db push` against the shared project.
+
 ## Authority and verification boundary
 
 This is the current repository context for Pins Hub. Current source code,

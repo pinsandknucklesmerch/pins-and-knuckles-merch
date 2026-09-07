@@ -544,6 +544,45 @@ export type Database = {
           },
         ]
       }
+      epcc_report_templates: {
+        Row: {
+          created_at: string
+          organisation_id: string
+          template: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          organisation_id: string
+          template: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          organisation_id?: string
+          template?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "epcc_report_templates_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: true
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "epcc_report_templates_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       eu_embroidery_pricing: {
         Row: {
           created_at: string
@@ -1192,6 +1231,61 @@ export type Database = {
             columns: ["tour_id"]
             isOneToOne: false
             referencedRelation: "merchbuddy_tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchbuddy_show_inventory_counts: {
+        Row: {
+          count_in_quantity: number | null
+          count_out_quantity: number | null
+          created_at: string
+          id: string
+          show_id: string
+          updated_at: string
+          updated_by: string | null
+          variant_id: string
+        }
+        Insert: {
+          count_in_quantity?: number | null
+          count_out_quantity?: number | null
+          created_at?: string
+          id?: string
+          show_id: string
+          updated_at?: string
+          updated_by?: string | null
+          variant_id: string
+        }
+        Update: {
+          count_in_quantity?: number | null
+          count_out_quantity?: number | null
+          created_at?: string
+          id?: string
+          show_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          variant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchbuddy_show_inventory_counts_show_id_fkey"
+            columns: ["show_id"]
+            isOneToOne: false
+            referencedRelation: "merchbuddy_shows"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_show_inventory_counts_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_show_inventory_counts_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "merchbuddy_product_variants"
             referencedColumns: ["id"]
           },
         ]

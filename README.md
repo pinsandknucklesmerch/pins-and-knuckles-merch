@@ -1,5 +1,11 @@
 # Pins Hub Rebuild
 
+The shared Supabase migration sequence is synchronized through `20260902000000_create_merchbuddy_show_inventory_counts.sql`, including the EPCC and inventory migrations. Pins Hub remains the migration authority for project `vggajzzagwzgmddnytle`.
+
+## Shared Supabase migration ownership
+
+Pins Hub owns the forward-only migration history for the shared Supabase project `vggajzzagwzgmddnytle`. Pins Merch App consumes generated database types and must not independently run `db push` against that project. Merch-specific schema migrations, including inventory persistence, are authored and applied from this repository; consumer applications may regenerate their types from the shared project.
+
 Pins Hub is the internal operations hub for Pins & Knuckles merchandise workflows. This repository is the clean rebuild of the hub, with the legacy app kept as reference only for confirmed business behaviour.
 
 ## Stack

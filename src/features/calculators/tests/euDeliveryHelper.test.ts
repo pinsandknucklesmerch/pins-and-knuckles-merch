@@ -11,6 +11,7 @@ test("EU delivery markup and VAT preserve the legacy calculation", () => {
   assert.equal(result.deliveryBaseExclVat, 50);
   assert.equal(result.deliveryMarkupExclVat, 10);
   assert.equal(result.deliverySubtotalExclVat, 60);
+  assert.equal(result.deliveryCostPerBoxExclVat, 30);
   assert.ok(Math.abs(result.deliveryVatAmount - 16.2) < 1e-9);
   assert.ok(Math.abs(result.deliveryTotalInclVat - 76.2) < 1e-9);
 });
