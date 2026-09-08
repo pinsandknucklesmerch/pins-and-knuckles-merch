@@ -6,7 +6,7 @@ export const BACKGROUND_ANIMATION_STORAGE_KEY = "pins-hub-background-animation";
 export const BACKGROUND_ANIMATION_CHANGE_EVENT = "pins-hub-background-animation-change";
 
 export function readStoredBackgroundAnimation(value: string | null): boolean {
-  return value === "true";
+  return value !== "false";
 }
 
 type BackgroundAnimationPreference = {

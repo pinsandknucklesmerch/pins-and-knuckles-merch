@@ -75,7 +75,7 @@ export function BackgroundLayer({ variant }: BackgroundLayerProps) {
   }, [enabled]);
 
   const isPublic = variant === "public";
-  const staticSurface = isPublic ? "absolute inset-0 bg-black" : "fixed inset-0 bg-background";
+  const staticSurface = isPublic ? "absolute inset-0 bg-black" : "fixed inset-0 bg-black";
   const animationSurface = isPublic ? "absolute inset-0 z-0" : "fixed inset-0 z-0";
 
   return (

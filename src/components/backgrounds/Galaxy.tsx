@@ -292,7 +292,7 @@ export default function Galaxy({
 
  function update(t: number) {
   animateId = 0;
-  if (!disableAnimation && !shouldReduceMotion) {
+  if (!shouldReduceMotion) {
         program.uniforms.uTime.value = t * 0.001;
         program.uniforms.uStarSpeed.value = (t * 0.001 * starSpeed) / 10.0;
       }
@@ -313,7 +313,7 @@ export default function Galaxy({
   }
   renderer.render({ scene: mesh });
 
-  if (!shouldReduceMotion) {
+  if (!disableAnimation && !shouldReduceMotion) {
    animateId = requestAnimationFrame(update);
   }
  }
