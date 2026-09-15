@@ -1,5 +1,129 @@
 # Pins Hub — Canonical Project Context
 
+## Band-first lifecycle and legacy compatibility (Batch 2C-2C)
+
+`20260911170000_finalize_merchbuddy_band_lifecycle.sql` completes the prepared backend authorization/lifecycle chain. Legacy Tour-user rows now support soft revocation by a direct Band owner only; no authenticated client can create or otherwise mutate new legacy grants. Revoked grants are excluded from the internal exact-Tour resolver, never create Band-wide access, and inactive Bands continue to block legacy operational writes. Direct owners deactivate Bands through a status-only RPC; effective active managers or direct owners reactivate them through a separate status-only RPC, leaving the inactive-definition guard intact. Account-manager associations remain non-authorizing metadata with authenticated mutation deferred; no Organisation-admin mutation path is restored. The Band-first schema, helpers, RLS cutover, creation, direct membership/ownership, Organisation assignment, and lifecycle migrations are prepared but unapplied. The mobile app remains Organisation-first pending its separate cutover.
+
+## Band-first remaining rollout
+
+After prepared Batch 2C-2C, the remaining Band-first rollout is scoped account-manager administration if approved, a later/manual legacy Tour-user conversion or sunset decision, migration application and type regeneration through the shared schema workflow, runtime verification, and the separate mobile Band-first access/selection/provider cutover. Organisation relationship and explicit assignment administration are complete in the prepared migration sequence.
+
+## Band-first Organisation management (Batch 2C-2B)
+
+`20260911160000_manage_merchbuddy_band_organisations.sql` completes the Organisation relationship and explicit assignment slice. Direct owners request, remove, assign, change, and revoke; active target-Organisation members with effective Pins Hub or Pins Merch admin/developer access may accept a request or relinquish only their Organisation's own relationship. Every Organisation-derived Band path still requires active membership, eligible entitlement, an active relationship, and an active explicit assignment. Read entitlement caps assignments at viewer; write/admin/developer caps at manager. Relationships grant no Organisation-wide or future-Band access. Relationship removal/relinquishment soft-revokes active assignments but never alters direct membership or ownership; reattachment requires fresh acceptance and explicit reassignment. An owner-only lookup exposes minimal eligible member identity fields for a single attached Organisation. Legacy conversion/sunset and mobile Band-first cutover remain later work.
+
+## Band-first direct membership administration (Batch 2C-2A)
+
+`20260911150000_manage_merchbuddy_band_members.sql` adds private Band invitations and authenticated RPCs for direct membership role changes, soft revocation/self-leave, and explicit ownership transfer. Only active direct owners may administer direct members; Organisation-derived managers and Organisation owner/admin/developer status do not bypass that rule. Pending invitations grant no visibility, target an existing profile, expire after seven days, and require invited-profile acceptance plus current inviter-owner revalidation. Every mutation derives actors from `auth.uid()` and preserves event provenance. Band-row locking serializes ownership changes and guarantees at least one active direct owner; transfer promotes the target before optionally demoting the caller to manager. Organisation relationship/assignment administration remains Batch 2C-2B.
+
+## Band-first creation (Batch 2C-1)
+
+`20260911140000_create_merchbuddy_bands.sql` adds the authenticated transactional RPCs `create_merchbuddy_standalone_band(text)` and `create_merchbuddy_organisation_band(uuid, text)`. Both require a valid profile, derive all actor/owner fields from `auth.uid()`, and bootstrap a direct active owner before returning. Managed creation additionally requires active membership in the target Organisation and effective Pins Hub or Pins Merch admin/developer entitlement; it creates the active Organisation relationship and creator manager assignment. Raw authenticated Band INSERT remains blocked. Batch 2C-2 remains responsible for member/access administration, ownership transfer and last-owner protection, Organisation relationship/assignment administration, lifecycle/legacy-grant operations, and the later mobile cutover.
+
+## Band-first operational authorization (2026-09-11, prepared Batch 2B)
+
+`20260911120000_cut_over_merchbuddy_band_authorization.sql` follows the foundation
+and Batch 2A. It defines the atomic operational RLS/helper cutover for Bands,
+Tours, Products, variants, Shows, inventory, contacts, account-manager
+associations, and Tour-user grants. It is prepared, not applied or runtime-verified
+here; no generated types were regenerated in this batch.
+
+The migration replaces the three operational Tour helpers and customer visibility
+helper, adds `can_operate_merchbuddy_tour` for staff inventory writes, drops all
+29 known policies, and creates 22 scoped policies in one transaction. All nine
+tables are locked during the change; unexpected remaining policies abort and
+roll back the transaction instead of leaving a permissive OR fallback.
+
+After successful application, direct/explicitly assigned Band paths determine
+operational access. Organisation entitlement alone and Organisation owner/admin/
+developer status do not authorize Bands. Legacy Tour roles remain Tour-scoped;
+legacy staff retains Product/Show compatibility writes while new Band staff has
+only Count In/Count Out writes. Every operational write requires an active Band.
+
+Authenticated mutation grants are column-specific: parent IDs, legacy Organisation
+metadata, row IDs, creation timestamps, and actor fields cannot be changed through
+ordinary updates. Inventory updates are restricted to its two counts. Band UPDATE
+is direct-owner-only for name/status; a trigger rejects renaming an inactive Band
+even when reactivating in the same statement. Owner reactivation must be status-only.
+
+Band INSERT, account-manager association mutations, and legacy Tour-grant
+mutations are blocked for authenticated clients pending Batch 2C RPCs. Contacts
+require full Band visibility for reads and active manager/owner for writes.
+Account-manager reads are owner-only; Tour grants are visible to their subject
+or a direct Band owner. No authenticated hard-delete remains on these tables.
+
+Tour INSERT RETURNING uses the policy row's existing parent Band permission,
+without the old broad Organisation SELECT branch or a new-row STABLE lookup.
+Descendant inserts authorize existing parents. The private Band access tables and
+one-way Pins Hub/Merch entitlement inheritance are retained.
+
+The mobile app is still Organisation-first and needs its later client cutover;
+the old Create Band action is blocked after this migration is applied. Batch 2C
+must implement transactional Band creation, member/Organisation assignment and
+ownership administration, last-owner protection, and scoped lifecycle/legacy
+grant operations. See the [Band-first reference](../reference/MERCH_BAND_FIRST_FOUNDATION.md)
+for the full policy/grant inventory and deferred work. None of these migrations
+has been applied as part of the implementation batches described here.
+
+## Band-first Merch helpers (2026-09-11, prepared Batch 2A)
+
+`20260911110000_add_merchbuddy_band_permission_helpers.sql` follows the foundation
+migration below. It implements `get_merchbuddy_band_role`, the four
+`can_access/operate/manage/administer_merchbuddy_band` predicates, and authenticated
+`get_accessible_merchbuddy_bands()`. Three database-owner-only internal functions share
+Band-path aggregation, caller-bound legacy Tour grants, and staged Tour access
+context for the later cutover.
+
+Effective Band role is the highest active direct or valid assigned Organisation
+path. Organisation paths require the exact active caller membership, active
+relationship/assignment, and existing Hub/Merch entitlement capped at viewer for
+read or manager for write/admin/developer. Reusing the Organisation entitlement
+helper relies on the existing unique Organisation/user membership constraint;
+there is no Organisation-wide fallback or Organisation-owner exception. Owner
+remains direct-only. Legacy Tour grants never raise Band-wide role.
+
+The workspace RPC deduplicates Band IDs, returns active and inactive Bands with
+role/provenance flags, and represents Tour-only users with a null Band role,
+`is_tour_limited`, and only their assigned Tour IDs. Operate/manage predicates
+require an active Band; historical reads and owner access administration remain
+possible on inactive Bands. Permission tables remain private with no client
+SELECT grants; only the six safe API functions gain authenticated execution.
+
+Batch 2A is prepared, not applied or runtime-verified here. Batch 2A alone leaves
+operational RLS and Tour helpers Organisation-first; the prepared Batch 2B above
+cuts over those policies/helpers and protects canonical parent IDs. Do not infer
+deployed Band-first protection from the presence of these migration files.
+No mobile code or creation/mutation RPCs are included. See the
+[foundation and Batch 2A reference](../reference/MERCH_BAND_FIRST_FOUNDATION.md)
+for exact API shapes, security boundaries, and next-batch dependencies. Apply
+foundation then Batch 2A, and regenerate shared/consumer database types afterward.
+
+## Band-first Merch schema foundation (2026-09-11, prepared)
+
+`20260911100000_add_merchbuddy_band_first_foundation.sql` adds direct Band
+memberships, Organisation management relationships, and same-Organisation member
+assignments. It establishes an unconditional Tour-to-Band FK and makes legacy
+Band/Tour `organisation_id` metadata nullable. Physical `merchbuddy_customers`
+names and all operational IDs/data are retained.
+
+This is foundation-only and has not been applied in this batch. New access tables
+are RLS-enabled with no client grants/policies; only service-role SELECT/INSERT/
+UPDATE is granted. Existing Organisation-wide authorization helpers, operational
+RLS, Pins Hub inheritance, and mobile navigation are unchanged. Direct Band access
+and least-privilege Organisation visibility are not delivered until the separate
+authorization cutover.
+
+There are no real Bands; the guarded backfill supports zero or one disposable
+Band, grants its valid creator direct ownership, and records its existing
+Organisation relationship. It creates no Organisation-member assignments and
+does not promote Tour users. Unexpected Band counts or an invalid creator abort
+the transaction for explicit resolution. Regenerate shared and consumer database
+types after application; generated snapshots were not hand-edited.
+
+See [Band-first foundation reference](../reference/MERCH_BAND_FIRST_FOUNDATION.md)
+for the exact schema, integrity rules, test-data handling, and next-batch policy
+dependencies.
+
 ## Current shared schema status (2026-09-02)
 
 The three previously pending migrations are now applied to project `vggajzzagwzgmddnytle`: TV cleanup, EPCC report templates, and MerchBuddy inventory counts. Pins Hub remains the authoritative migration repository; its generated types include both new tables.
@@ -244,13 +368,14 @@ unrounded amount then stable recipient order.
 
 ## MerchBuddy boundary
 
-Pins Hub/Supabase contains MerchBuddy Phase 1 foundation only: organisation-
-scoped customers and contacts, account managers, tours and tour users, products
-and variants, shows, indexes/triggers, access helper functions, RLS policies,
-and authenticated grants. The schema includes tour-level roles and MerchBuddy
-app access rules. There are no MerchBuddy routes or mobile application source
-files in this repository. The actual MerchBuddy Expo/React Native application
-lives in a separate repository.
+Pins Hub/Supabase owns the MerchBuddy operational schema: customers/Bands and
+contacts, account managers, tours and tour users, products and variants, shows,
+inventory counts, indexes/triggers, access helpers, RLS, and grants. The prepared
+Band-first foundation described above adds explicit Band access structures and
+nullable legacy Organisation metadata, but leaves current Organisation-first
+authorization in place until the next cutover. There are no Pins Merch routes or
+mobile application source files in this repository. Pins Merch App lives in a
+separate Expo/React Native repository and consumes this shared schema.
 
 ## Developer support, configuration, and verification
 

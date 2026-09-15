@@ -13,6 +13,7 @@ export type CompanyKpiMonth = {
   quotesDone: number | null;
   ordersProcessed: number | null;
   salesInboxEnquiries: number | null;
+  salesInboxDecidedEnquiries?: number | null;
   converted: number | null;
   mondaySyncMetadata: { sourceBoardId: string; fetchedAt: string } | null;
   notes: string | null;

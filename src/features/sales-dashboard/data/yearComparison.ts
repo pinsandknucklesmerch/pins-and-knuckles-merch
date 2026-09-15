@@ -15,7 +15,7 @@ function point(month: CompanyKpiMonth): YearComparisonPoint {
     converted: month.converted,
     conversionRate: calculateConversionRate(effectiveCompanyKpiValue(month, "ORDERS_PROCESSED"), effectiveCompanyKpiValue(month, "QUOTES_DONE")),
     salesInboxEnquiries: month.salesInboxEnquiries,
-    salesInboxConversionRate: calculateConversionRate(month.converted, month.salesInboxEnquiries),
+    salesInboxConversionRate: calculateConversionRate(month.converted, month.salesInboxDecidedEnquiries === undefined ? month.salesInboxEnquiries : month.salesInboxDecidedEnquiries),
   };
 }
 

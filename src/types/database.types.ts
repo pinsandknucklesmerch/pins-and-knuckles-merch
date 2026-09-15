@@ -1814,6 +1814,7 @@ export type Database = {
           organisation_id: string | null
           quotes_done: number | null
           sales_inbox_enquiries: number | null
+          sales_inbox_decided_enquiries: number | null
           updated_at: string
           updated_by: string | null
           year: number
@@ -1832,6 +1833,7 @@ export type Database = {
           organisation_id?: string | null
           quotes_done?: number | null
           sales_inbox_enquiries?: number | null
+          sales_inbox_decided_enquiries?: number | null
           updated_at?: string
           updated_by?: string | null
           year: number
@@ -1850,6 +1852,7 @@ export type Database = {
           organisation_id?: string | null
           quotes_done?: number | null
           sales_inbox_enquiries?: number | null
+          sales_inbox_decided_enquiries?: number | null
           updated_at?: string
           updated_by?: string | null
           year?: number

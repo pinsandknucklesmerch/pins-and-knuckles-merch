@@ -9,7 +9,7 @@ import { buildYearComparison } from "./yearComparison.ts";
 import { calculateYearToDate } from "../domain/calculateYearToDate.ts";
 import type { SnuggleProfitData } from "../server/snuggleProfit.ts";
 
-type CompanyRow = Pick<Database["public"]["Tables"]["sales_kpi_months"]["Row"], "year" | "month" | "monthly_profit" | "monthly_profit_source" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "monday_sync_metadata" | "notes" | "data_source">;
+type CompanyRow = Pick<Database["public"]["Tables"]["sales_kpi_months"]["Row"], "year" | "month" | "monthly_profit" | "monthly_profit_source" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "sales_inbox_decided_enquiries" | "converted" | "monday_sync_metadata" | "notes" | "data_source">;
 type MemberRow = Pick<Database["public"]["Tables"]["sales_kpi_member_months"]["Row"], "year" | "month" | "team_member_key" | "team_member_name" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "profit" | "pk_tax" | "snuggle_profit" | "member_classification" | "monday_source_metadata" | "epcc_source_metadata" | "data_source">;
 type TargetRow = Pick<Database["public"]["Tables"]["sales_kpi_targets"]["Row"], "organisation_id" | "metric_code" | "target_value" | "effective_from" | "effective_to" | "is_active">;
 type FinalRow = Pick<Database["public"]["Tables"]["sales_kpi_month_final_values"]["Row"], "metric_code" | "final_value" | "updated_at" | "updated_by">;
@@ -18,7 +18,7 @@ export function mapCompanyRow(row: CompanyRow): CompanyKpiMonth {
   const metadata = row.monday_sync_metadata && typeof row.monday_sync_metadata === "object" && !Array.isArray(row.monday_sync_metadata)
     ? row.monday_sync_metadata as { sourceBoardId?: unknown; fetchedAt?: unknown }
     : null;
-  return { year: row.year, month: row.month, monthlyProfit: row.monthly_profit, monthlyProfitSource: row.monthly_profit_source as CompanyKpiMonth["source"] | null, quotesDone: row.quotes_done, ordersProcessed: row.orders_processed, salesInboxEnquiries: row.sales_inbox_enquiries, converted: row.converted, mondaySyncMetadata: typeof metadata?.sourceBoardId === "string" && typeof metadata.fetchedAt === "string" ? { sourceBoardId: metadata.sourceBoardId, fetchedAt: metadata.fetchedAt } : null, notes: row.notes, source: row.data_source as CompanyKpiMonth["source"], finalValues: {} };
+  return { year: row.year, month: row.month, monthlyProfit: row.monthly_profit, monthlyProfitSource: row.monthly_profit_source as CompanyKpiMonth["source"] | null, quotesDone: row.quotes_done, ordersProcessed: row.orders_processed, salesInboxEnquiries: row.sales_inbox_enquiries, salesInboxDecidedEnquiries: row.sales_inbox_decided_enquiries, converted: row.converted, mondaySyncMetadata: typeof metadata?.sourceBoardId === "string" && typeof metadata.fetchedAt === "string" ? { sourceBoardId: metadata.sourceBoardId, fetchedAt: metadata.fetchedAt } : null, notes: row.notes, source: row.data_source as CompanyKpiMonth["source"], finalValues: {} };
 }
 
 export function mapFinalValues(rows: FinalRow[]): Partial<Record<FinalisableSalesKpiCode, SalesKpiMonthFinalValue>> {
@@ -33,7 +33,7 @@ export function getFixtureCompanyMonth(fixture: HistoricalSalesDashboardFixture,
   const index = month - 1;
   const general = fixture.years.find((row) => row.year === year);
   const inbox = fixture.salesInbox.find((row) => row.year === year);
-  return { year, month, monthlyProfit: general?.profit[index] ?? null, monthlyProfitSource: "historical_fixture", quotesDone: general?.enquiries[index] ?? null, ordersProcessed: null, salesInboxEnquiries: inbox?.enquiries[index] ?? null, converted: inbox?.conversions[index] ?? null, mondaySyncMetadata: null, notes: null, source: "historical_fixture" };
+  return { year, month, monthlyProfit: general?.profit[index] ?? null, monthlyProfitSource: "historical_fixture", quotesDone: general?.enquiries[index] ?? null, ordersProcessed: null, salesInboxEnquiries: inbox?.enquiries[index] ?? null, salesInboxDecidedEnquiries: null, converted: inbox?.conversions[index] ?? null, mondaySyncMetadata: null, notes: null, source: "historical_fixture" };
 }
 
 export function getFixtureMembers(fixture: HistoricalSalesDashboardFixture, year: number, month: number): TeamMemberKpiMonth[] {

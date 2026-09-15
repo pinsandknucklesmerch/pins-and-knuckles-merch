@@ -33,6 +33,7 @@ test("dry-run plans a current-month insert and preserves audit metadata", async 
   assert.deepEqual([outcomes[0].snapshot?.quotes_done, outcomes[0].snapshot?.orders_processed], [2, 1]);
   assert.deepEqual(outcomes[0].snapshot?.monday_sync_metadata.scopeA, { leads: 2, converted: 1, conversionRate: 50 });
   assert.deepEqual([outcomes[0].snapshot?.sales_inbox_enquiries, outcomes[0].snapshot?.converted], [1, 1]);
+  assert.equal(outcomes[0].snapshot?.sales_inbox_decided_enquiries, 1);
 });
 
 test("July 2026 write payload includes Scope A and Scope B metrics with Monday metadata only", async () => {
@@ -83,6 +84,29 @@ test("Scope B zeroes remain explicit in the company payload", async () => {
   const payload = mondaySalesWritePayload(outcome.snapshot!);
   assert.deepEqual([outcome.snapshot?.sales_inbox_enquiries, outcome.snapshot?.converted], [0, 0]);
   assert.deepEqual([payload.sales_inbox_enquiries, payload.converted], [0, 0]);
+});
+
+test("Sales Inbox conversion counts only explicit Yes and No values", async () => {
+  const scopedItems = [
+    ...items,
+    { id: "inbox-no", name: "Inbox no", group: { id: "week", title: "WEEK 1" }, column_values: [{ id: "status_16", text: "Sales Inbox" }, { id: "status", text: "No" }, { id: "date8", text: "2026-07-03" }] },
+    { id: "inbox-blank", name: "Inbox blank", group: { id: "week", title: "WEEK 1" }, column_values: [{ id: "status_16", text: "Sales Inbox" }, { id: "status", text: "" }, { id: "date8", text: "2026-07-04" }] },
+    { id: "inbox-pending", name: "Inbox pending", group: { id: "week", title: "WEEK 1" }, column_values: [{ id: "status_16", text: "Sales Inbox" }, { id: "status", text: "Pending" }, { id: "date8", text: "2026-07-05" }] },
+    { id: "referral-yes", name: "Referral yes", group: { id: "week", title: "WEEK 1" }, column_values: [{ id: "status_16", text: "Referral" }, { id: "status", text: "Yes" }, { id: "date8", text: "2026-07-06" }] },
+  ];
+  const outcome = (await syncMondaySalesDashboard({
+    ...base,
+    organisationId: "org-1",
+    collectItems: async () => ({ items: scopedItems }),
+    apply: false,
+  }))[0];
+
+  assert.deepEqual([
+    outcome.snapshot?.organisation_id,
+    outcome.snapshot?.sales_inbox_enquiries,
+    outcome.snapshot?.sales_inbox_decided_enquiries,
+    outcome.snapshot?.converted,
+  ], ["org-1", 4, 2, 1]);
 });
 
 test("valid Profit Tracking includes both profit fields in the metrics patch", async () => {

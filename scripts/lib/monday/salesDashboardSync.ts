@@ -45,6 +45,7 @@ export type MondaySnapshot = {
   quotes_done: number;
   orders_processed: number;
   sales_inbox_enquiries: number;
+  sales_inbox_decided_enquiries: number;
   converted: number;
   monthly_profit?: number;
   monthly_profit_source?: "monday";
@@ -65,7 +66,7 @@ export type MondaySnapshot = {
   };
 };
 
-export type MondaySalesWritePayload = Pick<MondaySnapshot, "organisation_id" | "year" | "month" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "converted" | "monday_sync_metadata"> & {
+export type MondaySalesWritePayload = Pick<MondaySnapshot, "organisation_id" | "year" | "month" | "quotes_done" | "orders_processed" | "sales_inbox_enquiries" | "sales_inbox_decided_enquiries" | "converted" | "monday_sync_metadata"> & {
   monthly_profit?: number;
   monthly_profit_source?: "monday";
 };
@@ -105,6 +106,7 @@ export function mondaySalesWritePayload(snapshot: MondaySnapshot): MondaySalesWr
     quotes_done: snapshot.quotes_done,
     orders_processed: snapshot.orders_processed,
     sales_inbox_enquiries: snapshot.sales_inbox_enquiries,
+    sales_inbox_decided_enquiries: snapshot.sales_inbox_decided_enquiries,
     converted: snapshot.converted,
     monday_sync_metadata: snapshot.monday_sync_metadata,
   };
@@ -238,6 +240,7 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
       quotes_done: scopeA.totalLeadItems,
       orders_processed: scopeA.convertedItems,
       sales_inbox_enquiries: scopeB.totalLeadItems,
+      sales_inbox_decided_enquiries: scopeB.decidedItems,
       converted: scopeB.convertedItems,
       data_source: "monday",
       memberSnapshots,

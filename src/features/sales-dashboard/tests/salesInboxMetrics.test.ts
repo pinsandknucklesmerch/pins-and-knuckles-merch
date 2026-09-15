@@ -12,7 +12,8 @@ function month(overrides: Partial<CompanyKpiMonth> = {}): CompanyKpiMonth {
     monthlyProfit: null,
     quotesDone: null,
     ordersProcessed: null,
-    salesInboxEnquiries: 44,
+  salesInboxEnquiries: 44,
+  salesInboxDecidedEnquiries: 44,
     converted: 11,
     mondaySyncMetadata: null,
     notes: null,
@@ -21,8 +22,8 @@ function month(overrides: Partial<CompanyKpiMonth> = {}): CompanyKpiMonth {
   };
 }
 
-test("Sales Inbox conversion uses converted divided by current enquiries", () => {
-  const metrics = calculateCompanyMetrics(month(), month({ year: 2025, salesInboxEnquiries: 67, converted: 20 }), {});
+test("Sales Inbox conversion uses converted divided by decided enquiries", () => {
+  const metrics = calculateCompanyMetrics(month({ salesInboxEnquiries: 90, salesInboxDecidedEnquiries: 80 }), month({ year: 2025, salesInboxEnquiries: 67, salesInboxDecidedEnquiries: 60, converted: 20 }), {});
   const inboxConversion = metrics.find((metric) => metric.code === "SALES_INBOX_CONVERSION_RATE");
   assert.equal(inboxConversion?.value, 25);
   assert.equal(formatPercentagePoints(inboxConversion?.value ?? null), "25.0%");
@@ -51,6 +52,10 @@ test("null and zero enquiry denominators remain safe", () => {
   assert.equal(formatPercentagePoints(calculateConversionRate(11, 0)), "0.0%");
   assert.equal(comparisonArcRatio(null, 67), null);
   assert.equal(comparisonArcRatio(44, 0), null);
+});
+test("Sales Inbox conversion safely returns zero for no decided enquiries", () => {
+  const metrics = calculateCompanyMetrics(month({ salesInboxDecidedEnquiries: 0 }), null, {});
+  assert.equal(metrics.find((metric) => metric.code === "SALES_INBOX_CONVERSION_RATE")?.value, 0);
 });
 
 test("Sales Inbox card uses the required semantic heading hierarchy", () => {

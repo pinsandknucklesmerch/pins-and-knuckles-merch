@@ -49,8 +49,8 @@ export function calculateCompanyMetrics(
   const previousOrders = previous ? effectiveCompanyKpiValue(previous, "ORDERS_PROCESSED") : null;
   const currentConversion = calculateConversionRate(currentOrders, currentQuotes);
   const previousConversion = calculateConversionRate(previousOrders, previousQuotes);
-  const currentInboxConversion = calculateConversionRate(current.converted, current.salesInboxEnquiries);
-  const previousInboxConversion = previous ? calculateConversionRate(previous.converted, previous.salesInboxEnquiries) : null;
+  const currentInboxConversion = calculateConversionRate(current.converted, current.salesInboxDecidedEnquiries === undefined ? current.salesInboxEnquiries : current.salesInboxDecidedEnquiries);
+  const previousInboxConversion = previous ? calculateConversionRate(previous.converted, previous.salesInboxDecidedEnquiries === undefined ? previous.salesInboxEnquiries : previous.salesInboxDecidedEnquiries) : null;
   return [
     { ...metric("MONTHLY_PROFIT", "Monthly Profit", currentProfit, previousProfit, targets.MONTHLY_PROFIT ?? null, "currency"), calculatedValue: current.monthlyProfit, finalValue: current.finalValues?.MONTHLY_PROFIT?.value, isFinal: current.finalValues?.MONTHLY_PROFIT !== undefined },
     { ...metric("QUOTES_DONE", "Quotes Done", currentQuotes, previousQuotes, targets.QUOTES_DONE ?? null, "number"), calculatedValue: current.quotesDone, finalValue: current.finalValues?.QUOTES_DONE?.value, isFinal: current.finalValues?.QUOTES_DONE !== undefined },

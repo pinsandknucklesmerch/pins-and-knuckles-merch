@@ -33,7 +33,8 @@ const weeklyGroup = /^week\s+[1-5]$/i;
 type Person = { id: string | null; name: string; normalizedName: string };
 type DateSource = "date_in_touch" | "created_at_fallback";
 type DateIssue = "invalid_date_in_touch" | "missing_created_at" | "invalid_created_at";
-type SummaryItem = { item: MondayItem; people: Person[]; channel: string | null; channelNormalized: string; converted: boolean; date: string | null; dateSource: DateSource | null; dateIssue: DateIssue | null; dateMatchesBoardMonth: boolean };
+type ConversionState = "yes" | "no" | "undecided";
+type SummaryItem = { item: MondayItem; people: Person[]; channel: string | null; channelNormalized: string; conversionState: ConversionState; converted: boolean; date: string | null; dateSource: DateSource | null; dateIssue: DateIssue | null; dateMatchesBoardMonth: boolean };
 type Month = { year: number; month: number; label: string };
 export type MondayMemberKpi = {
   teamMemberKey: string;
@@ -83,7 +84,8 @@ function aggregate(items: SummaryItem[]) {
   }
   const memberRows = [...members.values()].map((member) => ({ ...member, mondayUserIds: member.mondayUserIds.sort(), conversionRate: rate(member.converted, member.leads) })).sort((a, b) => a.displayName.localeCompare(b.displayName));
   const channelRows = [...channels.values()].map((channel) => ({ ...channel, conversionRate: rate(channel.converted, channel.leads) })).sort((a, b) => a.displayLabel.localeCompare(b.displayLabel)); const converted = items.filter((item) => item.converted).length;
-  return { totalLeadItems: items.length, convertedItems: converted, conversionRate: rate(converted, items.length), byAccountManager: memberRows, byChannel: channelRows, blankChannelCount, blankAccountManagerCount };
+  const decided = items.filter((item) => item.conversionState !== "undecided").length;
+  return { totalLeadItems: items.length, decidedItems: decided, convertedItems: converted, conversionRate: rate(converted, items.length), byAccountManager: memberRows, byChannel: channelRows, blankChannelCount, blankAccountManagerCount };
 }
 function memberKpis(items: SummaryItem[]): MondayMemberKpi[] {
   const members = new Map<string, MondayMemberKpi & { sources: Map<string, { id: string | null; name: string }> }>();
@@ -124,7 +126,9 @@ export function summarizeMonthlySalesBoard(board: Pick<MondayBoard, "id" | "name
   for (const item of items) {
     const group = item.group?.title ?? null; if (!group || !weeklyGroup.test(group)) { excludedItems.push({ id: String(item.id), name: item.name, group, reason: group?.toLowerCase() === "profit tracking" ? "profit-tracking-group" : "non-weekly-group" }); continue; }
     const resolvedDate = dateResolution(item, columns.dateInTouch); const dateMatchesBoardMonth = Boolean(resolvedDate.date && expectedMonth && resolvedDate.date.startsWith(`${expectedMonth.year}-${String(expectedMonth.month).padStart(2, "0")}-`));
-    included.push({ item, people: people(column(item, columns.people)), channel: column(item, columns.channel)?.text?.trim() || null, channelNormalized: normalizeStatus(column(item, columns.channel)?.text), converted: normalizeStatus(column(item, columns.converted)?.text) === "yes", ...resolvedDate, dateMatchesBoardMonth });
+    const conversionValue = normalizeStatus(column(item, columns.converted)?.text);
+    const conversionState: ConversionState = conversionValue === "yes" || conversionValue === "no" ? conversionValue : "undecided";
+    included.push({ item, people: people(column(item, columns.people)), channel: column(item, columns.channel)?.text?.trim() || null, channelNormalized: normalizeStatus(column(item, columns.channel)?.text), conversionState, converted: conversionState === "yes", ...resolvedDate, dateMatchesBoardMonth });
   }
   const validDates = included.filter((item) => item.dateMatchesBoardMonth); const salesInbox = (rows: SummaryItem[]) => rows.filter((item) => item.channelNormalized === "sales inbox"); const multiAccountManagers = included.filter((item) => item.people.length > 1).map((item) => ({ id: String(item.item.id), name: item.item.name, converted: item.converted, accountManagers: item.people }));
   const missingDates = included.filter((item) => !item.date).map((item) => ({ id: String(item.item.id), name: item.item.name, group: item.item.group?.title ?? null, reason: item.dateIssue })); const mismatchedDates = included.filter((item) => item.date && !item.dateMatchesBoardMonth).map((item) => ({ sourceBoardId: String(board.id), sourceBoardMonth: expectedMonth?.label ?? board.name, itemId: String(item.item.id), itemName: item.item.name, group: item.item.group?.title ?? null, actualReportingDate: item.date, dateSource: item.dateSource, includedInBoardMembershipTotals: true, includedInValidDateTotals: false, action: "review-in-monday" as const }));
@@ -148,6 +152,25 @@ export class MondayClient {
     let payload: GraphQlResponse<T>; try { payload = await response.json() as GraphQlResponse<T>; } catch { throw new Error(`Monday API returned invalid JSON (HTTP ${response.status}).`); }
     if (!response.ok) throw new Error(`Monday API request failed (HTTP ${response.status}): ${payload.errors?.map((error) => error.message).join("; ") ?? "unknown error"}`);
     if (payload.errors?.length) throw new Error(`Monday GraphQL error: ${payload.errors.map((error) => error.message).join("; ")}`);
+    if (!payload.data) throw new Error("Monday API response did not contain data.");
+    return payload.data;
+  }
+  async mutate<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
+    if (!mutation.test(query)) throw new Error("Monday write requests must use a GraphQL mutation.");
+    const body = JSON.stringify({ query, variables });
+    let response: Response | null = null;
+    let networkError: unknown;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try { response = await this.request("https://api.monday.com/v2", { method: "POST", headers: { Authorization: this.token, "Content-Type": "application/json", "API-Version": "2024-10" }, body }); } catch (error) { networkError = error; }
+      if (response && ![429, 502, 503].includes(response.status)) break;
+      if (attempt < 2) await new Promise((done) => setTimeout(done, 25 * (attempt + 1)));
+    }
+    if (!response) throw new Error("Monday API network request failed after 3 attempts: " + (networkError instanceof Error ? networkError.message : "unknown error"));
+    if (response.status === 429) throw new Error("Monday API rate limit reached after 3 attempts. Retry after " + (response.headers.get("retry-after") ?? "the provider's indicated delay") + ".");
+    let payload: GraphQlResponse<T>;
+    try { payload = await response.json() as GraphQlResponse<T>; } catch { throw new Error("Monday API returned invalid JSON (HTTP " + response.status + ")."); }
+    if (!response.ok) throw new Error("Monday API request failed (HTTP " + response.status + "): " + (payload.errors?.map((error) => error.message).join("; ") ?? "unknown error"));
+    if (payload.errors?.length) throw new Error("Monday GraphQL error: " + payload.errors.map((error) => error.message).join("; "));
     if (!payload.data) throw new Error("Monday API response did not contain data.");
     return payload.data;
   }
