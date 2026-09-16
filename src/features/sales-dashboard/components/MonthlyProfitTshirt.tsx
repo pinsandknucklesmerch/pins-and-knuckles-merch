@@ -42,7 +42,7 @@ export function MonthlyProfitTshirt({ value, target, tvMode = false, ariaLabel }
           </g>
         </g> : null}
       </svg>
-      <Image className={styles.shirtArtwork} src="/reference-assets/tshirt.png" alt="" aria-hidden="true" width={1536} height={1024} />
+      <Image className={styles.shirtArtwork} src="/reference-assets/tshirt.png" alt="" aria-hidden="true" width={1536} height={1024} loading="eager" />
     </div>
   );
 }

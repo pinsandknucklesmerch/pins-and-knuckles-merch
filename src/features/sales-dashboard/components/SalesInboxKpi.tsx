@@ -12,7 +12,7 @@ function number(value: number | null) {
   return value === null ? "—" : value.toLocaleString("en-GB");
 }
 
-export function SalesInboxKpi({ enquiries, conversionRate, animationKey, animationDelayMs = 0, tvMode = false }: { enquiries: MetricResult; conversionRate: MetricResult; animationKey?: string | number; animationDelayMs?: number; tvMode?: boolean }) {
+export function SalesInboxKpi({ enquiries, conversionRate, selectedPeriodLabel, animationKey, animationDelayMs = 0, tvMode = false }: { enquiries: MetricResult; conversionRate: MetricResult; selectedPeriodLabel?: string; animationKey?: string | number; animationDelayMs?: number; tvMode?: boolean }) {
   const enquiriesRatio = comparisonArcRatio(enquiries.value, enquiries.previousYear);
   const hasEnquiriesComparison = enquiriesRatio !== null;
 
@@ -31,7 +31,8 @@ export function SalesInboxKpi({ enquiries, conversionRate, animationKey, animati
         </div>
       </section>
       <section className={styles.conversion} aria-labelledby="sales-inbox-conversion-rate">
-        <h3 id="sales-inbox-conversion-rate" className={styles.label}>Conversion Rate</h3>
+        <h3 id="sales-inbox-conversion-rate" className={styles.label}>Sales Inbox Conversion Rate</h3>
+        {selectedPeriodLabel ? <div className={styles.reference}>{selectedPeriodLabel}</div> : null}
         <AnimatedMetricValue value={conversionRate.value} format="percent" className={styles.conversionValue} tvKpiValue={tvMode} />
         <div className={styles.comparison}>
           {conversionRate.previousYear === null ? (

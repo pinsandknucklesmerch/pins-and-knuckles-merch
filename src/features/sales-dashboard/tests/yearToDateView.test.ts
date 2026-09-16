@@ -32,6 +32,7 @@ test("YTD uses dedicated reference-driven cards and metric-specific comparison c
   for (const code of ["QUOTES_DONE", "ORDERS_PROCESSED", "CONVERTED", "CONVERSION_RATE", "SALES_INBOX_ENQUIRIES", "SALES_INBOX_CONVERSION_RATE"]) {
     assert.match(component, new RegExp(`code: "${code}"`));
   }
+  assert.match(component, /label: "YTD Sales Inbox Conversion Rate"/);
   assert.match(component, /YtdProfitSummary/);
   assert.match(component, /YtdMonthlyProfitChart/);
   assert.match(component, /YtdComparisonCard/);

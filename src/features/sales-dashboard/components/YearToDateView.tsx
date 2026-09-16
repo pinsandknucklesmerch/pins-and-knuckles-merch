@@ -27,7 +27,7 @@ const METRICS: MetricDefinition[] = [
   { code: "CONVERTED", label: "Converted", format: "number", chart: "bar", icon: BadgeCheck, tone: "purple" },
   { code: "CONVERSION_RATE", label: "Conversion Rate", format: "percent", chart: "line", icon: Percent, tone: "amber" },
   { code: "SALES_INBOX_ENQUIRIES", label: "Active Marketing Enquiries", format: "number", chart: "bar", icon: Mail, tone: "cyan" },
-  { code: "SALES_INBOX_CONVERSION_RATE", label: "Sales Inbox Conversion Rate", format: "percent", chart: "line", icon: Percent, tone: "violet" },
+  { code: "SALES_INBOX_CONVERSION_RATE", label: "YTD Sales Inbox Conversion Rate", format: "percent", chart: "line", icon: Percent, tone: "violet" },
 ];
 
 function formatValue(value: number | null, format: YtdChartFormat) {

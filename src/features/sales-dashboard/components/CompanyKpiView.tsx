@@ -2,6 +2,7 @@
 
 import { MetricGrid } from "metricui";
 import type { CSSProperties } from "react";
+import { DASHBOARD_MONTHS } from "../types";
 import type { CompanyKpiMonth, MetricResult } from "../domain/types";
 import { CombinedKpiCard } from "./CombinedKpiCard";
 import { LiveStatus } from "./LiveStatus";
@@ -24,6 +25,7 @@ export function CompanyKpiView({ current, metrics, gaugeAnimationKey, gaugeAnima
   const inbox = metricByCode(metrics, "SALES_INBOX_ENQUIRIES");
   const conversion = metricByCode(metrics, "CONVERSION_RATE");
   const inboxConversion = metricByCode(metrics, "SALES_INBOX_CONVERSION_RATE");
+  const selectedPeriodLabel = `${DASHBOARD_MONTHS[current.month - 1] ?? current.month} ${current.year}`;
 
   return (
     <div className="grid gap-2.5" data-tv-view={tvMode ? "overview" : undefined}>
@@ -35,7 +37,7 @@ export function CompanyKpiView({ current, metrics, gaugeAnimationKey, gaugeAnima
               <ProfitShirtKpi metric={profit} animationKey={gaugeAnimationKey ?? "initial"} />
             </div>
             <div className={`${styles.tvGroup} ${tvMode ? styles.tvGroupTv : ""}`} data-tv-group={tvMode ? "overview-inbox" : undefined} style={tvMode ? { "--tv-enter-index": 4 } as CSSProperties : undefined}>
-              <SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} animationKey={gaugeAnimationKey ?? "initial"} />
+              <SalesInboxKpi enquiries={inbox} conversionRate={inboxConversion} selectedPeriodLabel={selectedPeriodLabel} animationKey={gaugeAnimationKey ?? "initial"} />
             </div>
           </div>
         </MetricGrid.Item>

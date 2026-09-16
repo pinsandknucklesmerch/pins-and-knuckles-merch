@@ -68,7 +68,8 @@ test("Sales Inbox card uses the required semantic heading hierarchy", () => {
   const component = readFileSync(new URL("../components/SalesInboxKpi.tsx", import.meta.url), "utf8");
   assert.match(component, /<h2 className=\{styles\.heading\}>Sales Inbox<\/h2>/);
   assert.match(component, /<h3 id="sales-inbox-enquiries" className=\{styles\.label\}>Enquiries<\/h3>/);
-  assert.match(component, /<h3 id="sales-inbox-conversion-rate" className=\{styles\.label\}>Conversion Rate<\/h3>/);
+  assert.match(component, /<h3 id="sales-inbox-conversion-rate" className=\{styles\.label\}>Sales Inbox Conversion Rate<\/h3>/);
+  assert.match(component, /selectedPeriodLabel \? <div className=\{styles\.reference\}>\{selectedPeriodLabel\}<\/div> : null/);
   assert.doesNotMatch(component, />Sales Inbox Enquiries</);
 });
 
@@ -80,6 +81,8 @@ test("Overview renders the two top cards before the full-width performance card"
 
   assert.match(component, /<MetricGrid columns=\{12\} gap=\{12\}>/);
   assert.ok(profitIndex >= 0 && profitIndex < inboxIndex);
+  assert.match(component, /const selectedPeriodLabel = `\$\{DASHBOARD_MONTHS\[current\.month - 1\] \?\? current\.month\} \$\{current\.year\}`/);
+  assert.match(component, /selectedPeriodLabel=\{selectedPeriodLabel\}/);
   assert.ok(inboxIndex >= 0 && inboxIndex < performanceIndex);
   assert.match(component, /<MetricGrid\.Item span="full">\s*<CombinedKpiCard first=\{quotes\} second=\{orders\} third=\{conversion\}/);
   assert.doesNotMatch(component, /convertedMetric|Converted/);

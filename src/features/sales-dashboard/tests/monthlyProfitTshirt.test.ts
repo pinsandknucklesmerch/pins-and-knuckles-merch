@@ -11,6 +11,7 @@ test("T-shirt liquid uses the artwork coordinate system and clips every wave to 
   assert.match(component, /fillRule="evenodd"/);
   assert.match(component, /clipPath=\{`url\(#\$\{clipId\}\)`\}/);
   assert.match(component, /fillPercent > 0/);
+  assert.match(component, /src="\/reference-assets\/tshirt\.png"[^>]*loading="eager"/);
   assert.match(styles, /\.liquid \{ overflow: hidden; \}/);
 });
 
