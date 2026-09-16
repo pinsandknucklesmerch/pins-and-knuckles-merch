@@ -86,7 +86,7 @@ test("Scope B zeroes remain explicit in the company payload", async () => {
   assert.deepEqual([payload.sales_inbox_enquiries, payload.converted], [0, 0]);
 });
 
-test("Sales Inbox conversion counts only explicit Yes and No values", async () => {
+test("Sales Inbox snapshot counts every Sales Inbox enquiry while only Yes is converted", async () => {
   const scopedItems = [
     ...items,
     { id: "inbox-no", name: "Inbox no", group: { id: "week", title: "WEEK 1" }, column_values: [{ id: "status_16", text: "Sales Inbox" }, { id: "status", text: "No" }, { id: "date8", text: "2026-07-03" }] },
@@ -107,6 +107,7 @@ test("Sales Inbox conversion counts only explicit Yes and No values", async () =
     outcome.snapshot?.sales_inbox_decided_enquiries,
     outcome.snapshot?.converted,
   ], ["org-1", 4, 2, 1]);
+  assert.equal(outcome.snapshot!.converted / outcome.snapshot!.sales_inbox_enquiries, 0.25);
 });
 
 test("valid Profit Tracking includes both profit fields in the metrics patch", async () => {

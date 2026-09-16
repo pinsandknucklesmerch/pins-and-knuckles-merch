@@ -22,6 +22,7 @@ function point(values: Partial<YearComparisonPoint>): YearComparisonPoint {
     converted: null,
     conversionRate: null,
     salesInboxEnquiries: null,
+    salesInboxDecidedEnquiries: null,
     salesInboxConversionRate: null,
     ...values,
   };
@@ -60,12 +61,14 @@ test("YTD charts reserve axis space and render full current and previous monthly
 
 test("YTD comparison selectors retain aggregate rate and count calculations", () => {
   const points = [
-    point({ month: 1, quotesDone: 100, ordersProcessed: 40, salesInboxEnquiries: 20, converted: 5 }),
-    point({ month: 2, label: "Feb", quotesDone: 50, ordersProcessed: 35, salesInboxEnquiries: 30, converted: 10 }),
+    point({ month: 1, quotesDone: 100, ordersProcessed: 40, salesInboxEnquiries: 10, salesInboxDecidedEnquiries: 1, converted: 1 }),
+    point({ month: 2, label: "Feb", quotesDone: 50, ordersProcessed: 35, salesInboxEnquiries: 90, salesInboxDecidedEnquiries: 45, converted: 45 }),
+    point({ month: 3, label: "Mar", salesInboxEnquiries: null, salesInboxDecidedEnquiries: null, converted: null }),
   ];
   assert.equal(sumYearComparisonMetric(points, "QUOTES_DONE"), 150);
   assert.equal(ytdComparisonValue(points, "CONVERSION_RATE"), 50);
-  assert.equal(ytdComparisonValue(points, "SALES_INBOX_CONVERSION_RATE"), 30);
+  assert.equal(ytdComparisonValue(points, "SALES_INBOX_CONVERSION_RATE"), 46);
+  assert.equal(ytdComparisonValue([point({ salesInboxEnquiries: 4, salesInboxDecidedEnquiries: 0, converted: 0 })], "SALES_INBOX_CONVERSION_RATE"), 0);
 });
 
 test("YTD chart values preserve finite zeroes and turn invalid values into gaps", () => {

@@ -53,6 +53,7 @@ export type YearComparisonPoint = {
   converted: number | null;
   conversionRate: number | null;
   salesInboxEnquiries: number | null;
+  salesInboxDecidedEnquiries: number | null;
   salesInboxConversionRate: number | null;
 };
 

@@ -5,6 +5,11 @@ export function calculateConversionRate(converted: number | null, enquiries: num
   return Math.round((converted / enquiries) * 1000) / 10;
 }
 
+export function calculateSalesInboxConversionRate(converted: number | null, enquiries: number | null): number | null {
+  if (enquiries === null || converted === null || !Number.isFinite(enquiries) || !Number.isFinite(converted)) return null;
+  return calculateConversionRate(converted, enquiries);
+}
+
 export function calculateTargetProgress(value: number | null, target: number | null): number | null {
   if (value === null || target === null || !Number.isFinite(target) || target <= 0) return null;
   return Math.round((value / target) * 1000) / 10;
@@ -49,8 +54,8 @@ export function calculateCompanyMetrics(
   const previousOrders = previous ? effectiveCompanyKpiValue(previous, "ORDERS_PROCESSED") : null;
   const currentConversion = calculateConversionRate(currentOrders, currentQuotes);
   const previousConversion = calculateConversionRate(previousOrders, previousQuotes);
-  const currentInboxConversion = calculateConversionRate(current.converted, current.salesInboxDecidedEnquiries === undefined ? current.salesInboxEnquiries : current.salesInboxDecidedEnquiries);
-  const previousInboxConversion = previous ? calculateConversionRate(previous.converted, previous.salesInboxDecidedEnquiries === undefined ? previous.salesInboxEnquiries : previous.salesInboxDecidedEnquiries) : null;
+  const currentInboxConversion = calculateSalesInboxConversionRate(current.converted, current.salesInboxEnquiries);
+  const previousInboxConversion = previous ? calculateSalesInboxConversionRate(previous.converted, previous.salesInboxEnquiries) : null;
   return [
     { ...metric("MONTHLY_PROFIT", "Monthly Profit", currentProfit, previousProfit, targets.MONTHLY_PROFIT ?? null, "currency"), calculatedValue: current.monthlyProfit, finalValue: current.finalValues?.MONTHLY_PROFIT?.value, isFinal: current.finalValues?.MONTHLY_PROFIT !== undefined },
     { ...metric("QUOTES_DONE", "Quotes Done", currentQuotes, previousQuotes, targets.QUOTES_DONE ?? null, "number"), calculatedValue: current.quotesDone, finalValue: current.finalValues?.QUOTES_DONE?.value, isFinal: current.finalValues?.QUOTES_DONE !== undefined },

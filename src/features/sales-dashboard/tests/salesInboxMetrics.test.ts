@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { calculateCompanyMetrics, calculateConversionRate } from "../domain/calculateDashboardKpis.ts";
+import { calculateCompanyMetrics, calculateConversionRate, calculateSalesInboxConversionRate } from "../domain/calculateDashboardKpis.ts";
 import type { CompanyKpiMonth } from "../domain/types.ts";
 import { comparisonArcFillPercent, comparisonArcRatio, formatPercentagePoints } from "../lib/metricDisplay.ts";
 
@@ -22,11 +22,17 @@ function month(overrides: Partial<CompanyKpiMonth> = {}): CompanyKpiMonth {
   };
 }
 
-test("Sales Inbox conversion uses converted divided by decided enquiries", () => {
-  const metrics = calculateCompanyMetrics(month({ salesInboxEnquiries: 90, salesInboxDecidedEnquiries: 80 }), month({ year: 2025, salesInboxEnquiries: 67, salesInboxDecidedEnquiries: 60, converted: 20 }), {});
+test("Sales Inbox conversion uses converted divided by all Sales Inbox enquiries", () => {
+  const metrics = calculateCompanyMetrics(month({ salesInboxEnquiries: 90, salesInboxDecidedEnquiries: 20 }), month({ year: 2025, salesInboxEnquiries: 67, salesInboxDecidedEnquiries: 20, converted: 20 }), {});
   const inboxConversion = metrics.find((metric) => metric.code === "SALES_INBOX_CONVERSION_RATE");
-  assert.equal(inboxConversion?.value, 25);
-  assert.equal(formatPercentagePoints(inboxConversion?.value ?? null), "25.0%");
+  assert.equal(inboxConversion?.value, 12.2);
+  assert.equal(inboxConversion?.previousYear, 29.9);
+  assert.equal(formatPercentagePoints(inboxConversion?.value ?? null), "12.2%");
+});
+
+test("Sales Inbox conversion preserves a genuine zero and marks unavailable source data null", () => {
+  assert.equal(calculateSalesInboxConversionRate(0, 4), 0);
+  assert.equal(calculateSalesInboxConversionRate(null, null), null);
 });
 
 test("Sales Inbox enquiries arc compares only current and last-year enquiries", () => {

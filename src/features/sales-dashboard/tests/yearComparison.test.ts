@@ -4,6 +4,7 @@ import test from "node:test";
 import { getFixtureCompanyMonth } from "../data/mappers.ts";
 import { buildYearComparison, formatYearComparisonValue, selectCurrentMonthComparison, yearComparisonValue } from "../data/yearComparison.ts";
 import { historicalSalesDashboardFixture } from "../data/workbookFixture.ts";
+import type { CompanyKpiMonth } from "../domain/types.ts";
 
 function year(year: number) {
   return Array.from({ length: 12 }, (_, index) => getFixtureCompanyMonth(historicalSalesDashboardFixture, year, index + 1));
@@ -49,6 +50,46 @@ test("trend values format as GBP, integers, and percentage points", () => {
   assert.equal(formatYearComparisonValue(91571.84, "MONTHLY_PROFIT"), "£91,572");
   assert.equal(formatYearComparisonValue(44, "SALES_INBOX_ENQUIRIES"), "44");
   assert.equal(formatYearComparisonValue(25, "SALES_INBOX_CONVERSION_RATE"), "25.0%");
+});
+
+function inboxMonth(year: number, month: number, enquiries: number | null, decided: number | null, converted: number | null): CompanyKpiMonth {
+  return {
+    year, month, monthlyProfit: null, quotesDone: null, ordersProcessed: null,
+    salesInboxEnquiries: enquiries,
+    salesInboxDecidedEnquiries: decided, converted,
+    mondaySyncMetadata: null, notes: null, source: "monday",
+  };
+}
+
+test("Sales Inbox history uses each month’s total enquiry count and retains the previous-year series", () => {
+  const comparison = buildYearComparison(2026, [
+    inboxMonth(2026, 1, 30, 10, 10),
+    inboxMonth(2026, 2, 50, 15, 15),
+  ], [
+    inboxMonth(2025, 1, 20, 5, 5),
+    inboxMonth(2025, 2, 40, 20, 20),
+  ]);
+
+  assert.deepEqual(
+    comparison.selected.map((point) => point.salesInboxConversionRate),
+    [33.3, 30],
+  );
+  assert.deepEqual(
+    comparison.previous.map((point) => point.salesInboxConversionRate),
+    [25, 50],
+  );
+});
+
+test("Sales Inbox history distinguishes unavailable source data from a real zero percent month", () => {
+  const comparison = buildYearComparison(2026, [
+    inboxMonth(2026, 1, null, null, null),
+    inboxMonth(2026, 2, 4, 0, 0),
+  ], []);
+
+  assert.deepEqual(
+    comparison.selected.map((point) => point.salesInboxConversionRate),
+    [null, 0],
+  );
 });
 
 test("Leads is excluded from the chart selector and legacy selections fall back", () => {
