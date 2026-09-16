@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { effectivePinsHubAccessLevel, hasAdminAccess, hasDeveloperAccess } from "./pinsHubAccess.ts";
+import {
+  effectivePinsHubAccessLevel,
+  hasAdminAccess,
+  hasDeveloperAccess,
+  resolvePinsHubAccess,
+} from "./pinsHubAccess.ts";
 import { hasPinsHubAccessLevel, isPinsHubAccessLevel } from "./pinsHubRoles.ts";
 
 function access(level: "developer" | "admin" | "write" | "read", role: "owner" | "admin" = "admin") {
@@ -28,6 +33,59 @@ test("owner receives effective admin access without changing stored access", () 
   assert.equal(effectivePinsHubAccessLevel(access("write", "owner")), "admin");
   assert.equal(hasAdminAccess(access("read", "owner")), true);
   assert.equal(hasDeveloperAccess(access("read", "owner")), true);
+});
+
+test("access resolution selects the authenticated user's profile", async () => {
+  let profileFilter: [string, string] | null = null;
+  const authenticatedUserId = "authenticated-user";
+  const client = {
+    auth: {
+      getUser: async () => ({
+        data: { user: { id: authenticatedUserId } },
+        error: null,
+      }),
+    },
+    from: (table: string) => {
+      assert.equal(table, "profiles");
+      return {
+        select: () => ({
+          eq: (column: string, value: string) => {
+            profileFilter = [column, value];
+            return {
+              returns: async () => ({
+                data: [{
+                  id: authenticatedUserId,
+                  email: "authenticated@example.com",
+                  last_active_at: null,
+                  organisation_members: [{
+                    id: "authenticated-membership",
+                    organisation_id: "organisation-1",
+                    role: "admin",
+                    is_active: true,
+                    app_access: [{
+                      id: "authenticated-access",
+                      organisation_member_id: "authenticated-membership",
+                      app_key: "pins_hub",
+                      access_level: "write",
+                    }],
+                  }],
+                }],
+                error: null,
+              }),
+            };
+          },
+        }),
+      };
+    },
+  };
+
+  const result = await resolvePinsHubAccess(client as never);
+
+  assert.deepEqual(profileFilter, ["id", authenticatedUserId]);
+  assert.equal(result.authenticated, true);
+  assert.equal(result.user?.id, authenticatedUserId);
+  assert.equal(result.membership?.id, "authenticated-membership");
+  assert.equal(result.access?.id, "authenticated-access");
 });
 
 test("developer navigation and routes use the central server-side permission helper", async () => {

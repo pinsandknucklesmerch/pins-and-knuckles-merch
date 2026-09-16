@@ -84,10 +84,21 @@ type PinsHubSupabaseClient = SupabaseClient<Database>;
 export async function resolvePinsHubAccess(
   supabase: PinsHubSupabaseClient,
 ): Promise<PinsHubAccessResult> {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return {
+      ...createUnauthenticatedResult(),
+      error: authError?.message ?? null,
+      accessDeniedReason: authError?.message ?? "No authenticated user.",
+    };
+  }
+
 
     const { data: profiles, error: accessQueryError } = await supabase
       .from("profiles")
       .select("id,email,last_active_at,organisation_members!organisation_members_user_id_fkey(id,organisation_id,role,is_active,app_access(id,organisation_member_id,app_key,access_level))")
+      .eq("id", user.id)
       .returns<ProfileAccessRow[]>();
 
     if (accessQueryError) {
