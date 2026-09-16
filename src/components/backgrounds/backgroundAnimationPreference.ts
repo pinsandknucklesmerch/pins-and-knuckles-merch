@@ -9,6 +9,13 @@ export function readStoredBackgroundAnimation(value: string | null): boolean {
   return value !== "false";
 }
 
+export function isBackgroundAnimationControlDisabled(
+  ready: boolean | null | undefined,
+  reducedMotion: boolean | null | undefined,
+): boolean {
+  return ready !== true || reducedMotion === true;
+}
+
 type BackgroundAnimationPreference = {
   enabled: boolean;
   reducedMotion: boolean;

@@ -1,9 +1,13 @@
 "use client";
 
-import { useBackgroundAnimationPreference } from "@/components/backgrounds/backgroundAnimationPreference";
+import {
+  isBackgroundAnimationControlDisabled,
+  useBackgroundAnimationPreference,
+} from "@/components/backgrounds/backgroundAnimationPreference";
 
 export function BackgroundAnimationPreference() {
   const { enabled, reducedMotion, ready, setEnabled } = useBackgroundAnimationPreference();
+  const disabled = isBackgroundAnimationControlDisabled(ready, reducedMotion);
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -18,7 +22,7 @@ export function BackgroundAnimationPreference() {
           type="checkbox"
           role="switch"
           checked={enabled}
-          disabled={!ready || reducedMotion}
+          disabled={disabled}
           onChange={(event) => setEnabled(event.target.checked)}
           className="size-4 accent-primary disabled:cursor-not-allowed disabled:opacity-50"
         />

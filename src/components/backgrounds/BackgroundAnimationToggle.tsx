@@ -1,6 +1,9 @@
 "use client";
 
-import { useBackgroundAnimationPreference } from "./backgroundAnimationPreference";
+import {
+  isBackgroundAnimationControlDisabled,
+  useBackgroundAnimationPreference,
+} from "./backgroundAnimationPreference";
 
 type BackgroundAnimationToggleProps = {
   showLabel?: boolean;
@@ -8,7 +11,7 @@ type BackgroundAnimationToggleProps = {
 
 export function BackgroundAnimationToggle({ showLabel = true }: BackgroundAnimationToggleProps) {
   const { enabled, ready, reducedMotion, setEnabled } = useBackgroundAnimationPreference();
-  const disabled = !ready || reducedMotion;
+  const disabled = isBackgroundAnimationControlDisabled(ready, reducedMotion);
 
   return (
     <button
