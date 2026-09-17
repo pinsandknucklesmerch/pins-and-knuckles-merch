@@ -175,12 +175,21 @@ legacy Hub architecture are not part of this application.
   `/hub/sales-dashboard/tv/settings`. Reporting routes: `/hub/reporting`, `/hub/reporting/epcc`, and `/hub/reporting/metrics`.
 - Calculators: EU Standard, EU US Clients, and UK Trade under
   `/hub/calculators`.
-- Operations: PK Tax, Commercial Invoice Generator, and Data Management for
-  Garments, Product Types, and Invoice Companies.
+- Operations: PK Tax, Commercial Invoice Generator, Data Management for
+  Garments, Product Types, and Invoice Companies, and Quick Reference.
 - Developer: `/hub/developer`, `/hub/developer/feedback`, and
   `/hub/developer/diagnostics`.
 - Scheduled routes: `GET /api/cron/epcc-profit` and
   `GET /api/cron/monday-sales-sync`.
+
+### Quick Reference
+
+Quick Reference is centrally managed in Supabase with no browser-local
+persistence. `/hub/reference` provides protected active-record read/copy access;
+write users can add and edit through `/hub/reference/manage`, while effective
+admins (including developers under the existing hierarchy) can also deactivate,
+reactivate, and permanently delete records. Read users have no management
+controls.
 
 ## Authentication, access, and user management
 

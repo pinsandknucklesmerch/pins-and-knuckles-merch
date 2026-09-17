@@ -6,6 +6,7 @@ import {
   FileText,
   Landmark,
   Database,
+  BookOpen,
   UserRound,
   Wrench,
   type LucideIcon,
@@ -39,6 +40,7 @@ export const hubFeatureNavigation: HubFeatureNavigationItem[] = [
   },
   { href: "/hub/pk-tax", label: "PK Tax", icon: Landmark },
   { href: "/hub/commercial-invoices", label: "Commercial Invoices", icon: FileText },
+  { href: "/hub/reference", label: "Quick Reference", icon: BookOpen },
   {
     href: "/hub/data", label: "Data Management", icon: Database,
     children: [

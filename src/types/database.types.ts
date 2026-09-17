@@ -1015,6 +1015,53 @@ export type Database = {
           },
         ]
       }
+      quick_reference_records: {
+        Row: {
+          body: string
+          category: string
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          organisation_id: string
+          title: string
+          updated_at: string
+          warning: string | null
+        }
+        Insert: {
+          body: string
+          category: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          organisation_id: string
+          title: string
+          updated_at?: string
+          warning?: string | null
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          organisation_id?: string
+          title?: string
+          updated_at?: string
+          warning?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quick_reference_records_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       merchbuddy_customer_account_managers: {
         Row: {
           created_at: string
