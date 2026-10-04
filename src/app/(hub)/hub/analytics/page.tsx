@@ -4,6 +4,7 @@ import { AnalyticsDashboard } from "@/features/analytics/components/AnalyticsDas
 import { parseWebsiteAnalyticsPeriod } from "@/features/analytics/lib/period";
 import { parseAnalyticsView } from "@/features/analytics/lib/view";
 import { Ga4ConfigurationError, getGa4WebsiteAnalyticsReport, type Ga4WebsiteAnalyticsReport } from "@/features/analytics/server/ga4";
+import { getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -12,7 +13,12 @@ function first(value: string | string[] | undefined) {
 }
 
 export default async function AnalyticsPage({ searchParams }: Props) {
-  const params = await searchParams;
+  const [params, access] = await Promise.all([searchParams, getCurrentPinsHubAccess()]);
+
+  if (!access.access) {
+    return <AppShell pinsHubAccess={access}><PageHeader title="Analytics" /></AppShell>;
+  }
+
   const activeView = parseAnalyticsView(first(params.view));
   const period = parseWebsiteAnalyticsPeriod(first(params.period));
   let websiteReport: Ga4WebsiteAnalyticsReport | null = null;
@@ -27,7 +33,7 @@ export default async function AnalyticsPage({ searchParams }: Props) {
   }
 
   return (
-    <AppShell>
+    <AppShell pinsHubAccess={access}>
       <PageHeader title="Analytics" />
       <AnalyticsDashboard activeView={activeView} period={period} websiteReport={websiteReport} websiteError={websiteError} />
     </AppShell>

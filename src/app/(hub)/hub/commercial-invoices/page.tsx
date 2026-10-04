@@ -6,6 +6,7 @@ import { CommercialInvoiceGenerator } from "@/features/commercial-invoices/compo
 import {
   getInvoiceDirectory,
 } from "@/features/commercial-invoices/data/invoiceDirectoryRepository";
+import { getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
 
 export default function CommercialInvoicesPage() {
   return (
@@ -16,10 +17,13 @@ export default function CommercialInvoicesPage() {
 }
 
 async function CommercialInvoicesContent() {
+  const access = await getCurrentPinsHubAccess();
+  if (!access.access) return <AppShell pinsHubAccess={access}><PageHeader title="Commercial Invoice Generator" /></AppShell>;
+
   const [companies, products] = await getInvoiceDirectory();
 
   return (
-    <AppShell>
+    <AppShell pinsHubAccess={access}>
       <PageHeader title="Commercial Invoice Generator" />
       <CommercialInvoiceGenerator companies={companies} products={products} />
     </AppShell>

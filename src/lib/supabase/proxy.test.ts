@@ -15,10 +15,3 @@ test("skips Auth claims calls for App Router prefetches", () => {
   assert.match(sessionProxy, /next-router-prefetch/);
   assert.match(sessionProxy, /if \(isPrefetch\) \{\s*return supabaseResponse;\s*\}/);
 });
-
-test("has removable /hub-only request diagnostics", () => {
-  assert.match(sessionProxy, /TEMPORARY: remove after identifying the repeated \/hub request source/);
-  assert.match(sessionProxy, /request\.nextUrl\.pathname !== "\/hub"/);
-  assert.match(sessionProxy, /hasNextRouterStateTree: headers\.has\("next-router-state-tree"\)/);
-  assert.match(sessionProxy, /getClaims: willGetClaims \? "run" : "bypass"/);
-});

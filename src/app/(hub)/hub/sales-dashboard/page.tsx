@@ -18,6 +18,8 @@ export default function SalesDashboardPage({ searchParams }: Props) {
 
 async function SalesDashboardPageContent({ searchParams }: Props) {
   const [params, access] = await Promise.all([searchParams, getCurrentPinsHubAccess()]);
+  if (!access.access) return <AppShell pinsHubAccess={access}>{null}</AppShell>;
+
   const now = new Date();
   const { year, month } = parseDashboardPeriod(params, now);
   const dashboardView = parseDashboardView(first(params.dashboardView));
@@ -26,5 +28,5 @@ async function SalesDashboardPageContent({ searchParams }: Props) {
   const isAdmin = hasAdminAccess(access);
   const organisationId = access.membership?.organisation_id ?? null;
   const [data, staleWarnings] = await Promise.all([loadSalesDashboard(year, month, organisationId), isAdmin ? loadSalesDashboardStaleWarnings(organisationId, year, month, now) : Promise.resolve([])]);
-  return <AppShell tvMode={tvMode} wideContent><SalesDashboard data={data} year={year} month={month} isAdmin={isAdmin} initialDashboardView={dashboardView} staleWarnings={staleWarnings} tvMode={tvMode} tvDurationSeconds={tvDurationSeconds} /></AppShell>;
+  return <AppShell pinsHubAccess={access} tvMode={tvMode} wideContent><SalesDashboard data={data} year={year} month={month} isAdmin={isAdmin} initialDashboardView={dashboardView} staleWarnings={staleWarnings} tvMode={tvMode} tvDurationSeconds={tvDurationSeconds} /></AppShell>;
 }

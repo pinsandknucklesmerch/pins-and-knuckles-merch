@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { resolvePinsHubAccess, type PinsHubAccessResult } from "@/lib/access/pinsHubAccess";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database.types";
 import type { GarmentRecord, PricingCategory, ProductTypeRecord } from "../types";
@@ -42,15 +41,13 @@ export async function getGarments(supabase: CatalogClient): Promise<GarmentRecor
 }
 
 export async function loadDataManagementSummary(): Promise<{
-  access: PinsHubAccessResult;
   garmentCount: number;
   productTypeCount: number;
   invoiceCompanyCount: number;
 }> {
   const supabase = await createClient();
   const organisationId = await resolveCanonicalInvoiceOrganisation(supabase);
-  const [access, garments, productTypes, invoiceCompanies] = await Promise.all([
-    resolvePinsHubAccess(supabase),
+  const [garments, productTypes, invoiceCompanies] = await Promise.all([
     supabase.from("garments").select("id", { count: "exact", head: true }),
     supabase.from("product_types").select("id", { count: "exact", head: true }),
     supabase.from("invoice_companies").select("id", { count: "exact", head: true }).eq("organisation_id", organisationId).eq("is_active", true),
@@ -61,7 +58,6 @@ export async function loadDataManagementSummary(): Promise<{
   }
 
   return {
-    access,
     garmentCount: garments.count ?? 0,
     productTypeCount: productTypes.count ?? 0,
     invoiceCompanyCount: invoiceCompanies.count ?? 0,
@@ -69,27 +65,21 @@ export async function loadDataManagementSummary(): Promise<{
 }
 
 export async function loadGarmentsData(): Promise<{
-  access: PinsHubAccessResult;
   garments: GarmentRecord[];
   productTypes: ProductTypeRecord[];
 }> {
   const supabase = await createClient();
-  const [access, garments, productTypes] = await Promise.all([
-    resolvePinsHubAccess(supabase),
+  const [garments, productTypes] = await Promise.all([
     getGarments(supabase),
     getProductTypes(supabase),
   ]);
-  return { access, garments, productTypes };
+  return { garments, productTypes };
 }
 
 export async function loadProductTypesData(): Promise<{
-  access: PinsHubAccessResult;
   productTypes: ProductTypeRecord[];
 }> {
   const supabase = await createClient();
-  const [access, productTypes] = await Promise.all([
-    resolvePinsHubAccess(supabase),
-    getProductTypes(supabase),
-  ]);
-  return { access, productTypes };
+  const productTypes = await getProductTypes(supabase);
+  return { productTypes };
 }

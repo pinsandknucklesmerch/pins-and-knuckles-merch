@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { hasAdminAccess, getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
+import type { Database, Json } from "@/types/database.types";
 import { revalidatePath } from "next/cache";
 import {
   cloneEpccReportTemplate,
@@ -12,13 +13,23 @@ import {
 function isEpccReportComponentId(value: unknown): value is EpccReportComponentId {
   return typeof value === "string" && DEFAULT_EPCC_REPORT_TEMPLATE.components.some((component) => component.id === value);
 }
-type TemplateQuery = {
-  select(columns: string): TemplateQuery;
-  eq(column: string, value: string): TemplateQuery;
-  maybeSingle(): Promise<{ data: { template: unknown } | null; error: unknown }>;
-  upsert(values: Record<string, unknown>, options: { onConflict: string }): Promise<{ error: unknown }>;
-};
-type UntypedSupabase = { from(table: string): TemplateQuery };
+type EpccReportTemplateInsert = Database["public"]["Tables"]["epcc_report_templates"]["Insert"];
+
+function serialiseEpccReportTemplate(template: EpccReportTemplate): Json {
+  return {
+    version: template.version,
+    components: template.components.map((component) => ({
+      id: component.id,
+      type: component.type,
+      page: component.page,
+      region: component.region,
+      enabled: component.enabled,
+      label: component.label,
+      ...(component.labels ? { labels: { ...component.labels } } : {}),
+      order: component.order,
+    })),
+  };
+}
 
 export function normalizeEpccReportTemplate(value: unknown): EpccReportTemplate {
   if (!value || typeof value !== "object") return cloneEpccReportTemplate();
@@ -54,7 +65,11 @@ export function normalizeEpccReportTemplate(value: unknown): EpccReportTemplate 
 export async function loadEpccReportTemplate(organisationId: string | null): Promise<EpccReportTemplate> {
   if (!organisationId) return cloneEpccReportTemplate();
   const supabase = await createClient();
-  const { data, error } = await (supabase as unknown as UntypedSupabase).from("epcc_report_templates").select("template").eq("organisation_id", organisationId).maybeSingle();
+  const { data, error } = await supabase
+    .from("epcc_report_templates")
+    .select("template")
+    .eq("organisation_id", organisationId)
+    .maybeSingle();
   if (error || !data) return cloneEpccReportTemplate();
   return normalizeEpccReportTemplate(data.template);
 }
@@ -63,8 +78,15 @@ export async function saveEpccReportTemplate(template: EpccReportTemplate): Prom
   const access = await getCurrentPinsHubAccess();
   if (!hasAdminAccess(access) || !access.membership?.organisation_id || !access.user?.id) return { ok: false, message: "Admin access required." };
   const normalized = normalizeEpccReportTemplate(template);
+  const payload: EpccReportTemplateInsert = {
+    organisation_id: access.membership.organisation_id,
+    template: serialiseEpccReportTemplate(normalized),
+    updated_by: access.user.id,
+  };
   const supabase = await createClient();
-  const { error } = await (supabase as unknown as UntypedSupabase).from("epcc_report_templates").upsert({ organisation_id: access.membership.organisation_id, template: normalized, updated_by: access.user.id }, { onConflict: "organisation_id" });
+  const { error } = await supabase
+    .from("epcc_report_templates")
+    .upsert(payload, { onConflict: "organisation_id" });
   if (error) return { ok: false, message: "Report template could not be saved." };
   revalidatePath("/hub/reporting/epcc");
   return { ok: true, message: "Report template saved." };

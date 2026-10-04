@@ -5,6 +5,7 @@ import { LoadingState } from "@/components/ui/LoadingState";
 import { CalculatorShell } from "@/features/calculators/components/CalculatorShell";
 import { EuCalculator } from "@/features/calculators/components/EuCalculator";
 import { loadEuCalculatorReferenceData } from "@/features/calculators/data/calculatorRepository";
+import { getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
 import { createClient } from "@/lib/supabase/server";
 
 export default function EuStandardCalculatorPage() {
@@ -16,6 +17,9 @@ export default function EuStandardCalculatorPage() {
 }
 
 async function EuStandardCalculatorPageContent() {
+  const access = await getCurrentPinsHubAccess();
+  if (!access.access) return <AppShell pinsHubAccess={access} wideContent><CalculatorShell title="EU Standard">{null}</CalculatorShell></AppShell>;
+
   const supabase = await createClient();
 
   try {
@@ -25,7 +29,7 @@ async function EuStandardCalculatorPageContent() {
     );
 
     return (
-      <AppShell wideContent>
+      <AppShell pinsHubAccess={access} wideContent>
         <CalculatorShell title="EU Standard">
           <EuCalculator referenceData={referenceData} />
         </CalculatorShell>
@@ -33,7 +37,7 @@ async function EuStandardCalculatorPageContent() {
     );
   } catch (error) {
     return (
-      <AppShell wideContent>
+      <AppShell pinsHubAccess={access} wideContent>
         <CalculatorShell title="EU Standard">
           <ErrorState
             title="Calculator unavailable"

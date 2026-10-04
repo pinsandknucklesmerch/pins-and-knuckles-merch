@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { resolvePinsHubAccess, type PinsHubAccessResult } from "@/lib/access/pinsHubAccess";
 import { createClient } from "@/lib/supabase/server";
 import { resolveCanonicalInvoiceOrganisation } from "@/features/commercial-invoices/data/invoiceDirectoryQueries";
 import { mapInvoiceCompanyRow } from "@/features/commercial-invoices/data/invoiceDirectoryMappers";
@@ -14,8 +13,8 @@ export async function getInvoiceCompanies(supabase: Client, organisationId: stri
   return (data ?? []).map(mapInvoiceCompanyRow);
 }
 
-export async function loadInvoiceCompaniesData(): Promise<{ access: PinsHubAccessResult; companies: InvoiceCompanyRecord[] }> {
+export async function loadInvoiceCompaniesData(): Promise<{ companies: InvoiceCompanyRecord[] }> {
   const supabase = await createClient();
-  const [access, organisationId] = await Promise.all([resolvePinsHubAccess(supabase), resolveCanonicalInvoiceOrganisation(supabase)]);
-  return { access, companies: await getInvoiceCompanies(supabase, organisationId) };
+  const organisationId = await resolveCanonicalInvoiceOrganisation(supabase);
+  return { companies: await getInvoiceCompanies(supabase, organisationId) };
 }

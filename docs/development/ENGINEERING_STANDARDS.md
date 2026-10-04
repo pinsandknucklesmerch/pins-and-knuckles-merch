@@ -1,42 +1,82 @@
 # Pins Hub Engineering Standards
 
-These are repository conventions. Read the [project context](../ai-context/PROJECT_CONTEXT.md) first for current architecture and source ownership.
+This document contains durable implementation principles. Root [`AGENTS.md`](../../AGENTS.md) owns repository working rules and verification workflow; [`PROJECT_CONTEXT.md`](../ai-context/PROJECT_CONTEXT.md) owns the changing implementation and operational snapshot. Current source, migrations, manifests, and configuration remain the technical authority.
 
 ## Architecture and ownership
 
-- Organise feature code under `src/features/<feature-name>/`; use `components/`, `data/`, `lib/`, `domain/`, `server/`, and `types.ts` only when they clarify ownership. Keep routes thin.
-- Put reusable cross-feature UI in `src/components/ui` and layout in `src/components/layout`. Keep feature-specific code local until genuine reuse justifies extraction.
-- Prefer server components for initial data loading. Use client components for interaction, browser APIs, and local form state. Put external clients and privileged operations in server-only modules.
-- Keep data access, mapping, validation, and domain rules outside presentation components. Avoid cross-feature imports and circular dependencies; depend on a focused shared layer when necessary.
+- Keep App Router route files thin. Route files should compose loading, authorization, and feature entry points rather than own business rules.
+- Organise feature behavior under `src/features/<feature-name>/`. Use internal `components`, `data`, `domain`, `lib`, `server`, or type modules when those boundaries clarify ownership; do not create folders mechanically.
+- Keep reusable UI in `src/components/ui`, shared layout in `src/components/layout`, and genuinely cross-feature infrastructure in focused shared modules.
+- Keep feature-specific behavior local until more than one consumer has a stable, meaningful contract. Avoid circular feature dependencies and convenience imports that blur ownership.
+- Follow the persistence, authentication, and integration architecture already established by the repository. New work should extend those systems rather than introduce a competing stack for a local problem.
 
-## Reuse
+## Server and client boundaries
 
-> Before creating a new component, hook, helper, domain function, formatter, validation rule, or UI pattern, search the existing repository for an equivalent. Reuse or extend the existing abstraction wherever practical. Introduce a new abstraction only when the existing one genuinely does not fit.
+- Prefer server components for initial data access and rendering. Use client components for interaction, browser APIs, and local UI state.
+- Keep privileged credentials, service-role clients, Admin API operations, integration clients, and trusted mutations in server-only modules.
+- Treat server actions and route handlers as request boundaries: authenticate, authorize, validate, call domain/data code, and return a deliberate result.
+- Do not make presentation components responsible for database access, integration calls, authorization decisions, or business calculations.
+- Pass the smallest serializable contract across the server/client boundary. Do not expose secrets, privileged records, or database implementation detail because it is convenient for the UI.
 
-Similar appearance alone is not a reason to duplicate a component. Conversely, do not turn a focused shared abstraction into a giant configuration surface prematurely.
+## TypeScript and data contracts
 
-## TypeScript and domain rules
+- Use strong, explicit types for domain values, validated inputs, persistence records, integration payloads, and view models where they make boundaries clearer.
+- Avoid unnecessary `any`, unsafe assertions, and casts used only to silence a mismatch. Narrow unknown values at the boundary that introduced them.
+- Handle nullable and optional data deliberately. Preserve the difference between absent, unknown, empty, and zero when the domain distinguishes them.
+- Generated database types are compile-time snapshots, not domain models or deployment proof. Map them to domain/view types when that prevents persistence concerns from leaking through the application.
+- Keep transformations explicit and one-directional where practical so source data, normalized data, derived values, and display values cannot be confused.
 
-- Use explicit domain, input, and view types where they make boundaries clear. Do not use unnecessary `any`.
-- Handle nullable data and errors deliberately. Validate and normalise at request, integration, and form boundaries.
-- Keep generated database types separate from domain/view models when mapping improves clarity or prevents database details leaking into UI.
-- Keep each calculation or business rule authoritative in one domain implementation. UI consumes results; it does not recreate formulas. Add focused automated tests for important rules and edge cases.
+## Domain rules and validation
 
-## Supabase and security
+- Give each calculation, mapping, permission interpretation, and business rule one authoritative implementation. UI, exports, reports, and integrations should consume that implementation rather than recreate it.
+- Keep source-owned values distinct from derived values. Do not overwrite one integration's fields from another source unless the domain contract explicitly defines that behavior.
+- Validate at every trust boundary: requests, forms, environment/configuration input, external APIs, imported files, and database-facing mutations.
+- Enforce critical invariants at the strongest appropriate layer. Database constraints and policies protect persisted integrity; server/domain validation provides clearer application errors; client validation improves interaction but is not a security boundary.
+- Prefer explicit state transitions over scattered boolean updates for workflows with lifecycle, ownership, or audit requirements.
 
-- `supabase/migrations/` is authoritative for schema changes. Add forward-only, versioned migrations; do not casually edit applied migrations.
-- RLS, grants, RPC checks, and server-side authorization are the security boundary. UI visibility is never authorization.
-- Use established SSR/browser/admin clients correctly. `SUPABASE_SERVICE_ROLE_KEY` and all integration credentials remain server-only; never use `NEXT_PUBLIC_` for secrets.
-- Regenerate `src/types/database.types.ts` when a schema change requires it. Treat destructive migrations and data actions as deliberate, reviewed operations with a recovery plan.
+## Supabase, authorization, and migrations
 
-## Verification
+- Represent schema changes as new forward-only, versioned migrations. Do not rewrite migration history that may have been applied.
+- Inspect the full migration history before changing a table, function, policy, grant, or constraint; its creation migration is rarely the whole current contract.
+- Preserve RLS, grants, RPC checks, and server-side authorization. Hiding a control or route in the browser never grants or revokes authority.
+- Use the established Supabase browser, SSR, and admin/service-role clients for their intended trust levels. Service-role keys and integration credentials must remain server-only and must never use public environment-variable exposure.
+- Design privileged RPCs narrowly: derive the actor from the authenticated context, use fixed search paths, validate scope and lifecycle, grant execution deliberately, and avoid accepting caller-supplied identity as authority.
+- Treat schema used by Pins Merch App as a shared contract. Assess compatibility of identity, access, organisation, Band, Tour, product, show, inventory, RLS, and RPC changes across both consumers.
+- Regenerate database types when a schema change requires compile-time coverage, while continuing to treat migrations and operational inspection as the authorities for schema intent and deployment state respectively.
+- Make destructive or irreversible data changes explicit, narrowly scoped, and recoverable where practical. Separate migration intent from assumptions about production data.
 
-Duncan runs the project's verification workflow separately after implementation. Codex/AI implementation work must not run routine verification automatically; Codex runs these commands only when Duncan explicitly requests them. The available commands are:
+## Integrations and external data
 
-```bash
-npm run lint
-npx tsc --noEmit
-npm run build
-```
+- Keep provider clients and provider-specific parsing in dedicated server-side modules behind domain-facing interfaces.
+- Validate external payloads and fail clearly when required identifiers, mappings, or configuration are missing. Do not guess board IDs, metric meanings, tax rules, ownership, or other business mappings.
+- Make retry, idempotency, deduplication, locking, provenance, and partial-failure behavior explicit for scheduled jobs and imports.
+- Sanitize operational diagnostics. Logs and persisted run history may contain useful context, but must not expose tokens, credentials, raw sensitive payloads, or unnecessary personal data.
+- Keep browser export and presentation formatting separate from canonical calculations and persisted source data.
 
-The repository has no deterministic full-suite command; focused tests may be run when explicitly requested.
+## Reuse and interface implementation
+
+- Search for an existing component, hook, helper, formatter, validator, domain function, data-access layer, or interaction pattern before creating another one.
+- Reuse or extend an existing abstraction when its contract fits. Do not fork a business rule or component for a cosmetic difference that the existing contract can express cleanly.
+- Avoid premature generalization. A focused local implementation is preferable to a shared abstraction with a large speculative configuration surface.
+- Keep shared components accessible, composable, and free of feature-specific business rules. Follow [`UI_STANDARDS.md`](UI_STANDARDS.md) and consult [`COMPONENT_CATALOG.md`](COMPONENT_CATALOG.md) for interface work.
+
+## Errors and observability
+
+- Return errors at the right abstraction level. Preserve actionable internal context for server diagnostics while showing users concise, safe messages.
+- Do not swallow failures or convert them into plausible empty data. Distinguish unavailable, unauthorized, invalid, and genuinely empty states.
+- Include enough structured context to diagnose integration and background-job failures without logging secrets or duplicating entire external payloads.
+- Keep expected business rejections separate from unexpected system failures so callers, run history, and monitoring can respond correctly.
+
+## Maintainability and change design
+
+- Prefer focused changes with clear ownership over broad refactors that mix unrelated concerns.
+- Use names that express domain meaning rather than current screen placement. Keep public module contracts small and implementation details private.
+- Remove duplication at the rule or contract level, not merely by combining unrelated code that happens to look similar.
+- Preserve established behavior outside the requested scope. Before removing code or schema, inspect call sites, data dependencies, scripts, policies, and operational usage.
+- Add focused automated coverage for important business rules, boundary validation, and regressions where the repository's testing patterns support it. Verification commands and when to run them are governed by root `AGENTS.md` and the current package manifest, not a fixed command inventory in this document.
+
+## Documentation boundaries
+
+- Document durable engineering principles here, current implementation state in `PROJECT_CONTEXT.md`, repository working procedure in `AGENTS.md`, and detailed domain behavior in focused reference documentation.
+- Do not copy route inventories, migration counts, dependency versions, rollout stages, or temporary implementation status into this file.
+- When documentation disagrees with confirmed current behavior, update the stale description; do not change working code merely to satisfy historical material.
