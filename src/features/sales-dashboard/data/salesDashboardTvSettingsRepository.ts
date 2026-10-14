@@ -5,7 +5,12 @@ import { defaultTvSettings, mapTvSettingsRows, sortTvSettings, validateTvSetting
 type TvSettingsClient = Pick<ReturnType<typeof createClient> extends Promise<infer Client> ? Client : never, "from">;
 
 export function normaliseTvSettingsRows(rows: Database["public"]["Tables"]["sales_dashboard_tv_settings"]["Row"][]): TvSlideSetting[] | null {
-  const mapped = mapTvSettingsRows(rows);
+  const existing = mapTvSettingsRows(rows);
+  // Preserve six-slide settings during the migration rollout window.
+  const mapped = existing.some((slide) => slide.slideKey === "sales_checklist") ? existing : [
+    ...existing,
+    { slideKey: "sales_checklist" as const, isEnabled: true, displayOrder: Math.max(-1, ...existing.map((slide) => slide.displayOrder)) + 1, durationSeconds: 30 },
+  ];
   return validateTvSettings(mapped) ? null : sortTvSettings(mapped);
 }
 

@@ -1015,49 +1015,330 @@ export type Database = {
           },
         ]
       }
-      quick_reference_records: {
+      merchbuddy_band_invitations: {
         Row: {
-          body: string
-          category: string
+          accepted_at: string | null
+          accepted_by: string | null
           created_at: string
-          display_order: number
+          customer_id: string
+          expires_at: string
           id: string
-          is_active: boolean
-          organisation_id: string
-          title: string
+          invited_by: string
+          invited_profile_id: string
+          metadata: Json
+          revoked_at: string | null
+          revoked_by: string | null
+          role: string
+          source: string
+          status: string
           updated_at: string
-          warning: string | null
         }
         Insert: {
-          body: string
-          category: string
+          accepted_at?: string | null
+          accepted_by?: string | null
           created_at?: string
-          display_order?: number
+          customer_id: string
+          expires_at: string
           id?: string
-          is_active?: boolean
-          organisation_id: string
-          title: string
+          invited_by: string
+          invited_profile_id: string
+          metadata?: Json
+          revoked_at?: string | null
+          revoked_by?: string | null
+          role: string
+          source?: string
+          status?: string
           updated_at?: string
-          warning?: string | null
         }
         Update: {
-          body?: string
-          category?: string
+          accepted_at?: string | null
+          accepted_by?: string | null
           created_at?: string
-          display_order?: number
+          customer_id?: string
+          expires_at?: string
           id?: string
-          is_active?: boolean
-          organisation_id?: string
-          title?: string
+          invited_by?: string
+          invited_profile_id?: string
+          metadata?: Json
+          revoked_at?: string | null
+          revoked_by?: string | null
+          role?: string
+          source?: string
+          status?: string
           updated_at?: string
-          warning?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "quick_reference_records_organisation_id_fkey"
+            foreignKeyName: "merchbuddy_band_invitations_accepted_by_fkey"
+            columns: ["accepted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_band_invitations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "merchbuddy_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_band_invitations_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_band_invitations_invited_profile_id_fkey"
+            columns: ["invited_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_band_invitations_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchbuddy_band_members: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          metadata: Json
+          profile_id: string
+          revoked_at: string | null
+          revoked_by: string | null
+          role: string
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          id?: string
+          metadata?: Json
+          profile_id: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          role: string
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          id?: string
+          metadata?: Json
+          profile_id?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          role?: string
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchbuddy_band_members_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_band_members_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "merchbuddy_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_band_members_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_band_members_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchbuddy_band_organisation_assignments: {
+        Row: {
+          band_organisation_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          metadata: Json
+          organisation_id: string
+          organisation_member_id: string
+          revoked_at: string | null
+          revoked_by: string | null
+          role: string
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          band_organisation_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          metadata?: Json
+          organisation_id: string
+          organisation_member_id: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          role: string
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          band_organisation_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          metadata?: Json
+          organisation_id?: string
+          organisation_member_id?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          role?: string
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchbuddy_band_org_assignments_member_org_fkey"
+            columns: ["organisation_member_id", "organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisation_members"
+            referencedColumns: ["id", "organisation_id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_band_org_assignments_relationship_org_fkey"
+            columns: ["band_organisation_id", "organisation_id"]
+            isOneToOne: false
+            referencedRelation: "merchbuddy_band_organisations"
+            referencedColumns: ["id", "organisation_id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_band_organisation_assignments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_band_organisation_assignments_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchbuddy_band_organisations: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          metadata: Json
+          organisation_id: string
+          requested_at: string
+          requested_by: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          metadata?: Json
+          organisation_id: string
+          requested_at?: string
+          requested_by?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          metadata?: Json
+          organisation_id?: string
+          requested_at?: string
+          requested_by?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchbuddy_band_organisations_accepted_by_fkey"
+            columns: ["accepted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_band_organisations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "merchbuddy_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_band_organisations_organisation_id_fkey"
             columns: ["organisation_id"]
             isOneToOne: false
             referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_band_organisations_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_band_organisations_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1158,7 +1439,7 @@ export type Database = {
           created_by: string
           id: string
           name: string
-          organisation_id: string
+          organisation_id: string | null
           status: string
           updated_at: string
         }
@@ -1167,7 +1448,7 @@ export type Database = {
           created_by: string
           id?: string
           name: string
-          organisation_id: string
+          organisation_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -1176,7 +1457,7 @@ export type Database = {
           created_by?: string
           id?: string
           name?: string
-          organisation_id?: string
+          organisation_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -1396,26 +1677,48 @@ export type Database = {
       merchbuddy_tour_users: {
         Row: {
           created_at: string
+          metadata: Json
           profile_id: string
+          revoked_at: string | null
+          revoked_by: string | null
           role: string
+          source: string
+          status: string
           tour_id: string
         }
         Insert: {
           created_at?: string
+          metadata?: Json
           profile_id: string
+          revoked_at?: string | null
+          revoked_by?: string | null
           role: string
+          source?: string
+          status?: string
           tour_id: string
         }
         Update: {
           created_at?: string
+          metadata?: Json
           profile_id?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
           role?: string
+          source?: string
+          status?: string
           tour_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "merchbuddy_tour_users_profile_id_fkey"
             columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchbuddy_tour_users_revoked_by_fkey"
+            columns: ["revoked_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -1438,7 +1741,7 @@ export type Database = {
           end_date: string | null
           id: string
           name: string
-          organisation_id: string
+          organisation_id: string | null
           start_date: string | null
           status: string
           updated_at: string
@@ -1451,7 +1754,7 @@ export type Database = {
           end_date?: string | null
           id?: string
           name: string
-          organisation_id: string
+          organisation_id?: string | null
           start_date?: string | null
           status?: string
           updated_at?: string
@@ -1464,7 +1767,7 @@ export type Database = {
           end_date?: string | null
           id?: string
           name?: string
-          organisation_id?: string
+          organisation_id?: string | null
           start_date?: string | null
           status?: string
           updated_at?: string
@@ -1478,11 +1781,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "merchbuddy_tours_customer_organisation_fkey"
-            columns: ["customer_id", "organisation_id"]
+            foreignKeyName: "merchbuddy_tours_customer_fkey"
+            columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "merchbuddy_customers"
-            referencedColumns: ["id", "organisation_id"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "merchbuddy_tours_organisation_fkey"
@@ -1633,6 +1936,338 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      quick_reference_records: {
+        Row: {
+          body: string
+          category: string
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          organisation_id: string
+          title: string
+          updated_at: string
+          warning: string | null
+        }
+        Insert: {
+          body: string
+          category: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          organisation_id: string
+          title: string
+          updated_at?: string
+          warning?: string | null
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          organisation_id?: string
+          title?: string
+          updated_at?: string
+          warning?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quick_reference_records_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_checklist_assignments: {
+        Row: {
+          display_name: string
+          display_order: number
+          id: string
+          is_active: boolean
+          monday_member_id: string | null
+          organisation_id: string
+          organisation_member_id: string | null
+          staff_key: string
+        }
+        Insert: {
+          display_name: string
+          display_order: number
+          id?: string
+          is_active?: boolean
+          monday_member_id?: string | null
+          organisation_id: string
+          organisation_member_id?: string | null
+          staff_key: string
+        }
+        Update: {
+          display_name?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          monday_member_id?: string | null
+          organisation_id?: string
+          organisation_member_id?: string | null
+          staff_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_checklist_assignments_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_checklist_assignments_organisation_member_id_fkey"
+            columns: ["organisation_member_id"]
+            isOneToOne: false
+            referencedRelation: "organisation_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_checklist_configurations: {
+        Row: {
+          duties: Json
+          effective_from: string
+          organisation_id: string
+          revision: string
+          staff: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          duties: Json
+          effective_from: string
+          organisation_id: string
+          revision?: string
+          staff: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          duties?: Json
+          effective_from?: string
+          organisation_id?: string
+          revision?: string
+          staff?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_checklist_configurations_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_checklist_duties: {
+        Row: {
+          display_order: number
+          id: string
+          is_active: boolean
+          name: string
+          organisation_id: string
+        }
+        Insert: {
+          display_order: number
+          id?: string
+          is_active?: boolean
+          name: string
+          organisation_id: string
+        }
+        Update: {
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          organisation_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_checklist_duties_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_checklist_entries: {
+        Row: {
+          id: string
+          organisation_id: string
+          status: string
+          updated_at: string
+          updated_by: string | null
+          week_duty_id: string
+          week_id: string
+          week_staff_id: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+          week_duty_id: string
+          week_id: string
+          week_staff_id: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+          week_duty_id?: string
+          week_id?: string
+          week_staff_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_checklist_entries_organisation_id_week_id_week_duty__fkey"
+            columns: ["organisation_id", "week_id", "week_duty_id"]
+            isOneToOne: false
+            referencedRelation: "sales_checklist_week_duties"
+            referencedColumns: ["organisation_id", "week_id", "id"]
+          },
+          {
+            foreignKeyName: "sales_checklist_entries_organisation_id_week_id_week_staff_fkey"
+            columns: ["organisation_id", "week_id", "week_staff_id"]
+            isOneToOne: false
+            referencedRelation: "sales_checklist_week_staff"
+            referencedColumns: ["organisation_id", "week_id", "id"]
+          },
+        ]
+      }
+      sales_checklist_week_duties: {
+        Row: {
+          display_order: number
+          duty_id: string
+          id: string
+          name: string
+          organisation_id: string
+          week_id: string
+        }
+        Insert: {
+          display_order: number
+          duty_id: string
+          id?: string
+          name: string
+          organisation_id: string
+          week_id: string
+        }
+        Update: {
+          display_order?: number
+          duty_id?: string
+          id?: string
+          name?: string
+          organisation_id?: string
+          week_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_checklist_week_duties_organisation_id_duty_id_fkey"
+            columns: ["organisation_id", "duty_id"]
+            isOneToOne: false
+            referencedRelation: "sales_checklist_duties"
+            referencedColumns: ["organisation_id", "id"]
+          },
+          {
+            foreignKeyName: "sales_checklist_week_duties_organisation_id_week_id_fkey"
+            columns: ["organisation_id", "week_id"]
+            isOneToOne: false
+            referencedRelation: "sales_checklist_weeks"
+            referencedColumns: ["organisation_id", "id"]
+          },
+        ]
+      }
+      sales_checklist_week_staff: {
+        Row: {
+          assignment_id: string
+          display_name: string
+          display_order: number
+          id: string
+          organisation_id: string
+          organisation_member_id: string
+          user_id: string
+          week_id: string
+        }
+        Insert: {
+          assignment_id: string
+          display_name: string
+          display_order: number
+          id?: string
+          organisation_id: string
+          organisation_member_id: string
+          user_id: string
+          week_id: string
+        }
+        Update: {
+          assignment_id?: string
+          display_name?: string
+          display_order?: number
+          id?: string
+          organisation_id?: string
+          organisation_member_id?: string
+          user_id?: string
+          week_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_checklist_week_staff_organisation_id_assignment_id_fkey"
+            columns: ["organisation_id", "assignment_id"]
+            isOneToOne: false
+            referencedRelation: "sales_checklist_assignments"
+            referencedColumns: ["organisation_id", "id"]
+          },
+          {
+            foreignKeyName: "sales_checklist_week_staff_organisation_id_week_id_fkey"
+            columns: ["organisation_id", "week_id"]
+            isOneToOne: false
+            referencedRelation: "sales_checklist_weeks"
+            referencedColumns: ["organisation_id", "id"]
+          },
+        ]
+      }
+      sales_checklist_weeks: {
+        Row: {
+          ends_at: string
+          id: string
+          organisation_id: string
+          starts_at: string
+        }
+        Insert: {
+          ends_at: string
+          id?: string
+          organisation_id: string
+          starts_at: string
+        }
+        Update: {
+          ends_at?: string
+          id?: string
+          organisation_id?: string
+          starts_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_checklist_weeks_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sales_dashboard_tv_settings: {
         Row: {
@@ -1860,8 +2495,8 @@ export type Database = {
           orders_processed: number | null
           organisation_id: string | null
           quotes_done: number | null
-          sales_inbox_enquiries: number | null
           sales_inbox_decided_enquiries: number | null
+          sales_inbox_enquiries: number | null
           updated_at: string
           updated_by: string | null
           year: number
@@ -1879,8 +2514,8 @@ export type Database = {
           orders_processed?: number | null
           organisation_id?: string | null
           quotes_done?: number | null
-          sales_inbox_enquiries?: number | null
           sales_inbox_decided_enquiries?: number | null
+          sales_inbox_enquiries?: number | null
           updated_at?: string
           updated_by?: string | null
           year: number
@@ -1898,8 +2533,8 @@ export type Database = {
           orders_processed?: number | null
           organisation_id?: string | null
           quotes_done?: number | null
-          sales_inbox_enquiries?: number | null
           sales_inbox_decided_enquiries?: number | null
+          sales_inbox_enquiries?: number | null
           updated_at?: string
           updated_by?: string | null
           year?: number
@@ -2239,12 +2874,112 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_merchbuddy_band_invitation: {
+        Args: { p_invitation_id: string }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          metadata: Json
+          profile_id: string
+          revoked_at: string | null
+          revoked_by: string | null
+          role: string
+          source: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_band_members"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      accept_merchbuddy_band_organisation_attachment: {
+        Args: { p_band_organisation_id: string }
+        Returns: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          metadata: Json
+          organisation_id: string
+          requested_at: string
+          requested_by: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          source: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_band_organisations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      assign_merchbuddy_band_organisation_member: {
+        Args: {
+          p_band_organisation_id: string
+          p_organisation_member_id: string
+          p_role: string
+        }
+        Returns: {
+          band_organisation_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          metadata: Json
+          organisation_id: string
+          organisation_member_id: string
+          revoked_at: string | null
+          revoked_by: string | null
+          role: string
+          source: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_band_organisation_assignments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      can_access_merchbuddy_band: {
+        Args: { target_customer_id: string }
+        Returns: boolean
+      }
       can_access_merchbuddy_customer: {
         Args: { target_customer_id: string }
         Returns: boolean
       }
       can_access_merchbuddy_tour: {
         Args: { target_tour_id: string }
+        Returns: boolean
+      }
+      can_admin_sales_checklist: {
+        Args: { p_organisation_id: string }
+        Returns: boolean
+      }
+      can_administer_merchbuddy_band: {
+        Args: { target_customer_id: string }
+        Returns: boolean
+      }
+      can_edit_sales_checklist_entry: {
+        Args: {
+          p_organisation_id: string
+          p_staff_id: string
+          p_week_id: string
+        }
+        Returns: boolean
+      }
+      can_manage_merchbuddy_band: {
+        Args: { target_customer_id: string }
         Returns: boolean
       }
       can_manage_merchbuddy_tour: {
@@ -2254,6 +2989,163 @@ export type Database = {
       can_manage_merchbuddy_tour_definition: {
         Args: { target_tour_id: string }
         Returns: boolean
+      }
+      can_operate_merchbuddy_band: {
+        Args: { target_customer_id: string }
+        Returns: boolean
+      }
+      can_operate_merchbuddy_tour: {
+        Args: { target_tour_id: string }
+        Returns: boolean
+      }
+      change_merchbuddy_band_member_role: {
+        Args: { p_customer_id: string; p_profile_id: string; p_role: string }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          metadata: Json
+          profile_id: string
+          revoked_at: string | null
+          revoked_by: string | null
+          role: string
+          source: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_band_members"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      change_merchbuddy_band_organisation_assignment_role: {
+        Args: {
+          p_band_organisation_id: string
+          p_organisation_member_id: string
+          p_role: string
+        }
+        Returns: {
+          band_organisation_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          metadata: Json
+          organisation_id: string
+          organisation_member_id: string
+          revoked_at: string | null
+          revoked_by: string | null
+          role: string
+          source: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_band_organisation_assignments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_merchbuddy_organisation_band: {
+        Args: { p_name: string; p_organisation_id: string }
+        Returns: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          organisation_id: string | null
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_customers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_merchbuddy_product_with_variants: {
+        Args: {
+          p_name: string
+          p_sale_price: number
+          p_tour_id: string
+          p_variants: Json
+        }
+        Returns: {
+          product: Json
+          variants: Json
+        }[]
+      }
+      create_merchbuddy_standalone_band: {
+        Args: { p_name: string }
+        Returns: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          organisation_id: string | null
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_customers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      deactivate_merchbuddy_band: {
+        Args: { p_customer_id: string }
+        Returns: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          organisation_id: string | null
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_customers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      ensure_sales_checklist_week: {
+        Args: { p_organisation_id: string }
+        Returns: string
+      }
+      get_accessible_merchbuddy_bands: {
+        Args: never
+        Returns: {
+          customer_id: string
+          effective_band_role: string
+          has_direct_access: boolean
+          has_legacy_tour_access: boolean
+          has_organisation_access: boolean
+          is_tour_limited: boolean
+          legacy_tour_ids: string[]
+          name: string
+          status: string
+        }[]
+      }
+      get_assignable_merchbuddy_band_organisation_members: {
+        Args: { p_band_organisation_id: string }
+        Returns: {
+          email: string
+          entitlement_ceiling: string
+          full_name: string
+          organisation_member_id: string
+          profile_id: string
+        }[]
+      }
+      get_merchbuddy_band_role: {
+        Args: { target_customer_id: string }
+        Returns: string
       }
       has_merchbuddy_access: {
         Args: { required_access_level?: string }
@@ -2318,6 +3210,32 @@ export type Database = {
         }
         Returns: string
       }
+      invite_merchbuddy_band_member: {
+        Args: { p_customer_id: string; p_profile_id: string; p_role: string }
+        Returns: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          customer_id: string
+          expires_at: string
+          id: string
+          invited_by: string
+          invited_profile_id: string
+          metadata: Json
+          revoked_at: string | null
+          revoked_by: string | null
+          role: string
+          source: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_band_invitations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       is_canonical_pins_knuckles_organisation: {
         Args: { target_organisation_id: string }
         Returns: boolean
@@ -2329,6 +3247,55 @@ export type Database = {
       is_own_organisation_membership: {
         Args: { target_member_id: string }
         Returns: boolean
+      }
+      merchbuddy_band_access_summary: {
+        Args: { target_customer_id?: string }
+        Returns: {
+          customer_id: string
+          effective_band_role: string
+          has_direct_access: boolean
+          has_organisation_access: boolean
+        }[]
+      }
+      merchbuddy_legacy_tour_access: {
+        Args: { target_customer_id?: string }
+        Returns: {
+          customer_id: string
+          legacy_tour_role: string
+          tour_id: string
+        }[]
+      }
+      merchbuddy_organisation_assignment_ceiling: {
+        Args: { p_organisation_id: string; p_organisation_member_id: string }
+        Returns: number
+      }
+      merchbuddy_tour_access_context: {
+        Args: { target_tour_id: string }
+        Returns: {
+          band_status: string
+          customer_id: string
+          effective_band_role: string
+          legacy_tour_role: string
+          tour_id: string
+        }[]
+      }
+      reactivate_merchbuddy_band: {
+        Args: { p_customer_id: string }
+        Returns: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          organisation_id: string | null
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_customers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       read_epcc_profit_ingestion_audit: {
         Args: { p_month: number; p_source_hash?: string; p_year: number }
@@ -2344,6 +3311,14 @@ export type Database = {
           source_hash_present: boolean
         }[]
       }
+      read_sales_checklist: {
+        Args: { p_organisation_id: string; p_week_id?: string }
+        Returns: Json
+      }
+      read_sales_checklist_management: {
+        Args: { p_organisation_id: string }
+        Returns: Json
+      }
       release_monday_sales_sync_lock: {
         Args: {
           p_lock_token: string
@@ -2353,8 +3328,176 @@ export type Database = {
         }
         Returns: undefined
       }
+      relinquish_merchbuddy_band_organisation: {
+        Args: { p_band_organisation_id: string }
+        Returns: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          metadata: Json
+          organisation_id: string
+          requested_at: string
+          requested_by: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          source: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_band_organisations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      remove_merchbuddy_band_organisation: {
+        Args: { p_band_organisation_id: string }
+        Returns: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          metadata: Json
+          organisation_id: string
+          requested_at: string
+          requested_by: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          source: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_band_organisations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      request_merchbuddy_band_organisation_attachment: {
+        Args: { p_customer_id: string; p_organisation_id: string }
+        Returns: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          metadata: Json
+          organisation_id: string
+          requested_at: string
+          requested_by: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          source: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_band_organisations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       reset_sales_dashboard_tv_settings: {
         Args: { p_organisation_id: string }
+        Returns: undefined
+      }
+      revoke_merchbuddy_band_member: {
+        Args: { p_customer_id: string; p_profile_id: string }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          metadata: Json
+          profile_id: string
+          revoked_at: string | null
+          revoked_by: string | null
+          role: string
+          source: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_band_members"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      revoke_merchbuddy_band_organisation_assignment: {
+        Args: {
+          p_band_organisation_id: string
+          p_organisation_member_id: string
+        }
+        Returns: {
+          band_organisation_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          metadata: Json
+          organisation_id: string
+          organisation_member_id: string
+          revoked_at: string | null
+          revoked_by: string | null
+          role: string
+          source: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_band_organisation_assignments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      revoke_merchbuddy_legacy_tour_user: {
+        Args: { p_profile_id: string; p_tour_id: string }
+        Returns: {
+          created_at: string
+          metadata: Json
+          profile_id: string
+          revoked_at: string | null
+          revoked_by: string | null
+          role: string
+          source: string
+          status: string
+          tour_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_tour_users"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      rollover_sales_checklists: { Args: never; Returns: number }
+      sales_checklist_week_start: { Args: never; Returns: string }
+      save_sales_checklist_management: {
+        Args: {
+          p_duties: Json
+          p_expected_effective_from: string
+          // SQL accepts null when no configuration exists; the generator omits RPC argument nullability.
+          p_expected_revision: string | null
+          p_organisation_id: string
+          p_staff: Json
+        }
+        Returns: undefined
+      }
+      save_sales_checklist_management_configuration: {
+        Args: {
+          p_duties: Json
+          // SQL accepts null when no configuration exists; the generator omits RPC argument nullability.
+          p_expected_revision: string | null
+          p_organisation_id: string
+          p_staff: Json
+        }
         Returns: undefined
       }
       save_sales_dashboard_tv_settings: {
@@ -2370,6 +3513,33 @@ export type Database = {
           p_user_agent: string
         }
         Returns: string
+      }
+      transfer_merchbuddy_band_ownership: {
+        Args: {
+          p_customer_id: string
+          p_demote_caller?: boolean
+          p_target_profile_id: string
+        }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          metadata: Json
+          profile_id: string
+          revoked_at: string | null
+          revoked_by: string | null
+          role: string
+          source: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchbuddy_band_members"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       try_acquire_monday_sales_sync_lock: {
         Args: {
@@ -2387,6 +3557,14 @@ export type Database = {
       update_hub_feedback_report: {
         Args: { p_developer_notes: string; p_id: string; p_status: string }
         Returns: undefined
+      }
+      update_sales_checklist_status: {
+        Args: {
+          p_entry_id: string
+          p_organisation_id: string
+          p_status: string
+        }
+        Returns: boolean
       }
     }
     Enums: {
@@ -2406,12 +3584,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2435,11 +3613,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2460,11 +3638,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2485,11 +3663,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2502,11 +3680,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

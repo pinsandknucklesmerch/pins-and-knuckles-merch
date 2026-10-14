@@ -16,3 +16,7 @@ This is a short routing aid, not a replacement for source inspection.
 | `MagicBento` | `src/components/ui/MagicBento.tsx` | Restrained interactive/navigation or KPI cards only; not forms, tables, dialogs, state surfaces, or dense breakdowns. |
 | `LoadingState`, `EmptyState`, `ErrorState` | `src/components/ui/*State.tsx` | Standard loading, empty, and error states for data surfaces. |
 | Sortable table header | `src/features/data-management/components/GarmentsManager.tsx` | Existing accessibility pattern (`aria-sort`, icon, screen-reader state); extract only when a real shared need is approved. |
+
+
+- `Checkbox` (`src/components/ui/Checkbox.tsx`): native checkbox semantics with the Hub focus ring and shape. Controlled checked state, labels and editability are supplied by the feature. Disabled state does not dim the represented status.
+- `ActionButton` accepts accessible button labels, descriptions and pressed state. Status-cycle buttons use a label announcing the current status and next action rather than a boolean pressed state; retain shared focus/keyboard behavior.

@@ -23,6 +23,7 @@ import { SalesDashboardStaleWarning } from "./SalesDashboardStaleWarning";
 import { buildTvModeUrl, DEFAULT_TV_DURATION_SECONDS } from "../lib/tvMode";
 import type { SalesDashboardStaleWarning as StaleWarning } from "../lib/cronRunStatus";
 import styles from "./SalesDashboard.module.css";
+import type { TvSettings } from "../lib/tvSettings";
 
 
 const DASHBOARD_TABS = [
@@ -33,7 +34,7 @@ const DASHBOARD_TABS = [
   { value: "team-members", label: "Team Members" },
 ];
 
-export function SalesDashboard({ data, year, month, isAdmin, initialDashboardView, staleWarnings = [], tvMode = false, tvDurationSeconds = DEFAULT_TV_DURATION_SECONDS }: { data: SalesDashboardData; year: number; month: number; isAdmin: boolean; initialDashboardView: DashboardView; staleWarnings?: StaleWarning[]; tvMode?: boolean; tvDurationSeconds?: number }) {
+export function SalesDashboard({ data, year, month, isAdmin, initialDashboardView, staleWarnings = [], tvMode = false, tvDurationSeconds = DEFAULT_TV_DURATION_SECONDS, tvSettings }: { data: SalesDashboardData; year: number; month: number; isAdmin: boolean; initialDashboardView: DashboardView; staleWarnings?: StaleWarning[]; tvMode?: boolean; tvDurationSeconds?: number; tvSettings?: TvSettings }) {
   const router = useRouter();
   const [activeDashboardView, setActiveDashboardView] = useState<DashboardView>(initialDashboardView);
   const companyMetrics = useMemo(() => calculateCompanyMetrics(data.company, data.previousCompany, data.targets), [data.company, data.previousCompany, data.targets]);
@@ -51,7 +52,7 @@ export function SalesDashboard({ data, year, month, isAdmin, initialDashboardVie
     router.push(buildTvModeUrl({ year, month, durationSeconds: tvDurationSeconds }));
   }, [month, router, tvDurationSeconds, year]);
 
-  if (tvMode) return <MetricDashboardProvider><SalesDashboardTvView data={data} year={year} month={month} companyMetrics={companyMetrics} monthlyProfitMetric={monthlyProfitMetric} durationSeconds={tvDurationSeconds} /></MetricDashboardProvider>;
+  if (tvMode) return <MetricDashboardProvider><SalesDashboardTvView data={data} year={year} month={month} companyMetrics={companyMetrics} monthlyProfitMetric={monthlyProfitMetric} durationSeconds={tvDurationSeconds} settings={tvSettings} /></MetricDashboardProvider>;
 
   const isOverviewView = activeDashboardView === "overview";
   const isYtdView = activeDashboardView === "ytd";

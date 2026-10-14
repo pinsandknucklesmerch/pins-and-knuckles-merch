@@ -4,6 +4,9 @@ import { cn } from "@/lib/utils";
 type ActionButtonBaseProps = {
   children: React.ReactNode;
   className?: string;
+  "aria-label"?: string;
+  "aria-pressed"?: boolean;
+  "aria-describedby"?: string;
 };
 
 export type ActionButtonProps =
@@ -27,6 +30,9 @@ export function ActionButton({
   onClick,
   type = "button",
   disabled = false,
+  "aria-label": ariaLabel,
+  "aria-pressed": ariaPressed,
+  "aria-describedby": ariaDescribedBy,
 }: ActionButtonProps) {
   const classes = cn(
     "inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -48,7 +54,7 @@ export function ActionButton({
   }
 
   return (
-    <button type={type} className={classes} onClick={onClick} disabled={disabled}>
+    <button type={type} className={classes} onClick={onClick} disabled={disabled} aria-label={ariaLabel} aria-pressed={ariaPressed} aria-describedby={ariaDescribedBy}>
       {children}
     </button>
   );

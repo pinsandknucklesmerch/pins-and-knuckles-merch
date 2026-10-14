@@ -45,6 +45,20 @@ Monday and EPCC data have distinct source ownership in the ingestion code. A ret
 
 Detailed behavior: [`docs/reference/SALES_DASHBOARD.md`](../reference/SALES_DASHBOARD.md).
 
+### Sales Weekly Checklist (source added 2026-10-13)
+
+`/hub/sales-checklist` provides persisted Monday 09:00 Africa/Johannesburg periods,
+immutable duty/staff snapshots, per-user current-week status editing and shared scores.
+Admin/developer management at `/hub/sales-checklist/manage` selects actual organisation
+users and schedules duty/team changes for future weeks. Effective-dated configuration
+supports safe rollover after a missed cron. Initial setup can establish the first week.
+Sales Dashboard TV Mode includes a read-only checklist slide with periodic refresh and
+uses validated persisted rotation settings. The additive October migrations must be
+applied in order; remote application, staff links and cron deployment are unconfirmed.
+Batch 3 gates TV rotation until all checklist pages are shown, rejects stale management
+effective weeks, and aligns TV settings RPC/RLS with the existing active-owner override.
+Details: [Sales Weekly Checklist](../reference/SALES_WEEKLY_CHECKLIST.md).
+
 ### Reporting and EPCC reports
 
 Reporting is separated from the operational dashboard:

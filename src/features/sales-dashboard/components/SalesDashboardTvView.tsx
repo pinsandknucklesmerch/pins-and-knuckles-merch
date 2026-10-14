@@ -9,7 +9,8 @@ import { DASHBOARD_MONTHS } from "../types";
 import type { MetricResult, SalesDashboardData } from "../domain/types";
 import type { TvSlide } from "../lib/tvMode";
 import { buildNormalModeUrl, nextTvView, previousTvView, tvDurationMilliseconds, TV_DATA_REFRESH_INTERVAL_MS } from "../lib/tvMode";
-import { safeTvSettings } from "../lib/tvSettings";
+import { safeTvSettings, type TvSettings } from "../lib/tvSettings";
+import { SalesChecklistTvSlide } from "@/features/sales-checklist/components/SalesChecklistTvSlide";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProfitShirtKpi } from "./ProfitShirtKpi";
 import { SalesInboxKpi } from "./SalesInboxKpi";
@@ -27,6 +28,7 @@ const VIEW_LABELS: Record<TvSlide, string> = {
   snuggle: "Snuggle",
   team_members: "Team Members",
   "live-zoo-cam": "Live Zoo Cam",
+  sales_checklist: "Sales Weekly Checklist",
 };
 
 type SalesDashboardTvViewProps = {
@@ -36,6 +38,7 @@ type SalesDashboardTvViewProps = {
   companyMetrics: MetricResult[];
   monthlyProfitMetric: MetricResult;
   durationSeconds: number;
+  settings?: TvSettings;
 };
 
 function metricByCode(metrics: MetricResult[], code: MetricResult["code"]) {
@@ -44,13 +47,15 @@ function metricByCode(metrics: MetricResult[], code: MetricResult["code"]) {
   return metric;
 }
 
-export function SalesDashboardTvView({ data, year, month, companyMetrics, monthlyProfitMetric, durationSeconds }: SalesDashboardTvViewProps) {
+export function SalesDashboardTvView({ data, year, month, companyMetrics, monthlyProfitMetric, durationSeconds, settings }: SalesDashboardTvViewProps) {
   const router = useRouter();
-  const rotation = useMemo(() => safeTvSettings().slides.filter((slide) => slide.isEnabled), []);
+  const rotation = useMemo(() => (settings ?? safeTvSettings()).slides.filter((slide) => slide.isEnabled), [settings]);
   const rotationKeys = useMemo(() => rotation.map((slide) => slide.slideKey), [rotation]);
   const [activeView, setActiveView] = useState<TvSlide>(rotation[0]?.slideKey ?? "overview");
   const [cycleKey, setCycleKey] = useState(0);
   const [progressKey, setProgressKey] = useState(0);
+  const [checklistPlaybackComplete, setChecklistPlaybackComplete] = useState(false);
+  const [checklistDurationElapsed, setChecklistDurationElapsed] = useState(false);
   const [manualPaused, setManualPaused] = useState(false);
   const [pointerOver, setPointerOver] = useState(false);
   const [focusWithin, setFocusWithin] = useState(false);
@@ -68,6 +73,8 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
     if (!rotationKeys.includes(nextView)) return;
     if (nextView === activeView) return;
     setActiveView(nextView);
+    setChecklistPlaybackComplete(false);
+    setChecklistDurationElapsed(false);
     setCycleKey((current) => current + 1);
     setProgressKey((current) => current + 1);
   }, [activeView, rotationKeys]);
@@ -80,10 +87,25 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
   }, [activeView, changeView, rotationKeys]);
 
   useEffect(() => {
+    setChecklistDurationElapsed(false);
     if (paused) return;
-    const timeout = window.setTimeout(moveNext, durationMs);
+    const timeout = window.setTimeout(() => {
+      if (activeView === "sales_checklist") setChecklistDurationElapsed(true);
+      else moveNext();
+    }, durationMs);
     return () => window.clearTimeout(timeout);
-  }, [activeView, durationMs, moveNext, paused]);
+  }, [activeView, cycleKey, durationMs, moveNext, paused]);
+
+  useEffect(() => {
+    if (activeView !== "sales_checklist" || paused || !checklistDurationElapsed || !checklistPlaybackComplete) return;
+    if (rotationKeys.length === 1) {
+      // A checklist-only rotation must keep paging, rather than staying on the last page forever.
+      setChecklistPlaybackComplete(false);
+      setChecklistDurationElapsed(false);
+      setCycleKey((current) => current + 1);
+      setProgressKey((current) => current + 1);
+    } else moveNext();
+  }, [activeView, checklistDurationElapsed, checklistPlaybackComplete, moveNext, paused, rotationKeys.length]);
 
   useEffect(() => {
     if (previousPausedRef.current && !paused) setProgressKey((current) => current + 1);
@@ -99,8 +121,8 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
 
   useEffect(() => {
     if (documentHidden) return;
-    const refreshTimer = window.setTimeout(() => router.refresh(), TV_DATA_REFRESH_INTERVAL_MS);
-    return () => window.clearTimeout(refreshTimer);
+    const refreshTimer = window.setInterval(() => router.refresh(), TV_DATA_REFRESH_INTERVAL_MS);
+    return () => window.clearInterval(refreshTimer);
   }, [documentHidden, router]);
 
   useEffect(() => {
@@ -159,8 +181,9 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
     if (activeView === "year_comparison") return <YearComparisonChart comparison={data.yearComparison} showControls={false} tvMode />;
     if (activeView === "team_members") return <TeamMembersTab data={data} year={year} month={month} tvMode />;
     if (activeView === "live-zoo-cam") return <LiveZooCamSlide />;
+    if (activeView === "sales_checklist") return <SalesChecklistTvSlide durationSeconds={durationMs / 1_000} paused={paused} onPlaybackComplete={setChecklistPlaybackComplete} />;
     return <EmptyState title="No dashboard view" />;
-  }, [activeView, companyMetrics, cycleKey, data, month, monthLabel, monthlyProfitMetric, year]);
+  }, [activeView, companyMetrics, cycleKey, data, durationMs, month, monthLabel, monthlyProfitMetric, paused, year]);
 
   return (
     <div
@@ -179,7 +202,7 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
         <div className={styles.headerMeta}>
           <span className={styles.eyebrow}>Sales Dashboard · TV</span>
           <strong className={styles.title}>{viewLabel}</strong>
-          <span className={styles.date}>{monthLabel} {year}</span>
+          <span className={styles.date}>{activeView === "sales_checklist" ? "Current weekly period" : `${monthLabel} ${year}`}</span>
         </div>
       </header>
 
@@ -192,7 +215,7 @@ export function SalesDashboardTvView({ data, year, month, companyMetrics, monthl
       <footer className={styles.footer}>
         <div className={styles.progressTrack} aria-hidden="true"><div key={progressKey} className={styles.progressFill} style={{ "--tv-duration": `${durationMs}ms` } as CSSProperties} /></div>
         <div className={styles.controls}>
-          <span className={styles.viewName}>{viewLabel} · {paused ? "Paused" : "Rotating"}</span>
+          <span className={styles.viewName}>{viewLabel} · {paused ? "Paused" : activeView === "sales_checklist" && checklistDurationElapsed && !checklistPlaybackComplete ? "Showing remaining pages" : "Rotating"}</span>
           <div className={styles.toolbar}>
             <div className={styles.buttonGroup}>
             <button className={styles.controlButton} type="button" onClick={movePrevious} aria-label="Previous TV view"><ChevronLeft size={14} aria-hidden="true" />Previous</button>

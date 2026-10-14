@@ -1,5 +1,6 @@
 "use client";
 import { useActionState, useEffect, useRef, useState } from "react";
+import { emailDisplayName as sharedEmailDisplayName } from "../lib/displayName";
 import { inviteMember } from "../actions/inviteMember";
 import { initialInviteActionState, allOrganisationRoles } from "../types";
 import { pinsHubAccessLabels, pinsHubAccessLevels } from "@/lib/access/pinsHubRoles";
@@ -8,7 +9,8 @@ import { feedback } from "@/components/ui/feedback";
 import { Select } from "@/components/ui/Select";
 import { nativeControlClassName } from "@/components/ui/styles";
 
-export function emailDisplayName(email: string) { return email.split("@", 1)[0].replace(/[._-]+/g, " ").trim().replace(/\s+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()); }
+export function emailDisplayName(email: string) { return sharedEmailDisplayName(email); }
+
 export function AddUserForm() {
   const [state, action, pending] = useActionState(inviteMember, initialInviteActionState); const [name, setName] = useState(""); const [nameTouched, setNameTouched] = useState(false); const formRef = useRef<HTMLFormElement>(null);
   useEffect(() => { if (state.status === "success" && state.message) feedback.success(state.message); if (state.status === "error" && state.message) feedback.error(state.message); }, [state]);

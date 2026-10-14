@@ -7,6 +7,7 @@ import {
   Landmark,
   Database,
   BookOpen,
+  ListChecks,
   UserRound,
   Wrench,
   type LucideIcon,
@@ -21,6 +22,7 @@ export type HubFeatureNavigationItem = {
 
 export const hubFeatureNavigation: HubFeatureNavigationItem[] = [
   { href: "/hub/sales-dashboard", label: "Sales Dashboard", icon: ChartNoAxesColumnIncreasing },
+  { href: "/hub/sales-checklist", label: "Sales Checklist", icon: ListChecks },
   {
     href: "/hub/reporting", label: "Reporting", icon: FileChartColumn,
     children: [

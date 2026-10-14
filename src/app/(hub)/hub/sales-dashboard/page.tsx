@@ -8,6 +8,7 @@ import { loadSalesDashboardStaleWarnings } from "@/features/sales-dashboard/data
 import { parseDashboardPeriod } from "@/features/sales-dashboard/lib/dashboardPeriod";
 import { parseDashboardView } from "@/features/sales-dashboard/lib/dashboardView";
 import { isTvMode, parseTvDuration } from "@/features/sales-dashboard/lib/tvMode";
+import { loadSalesDashboardTvSettings } from "@/features/sales-dashboard/data/salesDashboardTvSettingsRepository";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 function first(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
@@ -27,6 +28,6 @@ async function SalesDashboardPageContent({ searchParams }: Props) {
   const tvDurationSeconds = parseTvDuration(params.duration);
   const isAdmin = hasAdminAccess(access);
   const organisationId = access.membership?.organisation_id ?? null;
-  const [data, staleWarnings] = await Promise.all([loadSalesDashboard(year, month, organisationId), isAdmin ? loadSalesDashboardStaleWarnings(organisationId, year, month, now) : Promise.resolve([])]);
-  return <AppShell pinsHubAccess={access} tvMode={tvMode} wideContent><SalesDashboard data={data} year={year} month={month} isAdmin={isAdmin} initialDashboardView={dashboardView} staleWarnings={staleWarnings} tvMode={tvMode} tvDurationSeconds={tvDurationSeconds} /></AppShell>;
+  const [data, staleWarnings, tvSettings] = await Promise.all([loadSalesDashboard(year, month, organisationId), isAdmin ? loadSalesDashboardStaleWarnings(organisationId, year, month, now) : Promise.resolve([]), tvMode ? loadSalesDashboardTvSettings(organisationId) : Promise.resolve(undefined)]);
+  return <AppShell pinsHubAccess={access} tvMode={tvMode} wideContent><SalesDashboard data={data} year={year} month={month} isAdmin={isAdmin} initialDashboardView={dashboardView} staleWarnings={staleWarnings} tvMode={tvMode} tvDurationSeconds={tvDurationSeconds} tvSettings={tvSettings} /></AppShell>;
 }

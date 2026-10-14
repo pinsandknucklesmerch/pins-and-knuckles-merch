@@ -32,7 +32,12 @@ The active export renders a fixed-width off-screen React subtree (`ProfitPdfRepo
 
 ## TV and access
 
-TV mode is dashboard query state. Administrators configure six persisted slides—Overview, YTD, Year Comparison, Snuggle, Live Zoo Cam, and Team Members—at `/hub/sales-dashboard/tv/settings`, with enabled state, order, and 10–300 second durations.
+Active organisation owners with Hub access use the same TV settings override as the
+Hub UI, including owners with stored read/write app access. Non-owner users still need
+admin/developer access. Checklist automatic rotation waits for a complete page pass;
+large checklists extend playback as needed, while manual controls remain available.
+
+TV mode is dashboard query state. Administrators configure seven persisted slides—Overview, YTD, Year Comparison, Snuggle, Live Zoo Cam, Team Members, and Sales Weekly Checklist—at `/hub/sales-dashboard/tv/settings`, with enabled state, order, and 10–300 second durations. Playback consumes validated persisted settings with safe defaults. The checklist is read-only, polls its current Johannesburg weekly period every 15 seconds while displayed, and reuses checklist snapshots and scoring independently of the reporting month/year. See [Sales Weekly Checklist](SALES_WEEKLY_CHECKLIST.md) for configuration, access and rollout details.
 
 From July 2026, Monday owns Quotes Done, Orders Processed, sales-inbox/conversion fields, and associated provenance; EPCC/NetSuite owns company monthly Profit and member Profit/PK Tax. Final values are display overrides and never overwrite source-owned values. Historical workbook fallback remains intentional technical debt until persisted coverage is confirmed.
 

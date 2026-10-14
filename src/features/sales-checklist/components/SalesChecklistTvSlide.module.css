@@ -1,0 +1,16 @@
+.slide { --checklist-status-font-size: clamp(0.875rem, 1.3vw, 1.5rem); --checklist-status-width: clamp(6.5rem, 9vw, 11rem); --checklist-status-height: clamp(1.75rem, 2.6vw, 3rem); display: grid; align-content: center; gap: 1rem; padding: 0.5rem 0; }
+.heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.75rem; }
+.heading h2 { font-size: clamp(1.25rem, 2vw, 2.5rem); font-weight: 650; }
+.heading > span { font-size: clamp(1rem, 1.2vw, 1.5rem); color: hsl(var(--muted-foreground)); }
+.table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: clamp(1rem, 1.7vw, 2rem); }
+.table th, .table td { padding: clamp(0.5rem, 1vh, 1rem); border-bottom: 1px solid hsl(var(--border)); overflow-wrap: anywhere; }
+.table thead th { vertical-align: top; font-weight: 650; }
+.table thead th:first-child, .table tbody th { width: 24%; text-align: left; }
+.table tbody th { font-weight: 500; }
+.name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dutyName { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.table td, .table thead th:not(:first-child) { text-align: center; }
+.score { display: block; font-size: clamp(1.5rem, 3vw, 3.5rem); color: hsl(var(--foreground)); line-height: 1.2; margin-top: 0.25rem; }
+.progressLabel { display: block; font-size: clamp(0.875rem, 1vw, 1.25rem); font-weight: 400; color: hsl(var(--muted-foreground)); }
+.progress { display: block; width: 100%; height: 0.4rem; margin-top: 0.5rem; accent-color: color-mix(in srgb, #16a34a 65%, hsl(var(--foreground))); }
+@media (max-height: 800px) { .table { font-size: clamp(0.875rem, 1.4vw, 1.5rem); } .table th, .table td { padding: 0.35rem; } .score { font-size: clamp(1.25rem, 2.5vw, 2.5rem); } }

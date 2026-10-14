@@ -7,6 +7,7 @@ export const TV_SLIDE_KEYS = [
   "snuggle",
   "live-zoo-cam",
   "team_members",
+  "sales_checklist",
 ] as const;
 
 export type TvSlideKey = (typeof TV_SLIDE_KEYS)[number];
@@ -33,8 +34,7 @@ export const DEFAULT_TV_SETTINGS: readonly TvSlideSetting[] = TV_SLIDE_KEYS.map(
   durationSeconds: 30,
 }));
 
-// Temporary runtime guardrail: keep the Team Members dashboard tab available,
-// but exclude it from TV playback until settings persistence is repaired.
+// Safe defaults when persisted settings are absent or invalid.
 export const TV_RUNTIME_FALLBACK_SETTINGS: readonly TvSlideSetting[] = DEFAULT_TV_SETTINGS.map((slide) => ({
   ...slide,
   isEnabled: true,

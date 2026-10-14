@@ -11,9 +11,9 @@ test("TV mode activates only for tv=1", () => {
 });
 
 test("TV slide registry wraps in both directions", () => {
-  assert.deepEqual(TV_VIEWS, ["overview", "ytd", "year_comparison", "snuggle", "live-zoo-cam", "team_members"]);
+  assert.deepEqual(TV_VIEWS, ["overview", "ytd", "year_comparison", "snuggle", "live-zoo-cam", "team_members", "sales_checklist"]);
   assert.equal(nextTvView("live-zoo-cam"), "team_members");
-  assert.equal(previousTvView("overview"), "team_members");
+  assert.equal(previousTvView("overview"), "sales_checklist");
   assert.equal(nextTvView("overview", ["overview", "snuggle"]), "snuggle");
   assert.equal(previousTvView("overview", ["overview", "snuggle"]), "snuggle");
 });
@@ -27,15 +27,16 @@ test("TV URL helpers preserve reporting context and duration fallback", () => {
   assert.equal(buildNormalModeUrl({ month: 8, year: 2026 }), "/hub/sales-dashboard?month=8&year=2026");
 });
 
-test("TV controller uses the safe six-slide fallback, includes Team Members last, and pauses hidden tabs", () => {
+test("TV controller uses configured rotation with a seven-slide fallback and pauses hidden tabs", () => {
   const component = readFileSync(new URL("../components/SalesDashboardTvView.tsx", import.meta.url), "utf8");
-  assert.deepEqual(TV_RUNTIME_FALLBACK_SETTINGS.filter((slide) => slide.isEnabled).map((slide) => slide.slideKey), ["overview", "ytd", "year_comparison", "snuggle", "live-zoo-cam", "team_members"]);
+  assert.deepEqual(TV_RUNTIME_FALLBACK_SETTINGS.filter((slide) => slide.isEnabled).map((slide) => slide.slideKey), ["overview", "ytd", "year_comparison", "snuggle", "live-zoo-cam", "team_members", "sales_checklist"]);
   assert.equal(TV_RUNTIME_FALLBACK_SETTINGS.find((slide) => slide.slideKey === "team_members")?.isEnabled, true);
-  assert.match(component, /safeTvSettings\(\)\.slides\.filter/);
+  assert.match(component, /settings \?\? safeTvSettings\(\)/);
   assert.match(component, /durationSeconds/);
   assert.match(component, /setManualPaused/);
   assert.match(component, /visibilitychange/);
   assert.match(component, /<LiveZooCamSlide/);
+  assert.match(component, /<SalesChecklistTvSlide/);
   assert.match(component, /<TeamMembersTab data=\{data\} year=\{year\} month=\{month\} tvMode \/>/);
   assert.match(component, /styles\.tvEnter/);
   assert.match(component, /if \(nextView === activeView\) return/);
@@ -59,9 +60,10 @@ test("TV KPI motion hooks are opt-in and do not add looping visual animation", (
   assert.match(shirtStyles, /\.tvVisual \.wavePrimary,[\s\S]*animation: none/);
 });
 
-test("dashboard rendering does not depend on TV settings or its RPC", () => {
+test("dashboard loads persisted rotation settings only in TV mode", () => {
   const page = readFileSync(new URL("../../../app/(hub)/hub/sales-dashboard/page.tsx", import.meta.url), "utf8");
-  assert.doesNotMatch(page, /loadSalesDashboardTvSettings|tvSettings|sales_dashboard_tv_settings|save_sales_dashboard_tv_settings/);
+  assert.match(page, /tvMode \? loadSalesDashboardTvSettings/);
+  assert.doesNotMatch(page, /save_sales_dashboard_tv_settings/);
 });
 
 test("Team Members remains a normal dashboard tab", () => {

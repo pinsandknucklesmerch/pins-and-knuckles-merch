@@ -1,0 +1,23 @@
+.control { display: inline-flex; align-items: center; justify-content: center; max-width: 100%; color: var(--checklist-status-color); }
+.control[data-status="complete"] { --checklist-status-color: color-mix(in srgb, #16a34a 65%, hsl(var(--foreground))); }
+.control[data-status="to_do"] { --checklist-status-color: color-mix(in srgb, #ea580c 65%, hsl(var(--foreground))); }
+.control[data-status="na"] { --checklist-status-color: color-mix(in srgb, #64748b 65%, hsl(var(--foreground))); }
+.control .button {
+  width: var(--checklist-status-width, 6.5rem);
+  max-width: 100%;
+  height: var(--checklist-status-height, 1.75rem);
+  padding: 0 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--checklist-status-color) 40%, hsl(var(--border)));
+  border-radius: var(--hub-control-radius);
+  background: color-mix(in srgb, var(--checklist-status-color) 12%, hsl(var(--card)));
+  color: inherit;
+  font-size: var(--checklist-status-font-size, 0.75rem);
+  font-weight: 500;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.control .button:not(:disabled) { cursor: pointer; }
+.control .button:not(:disabled):hover { background: color-mix(in srgb, var(--checklist-status-color) 22%, hsl(var(--card))); }
+.control .button:disabled { cursor: default; opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .control .button { transition: none; } }
+.progress { accent-color: color-mix(in srgb, #16a34a 65%, hsl(var(--foreground))); }
