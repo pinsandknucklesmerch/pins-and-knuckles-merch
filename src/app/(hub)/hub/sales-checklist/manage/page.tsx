@@ -12,6 +12,6 @@ export default async function ChecklistManagementPage() {
   return <AppShell pinsHubAccess={access}>
     <PageHeader title="Checklist Management" />
     {errorMessage ? <ErrorState title="Management unavailable" message={errorMessage} /> : null}
-    {management ? <ChecklistManagement key={`${management.revision ?? "initial"}:${management.effectiveFrom}`} management={management} /> : null}
+    {management ? <ChecklistManagement management={management} /> : null}
   </AppShell>;
 }

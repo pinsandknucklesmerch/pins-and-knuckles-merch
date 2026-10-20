@@ -12,10 +12,7 @@ export function nextChecklistStatus(status: ChecklistStatus): ChecklistStatus {
   return NEXT_CHECKLIST_STATUS[status];
 }
 
-export type WeeklyChecklist = {
-  weekId: string;
-  startsAt: string;
-  resetRevision: string;
+export type SalesChecklist = {
   canClear: boolean;
   duties: Array<{ id: string; name: string }>;
   staff: Array<{ id: string; name: string; canEdit: boolean }>;
@@ -32,10 +29,6 @@ export function checklistScore(statuses: ChecklistStatus[]) {
   return { complete, applicable, percentage: applicable === 0 ? null : Math.round(complete / applicable * 100) };
 }
 
-export function weekLabel(startsAt: string) {
-  return `Week of ${new Intl.DateTimeFormat("en-ZA", { timeZone: "Africa/Johannesburg", day: "numeric", month: "short", year: "numeric" }).format(new Date(startsAt))}`;
-}
-
 export function isUuid(value: unknown): value is string {
   return typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 }
@@ -45,9 +38,9 @@ export function record(value: unknown): value is Record<string, unknown> {
 }
 
 // Validate the JSON RPC boundary rather than asserting a generated JSON type is a domain object.
-export function parseWeeklyChecklist(value: unknown): WeeklyChecklist {
-  if (!record(value) || !isUuid(value.weekId) || typeof value.canClear !== "boolean" || !isUuid(value.resetRevision)
-    || typeof value.startsAt !== "string" || !Number.isFinite(Date.parse(value.startsAt)) || !Array.isArray(value.duties) || !Array.isArray(value.staff) || !Array.isArray(value.entries)) {
+export function parseSalesChecklist(value: unknown): SalesChecklist {
+  if (!record(value) || typeof value.canClear !== "boolean"
+    || !Array.isArray(value.duties) || !Array.isArray(value.staff) || !Array.isArray(value.entries)) {
     throw new Error("Checklist data could not be loaded.");
   }
   const duties = value.duties.map((duty: unknown) => {
@@ -62,5 +55,5 @@ export function parseWeeklyChecklist(value: unknown): WeeklyChecklist {
     if (!record(entry) || !isUuid(entry.id) || !isUuid(entry.dutyId) || !isUuid(entry.staffId) || !isChecklistStatus(entry.status)) throw new Error("Invalid checklist entry.");
     return { id: entry.id, dutyId: entry.dutyId, staffId: entry.staffId, status: entry.status };
   });
-  return { weekId: value.weekId, startsAt: value.startsAt, resetRevision: value.resetRevision, canClear: value.canClear, duties, staff, entries };
+  return { canClear: value.canClear, duties, staff, entries };
 }

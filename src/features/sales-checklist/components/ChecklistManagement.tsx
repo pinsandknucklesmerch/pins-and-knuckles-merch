@@ -8,7 +8,6 @@ import { Panel } from "@/components/ui/Panel";
 import { SearchableCombobox } from "@/components/ui/SearchableCombobox";
 import { feedback } from "@/components/ui/feedback";
 import { saveChecklistManagement } from "../actions";
-import { weekLabel } from "../domain/checklist";
 import { moveChecklistRow, parseManagementInput, type ChecklistManagement as Management } from "../domain/management";
 
 function OrderControls({ index, length, disabled, onMove }: { index: number; length: number; disabled: boolean; onMove: (direction: -1 | 1) => void }) {
@@ -24,24 +23,22 @@ export function ChecklistManagement({ management }: { management: Management }) 
   const [staff, setStaff] = useState(() => [...management.staff].sort((a, b) => a.displayOrder - b.displayOrder));
   const [saving, startSaving] = useTransition();
   const [validationMessage, setValidationMessage] = useState<string | null>(null);
-  const [refreshRequired, setRefreshRequired] = useState(false);
 
   function save() {
-    try { parseManagementInput({ revision: management.revision, effectiveFrom: management.effectiveFrom, duties, staff }); }
+    try { parseManagementInput({ duties, staff }); }
     catch (error) { setValidationMessage(error instanceof Error ? error.message : "Check the highlighted configuration."); return; }
     setValidationMessage(null);
     startSaving(async () => {
       try {
-        const result = await saveChecklistManagement({ revision: management.revision, effectiveFrom: management.effectiveFrom, duties, staff });
+        const result = await saveChecklistManagement({ duties, staff });
         (result.ok ? feedback.success : feedback.error)(result.message);
-        if (result.refreshRequired) setRefreshRequired(true);
         if (result.ok) router.refresh();
       } catch { feedback.error("Checklist configuration could not be saved. Please try again."); }
     });
   }
 
   return <>
-    <p className="text-sm text-muted-foreground">Changes apply to {weekLabel(management.effectiveFrom).toLowerCase()}, Monday 09:00. Saved weekly snapshots remain unchanged.</p>
+    <p className="text-sm text-muted-foreground">Changes apply to the current checklist immediately. Existing statuses are kept for duties and team members that remain active.</p>
     <Panel title="Duties">
       <div className="grid gap-3">
         {duties.map((duty, index) => <div key={duty.id} className="flex flex-wrap items-center gap-3 border-b border-border/70 pb-3">
@@ -72,6 +69,6 @@ export function ChecklistManagement({ management }: { management: Management }) 
       </div>
     </Panel>
     {validationMessage ? <p id="checklist-validation" role="alert" className="text-sm text-destructive">{validationMessage}</p> : null}
-    <div className="flex flex-wrap gap-2"><ActionButton disabled={saving || refreshRequired} onClick={save}>{saving ? "Saving…" : "Save Configuration"}</ActionButton>{refreshRequired ? <ActionButton disabled={saving} onClick={() => startSaving(() => router.refresh())}>Refresh Configuration</ActionButton> : null}<ActionButton href="/hub/sales-checklist" className="bg-secondary text-secondary-foreground hover:bg-secondary/80">Back to Checklist</ActionButton></div>
+    <div className="flex flex-wrap gap-2"><ActionButton disabled={saving} onClick={save}>{saving ? "Saving…" : "Save Configuration"}</ActionButton><ActionButton href="/hub/sales-checklist" className="bg-secondary text-secondary-foreground hover:bg-secondary/80">Back to Checklist</ActionButton></div>
   </>;
 }

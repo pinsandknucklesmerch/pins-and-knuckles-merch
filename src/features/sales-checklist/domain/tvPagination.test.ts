@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import type { WeeklyChecklist } from "./checklist.ts";
+import type { SalesChecklist } from "./checklist.ts";
 import { checklistTvLayoutKey, checklistTvPagePlan } from "./tvPagination.ts";
 
-function checklist(dutyCount: number, staffCount: number): WeeklyChecklist {
+function checklist(dutyCount: number, staffCount: number): SalesChecklist {
   return {
-    weekId: "week", startsAt: "2026-10-12T07:00:00Z", resetRevision: "revision", canClear: false, entries: [],
+    canClear: false, entries: [],
     duties: Array.from({ length: dutyCount }, (_, index) => ({ id: `duty-${index}`, name: `Duty ${index}` })),
     staff: Array.from({ length: staffCount }, (_, index) => ({ id: `staff-${index}`, name: `Staff ${index}`, canEdit: false })),
   };
@@ -27,11 +27,10 @@ test("paging includes partial duty and staff groups without reducing minimum dwe
   assert.ok(large.pageCount * large.pageDurationMs > 10_000, "rotation must wait beyond its configured timeout for this page pass");
 });
 
-test("saved status changes preserve playback, while layout and week changes restart it", () => {
+test("saved status changes preserve playback, while layout changes restart it", () => {
   const original = checklist(9, 5);
   const originalKey = checklistTvLayoutKey(original);
   assert.equal(checklistTvLayoutKey({ ...original, entries: [{ id: "entry", dutyId: "duty-0", staffId: "staff-0", status: "complete" }] }), originalKey);
-  assert.notEqual(checklistTvLayoutKey({ ...original, weekId: "next-week" }), originalKey);
   assert.notEqual(checklistTvLayoutKey({ ...original, duties: original.duties.slice(1) }), originalKey);
   assert.notEqual(checklistTvLayoutKey({ ...original, staff: [...original.staff].reverse() }), originalKey);
   assert.notEqual(checklistTvLayoutKey({ ...original, duties: [...original.duties, { id: "new-duty", name: "New duty" }] }), originalKey);

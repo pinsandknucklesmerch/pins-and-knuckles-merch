@@ -11,6 +11,6 @@ export default async function SalesChecklistPage() {
   return <AppShell pinsHubAccess={access}>
     <PageHeader title="Sales Weekly Checklist" action={hasAdminAccess(access) ? <ActionButton href="/hub/sales-checklist/manage">Manage</ActionButton> : undefined} />
     {errorMessage ? <ErrorState title="Checklist unavailable" message={errorMessage} /> : null}
-    {checklist ? <WeeklyChecklistTable key={`${checklist.weekId}:${checklist.resetRevision}`} checklist={checklist} /> : null}
+    {checklist ? <WeeklyChecklistTable checklist={checklist} /> : null}
   </AppShell>;
 }

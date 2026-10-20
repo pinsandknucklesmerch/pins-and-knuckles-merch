@@ -1,14 +1,14 @@
-import type { WeeklyChecklist } from "./checklist";
+import type { SalesChecklist } from "./checklist";
 
 export const TV_DUTIES_PER_PAGE = 8;
 export const TV_STAFF_PER_PAGE = 4;
 
 // Status-only refreshes retain playback. A new week, order or task/team matrix restarts it.
-export function checklistTvLayoutKey(checklist: WeeklyChecklist) {
-  return JSON.stringify([checklist.weekId, checklist.duties.map((duty) => duty.id), checklist.staff.map((person) => person.id)]);
+export function checklistTvLayoutKey(checklist: SalesChecklist) {
+  return JSON.stringify([checklist.duties.map((duty) => duty.id), checklist.staff.map((person) => person.id)]);
 }
 
-export function checklistTvPagePlan(checklist: WeeklyChecklist, durationSeconds: number) {
+export function checklistTvPagePlan(checklist: SalesChecklist, durationSeconds: number) {
   const dutyPages = Math.max(1, Math.ceil(checklist.duties.length / TV_DUTIES_PER_PAGE));
   const staffPages = Math.max(1, Math.ceil(checklist.staff.length / TV_STAFF_PER_PAGE));
   const pageCount = dutyPages * staffPages;

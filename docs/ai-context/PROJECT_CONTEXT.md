@@ -1,6 +1,6 @@
 # Pins Hub — Canonical Project Context
 
-Last verified: 2026-09-23
+Last verified: 2026-10-20
 
 ## Purpose and boundaries
 
@@ -47,18 +47,18 @@ Detailed behavior: [`docs/reference/SALES_DASHBOARD.md`](../reference/SALES_DASH
 
 ### Sales Weekly Checklist (source added 2026-10-13)
 
-`/hub/sales-checklist` exposes only the current Monday 09:00 Africa/Johannesburg
-board, per-user status editing and shared scores. Admin/developer management at
-`/hub/sales-checklist/manage` selects actual organisation users and schedules duty/team
-changes for future weeks. Effective-dated configuration supports rollover after a missed
-cron without backfilling historical boards. Clear All requires confirmation and a database
-permission check (existing admin/developer/owner capability or Johan's explicitly provisioned
-Auth UUID). Organisation locking and reset revisions reject saves from before a reset.
-Sales Dashboard TV Mode reads the current board every 15 seconds; status-only refreshes
-preserve pagination and rotation. The October migrations must be applied in order;
-remote application, Johan's reset identity provisioning and cron deployment are unconfirmed.
-The 20261015100000 migration retains old rows but restricts period/status reads to the
-current board. No shared auth/access helpers or Merch policies change.
+`/hub/sales-checklist` uses one persistent organisation-scoped board backed by active
+duties, active organisation-user assignments and one status row per duty/staff pair.
+Statuses persist until changed or reset; there are no weekly snapshots, effective dates,
+history or week navigation. Management changes apply immediately while preserving
+statuses for pairs that remain active. Clear All requires confirmation and the database
+permits existing admin/developer/owner capability or Johan's explicitly provisioned Auth
+UUID. The same idempotent reset operation powers the Monday 09:00
+Africa/Johannesburg cron. Sales Dashboard TV Mode reads the same board every 15 seconds;
+status-only refreshes preserve pagination and rotation. Checklist migrations must be
+applied in order through `20261020100000_simplify_sales_checklist_current_board.sql`;
+remote application, Johan's reset identity provisioning and cron deployment remain
+unconfirmed. No shared auth/access helpers or Merch policies change.
 Details: [Sales Weekly Checklist](../reference/SALES_WEEKLY_CHECKLIST.md).
 
 ### Reporting and EPCC reports
@@ -156,7 +156,7 @@ Commercial Invoice and reporting workflows generate their supported files in app
 
 ## Database and migrations
 
-As of the verification date, `supabase/migrations` contains 53 versioned SQL migrations, from `20260709120000_foundation_auth_access.sql` through `20260917100000_create_quick_reference_records.sql`.
+As of the verification date, `supabase/migrations` contains 58 versioned SQL migrations, from `20260709120000_foundation_auth_access.sql` through `20261020100000_simplify_sales_checklist_current_board.sql`.
 
 The migration history covers:
 
@@ -166,6 +166,7 @@ The migration history covers:
 - Invoice Company/Product Type directories;
 - feedback and diagnostic tooling;
 - Quick Reference records;
+- the persistent Sales Weekly Checklist board, management, reset permissions, and TV slide;
 - Merch operational tables, show inventory counts, Band-first access structures, authorization helpers, RLS/grant cutover, transactional creation, membership/organisation administration, and lifecycle RPCs.
 
 The Band-first Merch work is represented by the September migration sequence and detailed in [`docs/reference/MERCH_BAND_FIRST_FOUNDATION.md`](../reference/MERCH_BAND_FIRST_FOUNDATION.md). No claim is made here that those migrations are applied remotely or that Pins Merch App has completed its corresponding client cutover.

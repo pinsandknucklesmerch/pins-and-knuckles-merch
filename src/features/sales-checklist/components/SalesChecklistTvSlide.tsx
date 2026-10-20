@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { readChecklistForTv } from "../actions";
-import { checklistScore, weekLabel, type ChecklistStatus, type WeeklyChecklist } from "../domain/checklist";
+import { checklistScore, type ChecklistStatus, type SalesChecklist } from "../domain/checklist";
 import styles from "./SalesChecklistTvSlide.module.css";
 import { checklistTvLayoutKey, checklistTvPagePlan, TV_DUTIES_PER_PAGE, TV_STAFF_PER_PAGE } from "../domain/tvPagination";
 
@@ -14,7 +14,7 @@ const REFRESH_INTERVAL_MS = 15_000;
 type PlaybackProps = { durationSeconds: number; paused: boolean; onPlaybackComplete: (complete: boolean) => void };
 
 export function SalesChecklistTvSlide({ durationSeconds, paused, onPlaybackComplete }: PlaybackProps) {
-  const [checklist, setChecklist] = useState<WeeklyChecklist | null>(null);
+  const [checklist, setChecklist] = useState<SalesChecklist | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const layoutRef = useRef<string | null>(null);
@@ -55,7 +55,7 @@ export function SalesChecklistTvSlide({ durationSeconds, paused, onPlaybackCompl
   return <ChecklistPages key={checklistTvLayoutKey(checklist)} checklist={checklist} durationSeconds={durationSeconds} paused={paused} onPlaybackComplete={onPlaybackComplete} />;
 }
 
-function ChecklistPages({ checklist, durationSeconds, paused, onPlaybackComplete }: PlaybackProps & { checklist: WeeklyChecklist }) {
+function ChecklistPages({ checklist, durationSeconds, paused, onPlaybackComplete }: PlaybackProps & { checklist: SalesChecklist }) {
   const [page, setPage] = useState(0);
   const [complete, setComplete] = useState(false);
   const { dutyPages, pageCount, pageDurationMs } = checklistTvPagePlan(checklist, durationSeconds);
@@ -78,7 +78,7 @@ function ChecklistPages({ checklist, durationSeconds, paused, onPlaybackComplete
   return <section className={styles.slide} data-tv-view="sales_checklist">
     <div className={styles.heading} data-tv-group="checklist-heading">
       <h2>Sales Weekly Checklist</h2>
-      <span>{weekLabel(checklist.startsAt)}{pageCount > 1 ? ` · Page ${page + 1}/${pageCount}` : ""}</span>
+      <span>Resets Monday at 09:00{pageCount > 1 ? ` · Page ${page + 1}/${pageCount}` : ""}</span>
     </div>
     <table className={styles.table}>
       <caption className="sr-only">Read-only weekly sales checklist and completion scores</caption>
@@ -93,6 +93,6 @@ function ChecklistPages({ checklist, durationSeconds, paused, onPlaybackComplete
         return <td key={person.id}>{status ? <ChecklistStatusControl status={status} label={`${person.name}: ${duty.name}`} readOnly /> : <span className="text-muted-foreground">Unavailable</span>}</td>;
       })}</tr>)}</tbody>
     </table>
-    {!duties.length ? <p className={styles.progressLabel}>No duties assigned for this week.</p> : null}
+    {!duties.length ? <p className={styles.progressLabel}>No active duties assigned.</p> : null}
   </section>;
 }

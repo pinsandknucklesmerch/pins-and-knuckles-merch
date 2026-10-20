@@ -7,12 +7,12 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Surface } from "@/components/ui/Surface";
 import { feedback } from "@/components/ui/feedback";
 import { clearChecklist, saveChecklistStatus } from "../actions";
-import { checklistScore, isChecklistStatus, weekLabel, type WeeklyChecklist } from "../domain/checklist";
+import { checklistScore, isChecklistStatus, type SalesChecklist } from "../domain/checklist";
 
 import statusStyles from "./ChecklistStatusControl.module.css";
 import { ChecklistStatusControl } from "./ChecklistStatusControl";
 
-export function WeeklyChecklistTable({ checklist }: { checklist: WeeklyChecklist }) {
+export function WeeklyChecklistTable({ checklist }: { checklist: SalesChecklist }) {
   const router = useRouter();
   const [refreshing, startRefresh] = useTransition();
   const [confirmClear, setConfirmClear] = useState(false);
@@ -23,7 +23,7 @@ export function WeeklyChecklistTable({ checklist }: { checklist: WeeklyChecklist
   const saving = useRef(new Set<string>());
   const persisted = useRef(new Map(checklist.entries.map((entry) => [entry.id, entry.status])));
 
-  // Refresh permissions and the weekly period at rollover, also when returning to the tab.
+  // Refresh permissions and remote status changes, including the scheduled Monday reset.
   useEffect(() => {
     const refresh = () => { if (!document.hidden && !resetInProgress.current && saving.current.size === 0) router.refresh(); };
     const timer = window.setInterval(refresh, 60_000);
@@ -49,7 +49,7 @@ export function WeeklyChecklistTable({ checklist }: { checklist: WeeklyChecklist
     setEntries((current) => current.map((row) => row.id === id ? { ...row, status: value } : row));
     setPending((current) => ({ ...current, [id]: true }));
     try {
-      const result = await saveChecklistStatus(id, value, checklist.resetRevision);
+      const result = await saveChecklistStatus(id, value);
       if (result.ok) {
         persisted.current.set(id, value);
         setEntries((current) => current.map((entry) => entry.id === id ? { ...entry, status: value } : entry));
@@ -74,11 +74,15 @@ export function WeeklyChecklistTable({ checklist }: { checklist: WeeklyChecklist
     resetInProgress.current = true;
     setResetting(true);
     try {
-      const result = await clearChecklist(checklist.weekId, checklist.resetRevision);
+      const result = await clearChecklist();
       if (result.ok) {
+        const cleared = entries.map((entry) => ({ ...entry, status: "to_do" as const }));
+        persisted.current = new Map(cleared.map((entry) => [entry.id, entry.status]));
+        setEntries(cleared);
         feedback.success(result.message);
-        // Keep editing locked until the refreshed revision remounts this board.
         setConfirmClear(false);
+        resetInProgress.current = false;
+        setResetting(false);
         startRefresh(() => router.refresh());
       } else {
         resetInProgress.current = false;
@@ -96,8 +100,7 @@ export function WeeklyChecklistTable({ checklist }: { checklist: WeeklyChecklist
 
   return <>
     <div className="flex flex-wrap items-center gap-3">
-      <span className="text-sm font-medium">{weekLabel(checklist.startsAt)}</span>
-      <span className="text-sm text-muted-foreground">Monday 09:00 rollover</span>
+      <span className="text-sm text-muted-foreground">Resets Monday at 09:00</span>
       {checklist.canClear ? <ActionButton className="border border-destructive/60 bg-transparent text-destructive hover:bg-destructive/10" disabled={resetting || refreshing || Object.values(pending).some(Boolean)} onClick={() => setConfirmClear(true)}>Clear All</ActionButton> : null}
     </div>
     <Dialog open={confirmClear} onClose={() => { if (!resetInProgress.current) setConfirmClear(false); }} title="Clear all task statuses?" description="All team members’ tasks will be reset to To Do. This cannot be undone." className="max-w-md">
@@ -134,7 +137,7 @@ export function WeeklyChecklistTable({ checklist }: { checklist: WeeklyChecklist
           })}
         </tr>)}</tbody>
       </table>
-      {checklist.duties.length === 0 ? <p className="p-3 text-sm text-muted-foreground">No duties assigned for this week.</p> : null}
+      {checklist.duties.length === 0 ? <p className="p-3 text-sm text-muted-foreground">No active duties assigned.</p> : null}
     </Surface>
   </>;
 }

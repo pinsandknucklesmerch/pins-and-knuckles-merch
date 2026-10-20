@@ -2032,44 +2032,6 @@ export type Database = {
           },
         ]
       }
-      sales_checklist_configurations: {
-        Row: {
-          duties: Json
-          effective_from: string
-          organisation_id: string
-          revision: string
-          staff: Json
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          duties: Json
-          effective_from: string
-          organisation_id: string
-          revision?: string
-          staff: Json
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          duties?: Json
-          effective_from?: string
-          organisation_id?: string
-          revision?: string
-          staff?: Json
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sales_checklist_configurations_organisation_id_fkey"
-            columns: ["organisation_id"]
-            isOneToOne: false
-            referencedRelation: "organisations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       sales_checklist_duties: {
         Row: {
           display_order: number
@@ -2102,173 +2064,48 @@ export type Database = {
           },
         ]
       }
-      sales_checklist_entries: {
+      sales_checklist_statuses: {
         Row: {
+          assignment_id: string
+          duty_id: string
           id: string
           organisation_id: string
           status: string
           updated_at: string
           updated_by: string | null
-          week_duty_id: string
-          week_id: string
-          week_staff_id: string
         }
         Insert: {
+          assignment_id: string
+          duty_id: string
           id?: string
           organisation_id: string
           status?: string
           updated_at?: string
           updated_by?: string | null
-          week_duty_id: string
-          week_id: string
-          week_staff_id: string
-        }
-        Update: {
-          id?: string
-          organisation_id?: string
-          status?: string
-          updated_at?: string
-          updated_by?: string | null
-          week_duty_id?: string
-          week_id?: string
-          week_staff_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sales_checklist_entries_organisation_id_week_id_week_duty__fkey"
-            columns: ["organisation_id", "week_id", "week_duty_id"]
-            isOneToOne: false
-            referencedRelation: "sales_checklist_week_duties"
-            referencedColumns: ["organisation_id", "week_id", "id"]
-          },
-          {
-            foreignKeyName: "sales_checklist_entries_organisation_id_week_id_week_staff_fkey"
-            columns: ["organisation_id", "week_id", "week_staff_id"]
-            isOneToOne: false
-            referencedRelation: "sales_checklist_week_staff"
-            referencedColumns: ["organisation_id", "week_id", "id"]
-          },
-        ]
-      }
-      sales_checklist_week_duties: {
-        Row: {
-          display_order: number
-          duty_id: string
-          id: string
-          name: string
-          organisation_id: string
-          week_id: string
-        }
-        Insert: {
-          display_order: number
-          duty_id: string
-          id?: string
-          name: string
-          organisation_id: string
-          week_id: string
-        }
-        Update: {
-          display_order?: number
-          duty_id?: string
-          id?: string
-          name?: string
-          organisation_id?: string
-          week_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sales_checklist_week_duties_organisation_id_duty_id_fkey"
-            columns: ["organisation_id", "duty_id"]
-            isOneToOne: false
-            referencedRelation: "sales_checklist_duties"
-            referencedColumns: ["organisation_id", "id"]
-          },
-          {
-            foreignKeyName: "sales_checklist_week_duties_organisation_id_week_id_fkey"
-            columns: ["organisation_id", "week_id"]
-            isOneToOne: false
-            referencedRelation: "sales_checklist_weeks"
-            referencedColumns: ["organisation_id", "id"]
-          },
-        ]
-      }
-      sales_checklist_week_staff: {
-        Row: {
-          assignment_id: string
-          display_name: string
-          display_order: number
-          id: string
-          organisation_id: string
-          organisation_member_id: string
-          user_id: string
-          week_id: string
-        }
-        Insert: {
-          assignment_id: string
-          display_name: string
-          display_order: number
-          id?: string
-          organisation_id: string
-          organisation_member_id: string
-          user_id: string
-          week_id: string
         }
         Update: {
           assignment_id?: string
-          display_name?: string
-          display_order?: number
+          duty_id?: string
           id?: string
           organisation_id?: string
-          organisation_member_id?: string
-          user_id?: string
-          week_id?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "sales_checklist_week_staff_organisation_id_assignment_id_fkey"
+            foreignKeyName: "sales_checklist_statuses_organisation_id_assignment_id_fkey"
             columns: ["organisation_id", "assignment_id"]
             isOneToOne: false
             referencedRelation: "sales_checklist_assignments"
             referencedColumns: ["organisation_id", "id"]
           },
           {
-            foreignKeyName: "sales_checklist_week_staff_organisation_id_week_id_fkey"
-            columns: ["organisation_id", "week_id"]
+            foreignKeyName: "sales_checklist_statuses_organisation_id_duty_id_fkey"
+            columns: ["organisation_id", "duty_id"]
             isOneToOne: false
-            referencedRelation: "sales_checklist_weeks"
+            referencedRelation: "sales_checklist_duties"
             referencedColumns: ["organisation_id", "id"]
-          },
-        ]
-      }
-      sales_checklist_weeks: {
-        Row: {
-          ends_at: string
-          id: string
-          organisation_id: string
-          starts_at: string
-          reset_revision: string
-        }
-        Insert: {
-          ends_at: string
-          id?: string
-          organisation_id: string
-          starts_at: string
-          reset_revision?: string
-        }
-        Update: {
-          ends_at?: string
-          id?: string
-          organisation_id?: string
-          starts_at?: string
-          reset_revision?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sales_checklist_weeks_organisation_id_fkey"
-            columns: ["organisation_id"]
-            isOneToOne: false
-            referencedRelation: "organisations"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -3118,10 +2955,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      ensure_sales_checklist_week: {
-        Args: { p_organisation_id: string }
-        Returns: string
-      }
       get_accessible_merchbuddy_bands: {
         Args: never
         Returns: {
@@ -3314,16 +3147,16 @@ export type Database = {
           source_hash_present: boolean
         }[]
       }
-      clear_sales_checklist: {
-        Args: { p_organisation_id: string; p_week_id: string; p_reset_revision: string }
-        Returns: boolean
-      }
       can_clear_sales_checklist: {
         Args: { p_organisation_id: string }
         Returns: boolean
       }
+      can_edit_sales_checklist_status: {
+        Args: { p_assignment_id: string; p_organisation_id: string }
+        Returns: boolean
+      }
       read_sales_checklist: {
-        Args: { p_organisation_id: string; p_week_id?: string }
+        Args: { p_organisation_id: string }
         Returns: Json
       }
       read_sales_checklist_management: {
@@ -3488,24 +3321,14 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      rollover_sales_checklists: { Args: never; Returns: number }
-      sales_checklist_week_start: { Args: never; Returns: string }
+      reset_all_sales_checklists: { Args: never; Returns: number }
+      reset_sales_checklist: {
+        Args: { p_organisation_id: string }
+        Returns: number
+      }
       save_sales_checklist_management: {
         Args: {
           p_duties: Json
-          p_expected_effective_from: string
-          // SQL accepts null when no configuration exists; the generator omits RPC argument nullability.
-          p_expected_revision: string | null
-          p_organisation_id: string
-          p_staff: Json
-        }
-        Returns: undefined
-      }
-      save_sales_checklist_management_configuration: {
-        Args: {
-          p_duties: Json
-          // SQL accepts null when no configuration exists; the generator omits RPC argument nullability.
-          p_expected_revision: string | null
           p_organisation_id: string
           p_staff: Json
         }
@@ -3568,15 +3391,6 @@ export type Database = {
       update_hub_feedback_report: {
         Args: { p_developer_notes: string; p_id: string; p_status: string }
         Returns: undefined
-      }
-      update_sales_checklist_status: {
-        Args: {
-          p_entry_id: string
-          p_organisation_id: string
-          p_status: string
-          p_reset_revision: string
-        }
-        Returns: boolean
       }
     }
     Enums: {
