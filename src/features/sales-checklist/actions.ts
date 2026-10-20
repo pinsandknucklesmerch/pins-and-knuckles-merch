@@ -7,17 +7,19 @@ import { isChecklistStatus, isUuid } from "./domain/checklist";
 import { parseManagementInput, type ChecklistManagementInput, type ChecklistManagementSaveResult } from "./domain/management";
 import { loadSalesChecklist } from "./data/checklistRepository";
 
-export async function saveChecklistStatus(entryId: string, status: string): Promise<{ ok: boolean; message: string }> {
-  if (!isUuid(entryId) || !isChecklistStatus(status)) return { ok: false, message: "Select a valid checklist status." };
+export async function saveChecklistStatus(entryId: string, status: string, resetRevision: string): Promise<{ ok: boolean; message: string }> {
+  if (!isUuid(entryId) || !isUuid(resetRevision) || !isChecklistStatus(status)) return { ok: false, message: "Select a valid checklist status." };
   const access = await getCurrentPinsHubAccess();
   if (!access.access || !access.membership?.is_active) return { ok: false, message: "You do not have checklist access." };
   const supabase = await createClient();
-  // Invoker RPC applies RLS: current week, organisation, active membership, own column/admin.
+  // Locked RPC enforces current week, organisation, active membership, own column/admin and reset revision.
   const { data, error } = await supabase.rpc("update_sales_checklist_status", {
     p_organisation_id: access.membership.organisation_id,
     p_entry_id: entryId,
     p_status: status,
+    p_reset_revision: resetRevision,
   });
+  if (error?.code === "40001") return { ok: false, message: "The checklist was reset. Refresh before saving again." };
   if (error || !data) return { ok: false, message: "Status could not be saved. Check your access and that this is the current week, then try again." };
   revalidatePath("/hub/sales-checklist");
   revalidatePath("/hub/sales-dashboard");
@@ -50,4 +52,22 @@ export async function saveChecklistManagement(payload: unknown): Promise<Checkli
   revalidatePath("/hub/sales-checklist/manage");
   revalidatePath("/hub/sales-dashboard");
   return { ok: true, message: "Checklist configuration saved." };
+}
+
+export async function clearChecklist(weekId: string, resetRevision: string): Promise<{ ok: boolean; message: string }> {
+  if (!isUuid(weekId) || !isUuid(resetRevision)) return { ok: false, message: "Invalid checklist." };
+  const access = await getCurrentPinsHubAccess();
+  if (!access.access || !access.membership?.is_active) return { ok: false, message: "You do not have checklist access." };
+  const supabase = await createClient();
+  // The database derives reset authority from auth.uid(), never client identity or labels.
+  const { data, error } = await supabase.rpc("clear_sales_checklist", {
+    p_organisation_id: access.membership.organisation_id,
+    p_week_id: weekId,
+    p_reset_revision: resetRevision,
+  });
+  if (error?.code === "40001") return { ok: false, message: "The checklist changed. Refresh before clearing it." };
+  if (error || !data) return { ok: false, message: "The checklist could not be cleared. Check your access and try again." };
+  revalidatePath("/hub/sales-checklist");
+  revalidatePath("/hub/sales-dashboard");
+  return { ok: true, message: "All tasks reset to To Do." };
 }

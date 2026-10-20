@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Select } from "@/components/ui/Select";
+import { ActionButton } from "@/components/ui/ActionButton";
+import { Dialog } from "@/components/ui/Dialog";
 import { Surface } from "@/components/ui/Surface";
 import { feedback } from "@/components/ui/feedback";
-import { saveChecklistStatus } from "../actions";
+import { clearChecklist, saveChecklistStatus } from "../actions";
 import { checklistScore, isChecklistStatus, weekLabel, type WeeklyChecklist } from "../domain/checklist";
 
 import statusStyles from "./ChecklistStatusControl.module.css";
@@ -13,7 +14,10 @@ import { ChecklistStatusControl } from "./ChecklistStatusControl";
 
 export function WeeklyChecklistTable({ checklist }: { checklist: WeeklyChecklist }) {
   const router = useRouter();
-  const [navigating, startNavigation] = useTransition();
+  const [refreshing, startRefresh] = useTransition();
+  const [confirmClear, setConfirmClear] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const resetInProgress = useRef(false);
   const [entries, setEntries] = useState(checklist.entries);
   const [pending, setPending] = useState<Record<string, boolean>>({});
   const saving = useRef(new Set<string>());
@@ -21,7 +25,7 @@ export function WeeklyChecklistTable({ checklist }: { checklist: WeeklyChecklist
 
   // Refresh permissions and the weekly period at rollover, also when returning to the tab.
   useEffect(() => {
-    const refresh = () => { if (!document.hidden && saving.current.size === 0) router.refresh(); };
+    const refresh = () => { if (!document.hidden && !resetInProgress.current && saving.current.size === 0) router.refresh(); };
     const timer = window.setInterval(refresh, 60_000);
     document.addEventListener("visibilitychange", refresh);
     return () => { window.clearInterval(timer); document.removeEventListener("visibilitychange", refresh); };
@@ -40,12 +44,12 @@ export function WeeklyChecklistTable({ checklist }: { checklist: WeeklyChecklist
     const entry = checklist.entries.find((row) => row.id === id);
     const person = checklist.staff.find((staff) => staff.id === entry?.staffId);
     const previous = persisted.current.get(id);
-    if (!isChecklistStatus(value) || !previous || !person?.canEdit || !checklist.isCurrent || navigating || saving.current.has(id) || value === previous) return;
+    if (!isChecklistStatus(value) || !previous || !person?.canEdit || resetInProgress.current || confirmClear || refreshing || saving.current.has(id) || value === previous) return;
     saving.current.add(id);
     setEntries((current) => current.map((row) => row.id === id ? { ...row, status: value } : row));
     setPending((current) => ({ ...current, [id]: true }));
     try {
-      const result = await saveChecklistStatus(id, value);
+      const result = await saveChecklistStatus(id, value, checklist.resetRevision);
       if (result.ok) {
         persisted.current.set(id, value);
         setEntries((current) => current.map((entry) => entry.id === id ? { ...entry, status: value } : entry));
@@ -61,18 +65,47 @@ export function WeeklyChecklistTable({ checklist }: { checklist: WeeklyChecklist
     finally {
       saving.current.delete(id);
       setPending((current) => ({ ...current, [id]: false }));
-      if (saving.current.size === 0) router.refresh();
+      if (!resetInProgress.current && saving.current.size === 0) router.refresh();
+    }
+  }
+
+  async function clearAll() {
+    if (!checklist.canClear || resetInProgress.current || saving.current.size > 0 || refreshing) return;
+    resetInProgress.current = true;
+    setResetting(true);
+    try {
+      const result = await clearChecklist(checklist.weekId, checklist.resetRevision);
+      if (result.ok) {
+        feedback.success(result.message);
+        // Keep editing locked until the refreshed revision remounts this board.
+        setConfirmClear(false);
+        startRefresh(() => router.refresh());
+      } else {
+        resetInProgress.current = false;
+        setResetting(false);
+        feedback.error(result.message);
+        startRefresh(() => router.refresh());
+      }
+    } catch {
+      resetInProgress.current = false;
+      setResetting(false);
+      feedback.error("The checklist could not be cleared. Please try again.");
+      startRefresh(() => router.refresh());
     }
   }
 
   return <>
     <div className="flex flex-wrap items-center gap-3">
-      <label htmlFor="checklist-week" className="text-sm font-medium">Week</label>
-      <div className="w-64"><Select id="checklist-week" value={checklist.weekId} disabled={navigating || Object.values(pending).some(Boolean)} onValueChange={(id) => startNavigation(() => router.push(id === checklist.weeks[0]?.id ? "/hub/sales-checklist" : `/hub/sales-checklist?week=${id}`))}>
-        {checklist.weeks.map((week) => <option key={week.id} value={week.id}>{weekLabel(week.startsAt)}</option>)}
-      </Select></div>
-      <span className="text-sm text-muted-foreground">{navigating ? "Loading…" : checklist.isCurrent ? "Current week · Monday 09:00 rollover" : "Historical week · Read only"}</span>
+      <span className="text-sm font-medium">{weekLabel(checklist.startsAt)}</span>
+      <span className="text-sm text-muted-foreground">Monday 09:00 rollover</span>
+      {checklist.canClear ? <ActionButton className="border border-destructive/60 bg-transparent text-destructive hover:bg-destructive/10" disabled={resetting || refreshing || Object.values(pending).some(Boolean)} onClick={() => setConfirmClear(true)}>Clear All</ActionButton> : null}
     </div>
+    <Dialog open={confirmClear} onClose={() => { if (!resetInProgress.current) setConfirmClear(false); }} title="Clear all task statuses?" description="All team members’ tasks will be reset to To Do. This cannot be undone." className="max-w-md">
+      <div className="flex justify-end gap-2">
+        <ActionButton disabled={resetting} className="bg-secondary text-secondary-foreground hover:bg-secondary/80" onClick={() => setConfirmClear(false)}>Cancel</ActionButton>
+        <ActionButton className="bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={resetting || refreshing || Object.values(pending).some(Boolean)} onClick={() => void clearAll()}>{resetting ? "Clearing…" : "Clear All"}</ActionButton>
+      </div>
+    </Dialog>
     <Surface variant="collapsible" className="overflow-x-auto">
       <table className="w-full table-fixed text-sm" style={{ minWidth: 208 + checklist.staff.length * 160 }}>
         <colgroup><col style={{ width: 208 }} />{checklist.staff.map((person) => <col key={person.id} style={{ width: 160 }} />)}</colgroup>
@@ -94,7 +127,7 @@ export function WeeklyChecklistTable({ checklist }: { checklist: WeeklyChecklist
             const entry = entries.find((item) => item.dutyId === duty.id && item.staffId === person.id);
             return <td key={person.id} className="px-2 py-3 text-center align-middle">
               {entry ? <div aria-busy={pending[entry.id] || false}>
-                <ChecklistStatusControl status={entry.status} label={`${person.name}: ${duty.name}`} readOnly={!person.canEdit || !checklist.isCurrent || navigating} pending={pending[entry.id]} onChange={(value) => void save(entry.id, value)} />
+                <ChecklistStatusControl status={entry.status} label={`${person.name}: ${duty.name}`} readOnly={!person.canEdit || resetting || confirmClear || refreshing} pending={pending[entry.id]} onChange={(value) => void save(entry.id, value)} />
                 {pending[entry.id] ? <span role="status" className="mt-1 block text-xs text-muted-foreground">Saving…</span> : null}
               </div> : <span className="text-muted-foreground">Unavailable</span>}
             </td>;

@@ -5,7 +5,7 @@ import { checklistTvLayoutKey, checklistTvPagePlan } from "./tvPagination.ts";
 
 function checklist(dutyCount: number, staffCount: number): WeeklyChecklist {
   return {
-    weekId: "week", isCurrent: true, weeks: [], entries: [],
+    weekId: "week", startsAt: "2026-10-12T07:00:00Z", resetRevision: "revision", canClear: false, entries: [],
     duties: Array.from({ length: dutyCount }, (_, index) => ({ id: `duty-${index}`, name: `Duty ${index}` })),
     staff: Array.from({ length: staffCount }, (_, index) => ({ id: `staff-${index}`, name: `Staff ${index}`, canEdit: false })),
   };

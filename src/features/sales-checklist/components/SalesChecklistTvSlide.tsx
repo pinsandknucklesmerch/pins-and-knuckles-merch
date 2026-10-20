@@ -70,7 +70,6 @@ function ChecklistPages({ checklist, durationSeconds, paused, onPlaybackComplete
     return () => window.clearTimeout(timer);
   }, [complete, onPlaybackComplete, page, pageCount, pageDurationMs, paused]);
 
-  const selectedWeek = checklist.weeks.find((week) => week.id === checklist.weekId);
   const staffOffset = Math.floor(page / dutyPages) * TV_STAFF_PER_PAGE;
   const dutyOffset = page % dutyPages * TV_DUTIES_PER_PAGE;
   const staff = checklist.staff.slice(staffOffset, staffOffset + TV_STAFF_PER_PAGE);
@@ -79,7 +78,7 @@ function ChecklistPages({ checklist, durationSeconds, paused, onPlaybackComplete
   return <section className={styles.slide} data-tv-view="sales_checklist">
     <div className={styles.heading} data-tv-group="checklist-heading">
       <h2>Sales Weekly Checklist</h2>
-      <span>{selectedWeek ? weekLabel(selectedWeek.startsAt) : "Current week"}{pageCount > 1 ? ` · Page ${page + 1}/${pageCount}` : ""}</span>
+      <span>{weekLabel(checklist.startsAt)}{pageCount > 1 ? ` · Page ${page + 1}/${pageCount}` : ""}</span>
     </div>
     <table className={styles.table}>
       <caption className="sr-only">Read-only weekly sales checklist and completion scores</caption>

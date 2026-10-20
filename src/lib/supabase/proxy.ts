@@ -1,4 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
+import { clearAuthCookiesAtScopes, createServerClient, type CookieMethodsServer } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
 
@@ -31,8 +31,14 @@ function redirectToLogin(request: NextRequest, reason?: string) {
   return NextResponse.redirect(url);
 }
 
+function withSessionCookies(response: NextResponse, sessionResponse: NextResponse) {
+  sessionResponse.cookies.getAll().forEach((cookie) => response.cookies.set(cookie));
+  return response;
+}
+
 export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const isPublic = pathname === "/" || isPublicPath(pathname);
   const hasAuthCookie = hasSupabaseAuthCookie(request);
   const isPrefetch = isNavigationPrefetch(request);
 
@@ -44,12 +50,14 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  if (isPublicPath(pathname)) {
+  // Password updates read the session in a Server Component, which cannot
+  // persist refreshes or expired-session cookie deletions itself.
+  if (isPublicPath(pathname) && pathname !== "/auth/update-password") {
     return supabaseResponse;
   }
 
   if (!hasAuthCookie) {
-    return pathname === "/" ? supabaseResponse : redirectToLogin(request);
+    return isPublic ? supabaseResponse : redirectToLogin(request);
   }
 
   // A prefetch never renders the route for the user. The foreground request
@@ -58,48 +66,76 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
+  const incomingCookies = request.cookies.getAll();
+  const cookieMethods = {
+    getAll() {
+      return request.cookies.getAll();
+    },
+    setAll(cookiesToSet) {
+      cookiesToSet.forEach(({ name, value, options }) => {
+        if (options.maxAge === 0) {
+          request.cookies.delete(name);
+        } else {
+          request.cookies.set(name, value);
+        }
+      });
+      const previousCookies = supabaseResponse.cookies.getAll();
+      supabaseResponse = NextResponse.next({ request });
+      previousCookies.forEach((cookie) => supabaseResponse.cookies.set(cookie));
+      cookiesToSet.forEach(({ name, value, options }) =>
+        supabaseResponse.cookies.set(name, value, options),
+      );
+    },
+  } satisfies CookieMethodsServer;
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
-          );
-        },
-      },
-    },
+    { cookies: cookieMethods },
   );
 
   const { data, error } = await supabase.auth.getClaims();
 
   if (error) {
     const errorCode = "code" in error ? String(error.code) : null;
-    if (errorCode === "over_request_rate_limit") {
-      return redirectToLogin(request, "auth-rate-limit");
+    if (errorCode === "refresh_token_not_found" || errorCode === "refresh_token_already_used") {
+      // Match the default project namespace used by the current Supabase clients.
+      // The SSR helper discovers every cookie chunk without another auth request.
+      const projectRef = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).hostname.split(".")[0];
+      const storageKey = `sb-${projectRef}-auth-token`;
+      for (const key of [storageKey, `${storageKey}-user`]) {
+        await clearAuthCookiesAtScopes({
+          getAll: () => incomingCookies,
+          setAll: cookieMethods.setAll,
+          storageKey: key,
+          scopes: [{}],
+        });
+      }
+
+      return pathname === "/auth/update-password"
+        ? supabaseResponse
+        : withSessionCookies(redirectToLogin(request), supabaseResponse);
     }
 
-    return pathname === "/" ? redirectToLogin(request) : supabaseResponse;
+    if (errorCode === "over_request_rate_limit") {
+      return pathname === "/auth/update-password"
+        ? supabaseResponse
+        : withSessionCookies(redirectToLogin(request, "auth-rate-limit"), supabaseResponse);
+    }
+
+    return pathname === "/"
+      ? withSessionCookies(redirectToLogin(request), supabaseResponse)
+      : supabaseResponse;
   }
 
   if (pathname === "/") {
     const url = request.nextUrl.clone();
     url.pathname = data?.claims ? "/hub" : "/login";
-    return NextResponse.redirect(url);
+    return withSessionCookies(NextResponse.redirect(url), supabaseResponse);
   }
 
-  if (!data?.claims) {
-    return redirectToLogin(request);
+  if (!data?.claims && !isPublic) {
+    return withSessionCookies(redirectToLogin(request), supabaseResponse);
   }
 
   return supabaseResponse;

@@ -47,16 +47,18 @@ Detailed behavior: [`docs/reference/SALES_DASHBOARD.md`](../reference/SALES_DASH
 
 ### Sales Weekly Checklist (source added 2026-10-13)
 
-`/hub/sales-checklist` provides persisted Monday 09:00 Africa/Johannesburg periods,
-immutable duty/staff snapshots, per-user current-week status editing and shared scores.
-Admin/developer management at `/hub/sales-checklist/manage` selects actual organisation
-users and schedules duty/team changes for future weeks. Effective-dated configuration
-supports safe rollover after a missed cron. Initial setup can establish the first week.
-Sales Dashboard TV Mode includes a read-only checklist slide with periodic refresh and
-uses validated persisted rotation settings. The additive October migrations must be
-applied in order; remote application, staff links and cron deployment are unconfirmed.
-Batch 3 gates TV rotation until all checklist pages are shown, rejects stale management
-effective weeks, and aligns TV settings RPC/RLS with the existing active-owner override.
+`/hub/sales-checklist` exposes only the current Monday 09:00 Africa/Johannesburg
+board, per-user status editing and shared scores. Admin/developer management at
+`/hub/sales-checklist/manage` selects actual organisation users and schedules duty/team
+changes for future weeks. Effective-dated configuration supports rollover after a missed
+cron without backfilling historical boards. Clear All requires confirmation and a database
+permission check (existing admin/developer/owner capability or Johan's explicitly provisioned
+Auth UUID). Organisation locking and reset revisions reject saves from before a reset.
+Sales Dashboard TV Mode reads the current board every 15 seconds; status-only refreshes
+preserve pagination and rotation. The October migrations must be applied in order;
+remote application, Johan's reset identity provisioning and cron deployment are unconfirmed.
+The 20261015100000 migration retains old rows but restricts period/status reads to the
+current board. No shared auth/access helpers or Merch policies change.
 Details: [Sales Weekly Checklist](../reference/SALES_WEEKLY_CHECKLIST.md).
 
 ### Reporting and EPCC reports

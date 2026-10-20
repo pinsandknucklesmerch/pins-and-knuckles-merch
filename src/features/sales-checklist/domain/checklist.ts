@@ -14,8 +14,9 @@ export function nextChecklistStatus(status: ChecklistStatus): ChecklistStatus {
 
 export type WeeklyChecklist = {
   weekId: string;
-  isCurrent: boolean;
-  weeks: Array<{ id: string; startsAt: string }>;
+  startsAt: string;
+  resetRevision: string;
+  canClear: boolean;
   duties: Array<{ id: string; name: string }>;
   staff: Array<{ id: string; name: string; canEdit: boolean }>;
   entries: Array<{ id: string; dutyId: string; staffId: string; status: ChecklistStatus }>;
@@ -45,14 +46,10 @@ export function record(value: unknown): value is Record<string, unknown> {
 
 // Validate the JSON RPC boundary rather than asserting a generated JSON type is a domain object.
 export function parseWeeklyChecklist(value: unknown): WeeklyChecklist {
-  if (!record(value) || !isUuid(value.weekId) || typeof value.isCurrent !== "boolean"
-    || !Array.isArray(value.weeks) || !Array.isArray(value.duties) || !Array.isArray(value.staff) || !Array.isArray(value.entries)) {
+  if (!record(value) || !isUuid(value.weekId) || typeof value.canClear !== "boolean" || !isUuid(value.resetRevision)
+    || typeof value.startsAt !== "string" || !Number.isFinite(Date.parse(value.startsAt)) || !Array.isArray(value.duties) || !Array.isArray(value.staff) || !Array.isArray(value.entries)) {
     throw new Error("Checklist data could not be loaded.");
   }
-  const weeks = value.weeks.map((week: unknown) => {
-    if (!record(week) || !isUuid(week.id) || typeof week.startsAt !== "string" || !Number.isFinite(Date.parse(week.startsAt))) throw new Error("Invalid checklist week.");
-    return { id: week.id, startsAt: week.startsAt };
-  });
   const duties = value.duties.map((duty: unknown) => {
     if (!record(duty) || !isUuid(duty.id) || typeof duty.name !== "string") throw new Error("Invalid checklist duty.");
     return { id: duty.id, name: duty.name };
@@ -65,5 +62,5 @@ export function parseWeeklyChecklist(value: unknown): WeeklyChecklist {
     if (!record(entry) || !isUuid(entry.id) || !isUuid(entry.dutyId) || !isUuid(entry.staffId) || !isChecklistStatus(entry.status)) throw new Error("Invalid checklist entry.");
     return { id: entry.id, dutyId: entry.dutyId, staffId: entry.staffId, status: entry.status };
   });
-  return { weekId: value.weekId, isCurrent: value.isCurrent, weeks, duties, staff, entries };
+  return { weekId: value.weekId, startsAt: value.startsAt, resetRevision: value.resetRevision, canClear: value.canClear, duties, staff, entries };
 }

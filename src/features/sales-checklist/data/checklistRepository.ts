@@ -1,20 +1,18 @@
 import "server-only";
 import { getCurrentPinsHubAccess } from "@/lib/access/pinsHubAccess";
 import { createClient } from "@/lib/supabase/server";
-import { isUuid, parseWeeklyChecklist, type WeeklyChecklist } from "../domain/checklist";
+import { parseWeeklyChecklist, type WeeklyChecklist } from "../domain/checklist";
 
 import { resolveChecklistDisplayNames } from "./displayNames";
 
-export async function loadSalesChecklist(weekId?: string) {
+export async function loadSalesChecklist() {
   const access = await getCurrentPinsHubAccess();
   let checklist: WeeklyChecklist | null = null;
   let errorMessage: string | null = null;
   if (!access.access || !access.membership?.is_active) return { access, checklist, errorMessage };
-  if (weekId && !isUuid(weekId)) return { access, checklist, errorMessage: "This checklist week is invalid." };
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("read_sales_checklist", {
     p_organisation_id: access.membership.organisation_id,
-    ...(weekId ? { p_week_id: weekId } : {}),
   });
   if (error) {
     errorMessage = error.code === "P0001"

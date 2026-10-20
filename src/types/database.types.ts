@@ -2246,18 +2246,21 @@ export type Database = {
           id: string
           organisation_id: string
           starts_at: string
+          reset_revision: string
         }
         Insert: {
           ends_at: string
           id?: string
           organisation_id: string
           starts_at: string
+          reset_revision?: string
         }
         Update: {
           ends_at?: string
           id?: string
           organisation_id?: string
           starts_at?: string
+          reset_revision?: string
         }
         Relationships: [
           {
@@ -3311,6 +3314,14 @@ export type Database = {
           source_hash_present: boolean
         }[]
       }
+      clear_sales_checklist: {
+        Args: { p_organisation_id: string; p_week_id: string; p_reset_revision: string }
+        Returns: boolean
+      }
+      can_clear_sales_checklist: {
+        Args: { p_organisation_id: string }
+        Returns: boolean
+      }
       read_sales_checklist: {
         Args: { p_organisation_id: string; p_week_id?: string }
         Returns: Json
@@ -3563,6 +3574,7 @@ export type Database = {
           p_entry_id: string
           p_organisation_id: string
           p_status: string
+          p_reset_revision: string
         }
         Returns: boolean
       }
