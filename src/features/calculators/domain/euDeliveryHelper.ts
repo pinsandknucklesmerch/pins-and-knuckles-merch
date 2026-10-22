@@ -63,8 +63,6 @@ export function calculateEuDelivery(
 export function formatEuDeliveryCopy(delivery: Extract<EuDeliveryCalculation, { ok: true }>) {
   const money = (value: number) => `€${value.toFixed(2)}`;
   return [
-    "Delivery Helper",
-    "",
     `Delivery Country: ${delivery.rate.country}`,
     `Delivery Time: ${delivery.rate.deliveryTime}`,
     `Boxes: ${delivery.boxCount}`,
