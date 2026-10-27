@@ -132,7 +132,7 @@ Restore tooling is intended for explicitly configured disposable/local targets, 
 
 ### Monday
 
-The repository contains a Monday GraphQL client, board discovery/audit tooling, guarded historical import tooling, and a scheduled current-period sales sync. The cron implementation validates source data, uses a database lock, writes Monday-owned company/member fields through service-role access, and records best-effort run history. Rejected source data and overlapping-run outcomes are recorded as failed rather than successful runs.
+The repository contains a Monday GraphQL client, board discovery/audit tooling, guarded historical import tooling, and a scheduled current-period sales sync. The cron implementation validates source data, uses a database lock, writes Monday-owned company/member fields through service-role access, and records best-effort run history. A weekly row with a recoverable missing Channel is skipped from all calculations and reported in snapshot/run diagnostics while other valid rows continue; fatal board/import validation and a dataset with no usable weekly rows still reject the sync. Rejected source data and overlapping-run outcomes are recorded as failed rather than successful runs.
 
 `vercel.json` declares a daily schedule for `/api/cron/monday-sales-sync`. The repository cannot prove that the schedule is deployed, the token or board configuration is valid, or syncs have run successfully.
 

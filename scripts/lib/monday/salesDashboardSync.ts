@@ -1,6 +1,6 @@
 import { classifyBoardPeriod, discoverMonthlyBoards } from "./monthlyBoardAudit.ts";
 import { auditProfitTracking, shouldWriteMondayProfit, type ProfitTrackingAudit } from "./profitTracking.ts";
-import { summarizeMonthlySalesBoard, type MondayBoard, type MondayItem } from "./salesHistoryAudit.ts";
+import { summarizeMonthlySalesBoard, type MondayBoard, type MondayItem, type SkippedMondayItem } from "./salesHistoryAudit.ts";
 import type { MemberClassification } from "../../../src/features/sales-dashboard/domain/memberIdentity.ts";
 import { canonicalMemberIdentities } from "../../../src/features/sales-dashboard/domain/memberIdentity.ts";
 
@@ -60,6 +60,8 @@ export type MondaySnapshot = {
     quotesDone?: number;
     ordersProcessed?: number;
     trigger?: "cron";
+    skippedItemCount: number;
+    skippedItems: SkippedMondayItem[];
     mismatchedDates: Array<Record<string, unknown>>;
     scopeA: { leads: number; converted: number; conversionRate: number };
     profitTracking: ProfitTrackingAudit;
@@ -135,6 +137,7 @@ export type SyncOutcome = {
     missingDates: Array<Record<string, unknown>>;
     mismatchedDates: Array<Record<string, unknown>>;
     multiAccountManagers: Array<Record<string, unknown>>;
+    skippedItems: SkippedMondayItem[];
     safety: { safe: boolean; reasons: string[] };
   };
 };
@@ -192,9 +195,9 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
     const summary = summarizeMonthlySalesBoard(entry.board, collected.items, entry.structure?.resolvedColumns);
     const profitTracking = auditProfitTracking(entry.board, collected.items, fetchedAt);
     const safetyReasons: string[] = [];
+    if (summary.fetch.includedWeeklyItems === 0) safetyReasons.push("No usable weekly items remain after recoverable validation skips.");
     if (summary.validation.missingDateCount) safetyReasons.push(`${summary.validation.missingDateCount} weekly item(s) have no valid reporting date.`);
     if (summary.validation.blankAccountManagerItemCount) safetyReasons.push(`${summary.validation.blankAccountManagerItemCount} weekly item(s) have no account manager.`);
-    if (summary.validation.blankChannelItemCount) safetyReasons.push(`${summary.validation.blankChannelItemCount} weekly item(s) have no channel.`);
     if (profitTracking.excludedRows.some((row) => row.reason === "invalid-profit")) safetyReasons.push("Profit Tracking contains invalid profit values.");
     const audit = {
       resolvedWeeklyGroups: (entry.board.groups ?? []).filter((group) => /^week\s+[1-5]$/i.test(group.title)).map((group) => ({ id: String(group.id), title: group.title })),
@@ -204,6 +207,7 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
       missingDates: summary.missingDates,
       mismatchedDates: summary.mismatchedDates,
       multiAccountManagers: summary.multiAccountManagers,
+      skippedItems: summary.skippedItems,
       safety: { safe: safetyReasons.length === 0, reasons: safetyReasons },
     };
     const willWriteMondayProfit = shouldWriteMondayProfit(input.year, month);
@@ -244,7 +248,7 @@ export async function syncMondaySalesDashboard(input: SyncInput): Promise<SyncOu
       converted: scopeB.convertedItems,
       data_source: "monday",
       memberSnapshots,
-      monday_sync_metadata: { sourceBoardId: String(entry.board.id), fetchedAt, validation: summary.validation, dateSourceCounts: summary.dateSourceCounts, mismatchedDates: summary.mismatchedDates, scopeA: { leads: scopeA.totalLeadItems, converted: scopeA.convertedItems, conversionRate: scopeA.conversionRate }, profitTracking, ...(input.trigger === "cron" ? { reportingPeriod: { year: input.year, month }, quotesDone: scopeA.totalLeadItems, ordersProcessed: scopeA.convertedItems, trigger: "cron" as const } : {}) },
+      monday_sync_metadata: { sourceBoardId: String(entry.board.id), fetchedAt, validation: summary.validation, dateSourceCounts: summary.dateSourceCounts, skippedItemCount: summary.skippedItems.length, skippedItems: summary.skippedItems, mismatchedDates: summary.mismatchedDates, scopeA: { leads: scopeA.totalLeadItems, converted: scopeA.convertedItems, conversionRate: scopeA.conversionRate }, profitTracking, ...(input.trigger === "cron" ? { reportingPeriod: { year: input.year, month }, quotesDone: scopeA.totalLeadItems, ordersProcessed: scopeA.convertedItems, trigger: "cron" as const } : {}) },
     };
     if (willWriteMondayProfit && profitTracking.calculatedMonthlyTotal !== null) {
       snapshot.monthly_profit = profitTracking.calculatedMonthlyTotal;

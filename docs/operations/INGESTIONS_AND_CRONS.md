@@ -91,6 +91,9 @@ Current behavior:
 - source metadata
 - canonical member completion
 - safe historical CLI workflow
+- weekly rows with recoverable source-data problems, currently a missing Channel, are excluded from all KPI calculations while valid rows continue
+- skipped rows are recorded by item ID, item name, and reason in Monday snapshot metadata and the cron run summary
+- import-wide safety failures, including invalid structure, missing dates or owners, invalid profit values, or no usable weekly rows, still reject the sync without writing a snapshot
 
 ## Cron run history
 
@@ -103,7 +106,7 @@ Current behavior:
 - sanitized summary/metadata
 - sanitized error details
 
-Monday source-validation rejections and overlapping-run outcomes are recorded as failed runs. Only `updated`, `inserted`, and `unchanged` outcomes record a successful Monday run.
+Monday fatal source-validation rejections and overlapping-run outcomes are recorded as failed runs. Only `updated`, `inserted`, and `unchanged` outcomes record a successful Monday run. A successful run may report recoverable skipped rows; those rows are excluded from the persisted calculations and do not make the otherwise valid run stale.
 
 ## Developer Diagnostics
 

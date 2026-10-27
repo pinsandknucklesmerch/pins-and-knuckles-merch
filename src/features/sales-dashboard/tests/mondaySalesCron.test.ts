@@ -64,6 +64,47 @@ test("Monday successful responses complete run history", async () => {
   assert.deepEqual(calls, ["start", "complete"]);
 });
 
+test("Monday skipped-row success completes history with sanitized diagnostics", async () => {
+  const summaries: string[] = [];
+  const skippedCounts: Array<number | undefined> = [];
+  const handler = createMondaySalesSyncCronHandler(
+    async () => ({
+      outcome: "updated",
+      year: 2026,
+      month: 7,
+      quotesDone: 248,
+      ordersProcessed: 141,
+      changed: true,
+      skippedItemCount: 1,
+      skippedItems: [{ id: "13357521583", name: "Kila Kosa", reason: "missing-channel", message: "Channel is missing" }],
+    }),
+    () => true,
+    {
+      start: async () => ({ id: "run-1", startedAt: "2026-07-28T10:15:00Z" }),
+      complete: async (input) => {
+        summaries.push(input.summary);
+        skippedCounts.push(input.metadata?.skippedItemCount as number | undefined);
+      },
+      fail: async () => { assert.fail("skipped-row success must not fail run history"); },
+    },
+  );
+
+  const response = await handler(new Request("https://example.test/api/cron/monday-sales-sync"));
+  assert.equal(response.status, 200);
+  assert.match(summaries[0], /skipped 1: Kila Kosa \(13357521583\): Channel is missing/);
+  assert.deepEqual(skippedCounts, [1]);
+  assert.deepEqual(await response.json(), {
+    outcome: "updated",
+    year: 2026,
+    month: 7,
+    quotesDone: 248,
+    ordersProcessed: 141,
+    changed: true,
+    skippedItemCount: 1,
+    skippedItems: [{ id: "13357521583", name: "Kila Kosa", reason: "missing-channel", message: "Channel is missing" }],
+  });
+});
+
 test("Monday cron preserves its 500 response when ingestion fails", async () => {
   const handler = createMondaySalesSyncCronHandler(async () => { throw new Error("source unavailable"); }, () => true);
   const response = await handler(new Request("https://example.test/api/cron/monday-sales-sync"));

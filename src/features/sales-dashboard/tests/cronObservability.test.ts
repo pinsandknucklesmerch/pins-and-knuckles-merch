@@ -100,3 +100,17 @@ test("dashboard warning identifies stale sources and clears after today's succes
     row("monday-sales-sync", "success", "2026-08-11T08:16:00Z"),
   ], 2026, 8, now), []);
 });
+
+test("a successful Monday run with skipped-row metadata is fresh", () => {
+  const now = new Date("2026-08-11T10:00:00Z");
+  const monday = {
+    ...row("monday-sales-sync", "success", "2026-08-11T08:16:00Z"),
+    summary: "Monday updated; quotes 248; orders 141; skipped 1: Kila Kosa (13357521583): Channel is missing",
+    metadata: { outcome: "updated", skippedItemCount: 1 },
+  };
+
+  assert.deepEqual(buildSalesDashboardStaleWarnings([
+    row("epcc-profit", "success", "2026-08-11T08:06:00Z"),
+    monday,
+  ], 2026, 8, now), []);
+});

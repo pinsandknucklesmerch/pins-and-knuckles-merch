@@ -35,6 +35,12 @@ type DateSource = "date_in_touch" | "created_at_fallback";
 type DateIssue = "invalid_date_in_touch" | "missing_created_at" | "invalid_created_at";
 type ConversionState = "yes" | "no" | "undecided";
 type SummaryItem = { item: MondayItem; people: Person[]; channel: string | null; channelNormalized: string; conversionState: ConversionState; converted: boolean; date: string | null; dateSource: DateSource | null; dateIssue: DateIssue | null; dateMatchesBoardMonth: boolean };
+export type SkippedMondayItem = {
+  id: string;
+  name: string;
+  reason: "missing-channel";
+  message: "Channel is missing";
+};
 type Month = { year: number; month: number; label: string };
 export type MondayMemberKpi = {
   teamMemberKey: string;
@@ -122,21 +128,28 @@ function memberKpis(items: SummaryItem[]): MondayMemberKpi[] {
 }
 export function summarizeMonthlySalesBoard(board: Pick<MondayBoard, "id" | "name">, items: MondayItem[], resolvedColumns: Partial<typeof MONTHLY_SALES_COLUMNS> = {}) {
   const columns = { ...MONTHLY_SALES_COLUMNS, ...resolvedColumns };
-  const expectedMonth = boardMonth(board.name); const excludedItems: Array<{ id: string; name: string; group: string | null; reason: string }> = []; const included: SummaryItem[] = [];
+  const expectedMonth = boardMonth(board.name); const excludedItems: Array<{ id: string; name: string; group: string | null; reason: string }> = []; const skippedItems: SkippedMondayItem[] = []; const weeklyItems: SummaryItem[] = []; const included: SummaryItem[] = [];
   for (const item of items) {
     const group = item.group?.title ?? null; if (!group || !weeklyGroup.test(group)) { excludedItems.push({ id: String(item.id), name: item.name, group, reason: group?.toLowerCase() === "profit tracking" ? "profit-tracking-group" : "non-weekly-group" }); continue; }
+    const channel = column(item, columns.channel)?.text?.trim() || null;
     const resolvedDate = dateResolution(item, columns.dateInTouch); const dateMatchesBoardMonth = Boolean(resolvedDate.date && expectedMonth && resolvedDate.date.startsWith(`${expectedMonth.year}-${String(expectedMonth.month).padStart(2, "0")}-`));
     const conversionValue = normalizeStatus(column(item, columns.converted)?.text);
     const conversionState: ConversionState = conversionValue === "yes" || conversionValue === "no" ? conversionValue : "undecided";
-    included.push({ item, people: people(column(item, columns.people)), channel: column(item, columns.channel)?.text?.trim() || null, channelNormalized: normalizeStatus(column(item, columns.channel)?.text), conversionState, converted: conversionState === "yes", ...resolvedDate, dateMatchesBoardMonth });
+    const summaryItem = { item, people: people(column(item, columns.people)), channel, channelNormalized: normalizeStatus(channel), conversionState, converted: conversionState === "yes", ...resolvedDate, dateMatchesBoardMonth };
+    weeklyItems.push(summaryItem);
+    if (!channel) {
+      skippedItems.push({ id: String(item.id), name: item.name, reason: "missing-channel", message: "Channel is missing" });
+      continue;
+    }
+    included.push(summaryItem);
   }
   const validDates = included.filter((item) => item.dateMatchesBoardMonth); const salesInbox = (rows: SummaryItem[]) => rows.filter((item) => item.channelNormalized === "sales inbox"); const multiAccountManagers = included.filter((item) => item.people.length > 1).map((item) => ({ id: String(item.item.id), name: item.item.name, converted: item.converted, accountManagers: item.people }));
-  const missingDates = included.filter((item) => !item.date).map((item) => ({ id: String(item.item.id), name: item.item.name, group: item.item.group?.title ?? null, reason: item.dateIssue })); const mismatchedDates = included.filter((item) => item.date && !item.dateMatchesBoardMonth).map((item) => ({ sourceBoardId: String(board.id), sourceBoardMonth: expectedMonth?.label ?? board.name, itemId: String(item.item.id), itemName: item.item.name, group: item.item.group?.title ?? null, actualReportingDate: item.date, dateSource: item.dateSource, includedInBoardMembershipTotals: true, includedInValidDateTotals: false, action: "review-in-monday" as const }));
+  const missingDates = weeklyItems.filter((item) => !item.date).map((item) => ({ id: String(item.item.id), name: item.item.name, group: item.item.group?.title ?? null, reason: item.dateIssue })); const mismatchedDates = included.filter((item) => item.date && !item.dateMatchesBoardMonth).map((item) => ({ sourceBoardId: String(board.id), sourceBoardMonth: expectedMonth?.label ?? board.name, itemId: String(item.item.id), itemName: item.item.name, group: item.item.group?.title ?? null, actualReportingDate: item.date, dateSource: item.dateSource, includedInBoardMembershipTotals: true, includedInValidDateTotals: false, action: "review-in-monday" as const }));
   const multiManagerConvertedCount = multiAccountManagers.filter((item) => item.converted).length;
   const allByBoardMembership = aggregate(included);
   const memberKpiRows = memberKpis(included);
   const dateSourceCounts = { date_in_touch: included.filter((item) => item.dateSource === "date_in_touch").length, created_at_fallback: included.filter((item) => item.dateSource === "created_at_fallback").length };
-  return { board: { id: String(board.id), name: board.name, inferredMonth: expectedMonth }, fetch: { totalItemsFetched: items.length, includedWeeklyItems: included.length, excludedItems: excludedItems.length, deletedItems: "not returned by Monday item queries", inaccessibleItems: "not returned by Monday item queries", subitems: "not requested or included; Monday top-level item query only" }, scopes: { allLeads: { byBoardMembership: allByBoardMembership, byValidDateInTouchMonth: aggregate(validDates) }, salesInboxOnly: { byBoardMembership: aggregate(salesInbox(included)), byValidDateInTouchMonth: aggregate(salesInbox(validDates)) } }, memberKpiRows, validation: { missingDateCount: missingDates.length, invalidDateInTouchCount: missingDates.filter((item) => item.reason === "invalid_date_in_touch").length, missingDateSourceCount: missingDates.filter((item) => item.reason === "missing_created_at").length, invalidCreatedAtCount: missingDates.filter((item) => item.reason === "invalid_created_at").length, mismatchedDateCount: mismatchedDates.length, validDateInTouchMonthCount: validDates.length, multiManagerItemCount: multiAccountManagers.length, multiManagerConvertedCount, excludedFromMemberMetricsCount: multiAccountManagers.length, blankAccountManagerItemCount: included.filter((item) => !item.people.length).length, blankChannelItemCount: allByBoardMembership.blankChannelCount }, dateSourceCounts, excludedItems, missingDates, mismatchedDates, multiAccountManagers };
+  return { board: { id: String(board.id), name: board.name, inferredMonth: expectedMonth }, fetch: { totalItemsFetched: items.length, includedWeeklyItems: included.length, excludedItems: excludedItems.length, skippedItems: skippedItems.length, deletedItems: "not returned by Monday item queries", inaccessibleItems: "not returned by Monday item queries", subitems: "not requested or included; Monday top-level item query only" }, scopes: { allLeads: { byBoardMembership: allByBoardMembership, byValidDateInTouchMonth: aggregate(validDates) }, salesInboxOnly: { byBoardMembership: aggregate(salesInbox(included)), byValidDateInTouchMonth: aggregate(salesInbox(validDates)) } }, memberKpiRows, validation: { missingDateCount: missingDates.length, invalidDateInTouchCount: missingDates.filter((item) => item.reason === "invalid_date_in_touch").length, missingDateSourceCount: missingDates.filter((item) => item.reason === "missing_created_at").length, invalidCreatedAtCount: missingDates.filter((item) => item.reason === "invalid_created_at").length, mismatchedDateCount: mismatchedDates.length, validDateInTouchMonthCount: validDates.length, multiManagerItemCount: multiAccountManagers.length, multiManagerConvertedCount, excludedFromMemberMetricsCount: multiAccountManagers.length, blankAccountManagerItemCount: weeklyItems.filter((item) => !item.people.length).length, blankChannelItemCount: skippedItems.length, skippedItemCount: skippedItems.length }, dateSourceCounts, excludedItems, skippedItems, missingDates, mismatchedDates, multiAccountManagers };
 }
 
 export class MondayClient {

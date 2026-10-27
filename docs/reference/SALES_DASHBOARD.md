@@ -39,7 +39,7 @@ large checklists extend playback as needed, while manual controls remain availab
 
 TV mode is dashboard query state. Administrators configure seven persisted slides—Overview, YTD, Year Comparison, Snuggle, Live Zoo Cam, Team Members, and Sales Weekly Checklist—at `/hub/sales-dashboard/tv/settings`, with enabled state, order, and 10–300 second durations. Playback consumes validated persisted settings with safe defaults. The checklist is read-only, polls its current Johannesburg weekly period every 15 seconds while displayed, and reuses checklist snapshots and scoring independently of the reporting month/year. See [Sales Weekly Checklist](SALES_WEEKLY_CHECKLIST.md) for configuration, access and rollout details.
 
-From July 2026, Monday owns Quotes Done, Orders Processed, sales-inbox/conversion fields, and associated provenance; EPCC/NetSuite owns company monthly Profit and member Profit/PK Tax. Final values are display overrides and never overwrite source-owned values. Historical workbook fallback remains intentional technical debt until persisted coverage is confirmed.
+From July 2026, Monday owns Quotes Done, Orders Processed, sales-inbox/conversion fields, and associated provenance; EPCC/NetSuite owns company monthly Profit and member Profit/PK Tax. Final values are display overrides and never overwrite source-owned values. During Monday ingestion, a weekly row with a recoverable missing Channel is skipped and reported rather than included with a manufactured value; fatal import-wide validation still prevents snapshot persistence. Historical workbook fallback remains intentional technical debt until persisted coverage is confirmed.
 
 ## Operational boundary
 
