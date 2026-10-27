@@ -103,6 +103,8 @@ Current behavior:
 - sanitized summary/metadata
 - sanitized error details
 
+Monday source-validation rejections and overlapping-run outcomes are recorded as failed runs. Only `updated`, `inserted`, and `unchanged` outcomes record a successful Monday run.
+
 ## Developer Diagnostics
 
 Developer Diagnostics shows:
@@ -111,7 +113,7 @@ Developer Diagnostics shows:
 - latest successful run
 - overdue state
 
-Overdue status is calculated using the configured schedule plus a 30-minute grace period.
+Overdue status is calculated using the configured schedule plus a 60-minute grace period, matching the observed Vercel daily-cron delivery window.
 
 A missing or stale run-history row is an operational signal, not proof of the underlying cause.
 

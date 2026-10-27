@@ -128,9 +128,9 @@ vercel.json declares two UTC routes:
 | /api/cron/epcc-profit | 5 8 * * * | Requires a timing-safe CRON_SECRET bearer match; reads/parses Gmail EPCC reports, reconciles member totals, then applies the EPCC RPC. |
 | /api/cron/monday-sales-sync | 15 8 * * * | Requires the same bearer check; syncs current UTC month only for the canonical Pins & Knuckles organisation, after board validation and a per-organisation/year/month database lock. |
 
-Both use best-effort cron-run lifecycle recording. cron_run_history records status, period, duration, sanitized metadata/summary/errors. History-recording failure is logged but does not itself block ingestion. A completed cron handler can have a business-level Monday rejected outcome without being an execution failure.
+Both use best-effort cron-run lifecycle recording. cron_run_history records status, period, duration, sanitized metadata/summary/errors. History-recording failure is logged but does not itself block ingestion. Monday source-validation rejections and overlapping-run outcomes are classified as failed runs.
 
-Developer Diagnostics derives overdue state from the configured UTC schedule plus a 30-minute grace period. Repository code cannot prove remote Vercel schedule execution.
+Developer Diagnostics derives overdue state from the configured UTC schedule plus a 60-minute delivery grace period. Repository code cannot prove remote Vercel schedule execution.
 
 ## Important business logic
 

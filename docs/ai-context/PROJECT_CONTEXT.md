@@ -132,7 +132,7 @@ Restore tooling is intended for explicitly configured disposable/local targets, 
 
 ### Monday
 
-The repository contains a Monday GraphQL client, board discovery/audit tooling, guarded historical import tooling, and a scheduled current-period sales sync. The cron implementation validates source data, uses a database lock, writes Monday-owned company/member fields through service-role access, and records best-effort run history.
+The repository contains a Monday GraphQL client, board discovery/audit tooling, guarded historical import tooling, and a scheduled current-period sales sync. The cron implementation validates source data, uses a database lock, writes Monday-owned company/member fields through service-role access, and records best-effort run history. Rejected source data and overlapping-run outcomes are recorded as failed rather than successful runs.
 
 `vercel.json` declares a daily schedule for `/api/cron/monday-sales-sync`. The repository cannot prove that the schedule is deployed, the token or board configuration is valid, or syncs have run successfully.
 
@@ -192,7 +192,6 @@ Repository working and verification rules are in the root [`AGENTS.md`](../../AG
 - Remote Supabase migration state, policies, grants, RPCs, production data, and the Band-first Pins Merch client rollout are not established by this repository.
 - The generated database types do not yet mirror every Band-first migration object.
 - Sales Dashboard still retains a historical workbook fixture for gaps in persisted coverage.
-- Monday business-level rejected outcomes can complete the handler without being classified as thrown cron failures, limiting what run-history status alone proves.
 - Social analytics integrations are not connected.
 - Microsoft sign-in and SharePoint/OneDrive integrations are not implemented.
 - EU Trade remains intentionally deferred pending confirmed business rules.

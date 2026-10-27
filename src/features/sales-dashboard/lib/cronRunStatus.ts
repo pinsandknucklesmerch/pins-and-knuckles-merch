@@ -4,7 +4,7 @@ export const CRON_SCHEDULES_UTC: Record<CronJobName, { hour: number; minute: num
   "epcc-profit": { hour: 8, minute: 5 },
   "monday-sales-sync": { hour: 8, minute: 15 },
 };
-export const CRON_MISSED_RUN_GRACE_MINUTES = 30;
+export const CRON_MISSED_RUN_GRACE_MINUTES = 60;
 export type CronDiagnosticStatus = "successful" | "failed" | "overdue" | "never run";
 
 export function latestCronRuns(rows: CronRunHistoryRow[], jobName: CronJobName) {

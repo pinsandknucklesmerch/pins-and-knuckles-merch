@@ -67,7 +67,7 @@ Cron handlers attempt to write `cron_run_history` records for start, success,
 and failure. Stored data includes reporting period, duration, summary, and
 sanitized metadata/error text. Developer Diagnostics shows latest and latest
 successful runs, and marks a job overdue after its configured schedule plus a
-30-minute grace period.
+60-minute grace period.
 
 Run history is operational evidence, not a guarantee of Gmail, EPCC, or
 database correctness. Query failures or missing rows need remote investigation.

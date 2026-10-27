@@ -46,6 +46,24 @@ test("Monday cron rejects unauthorised calls and valid auth reaches the sync han
   assert.equal(calls, 1);
 });
 
+test("Monday successful responses complete run history", async () => {
+  const calls: string[] = [];
+  const handler = createMondaySalesSyncCronHandler(
+    async () => ({ outcome: "unchanged", year: 2026, month: 7, quotesDone: 249, ordersProcessed: 141, changed: false }),
+    () => true,
+    {
+      start: async () => { calls.push("start"); return { id: "run-1", startedAt: "2026-07-28T10:15:00Z" }; },
+      complete: async () => { calls.push("complete"); },
+      fail: async () => { calls.push("fail"); },
+    },
+  );
+
+  const response = await handler(new Request("https://example.test/api/cron/monday-sales-sync"));
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(calls, ["start", "complete"]);
+});
+
 test("Monday cron preserves its 500 response when ingestion fails", async () => {
   const handler = createMondaySalesSyncCronHandler(async () => { throw new Error("source unavailable"); }, () => true);
   const response = await handler(new Request("https://example.test/api/cron/monday-sales-sync"));
@@ -119,9 +137,22 @@ test("Monday cron bypasses only the shared historical review gate and writes can
 });
 
 test("Monday rejected responses include an operational reason", async () => {
-  const handler = createMondaySalesSyncCronHandler(async () => ({ outcome: "rejected", year: 2026, month: 7, quotesDone: null, ordersProcessed: null, changed: false, reason: "Supabase member KPI write failed." }), () => true);
+  const calls: string[] = [];
+  let rejectedError = "";
+  const handler = createMondaySalesSyncCronHandler(
+    async () => ({ outcome: "rejected", year: 2026, month: 7, quotesDone: null, ordersProcessed: null, changed: false, reason: "Supabase member KPI write failed." }),
+    () => true,
+    {
+      start: async () => { calls.push("start"); return { id: "run-1", startedAt: "2026-07-28T10:15:00Z" }; },
+      complete: async () => { calls.push("complete"); },
+      fail: async ({ error }) => { calls.push("fail"); rejectedError = error instanceof Error ? error.message : String(error); },
+    },
+  );
   const response = await handler(new Request("https://example.test/api/cron/monday-sales-sync"));
+  assert.equal(response.status, 422);
   assert.deepEqual(await response.json(), { outcome: "rejected", year: 2026, month: 7, quotesDone: null, ordersProcessed: null, changed: false, reason: "Supabase member KPI write failed." });
+  assert.deepEqual(calls, ["start", "fail"]);
+  assert.equal(rejectedError, "Supabase member KPI write failed.");
 });
 
 test("a member write rejection identifies the member table without exposing source records", async () => {

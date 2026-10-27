@@ -15,10 +15,10 @@ test("cron history separates jobs and selects latest and latest successful runs"
 });
 
 test("cron missed-run detection honors each UTC schedule and grace period", () => {
-  assert.equal(isCronOverdue("epcc-profit", new Date("2026-08-11T08:34:59Z")), false);
-  assert.equal(isCronOverdue("epcc-profit", new Date("2026-08-11T08:35:00Z")), true);
-  assert.equal(isCronOverdue("monday-sales-sync", new Date("2026-08-11T08:44:59Z")), false);
-  assert.equal(isCronOverdue("monday-sales-sync", new Date("2026-08-11T08:45:00Z")), true);
+  assert.equal(isCronOverdue("epcc-profit", new Date("2026-08-11T09:04:59Z")), false);
+  assert.equal(isCronOverdue("epcc-profit", new Date("2026-08-11T09:05:00Z")), true);
+  assert.equal(isCronOverdue("monday-sales-sync", new Date("2026-08-11T09:14:59Z")), false);
+  assert.equal(isCronOverdue("monday-sales-sync", new Date("2026-08-11T09:15:00Z")), true);
   assert.equal(isCronOverdue("epcc-profit", new Date("2026-08-11T10:00:00Z"), row("epcc-profit", "success", "2026-08-11T08:06:00Z")), false);
 });
 
