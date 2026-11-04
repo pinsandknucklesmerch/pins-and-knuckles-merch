@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { Panel } from "@/components/ui/Panel";
 import { copyText } from "@/components/ui/copyText";
 import { calculateUkTradeItem } from "../domain/ukTradePricingEngine.ts";
-import type { UkTradeItemInput, UkTradeReferenceData } from "../domain/types.ts";
+import type { UkTradeCustomGarmentColour, UkTradeItemInput, UkTradeReferenceData } from "../domain/types.ts";
 import { formatUkTradeQuote } from "../domain/ukTradeQuoteFormatter.ts";
 import { CalculatorErrors } from "./CalculatorErrors";
 import { CalculatorItemCard } from "./CalculatorItemCard";
@@ -14,6 +14,9 @@ import { CalculatorToolbar } from "./CalculatorToolbar";
 import { GarmentCombobox } from "./GarmentCombobox";
 import { UkTradeBreakdown } from "./UkTradeBreakdown";
 import { UkTradeDecorationControls } from "./UkTradeDecorationControls";
+import { CurrencyInput } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { isCustomGarmentId } from "../domain/customGarment.ts";
 
 const emptyItem = (index: number): UkTradeItemInput => ({ id: `item-${index}`, itemLabel: "", garmentId: null, quantity: 50, printPositions: [{ position: "FRONT", colourCount: 1 }], embroideryStitches: [null, null, null] });
 const money = (value: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(value);
@@ -42,13 +45,34 @@ export function UkTradeCalculator({ referenceData }: { referenceData: UkTradeRef
       <div className="grid min-w-0 content-start gap-4">
         {items.map((item, index) => {
           const itemErrors = results[index].errors.filter((error) => error.code !== "MISSING_GARMENT" || decorationAttempts[item.id]);
+          const customPriceError = itemErrors.find((error) => error.code === "INVALID_CUSTOM_GARMENT_PRICE");
+          const customColourError = itemErrors.find((error) => error.code === "MISSING_CUSTOM_GARMENT_COLOUR");
+          const otherErrors = itemErrors.filter((error) => error.code !== "INVALID_CUSTOM_GARMENT_PRICE" && error.code !== "MISSING_CUSTOM_GARMENT_COLOUR");
+          const customGarmentSelected = isCustomGarmentId(item.garmentId);
+          const customPriceErrorId = `custom-garment-cost-error-${item.id}`;
+          const customColourErrorId = `custom-garment-colour-error-${item.id}`;
           return <CalculatorItemCard key={item.id} index={index} itemLabel={item.itemLabel ?? ""} canRemove={items.length > 1} onItemLabelChange={(itemLabel) => update({ ...item, itemLabel })} onItemLabelBlur={(itemLabel) => update({ ...item, itemLabel })} onRemove={() => removeItem(item.id)}>
             <div className="grid gap-4 md:grid-cols-[1fr_140px]">
-              <GarmentCombobox garments={referenceData.garments} value={item.garmentId} onChange={(garmentId) => update({ ...item, garmentId })} />
+              <GarmentCombobox garments={referenceData.garments} value={item.garmentId} includeCustomGarment onChange={(garmentId) => update({ ...item, garmentId, customGarmentUnitCost: undefined, customGarmentColour: undefined })} />
               <CalculatorQuantityField min={50} max={10000} type="number" value={item.quantity} onChange={(event) => update({ ...item, quantity: Number(event.target.value) })} />
             </div>
+            {customGarmentSelected ? <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+              <label className="grid min-w-0 gap-1.5 text-xs font-medium text-muted-foreground">
+                Unit garment cost
+                <CurrencyInput currency="GBP" type="number" min="0" step="0.01" value={item.customGarmentUnitCost ?? ""} aria-invalid={customPriceError ? true : undefined} aria-describedby={customPriceError ? customPriceErrorId : undefined} onChange={(event) => update({ ...item, customGarmentUnitCost: event.target.value === "" ? undefined : Number(event.target.value) })} />
+                {customPriceError ? <span id={customPriceErrorId} className="font-normal text-destructive-foreground">{customPriceError.message}</span> : null}
+              </label>
+              <label className="grid min-w-0 gap-1.5 text-xs font-medium text-muted-foreground">
+                Garment colour
+                <Select value={item.customGarmentColour ?? ""} placeholder="Select colour" required invalid={Boolean(customColourError)} aria-describedby={customColourError ? customColourErrorId : undefined} onValueChange={(customGarmentColour) => update({ ...item, customGarmentColour: customGarmentColour as UkTradeCustomGarmentColour })}>
+                  <option value="WHITE">White</option>
+                  <option value="COLOURED">Coloured</option>
+                </Select>
+                {customColourError ? <span id={customColourErrorId} className="font-normal text-destructive-foreground">{customColourError.message}</span> : null}
+              </label>
+            </div> : null}
             <UkTradeDecorationControls printPositions={item.printPositions} embroideryStitches={item.embroideryStitches} onPrintPositionsChange={(printPositions) => update({ ...item, printPositions })} onEmbroideryChange={(embroideryStitches) => update({ ...item, embroideryStitches })} onDecorationSelect={() => setDecorationAttempts((current) => ({ ...current, [item.id]: true }))} />
-            <CalculatorErrors errors={itemErrors} />
+            <CalculatorErrors errors={otherErrors} />
           </CalculatorItemCard>;
         })}
       </div>

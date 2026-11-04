@@ -41,9 +41,11 @@ function createLine(overrides: Partial<EuQuoteLine["input"]> = {}, withDigitisin
       embroideryCustomerCost: 0,
       digitisingProductionCost: withDigitising ? 23 : 0,
       digitisingCustomerCost: withDigitising ? 25 : 0,
+      productionItemSubtotalExVat: 290,
+      customerItemSubtotalExVat: 459.5,
       productionSubtotalExVat: withDigitising ? 313 : 290,
-      customerSubtotalExVat: 459.5,
-      profitExVat: 169.5,
+      customerSubtotalExVat: withDigitising ? 484.5 : 459.5,
+      profitExVat: withDigitising ? 171.5 : 169.5,
       printBreakdowns: [{
         position: "FRONT",
         colourCount: 1,
@@ -99,15 +101,29 @@ test("default EU quote has exact single-item spacing", () => {
 });
 
 test("EU quote has exact digitising spacing", () => {
-  assert.equal(formatEuStandardQuote([createLine({}, true)], totals), "Item 1:\n\n5001 AS Colour Staple Tee (1 Col Front, Small embroidery)\n\nDigitizing fee = €31.75 (incl. VAT)\n\n50 x €9.19 (excl vat) ea = €583.57");
+  assert.equal(formatEuStandardQuote([createLine({}, true)], totals), "Item 1:\n\n5001 AS Colour Staple Tee (1 Col Front, Small embroidery)\n\nDigitizing fee = €31.75 (incl. VAT)\n\n50 x €9.19 (excl vat) ea = €583.57\n\nCombined total = €615.32 (incl. VAT)");
 });
 
 test("US Clients quote matches the legacy wording exactly", () => {
   const line = createLine();
+  line.result.customerItemSubtotalExVat = 559.5;
   line.result.customerSubtotalExVat = 559.5;
   assert.equal(
     formatUsClientQuote([line], { ...totals, customerSubtotalExVat: 559.5, vatRate: 27 }),
     "Item 1:\n\n5001 AS Colour Staple Tee (1c front + base)\n\n50 x €11.19 each (€559.50 ex vat)\nVAT = €151.07\nTOTAL = €710.57",
+  );
+});
+
+test("US Clients quote keeps digitising outside unit and item subtotal pricing", () => {
+  const line = createLine({}, true);
+  assert.equal(
+    formatUsClientQuote([line], {
+      ...totals,
+      customerSubtotalExVat: 484.5,
+      vatAmount: 130.815,
+      customerTotalIncVat: 615.315,
+    }),
+    "Item 1:\n\n5001 AS Colour Staple Tee (1c front, Small embroidery + base)\n\nDigitizing fee = €31.75 (incl. VAT)\n\n50 x €9.19 each (€459.50 ex vat)\nCombined subtotal = €484.50 ex vat\nVAT = €130.82\nTOTAL = €615.32",
   );
 });
 

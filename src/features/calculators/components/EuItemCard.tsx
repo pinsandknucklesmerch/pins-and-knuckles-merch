@@ -9,6 +9,8 @@ import { GarmentCombobox } from "./GarmentCombobox";
 import { PrintPositionControls } from "./PrintPositionControls";
 import type { CalculatorValidationError } from "../domain/types.ts";
 import { normaliseEuPkMarkupInput } from "../domain/euCalculatorInteractions.ts";
+import { isCustomGarmentId } from "../domain/customGarment.ts";
+import { CurrencyInput } from "@/components/ui/Input";
 import { useState } from "react";
 
 type EuItemCardProps = {
@@ -20,6 +22,7 @@ type EuItemCardProps = {
   onChange: (item: EuCalculatorItemInput) => void;
   onRemove: () => void;
   onPrintPositionSelect: () => void;
+  allowCustomGarment: boolean;
 };
 
 export function EuItemCard({
@@ -31,18 +34,59 @@ export function EuItemCard({
   onChange,
   onRemove,
   onPrintPositionSelect,
+  allowCustomGarment,
 }: EuItemCardProps) {
   const [pkMarkupDraft, setPkMarkupDraft] = useState(String(item.pkMarkupPerUnit ?? 0));
+  const customGarmentSelected = isCustomGarmentId(item.garmentId);
+  const customPriceError = errors.find(
+    (error) => error.code === "INVALID_CUSTOM_GARMENT_PRICE",
+  );
+  const otherErrors = errors.filter(
+    (error) => error.code !== "INVALID_CUSTOM_GARMENT_PRICE",
+  );
+  const customPriceErrorId = `custom-garment-cost-error-${item.id}`;
   return (
     <CalculatorItemCard index={index} itemLabel={item.itemLabel ?? ""} canRemove={canRemove} onItemLabelChange={(itemLabel) => onChange({ ...item, itemLabel })} onItemLabelBlur={(itemLabel) => onChange({ ...item, itemLabel })} onRemove={onRemove}>
         <div className="grid min-w-0 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,140px)]">
           <GarmentCombobox
             garments={garments}
             value={item.garmentId}
-            onChange={(garmentId) => onChange({ ...item, garmentId })}
+            includeCustomGarment={allowCustomGarment}
+            onChange={(garmentId) => onChange({
+              ...item,
+              garmentId,
+              customGarmentUnitCost: undefined,
+            })}
           />
           <CalculatorQuantityField min={50} max={2000} type="number" value={item.quantity} onChange={(event) => onChange({ ...item, quantity: Number(event.target.value) })} />
         </div>
+
+        {customGarmentSelected ? (
+          <label className="grid min-w-0 gap-1.5 text-xs font-medium text-muted-foreground sm:max-w-[220px]">
+            Unit garment cost
+            <CurrencyInput
+              currency="EUR"
+              type="number"
+              min="0"
+              step="0.01"
+              value={item.customGarmentUnitCost ?? ""}
+              aria-invalid={customPriceError ? true : undefined}
+              aria-describedby={customPriceError ? customPriceErrorId : undefined}
+              onChange={(event) => {
+                const value = event.target.value;
+                onChange({
+                  ...item,
+                  customGarmentUnitCost: value === "" ? undefined : Number(value),
+                });
+              }}
+            />
+            {customPriceError ? (
+              <span id={customPriceErrorId} className="font-normal text-destructive-foreground">
+                {customPriceError.message}
+              </span>
+            ) : null}
+          </label>
+        ) : null}
 
         <PrintPositionControls
           value={item.printPositions}
@@ -94,7 +138,7 @@ export function EuItemCard({
           />
         </div>
 
-        <CalculatorErrors errors={errors} />
+        <CalculatorErrors errors={otherErrors} />
     </CalculatorItemCard>
   );
 }

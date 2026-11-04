@@ -20,6 +20,8 @@ export type EuEmbroiderySize = "small" | "medium" | "large";
 export type CalculatorValidationCode =
   | "INVALID_PROFILE"
   | "INVALID_QUANTITY"
+  | "INVALID_CUSTOM_GARMENT_PRICE"
+  | "MISSING_CUSTOM_GARMENT_COLOUR"
   | "INVALID_PRINT_COLOUR_COUNT"
   | "MISSING_GARMENT"
   | "MISSING_GARMENT_PRICE"
@@ -134,10 +136,11 @@ export type CalculatorReferenceData = {
 };
 
 export type UkTradePrintPosition = "FRONT" | "BACK" | "LEFT_SLEEVE" | "RIGHT_SLEEVE" | "NECK_PRINT_STANDARD" | "NECK_PRINT_TRANSFER";
+export type UkTradeCustomGarmentColour = "WHITE" | "COLOURED";
 export type UkTradePrintTier = { pricingSetCode: string; positionCode: "STANDARD" | "NECK_PRINT_STANDARD" | "NECK_PRINT_TRANSFER"; colourCount: number | null; quantityTier: number; unitPrice: number; setupScreenCountStrategy: "colour_count" | "one" | "none" };
 export type UkTradeEmbroideryTier = { pricingSetCode: string; stitchCount: number; isExtra1000Stitches: boolean; quantityTier: number; unitPrice: number };
 export type UkTradeReferenceData = Pick<CalculatorReferenceData, "profile" | "priceSets" | "garments" | "fees"> & { printTiers: UkTradePrintTier[]; embroideryTiers: UkTradeEmbroideryTier[] };
-export type UkTradeItemInput = { id: string; itemLabel?: string; garmentId: string | null; quantity: number; printPositions: Array<{ position: UkTradePrintPosition; colourCount?: number }>; embroideryStitches: Array<number | null> };
+export type UkTradeItemInput = { id: string; itemLabel?: string; garmentId: string | null; customGarmentUnitCost?: number; customGarmentColour?: UkTradeCustomGarmentColour; quantity: number; printPositions: Array<{ position: UkTradePrintPosition; colourCount?: number }>; embroideryStitches: Array<number | null> };
 export type UkTradePrintCostBreakdown = {
   position: UkTradePrintPosition;
   colourCount: number | null;
@@ -195,6 +198,7 @@ export type EuCalculatorItemInput = {
   id: string;
   itemLabel?: string;
   garmentId: string | null;
+  customGarmentUnitCost?: number;
   quantity: number;
   printPositions: EuPrintSelection[];
   embroideryItems?: EuEmbroiderySelection[];
@@ -239,7 +243,13 @@ export type EuCalculatorItemResult = {
   embroideryCustomerCost: number;
   digitisingProductionCost: number;
   digitisingCustomerCost: number;
+  /** Quantity-based item subtotal; excludes one-off digitising charges. */
+  productionItemSubtotalExVat: number;
+  /** Quantity-based item subtotal; excludes one-off digitising charges. */
+  customerItemSubtotalExVat: number;
+  /** Combined item and one-off digitising total. */
   productionSubtotalExVat: number;
+  /** Combined item and one-off digitising total. */
   customerSubtotalExVat: number;
   profitExVat: number;
   printBreakdowns: EuPrintCostBreakdown[];

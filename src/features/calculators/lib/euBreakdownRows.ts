@@ -10,6 +10,7 @@ type ProductionBreakdown = {
   baseUnitPrice: number;
   unitCost: number;
   subtotal: number;
+  combinedTotal: number;
   digitising: number;
 };
 
@@ -19,6 +20,8 @@ type PinsBreakdown = {
   pkMarkupUnitPrice: number;
   unitCost: number;
   subtotal: number;
+  combinedTotal: number;
+  digitising: number;
   digitisingInclVat: number;
 };
 
@@ -33,7 +36,12 @@ function printLabel(position: string, colourCount: number | null) {
   return colourCount ? `${label} · ${colourCount} colour${colourCount === 1 ? "" : "s"}` : label;
 }
 
-export function buildAlignedEuBreakdownRows(line: EuQuoteLine, production: ProductionBreakdown, pins: PinsBreakdown): AlignedEuBreakdownRow[] {
+export function buildAlignedEuBreakdownRows(
+  line: EuQuoteLine,
+  production: ProductionBreakdown,
+  pins: PinsBreakdown,
+  separateDigitising = false,
+): AlignedEuBreakdownRow[] {
   const rows: AlignedEuBreakdownRow[] = [
     {
       key: "garment-base",
@@ -66,13 +74,15 @@ export function buildAlignedEuBreakdownRows(line: EuQuoteLine, production: Produ
     });
   }
 
-  if (line.result.digitisingProductionCost > 0 || line.result.digitisingCustomerCost > 0) {
-    rows.push({
+  const digitisingRow: AlignedEuBreakdownRow | null = line.result.digitisingProductionCost > 0 || line.result.digitisingCustomerCost > 0
+    ? {
       key: "digitising",
-      production: line.result.digitisingProductionCost > 0 ? { label: "Digitising production cost", amount: production.digitising } : undefined,
-      pins: line.result.digitisingCustomerCost > 0 ? { label: "Digitising fee incl. VAT", amount: pins.digitisingInclVat } : undefined,
-    });
-  }
+      production: line.result.digitisingProductionCost > 0 ? { label: separateDigitising ? "Digitising · one-off excl. VAT" : "Digitising production cost", amount: production.digitising } : undefined,
+      pins: line.result.digitisingCustomerCost > 0 ? { label: separateDigitising ? "Digitising · one-off excl. VAT" : "Digitising fee incl. VAT", amount: separateDigitising ? pins.digitising : pins.digitisingInclVat } : undefined,
+    }
+    : null;
+
+  if (!separateDigitising && digitisingRow) rows.push(digitisingRow);
 
   rows.push(
     {
@@ -86,6 +96,15 @@ export function buildAlignedEuBreakdownRows(line: EuQuoteLine, production: Produ
       pins: { label: "Item subtotal excl. VAT", amount: pins.subtotal },
     },
   );
+
+  if (separateDigitising) {
+    if (digitisingRow) rows.push(digitisingRow);
+    rows.push({
+      key: "combined-total",
+      production: { label: "Combined total incl. digitising excl. VAT", amount: production.combinedTotal },
+      pins: { label: "Combined total incl. digitising excl. VAT", amount: pins.combinedTotal },
+    });
+  }
 
   return rows;
 }

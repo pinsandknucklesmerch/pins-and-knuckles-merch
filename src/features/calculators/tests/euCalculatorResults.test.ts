@@ -16,7 +16,7 @@ test("Pins Price uses one semantic copy button for card and icon activation", ()
 test("breakdown presentation uses one combined card per item", () => {
   assert.match(results, /items\.map\(\(line, index\) => \{/);
   assert.match(results, /return <Surface key=\{line\.result\.itemId\} variant="compact"/);
-  assert.match(results, /buildAlignedEuBreakdownRows\(line, breakdown\.productionItems\[index\], breakdown\.pinsItems\[index\]\)/);
+  assert.match(results, /buildAlignedEuBreakdownRows\(line, breakdown\.productionItems\[index\], breakdown\.pinsItems\[index\], separateDigitising\)/);
   assert.match(results, /<BreakdownRow key=\{row\.key\} row=\{row\} \/>/);
   assert.match(results, /Cost line/);
   assert.match(results, /Production Cost/);
@@ -38,4 +38,9 @@ test("desktop calculator keeps inputs and results in responsive two columns", ()
   assert.match(calculator, /<EuCalculatorResults items=\{validQuoteLines\} totals=\{totals\}/);
   assert.match(results, /grid min-w-0 gap-3 sm:grid-cols-2/);
   assert.match(results, /whitespace-nowrap/);
+});
+
+test("both EU profiles present digitising separately from quantity pricing", () => {
+  assert.match(calculator, /<EuCalculatorResults items=\{validQuoteLines\} totals=\{totals\} separateDigitising quoteFormatter=/);
+  assert.doesNotMatch(calculator, /separateDigitising=\{profileCode === "EU_STANDARD"\}/);
 });

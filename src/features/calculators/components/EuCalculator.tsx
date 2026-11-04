@@ -18,6 +18,7 @@ import { formatEuStandardQuote, formatUsClientQuote } from "../domain/euQuoteFor
 import { shouldShowMissingGarmentError } from "../domain/euCalculatorInteractions.ts";
 import { Plus } from "lucide-react";
 import { ActionButton } from "@/components/ui/ActionButton";
+import { resolveEuGarment } from "../domain/customGarment.ts";
 
 type EuCalculatorProps = {
   referenceData: CalculatorReferenceData;
@@ -105,10 +106,9 @@ export function EuCalculator({ referenceData, profileCode = "EU_STANDARD" }: EuC
   const validQuoteLines: EuQuoteLine[] = calculations.flatMap((calculation) => {
     if (!calculation.result) return [];
     const input = items.find((item) => item.id === calculation.itemId);
-    const garment = referenceData.garments.find(
-      (candidate) => candidate.id === calculation.result?.garmentId,
-    );
-    if (!input || !garment) return [];
+    if (!input) return [];
+    const garment = resolveEuGarment(input, referenceData.garments);
+    if (!garment) return [];
     return [{ input, result: calculation.result, garment }];
   });
 
@@ -186,6 +186,7 @@ export function EuCalculator({ referenceData, profileCode = "EU_STANDARD" }: EuC
                 onChange={updateItem}
                 onRemove={() => removeItem(item.id)}
                 onPrintPositionSelect={() => markPrintPositionSelected(item.id)}
+                allowCustomGarment={profileCode === "EU_STANDARD"}
               />
             </div>)}
           </div>
@@ -210,7 +211,7 @@ export function EuCalculator({ referenceData, profileCode = "EU_STANDARD" }: EuC
         </div>
 
         {hasValidItems ? <div className="grid min-w-0 content-start gap-4">
-          <EuCalculatorResults items={validQuoteLines} totals={totals} quoteFormatter={profileCode === "EU_US_CLIENTS" ? formatUsClientQuote : formatEuStandardQuote} showEmptyState={false} />
+          <EuCalculatorResults items={validQuoteLines} totals={totals} separateDigitising quoteFormatter={profileCode === "EU_US_CLIENTS" ? formatUsClientQuote : formatEuStandardQuote} showEmptyState={false} />
         </div> : null}
       </div>
     </div>

@@ -3,6 +3,7 @@ import test from "node:test";
 import { calculateUkTradeItem } from "../domain/ukTradePricingEngine.ts";
 import { formatUkTradeQuote } from "../domain/ukTradeQuoteFormatter.ts";
 import type { UkTradeItemInput, UkTradeReferenceData } from "../domain/types.ts";
+import { CUSTOM_GARMENT_ID } from "../domain/customGarment.ts";
 
 const printTiers = [50, 100, 200, 500, 1000, 2500, 5000, 10000];
 const printOneColour = [1.47, .93, .75, .68, .60, .59, .58, .56];
@@ -67,6 +68,18 @@ test("UK trade separates all setup from unit and quantity pricing while reconcil
   assert.equal(result.itemTotalIncVat, 557.4);
 });
 
+test("UK trade quantity changes do not multiply embroidery setup", () => {
+  const fifty = calculateUkTradeItem(item({ printPositions: [], embroideryStitches: [7000, null, null] }), data);
+  const hundred = calculateUkTradeItem(item({ quantity: 100, printPositions: [], embroideryStitches: [7000, null, null] }), data);
+
+  assert.equal(fifty.embroiderySetupCount, 1);
+  assert.equal(hundred.embroiderySetupCount, 1);
+  assert.equal(fifty.embroiderySetupSubtotalExVat, 30);
+  assert.equal(hundred.embroiderySetupSubtotalExVat, 30);
+  assert.equal(fifty.unitPriceExVatExcludingSetup, 4.15);
+  assert.equal(hundred.unitPriceExVatExcludingSetup, 4.04);
+});
+
 test("UK acceptance values keep four-screen setup out of the £4.90 unit and £294 quantity total", () => {
   const acceptanceData = { ...data, printTiers: data.printTiers.map((tier) => tier.positionCode === "STANDARD" && tier.quantityTier === 50 && tier.colourCount === 1 ? { ...tier, unitPrice: 1.45 } : tier) };
   const result = calculateUkTradeItem(item({ printPositions: [{ position: "FRONT", colourCount: 1 }, { position: "BACK", colourCount: 1 }] }), acceptanceData);
@@ -103,6 +116,39 @@ test("UK white and Whites garments do not add standard underbase screens", () =>
   assert.equal(calculateUkTradeItem(item({ garmentId: "white", printPositions: [{ position: "FRONT", colourCount: 10 }] }), whiteData).screenCount, 10);
   const lowerCaseWhite = { ...whiteData, garments: whiteData.garments.map((garment) => garment.id === "white" ? { ...garment, colour: "white" } : garment) };
   assert.equal(calculateUkTradeItem(item({ garmentId: "white" }), lowerCaseWhite).screenCount, 1);
+});
+
+test("UK custom garment uses its temporary GBP unit cost", () => {
+  const result = calculateUkTradeItem(item({ garmentId: CUSTOM_GARMENT_ID, customGarmentUnitCost: 6.5, customGarmentColour: "COLOURED" }), data);
+  assert.equal(result.errors.length, 0);
+  assert.equal(result.garmentCost, 325);
+  assert.equal(result.unitPriceExVatExcludingSetup, 7.97);
+});
+
+test("UK custom garment colour preserves underbase screen rules", () => {
+  const white = calculateUkTradeItem(item({ garmentId: CUSTOM_GARMENT_ID, customGarmentUnitCost: 6.5, customGarmentColour: "WHITE" }), data);
+  const coloured = calculateUkTradeItem(item({ garmentId: CUSTOM_GARMENT_ID, customGarmentUnitCost: 6.5, customGarmentColour: "COLOURED" }), data);
+  assert.equal(white.screenCount, 1);
+  assert.equal(coloured.screenCount, 2);
+});
+
+test("UK custom garment rejects missing, negative, and non-finite prices", () => {
+  for (const customGarmentUnitCost of [undefined, -1, Number.NaN]) {
+    const result = calculateUkTradeItem(item({ garmentId: CUSTOM_GARMENT_ID, customGarmentUnitCost, customGarmentColour: "WHITE" }), data);
+    assert.deepEqual(result.errors.map((error) => error.code), ["INVALID_CUSTOM_GARMENT_PRICE"]);
+  }
+});
+
+test("UK custom garment requires a white or coloured selection", () => {
+  const result = calculateUkTradeItem(item({ garmentId: CUSTOM_GARMENT_ID, customGarmentUnitCost: 6.5 }), data);
+  assert.deepEqual(result.errors.map((error) => error.code), ["MISSING_CUSTOM_GARMENT_COLOUR"]);
+});
+
+test("UK custom garment is included in copied quote output", () => {
+  const custom = item({ garmentId: CUSTOM_GARMENT_ID, customGarmentUnitCost: 6.5, customGarmentColour: "WHITE" });
+  const quote = formatUkTradeQuote([custom], [calculateUkTradeItem(custom, data)], data.garments);
+  assert.match(quote, /Custom Garment White/);
+  assert.match(quote, /50 x £7\.97/);
 });
 
 test("UK empty colour counts are invalid and never treated as one colour", () => {

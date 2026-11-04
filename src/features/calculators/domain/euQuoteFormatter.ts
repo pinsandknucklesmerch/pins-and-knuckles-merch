@@ -54,10 +54,11 @@ export function formatEuStandardQuote(lines: EuQuoteLine[], totals: EuCalculator
         .map((part) => part.trim())
         .filter(Boolean);
       const garmentSummary = garmentParts.length > 0 ? garmentParts.join(" ") : "No garment";
-      const subtotalExclVat = result.customerSubtotalExVat;
-      const unitExclVat = result.quantity > 0 ? subtotalExclVat / result.quantity : 0;
-      const totalInclVat = subtotalExclVat * (1 + totals.vatRate / 100);
+      const itemSubtotalExclVat = result.customerItemSubtotalExVat;
+      const unitExclVat = result.quantity > 0 ? itemSubtotalExclVat / result.quantity : 0;
+      const itemTotalInclVat = itemSubtotalExclVat * (1 + totals.vatRate / 100);
       const digitisingFeeInclVat = result.digitisingCustomerCost * (1 + totals.vatRate / 100);
+      const combinedTotalInclVat = itemTotalInclVat + digitisingFeeInclVat;
 
       return [
         `${getEuItemLabel(input.itemLabel, index)}:`,
@@ -65,7 +66,10 @@ export function formatEuStandardQuote(lines: EuQuoteLine[], totals: EuCalculator
         ...(result.digitisingCustomerCost > 0
           ? [`Digitizing fee = ${money(digitisingFeeInclVat)} (incl. VAT)`]
           : []),
-        `${result.quantity} x ${money(unitExclVat)} (excl vat) ea = ${money(totalInclVat)}`,
+        `${result.quantity} x ${money(unitExclVat)} (excl vat) ea = ${money(itemTotalInclVat)}`,
+        ...(result.digitisingCustomerCost > 0
+          ? [`Combined total = ${money(combinedTotalInclVat)} (incl. VAT)`]
+          : []),
       ].join("\n\n");
     })
     .join("\n\n");
@@ -77,11 +81,13 @@ export function formatUsClientQuote(lines: EuQuoteLine[], totals: EuCalculatorTo
     const embroiderySummary = result.embroideryBreakdowns.map((embroidery) => embroideryLabels[embroidery.size]);
     const decorationSummary = [...printSummary, ...embroiderySummary].join(", ");
     const garmentSummary = [garment.code, garment.brandName, garment.name, garment.colour].map((part) => part.trim()).filter(Boolean).join(" ") || "No garment";
-    const subtotal = result.customerSubtotalExVat;
-    const vat = subtotal * (totals.vatRate / 100);
+    const itemSubtotalExVat = result.customerItemSubtotalExVat;
+    const combinedSubtotalExVat = result.customerSubtotalExVat;
+    const vat = combinedSubtotalExVat * (totals.vatRate / 100);
     const digitising = result.digitisingCustomerCost > 0 ? `Digitizing fee = ${money(result.digitisingCustomerCost * (1 + totals.vatRate / 100))} (incl. VAT)` : null;
     const heading = `${getEuItemLabel(input.itemLabel, index)}:\n\n${garmentSummary}${decorationSummary ? ` (${decorationSummary} + base)` : ""}`;
     const fee = digitising ? `\n\n${digitising}` : "";
-    return `${heading}${fee}\n\n${result.quantity} x ${money(subtotal / result.quantity)} each (${money(subtotal)} ex vat)\nVAT = ${money(vat)}\nTOTAL = ${money(subtotal + vat)}`;
+    const combinedSubtotal = digitising ? `\nCombined subtotal = ${money(combinedSubtotalExVat)} ex vat` : "";
+    return `${heading}${fee}\n\n${result.quantity} x ${money(itemSubtotalExVat / result.quantity)} each (${money(itemSubtotalExVat)} ex vat)${combinedSubtotal}\nVAT = ${money(vat)}\nTOTAL = ${money(combinedSubtotalExVat + vat)}`;
   }).join("\n\n");
 }

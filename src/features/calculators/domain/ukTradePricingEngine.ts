@@ -1,5 +1,6 @@
 import type { CalculatorValidationError, UkTradeItemInput, UkTradeItemResult, UkTradePrintPosition, UkTradeReferenceData } from "./types.ts";
 import { UK_TRADE_MAX_COLOURS } from "./ukTradeCalculatorInteractions.ts";
+import { isCustomGarmentId, isUkTradeCustomGarmentColour, resolveUkTradeGarment } from "./customGarment.ts";
 
 const printTiers = [50, 100, 200, 500, 1000, 2500, 5000, 10000];
 const embroideryTiers = [50, 100, 200, 500, 1000, 2500];
@@ -14,8 +15,15 @@ export function isWhiteUkTradeGarment(colour: string | null | undefined) {
 
 export function calculateUkTradeItem(input: UkTradeItemInput, data: UkTradeReferenceData): UkTradeItemResult {
   const errors: CalculatorValidationError[] = [];
-  const garment = input.garmentId ? data.garments.find((candidate) => candidate.id === input.garmentId) : undefined;
-  if (!garment) errors.push({ code: "MISSING_GARMENT", itemId: input.id, message: "Select garment." });
+  const customGarmentSelected = isCustomGarmentId(input.garmentId);
+  if (customGarmentSelected && (typeof input.customGarmentUnitCost !== "number" || !Number.isFinite(input.customGarmentUnitCost) || input.customGarmentUnitCost < 0)) {
+    errors.push({ code: "INVALID_CUSTOM_GARMENT_PRICE", itemId: input.id, field: "customGarmentUnitCost", message: "Enter a valid custom garment unit cost of zero or more." });
+  }
+  if (customGarmentSelected && !isUkTradeCustomGarmentColour(input.customGarmentColour)) {
+    errors.push({ code: "MISSING_CUSTOM_GARMENT_COLOUR", itemId: input.id, field: "customGarmentColour", message: "Select whether the custom garment is white or coloured." });
+  }
+  const garment = resolveUkTradeGarment(input, data.garments);
+  if (!garment && !customGarmentSelected) errors.push({ code: "MISSING_GARMENT", itemId: input.id, message: "Select garment." });
   if (garment?.gbpPrice === null) errors.push({ code: "MISSING_GARMENT_PRICE", itemId: input.id, message: "Missing GBP garment price." });
   if (input.quantity < 50) errors.push({ code: "INVALID_QUANTITY", itemId: input.id, message: "Minimum quantity 50." });
   if (input.printPositions.length === 0 && input.embroideryStitches.every((value) => value === null)) errors.push({ code: "MISSING_PRINT_TIER", itemId: input.id, message: "Select at least one print position or embroidery item." });

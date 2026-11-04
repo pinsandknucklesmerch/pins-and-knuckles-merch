@@ -1,20 +1,27 @@
 import type { EuQuoteLine } from "./euQuoteFormatter.ts";
 import type { EuCalculatorTotals, UkTradeItemInput, UkTradeItemResult } from "./types.ts";
 
-export function buildEuBreakdown(lines: EuQuoteLine[], totals: EuCalculatorTotals) {
+export function buildEuBreakdown(
+  lines: EuQuoteLine[],
+  totals: EuCalculatorTotals,
+  separateDigitising = false,
+) {
   return {
     productionItems: lines.map(({ result }) => ({
       baseUnitPrice: result.baseCost / result.quantity,
-      unitCost: result.productionSubtotalExVat / result.quantity,
-      subtotal: result.productionSubtotalExVat,
+      unitCost: (separateDigitising ? result.productionItemSubtotalExVat : result.productionSubtotalExVat) / result.quantity,
+      subtotal: separateDigitising ? result.productionItemSubtotalExVat : result.productionSubtotalExVat,
+      combinedTotal: result.productionSubtotalExVat,
       digitising: result.digitisingProductionCost,
     })),
     pinsItems: lines.map(({ result }) => ({
       baseUnitPrice: result.baseCost / result.quantity,
       garmentMarkupUnitPrice: result.garmentMarkupCost / result.quantity,
       pkMarkupUnitPrice: result.pkMarkupCost / result.quantity,
-      unitCost: result.customerSubtotalExVat / result.quantity,
-      subtotal: result.customerSubtotalExVat,
+      unitCost: (separateDigitising ? result.customerItemSubtotalExVat : result.customerSubtotalExVat) / result.quantity,
+      subtotal: separateDigitising ? result.customerItemSubtotalExVat : result.customerSubtotalExVat,
+      combinedTotal: result.customerSubtotalExVat,
+      digitising: result.digitisingCustomerCost,
       digitisingInclVat: result.digitisingCustomerCost * (1 + totals.vatRate / 100),
     })),
     totals,

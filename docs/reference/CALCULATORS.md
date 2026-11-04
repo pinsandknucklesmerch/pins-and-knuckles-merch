@@ -30,6 +30,7 @@ EU print tiers, EU embroidery prices, fees, and delivery rates.
 - Optional per-item PK markup is included only when enabled.
 - VAT comes from the calculator profile.
 - EU quantity validation supports 50–2,000.
+- EU Standard unit and item-subtotal pricing excludes digitising. Digitising remains a VAT-applicable one-off production/Pins charge and is added once in the combined totals.
 - Production price excludes garment and PK markups. Pins/customer price adds
   garment markup, opted-in PK markup, customer decoration/digitising cost, and
   VAT. Delivery is an optional separate helper and is excluded from calculator
@@ -45,6 +46,9 @@ markup, separate delivery helper, and calculation boundaries with EU Standard.
 
 Its profile-specific markup/configuration and US-client quote formatter are the
 meaningful differences. The formatter preserves the current `+ base` wording.
+As with EU Standard, unit and item-subtotal pricing excludes digitising.
+Digitising remains a VAT-applicable one-off production/Pins charge per
+embroidery item and is included once in combined totals and copied quotes.
 
 ## UK Trade
 
@@ -60,8 +64,18 @@ garment, a quantity of at least 50, and at least one print or embroidery item.
 - Embroidery uses floor quantity tiers through 2,500. Stitch counts normalize
   to the 7,000–15,000 configured blocks, with additional 1,000-stitch blocks
   above 15,000.
-- Screen and embroidery setup fees come from reference fees. Results expose
-  detailed costs, VAT, setup, and quote output.
+- Screen and embroidery setup fees come from reference fees. Both setup types
+  are one-off charges kept outside unit and quantity-subtotal pricing, then
+  included once in final totals with UK Trade VAT. Results expose detailed
+  costs, VAT, setup, and quote output.
+
+## UK Standard
+
+UK Standard is currently a calculator UI scaffold. It accepts garment and
+decoration drafts, including embroidery selections, but has no pricing engine,
+configured digitising/setup calculation, calculated results, or copied quote
+output. Digitising separation cannot be implemented safely until those UK
+Standard pricing rules exist in the source or authoritative configuration.
 
 ## EU Trade
 

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { calculateEuStandardPrice } from "../domain/euPricingEngine.ts";
+import { CUSTOM_GARMENT_ID } from "../domain/customGarment.ts";
 import type {
   CalculatorReferenceData,
   EuCalculatorInput,
@@ -468,8 +469,76 @@ test("calculates three embroidery items and digitising fees", () => {
 
   assert.equal(result.items[0].digitisingProductionCost, 69);
   assert.equal(result.items[0].digitisingCustomerCost, 75);
+  assert.equal(result.items[0].productionItemSubtotalExVat, 692.5);
+  assert.equal(result.items[0].customerItemSubtotalExVat, 975);
   assert.equal(result.totals.productionSubtotalExVat, 761.5);
   assert.equal(result.totals.customerSubtotalExVat, 1050);
+});
+
+test("EU Standard keeps digitising outside unit and item subtotal pricing", () => {
+  const reference = createReferenceData();
+  reference.garments[0] = { ...reference.garments[0], eurBasePrice: 2 };
+  reference.garmentMarkups = reference.garmentMarkups.map((markup) =>
+    markup.garmentType === "HOODIE" ? { ...markup, markupValue: 3 } : markup,
+  );
+  reference.fees = reference.fees.map((fee) =>
+    fee.feeCode === "EU_DIGITISING" && fee.costSide === "customer"
+      ? { ...fee, amount: 31.75 }
+      : fee,
+  );
+  const result = assertOk(calculateEuStandardPrice(createInput({
+    printPositions: [],
+    embroideryItems: [{ size: "small" }],
+  }), reference));
+  assert.equal(result.items[0].customerItemSubtotalExVat / result.items[0].quantity, 6.5);
+  assert.equal(result.items[0].customerItemSubtotalExVat, 325);
+  assert.equal(result.items[0].digitisingCustomerCost, 31.75);
+  assert.equal(result.items[0].customerSubtotalExVat, 356.75);
+});
+
+test("EU Standard quantity changes never multiply digitising charges", () => {
+  const reference = createReferenceData();
+  const fifty = assertOk(calculateEuStandardPrice(createInput({ printPositions: [], embroideryItems: [{ size: "small" }] }), reference));
+  const hundred = assertOk(calculateEuStandardPrice(createInput({ quantity: 100, printPositions: [], embroideryItems: [{ size: "small" }] }), reference));
+  assert.equal(fifty.items[0].digitisingProductionCost, 23);
+  assert.equal(hundred.items[0].digitisingProductionCost, 23);
+  assert.equal(fifty.items[0].digitisingCustomerCost, 25);
+  assert.equal(hundred.items[0].digitisingCustomerCost, 25);
+});
+
+test("EU US Clients keeps digitising outside unit pricing and constant across quantities", () => {
+  const reference = createReferenceData();
+  reference.profile = { ...reference.profile, id: "profile-us", code: "EU_US_CLIENTS", name: "EU US Clients" };
+  reference.priceSets = reference.priceSets.map((set) => ({ ...set, calculatorProfileId: "profile-us" }));
+  reference.garmentMarkups = reference.garmentMarkups.map((markup) => ({
+    ...markup,
+    calculatorProfileId: "profile-us",
+  }));
+  reference.fees = reference.fees.map((fee) => ({ ...fee, calculatorProfileId: "profile-us" }));
+  const embroideryItems = [{ size: "small" as const }];
+  const fifty = assertOk(calculateEuStandardPrice({
+    ...createInput({ printPositions: [], embroideryItems }),
+    profileCode: "EU_US_CLIENTS",
+  }, reference));
+  const hundred = assertOk(calculateEuStandardPrice({
+    ...createInput({ quantity: 100, printPositions: [], embroideryItems }),
+    profileCode: "EU_US_CLIENTS",
+  }, reference));
+
+  for (const result of [fifty, hundred]) {
+    assert.equal(
+      result.items[0].productionItemSubtotalExVat + result.items[0].digitisingProductionCost,
+      result.items[0].productionSubtotalExVat,
+    );
+    assert.equal(
+      result.items[0].customerItemSubtotalExVat + result.items[0].digitisingCustomerCost,
+      result.items[0].customerSubtotalExVat,
+    );
+  }
+  assert.equal(fifty.items[0].digitisingProductionCost, 23);
+  assert.equal(hundred.items[0].digitisingProductionCost, 23);
+  assert.equal(fifty.items[0].digitisingCustomerCost, 25);
+  assert.equal(hundred.items[0].digitisingCustomerCost, 25);
 });
 
 test("adds optional PK markup to customer subtotal only", () => {
@@ -561,6 +630,82 @@ test("returns MISSING_GARMENT_MARKUP for an OTHER garment without a profile mark
   assertErrorCodes(calculateEuStandardPrice(createInput(), referenceData), [
     "MISSING_GARMENT_MARKUP",
   ]);
+});
+
+test("custom garment uses its temporary unit cost and the OTHER markup", () => {
+  const referenceData = createReferenceData();
+  referenceData.garmentMarkups.push({
+    calculatorProfileId: PROFILE_ID,
+    garmentType: "OTHER",
+    markupValue: 3,
+  });
+
+  const result = calculateEuStandardPrice(
+    createInput({
+      garmentId: CUSTOM_GARMENT_ID,
+      customGarmentUnitCost: 6.5,
+    }),
+    referenceData,
+  );
+
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.items[0].baseCost, 325);
+  assert.equal(result.items[0].garmentMarkupCost, 150);
+});
+
+test("custom garment permits zero because catalogue garment prices permit zero", () => {
+  const referenceData = createReferenceData();
+  referenceData.garmentMarkups.push({
+    calculatorProfileId: PROFILE_ID,
+    garmentType: "OTHER",
+    markupValue: 3,
+  });
+
+  const result = calculateEuStandardPrice(
+    createInput({
+      garmentId: CUSTOM_GARMENT_ID,
+      customGarmentUnitCost: 0,
+    }),
+    referenceData,
+  );
+
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.items[0].baseCost, 0);
+  assert.equal(result.items[0].garmentMarkupCost, 150);
+});
+
+test("custom garment rejects missing, negative, and non-finite prices", () => {
+  const referenceData = createReferenceData();
+  referenceData.garmentMarkups.push({
+    calculatorProfileId: PROFILE_ID,
+    garmentType: "OTHER",
+    markupValue: 3,
+  });
+
+  for (const customGarmentUnitCost of [undefined, -1, Number.NaN]) {
+    assertErrorCodes(
+      calculateEuStandardPrice(
+        createInput({ garmentId: CUSTOM_GARMENT_ID, customGarmentUnitCost }),
+        referenceData,
+      ),
+      ["INVALID_CUSTOM_GARMENT_PRICE"],
+    );
+  }
+});
+
+test("custom garment does not calculate without an OTHER markup", () => {
+  assertErrorCodes(
+    calculateEuStandardPrice(
+      createInput({
+        garmentId: CUSTOM_GARMENT_ID,
+        customGarmentUnitCost: 6.5,
+      }),
+      createReferenceData(),
+    ),
+    ["MISSING_GARMENT_MARKUP"],
+  );
 });
 
 test("returns an explicit error for missing embroidery pricing", () => {

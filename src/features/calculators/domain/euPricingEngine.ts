@@ -6,6 +6,7 @@ import {
   findGarmentMarkup,
 } from "./priceLookup.ts";
 import { validateEuPrintColour, validateEuQuantity } from "./validation.ts";
+import { isCustomGarmentId, resolveEuGarment } from "./customGarment.ts";
 import type {
   CalculatorReferenceData,
   CalculatorValidationError,
@@ -129,11 +130,26 @@ export function calculateEuStandardPrice(
       errors.push(quantityError);
     }
 
-    const garment = item.garmentId
-      ? referenceData.garments.find((candidate) => candidate.id === item.garmentId)
-      : undefined;
+    const customGarmentSelected = isCustomGarmentId(item.garmentId);
+    const customGarmentUnitCost = item.customGarmentUnitCost;
 
-    if (!garment) {
+    if (
+      customGarmentSelected &&
+      (typeof customGarmentUnitCost !== "number" ||
+        !Number.isFinite(customGarmentUnitCost) ||
+        customGarmentUnitCost < 0)
+    ) {
+      errors.push({
+        code: "INVALID_CUSTOM_GARMENT_PRICE",
+        itemId: item.id,
+        field: "customGarmentUnitCost",
+        message: "Enter a valid custom garment unit cost of zero or more.",
+      });
+    }
+
+    const garment = resolveEuGarment(item, referenceData.garments);
+
+    if (!garment && !customGarmentSelected) {
       errors.push({
         code: "MISSING_GARMENT",
         itemId: item.id,
@@ -293,15 +309,18 @@ export function calculateEuStandardPrice(
       embroideryBreakdowns,
       (breakdown) => breakdown.digitisingCustomerCost,
     );
-    const productionSubtotalExVat =
-      printProductionCost + baseCost + embroideryProductionCost + digitisingProductionCost;
-    const customerSubtotalExVat =
+    const productionItemSubtotalExVat =
+      printProductionCost + baseCost + embroideryProductionCost;
+    const customerItemSubtotalExVat =
       printCustomerCost +
       baseCost +
       garmentMarkupCost +
       pkMarkupCost +
-      embroideryCustomerCost +
-      digitisingCustomerCost;
+      embroideryCustomerCost;
+    const productionSubtotalExVat =
+      productionItemSubtotalExVat + digitisingProductionCost;
+    const customerSubtotalExVat =
+      customerItemSubtotalExVat + digitisingCustomerCost;
 
     itemResults.push({
       itemId: item.id,
@@ -316,6 +335,8 @@ export function calculateEuStandardPrice(
       embroideryCustomerCost,
       digitisingProductionCost,
       digitisingCustomerCost,
+      productionItemSubtotalExVat,
+      customerItemSubtotalExVat,
       productionSubtotalExVat,
       customerSubtotalExVat,
       profitExVat: customerSubtotalExVat - productionSubtotalExVat,

@@ -15,6 +15,7 @@ type EuCalculatorResultsProps = {
   showSummary?: boolean;
   showBreakdown?: boolean;
   showEmptyState?: boolean;
+  separateDigitising?: boolean;
   quoteFormatter?: (items: EuQuoteLine[], totals: EuCalculatorTotals) => string;
 };
 
@@ -52,7 +53,7 @@ function BreakdownValue({ cell, valueClassName }: { cell?: AlignedEuBreakdownRow
 }
 
 function BreakdownRow({ row }: { row: AlignedEuBreakdownRow }) {
-  const emphasis = row.key === "unit-cost" || row.key === "subtotal";
+  const emphasis = row.key === "unit-cost" || row.key === "subtotal" || row.key === "combined-total";
   const unitCostValueClassName = row.key === "unit-cost" ? "text-red-500" : undefined;
   return <div className={`grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(max-content,0.75fr)_minmax(max-content,0.75fr)] items-start gap-x-3 border-b border-border/60 py-2 text-xs last:border-0 max-md:grid-cols-[minmax(0,1fr)_minmax(max-content,0.75fr)] max-md:gap-y-1 ${emphasis ? "font-semibold" : ""}`}>
     <span className="min-w-0 break-words text-muted-foreground max-md:col-span-2">{row.production?.label ?? row.pins?.label}</span>
@@ -67,9 +68,10 @@ export function EuCalculatorResults({
   showSummary = true,
   showBreakdown = true,
   showEmptyState = true,
+  separateDigitising = false,
   quoteFormatter = formatEuStandardQuote,
 }: EuCalculatorResultsProps) {
-  const breakdown = buildEuBreakdown(items, totals);
+  const breakdown = buildEuBreakdown(items, totals, separateDigitising);
 
   if (items.length === 0) {
     return showEmptyState ? <div className="rounded-md border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">No valid items</div> : null;
@@ -107,7 +109,7 @@ export function EuCalculatorResults({
         <div className="grid gap-4">
           <div className="grid min-w-0 gap-3">
             {items.map((line, index) => {
-              const rows = buildAlignedEuBreakdownRows(line, breakdown.productionItems[index], breakdown.pinsItems[index]);
+              const rows = buildAlignedEuBreakdownRows(line, breakdown.productionItems[index], breakdown.pinsItems[index], separateDigitising);
               return <Surface key={line.result.itemId} variant="compact" className="min-w-0 bg-background/55">
                 <ItemHeading line={line} index={index} />
                 <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(max-content,0.75fr)_minmax(max-content,0.75fr)] gap-x-3 border-b border-border/60 pb-2 text-[11px] font-semibold text-muted-foreground max-md:grid-cols-[minmax(0,1fr)_minmax(max-content,0.75fr)] max-md:gap-y-1">
@@ -121,8 +123,8 @@ export function EuCalculatorResults({
           </div>
           <div className="border-t border-border pt-3">
             <dl className="text-sm">
-              <DetailRow label="Production subtotal excl. VAT" value={money(totals.productionSubtotalExVat)} />
-              <DetailRow label="Pins subtotal excl. VAT" value={money(totals.customerSubtotalExVat)} />
+              <DetailRow label={separateDigitising ? "Combined production total excl. VAT" : "Production subtotal excl. VAT"} value={money(totals.productionSubtotalExVat)} />
+              <DetailRow label={separateDigitising ? "Combined Pins total excl. VAT" : "Pins subtotal excl. VAT"} value={money(totals.customerSubtotalExVat)} />
               <DetailRow label="VAT" value={money(totals.vatAmount)} />
               <DetailRow label="Total incl. VAT" value={money(totals.customerTotalIncVat)} />
               <DetailRow label="Profit excl. VAT" value={money(totals.profitExVat)} />
