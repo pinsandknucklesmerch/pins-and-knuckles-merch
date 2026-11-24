@@ -30,7 +30,7 @@ test("server query state initializes the dashboard without a mount reconciliatio
   const page = readFileSync(new URL("../../../app/(hub)/hub/sales-dashboard/page.tsx", import.meta.url), "utf8");
   assert.match(page, /parseDashboardView\(first\(params\.dashboardView\)\)/);
   assert.match(page, /initialDashboardView=\{dashboardView\}/);
-  assert.match(page, /<AppShell tvMode=\{tvMode\} wideContent>/);
+  assert.match(page, /<AppShell pinsHubAccess=\{access\} tvMode=\{tvMode\} wideContent>/);
   assert.doesNotMatch(page, /PageHeader/);
 });
 

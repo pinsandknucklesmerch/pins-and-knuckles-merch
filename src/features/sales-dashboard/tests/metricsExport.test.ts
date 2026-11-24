@@ -1,11 +1,32 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import ts from "typescript";
 import { calculateCompanyMetrics } from "../domain/calculateDashboardKpis.ts";
 import type { CompanyKpiMonth } from "../domain/types.ts";
 import { parseDashboardPeriod } from "../lib/dashboardPeriod.ts";
 import { buildMetricExportRows } from "../lib/metricsExport.ts";
 import { normalizeExportColors, shirtExportScale, shirtExportTransform } from "../lib/exportSafeColors.ts";
+
+function renderedProps(source: string, component: string): Record<string, string> {
+  const file = ts.createSourceFile("report.tsx", source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const renders: ts.JsxAttributes[] = [];
+  function visit(node: ts.Node) {
+    if ((ts.isJsxSelfClosingElement(node) || ts.isJsxOpeningElement(node)) && node.tagName.getText(file) === component) renders.push(node.attributes);
+    ts.forEachChild(node, visit);
+  }
+  visit(file);
+  assert.equal(renders.length, 1, component + " must have exactly one render site");
+  const props: Record<string, string> = {};
+  for (const attribute of renders[0].properties) {
+    assert.ok(ts.isJsxAttribute(attribute), "report props must remain explicit");
+    const initializer = attribute.initializer;
+    props[attribute.name.getText(file)] = initializer && ts.isJsxExpression(initializer)
+      ? initializer.expression?.getText(file) ?? ""
+      : initializer?.getText(file) ?? "true";
+  }
+  return props;
+}
 
 function month(overrides: Partial<CompanyKpiMonth> = {}): CompanyKpiMonth {
   return {
@@ -145,8 +166,9 @@ test("EPCC PDF trigger stays mounted with a fixed footprint during export", () =
   assert.doesNotMatch(styles, /display:\s*none|visibility:\s*hidden|opacity:\s*0(?:;|\s*$)/);
 });
 
-test("export dropdown is outside the filter form and cannot submit it", () => {
+test("dashboard actions and Reporting exports remain outside their filter forms", () => {
   const dashboard = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
+  const workspace = readFileSync(new URL("../components/MetricExportWorkspace.tsx", import.meta.url), "utf8");
   const metricUi = readFileSync(new URL("../../../../node_modules/metricui/dist/index.js", import.meta.url), "utf8");
   const formStart = dashboard.indexOf('<form data-testid="sales-dashboard-filter-form"');
   const formEnd = dashboard.indexOf("</form>", formStart);
@@ -160,7 +182,17 @@ test("export dropdown is outside the filter form and cannot submit it", () => {
   assert.match(filterForm, /<button[^>]*type="submit">Apply<\/button>/);
   assert.doesNotMatch(filterForm, /ExportMetricsButton|ManualKpiEntry/);
   assert.match(dashboard.slice(managementStart, actionsStart), /<ManualKpiEntry[\s\S]*<MonthlyKpiFinals/);
-  assert.match(dashboard.slice(actionsStart), /<ExportMetricsButton[\s\S]*<ActionButton onClick=\{enterTvMode\}>TV Mode/);
+  assert.match(dashboard.slice(actionsStart), /<ActionButton onClick=\{enterTvMode\}>TV Mode/);
+  assert.doesNotMatch(dashboard, /ExportMetricsButton|buildMetricExportRows/);
+
+  const reportingFormStart = workspace.indexOf('<form method="get" action="/hub/reporting/metrics"');
+  const reportingFormEnd = workspace.indexOf("</form>", reportingFormStart);
+  const exportStart = workspace.indexOf("<ExportMetricsButton ");
+  assert.ok(reportingFormStart >= 0 && reportingFormEnd > reportingFormStart);
+  assert.ok(exportStart > reportingFormEnd);
+  assert.match(workspace.slice(reportingFormStart, reportingFormEnd), /<ActionButton type="submit">Apply<\/ActionButton>/);
+  assert.doesNotMatch(workspace.slice(reportingFormStart, reportingFormEnd), /ExportMetricsButton/);
+  assert.match(workspace.slice(exportStart), /rows=\{rows\} targetRef=\{exportTargetRef\}/);
 
   assert.match(metricUi, /createPortal\(/);
   for (const option of ["Save as image", "Download CSV", "Copy to clipboard"]) assert.match(metricUi, new RegExp(option));
@@ -184,9 +216,14 @@ test("buildMetricExportRows is pure and returns plain serializable data", () => 
   assert.doesNotMatch(moduleSource, /use[A-Z]|router|fetch\(|setState|set[A-Z][A-Za-z]+\(/);
 });
 
-test("SalesDashboard memoizes the single export payload without navigation effects", () => {
+test("Reporting memoizes the single export payload without adding dashboard navigation effects", () => {
   const component = readFileSync(new URL("../components/SalesDashboard.tsx", import.meta.url), "utf8");
-  assert.match(component, /const exportRows = useMemo\(\(\) => buildMetricExportRows\(/);
+  const workspace = readFileSync(new URL("../components/MetricExportWorkspace.tsx", import.meta.url), "utf8");
+  assert.match(workspace, /const metrics = useMemo\(\(\) => calculateCompanyMetrics\(data\.company, data\.previousCompany, data\.targets\)/);
+  assert.match(workspace, /const rows = useMemo\(\(\) => buildMetricExportRows\(data\.company, metrics, \{ year, month \}\), \[data\.company, metrics, year, month\]\)/);
+  assert.equal(workspace.match(/buildMetricExportRows\(/g)?.length, 1);
+  assert.match(workspace, /<ExportMetricsButton rows=\{rows\}/);
+  assert.doesNotMatch(workspace, /useEffect|router\.(?:replace|refresh)|history\.replaceState|syncUrl=/);
   assert.doesNotMatch(component, /useEffect|router\.(?:replace|refresh)|history\.replaceState|syncUrl=/);
 
   const manualEntry = readFileSync(new URL("../components/ManualKpiEntry.tsx", import.meta.url), "utf8");
@@ -215,10 +252,28 @@ test("EPCC report keeps the requested profit and performance comparisons without
 
   assert.equal(report.match(/data-profit-pdf-page="true"/g)?.length, 2);
   assert.ok(report.indexOf('title="Company Profit"') < report.indexOf('title="Year to Date"'));
-  assert.match(report, /<ProfitReportMonthlyProfit key=\{component\.id\} metric=\{monthlyProfitMetric\} label=\{component\.label\} bonusLabel=\{component\.labels\?\.bonus\} \/>/);
+  const monthlyProps = renderedProps(report, "ProfitReportMonthlyProfit");
+  assert.equal(monthlyProps.metric, "monthlyProfitMetric");
+  assert.equal(monthlyProps.label, 'companyProfitComponents.find((component) => component.type === "monthly-profit")?.label');
+  assert.equal(monthlyProps.bonusLabel, 'companyProfitComponents.find((component) => component.type === "bonus-profit")?.label');
+  assert.equal(monthlyProps.showBonus, 'companyProfitComponents.some((component) => component.type === "bonus-profit")');
   assert.doesNotMatch(report, /<ProfitReportYtdSummary[\s\S]*reportMonth/);
-  assert.match(report, /<ProfitReportYtdSummary key=\{component\.id\} data=\{yearToDate\} comparison=\{yearComparison\} label=\{component\.label\} \/>/);
-  assert.match(report, /<ProfitReportMonthlyComparison data=\{yearToDate\} comparison=\{yearComparison\}/);
+  const ytdProps = renderedProps(report, "ProfitReportYtdSummary");
+  assert.equal(ytdProps.key, "component.id");
+  assert.equal(ytdProps.data, "yearToDate");
+  assert.equal(ytdProps.comparison, "yearComparison");
+  assert.equal(ytdProps.label, "component.label");
+  for (const [prop, type] of [
+    ["previousYearLabel", "previous-year-ytd"], ["targetLabel", "ytd-target"], ["varianceAboveLabel", "target-variance"],
+  ]) assert.equal(ytdProps[prop], 'yearToDatePrimaryComponents.find((item) => item.type === "' + type + '")?.label');
+  for (const [prop, type] of [
+    ["showPreviousYear", "previous-year-ytd"], ["showTarget", "ytd-target"], ["showVariance", "target-variance"],
+  ]) assert.equal(ytdProps[prop], 'yearToDatePrimaryComponents.some((item) => item.type === "' + type + '")');
+  assert.equal(ytdProps.varianceBelowLabel, "component.labels?.varianceBelow");
+  const comparisonProps = renderedProps(report, "ProfitReportMonthlyComparison");
+  assert.equal(comparisonProps.data, "yearToDate");
+  assert.equal(comparisonProps.comparison, "yearComparison");
+  assert.equal(comparisonProps.label, "component.label");
   assert.match(report, /<ProfitReportPerformanceKpis data=\{yearToDate\} comparison=\{yearComparison\}/);
   assert.doesNotMatch(report, /YearComparisonChart|ProfitReportCompanyProfit|ProfitReportYtdKpis/);
   assert.match(monthly, /companyProfitPresentation/);
@@ -265,8 +320,12 @@ test("Reporting EPCC workspace reuses the dashboard data, calculations, report s
   const dashboardPage = readFileSync(new URL("../../../app/(hub)/hub/sales-dashboard/page.tsx", import.meta.url), "utf8");
   const workspace = readFileSync(new URL("../components/EpccReportWorkspace.tsx", import.meta.url), "utf8");
 
-  assert.match(page, /loadSalesDashboard\(year, month, access\.membership\?\.organisation_id \?\? null\)/);
-  assert.match(page, /<EpccReportWorkspace data=\{data\} year=\{year\} month=\{month\} \/>/);
+  assert.match(page, /const organisationId = access\.membership\?\.organisation_id \?\? null/);
+  assert.match(page, /loadSalesDashboard\(year, month, organisationId\)/);
+  assert.match(page, /loadEpccReportTemplate\(organisationId\)/);
+  assert.match(page, /if \(!access\.access\)/);
+  assert.match(page, /<AppShell pinsHubAccess=\{access\} wideContent>/);
+  assert.match(page, /<EpccReportWorkspace data=\{data\} year=\{year\} month=\{month\} initialTemplate=\{template\} canEdit=\{hasAdminAccess\(access\)\} \/>/);
   assert.match(page, /parseDashboardPeriod\(params\)/);
   assert.match(dashboardPage, /parseDashboardPeriod\(params, now\)/);
   assert.match(workspace, /calculateCompanyMetrics\(data\.company, data\.previousCompany, data\.targets\)/);

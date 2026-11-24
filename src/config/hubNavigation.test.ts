@@ -8,6 +8,7 @@ test("defines every Hub feature card from shared navigation", () => {
     hubFeatureNavigation.map(({ label, href }) => ({ label, href })),
     [
       { label: "Sales Dashboard", href: "/hub/sales-dashboard" },
+      { label: "Sales Checklist", href: "/hub/sales-checklist" },
       { label: "Reporting", href: "/hub/reporting" },
       { label: "Analytics", href: "/hub/analytics" },
       { label: "Calculators", href: "/hub/calculators" },
@@ -16,6 +17,7 @@ test("defines every Hub feature card from shared navigation", () => {
         label: "Commercial Invoices",
         href: "/hub/commercial-invoices",
       },
+      { label: "Quick Reference", href: "/hub/reference" },
       { label: "Data Management", href: "/hub/data" },
     ],
   );

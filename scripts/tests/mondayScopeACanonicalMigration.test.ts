@@ -20,8 +20,6 @@ test("canonical Scope A migration copies values before dropping duplicate column
 test("runtime sync and dashboard sources do not use the removed columns", async () => {
   const sources = await Promise.all([
     "scripts/lib/monday/salesDashboardSync.ts",
-    "scripts/cleanup-sales-dashboard-2026-test-kpis.ts",
-    "scripts/lib/salesDashboard2026Cleanup.ts",
     "src/features/sales-dashboard/data/mappers.ts",
     "src/features/sales-dashboard/data/salesDashboardRepository.ts",
     "src/features/sales-dashboard/domain/calculateDashboardKpis.ts",

@@ -53,6 +53,35 @@ test("unsafe next paths fall back to the password update page", () => {
   assert.equal(getSafeAuthNextPath("/auth/update-password"), "/auth/update-password");
 });
 
+test("recovery redirects reject backslashes, control characters, and external destinations", () => {
+  const unsafePaths = [
+    null, "", "https://outside.example", "//outside.example", "///outside.example",
+    "/\\outside.example", "/\\\\outside.example", "/\\user@outside.example",
+    "/\t/outside.example", "/\n/outside.example", "/\r/outside.example",
+    "/\u0000/outside.example", "/auth/\u007fupdate-password", "javascript:alert(1)",
+  ];
+  for (const next of unsafePaths) {
+    const path = getSafeAuthNextPath(next);
+    assert.equal(path, "/auth/update-password", JSON.stringify(next));
+    assert.equal(new URL(path, "https://hub.example").origin, "https://hub.example");
+    assert.equal(parseRecoveryConfirmationInput({
+      tokenHash: "a".repeat(43), type: "recovery", next,
+    })?.next, "/auth/update-password");
+  }
+});
+
+test("legitimate local auth and Hub paths retain their query strings and fragments", () => {
+  for (const next of [
+    "/auth/update-password",
+    "/auth/update-password?mode=invite#password",
+    "/hub",
+    "/hub/reference?return=%2Fhub&label=two%20words#details",
+  ]) {
+    assert.equal(getSafeAuthNextPath(next), next);
+    assert.equal(new URL(getSafeAuthNextPath(next), "https://hub.example").origin, "https://hub.example");
+  }
+});
+
 test("the existing PKCE confirmation route still exchanges a code", async () => {
   const route = await readFile(new URL("../../../app/(auth)/auth/confirm/route.ts", import.meta.url), "utf8");
 

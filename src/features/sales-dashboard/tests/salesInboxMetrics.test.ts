@@ -59,14 +59,23 @@ test("null and zero enquiry denominators remain safe", () => {
   assert.equal(comparisonArcRatio(null, 67), null);
   assert.equal(comparisonArcRatio(44, 0), null);
 });
-test("Sales Inbox conversion safely returns zero for no decided enquiries", () => {
-  const metrics = calculateCompanyMetrics(month({ salesInboxDecidedEnquiries: 0 }), null, {});
-  assert.equal(metrics.find((metric) => metric.code === "SALES_INBOX_CONVERSION_RATE")?.value, 0);
+test("Sales Inbox conversion is independent of decided-enquiry metadata", () => {
+  for (const salesInboxDecidedEnquiries of [0, null, 44, 90]) {
+    const metrics = calculateCompanyMetrics(month({ salesInboxDecidedEnquiries }), null, {});
+    assert.equal(metrics.find((metric) => metric.code === "SALES_INBOX_CONVERSION_RATE")?.value, 25);
+  }
+});
+
+test("Sales Inbox conversion safely handles zero and unavailable total enquiries", () => {
+  for (const [salesInboxEnquiries, expected] of [[0, 0], [null, null]] as const) {
+    const metrics = calculateCompanyMetrics(month({ salesInboxEnquiries }), null, {});
+    assert.equal(metrics.find((metric) => metric.code === "SALES_INBOX_CONVERSION_RATE")?.value, expected);
+  }
 });
 
 test("Sales Inbox card uses the required semantic heading hierarchy", () => {
   const component = readFileSync(new URL("../components/SalesInboxKpi.tsx", import.meta.url), "utf8");
-  assert.match(component, /<h2 className=\{styles\.heading\}>Sales Inbox<\/h2>/);
+  assert.match(component, /<h2 className=\{styles\.heading\}>Active Marketing<\/h2>/);
   assert.match(component, /<h3 id="sales-inbox-enquiries" className=\{styles\.label\}>Enquiries<\/h3>/);
   assert.match(component, /<h3 id="sales-inbox-conversion-rate" className=\{styles\.label\}>Sales Inbox Conversion Rate<\/h3>/);
   assert.match(component, /selectedPeriodLabel \? <div className=\{styles\.reference\}>\{selectedPeriodLabel\}<\/div> : null/);

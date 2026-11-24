@@ -19,5 +19,5 @@ async function TeamContent() {
   const access = await getCurrentPinsHubAccess();
   if (!hasAdminAccess(access) || !access.membership?.organisation_id) notFound();
   const members = await getTeamMembers(access.membership.organisation_id);
-  return <AppShell><div className="flex items-center justify-between gap-3"><PageHeader title="User Access Management" />{canManageOrganisationUsers(access.access?.access_level, access.membership.role) ? <Link href="/hub/team/add" className="h-9 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground">Add User</Link> : null}</div><TeamMembersTable members={members} currentUserId={access.user?.id} /></AppShell>;
+  return <AppShell><div className="flex items-center justify-between gap-3"><PageHeader title="User Access Management" />{canManageOrganisationUsers(access.access?.access_level, access.membership.role) ? <Link href="/hub/team/add" className="h-9 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground">Add User</Link> : null}</div><TeamMembersTable members={members} currentUserId={access.user?.id} canResetPasswords={access.authenticated && access.membership.is_active} canManagePrivilegedUsers={canManageOrganisationUsers(access.access?.access_level, access.membership.role)} /></AppShell>;
 }

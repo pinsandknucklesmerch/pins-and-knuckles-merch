@@ -8,6 +8,8 @@ import { mondayIdentities } from "@/features/sales-dashboard/domain/memberIdenti
 import { initialUserAccessActionState, type UserAccessActionState } from "../types";
 import { validateUserUpdateInput } from "../lib/updateUser";
 import { authDisplayNameMetadata } from "../lib/authDisplayName";
+import { resolveSiteUrl } from "../lib/invite";
+import { sendPasswordRecoveryEmail } from "@/features/auth/lib/passwordRecovery";
 
 const mondayIds = new Set(mondayIdentities().map((person) => person.id));
 const fail = (message: string): UserAccessActionState => ({ status: "error", message });
@@ -17,6 +19,49 @@ async function adminContext() {
   const current = await getCurrentPinsHubAccess();
   if (!current.authenticated || !hasAdminAccess(current) || !current.membership?.organisation_id || !current.user) return null;
   return current;
+}
+
+export async function requestUserPasswordReset(formData: FormData): Promise<UserAccessActionState> {
+  try {
+    const current = await adminContext();
+    if (!current?.membership?.is_active) return fail("You do not have permission to reset user passwords.");
+
+    const membershipId = String(formData.get("membership_id") ?? "").trim();
+    if (!membershipId) return fail("User could not be found.");
+
+    const admin = createAdminClient();
+    const { data: target, error: membershipError } = await admin.from("organisation_members")
+      .select("id,user_id,role")
+      .eq("id", membershipId)
+      .eq("organisation_id", current.membership.organisation_id)
+      .maybeSingle();
+    if (membershipError || !target?.user_id) return fail("User could not be found.");
+
+    const { data: targetAccess, error: accessError } = await admin.from("app_access")
+      .select("access_level")
+      .eq("organisation_member_id", target.id)
+      .eq("app_key", "pins_hub")
+      .maybeSingle();
+    if (accessError) return fail("Password-reset email could not be sent. Please try again.");
+    if ((target.role === "owner" || targetAccess?.access_level === "developer")
+      && !canManageOrganisationUsers(current.access?.access_level, current.membership.role)) {
+      return fail("Only Owners and Developers may reset passwords for Owners or Developers.");
+    }
+
+    const { data, error: userError } = await admin.auth.admin.getUserById(target.user_id);
+    if (userError || !data.user?.email) return fail("Password-reset email could not be sent. Please try again.");
+    const siteUrl = resolveSiteUrl();
+    if (!siteUrl) return fail("Password-reset email could not be sent. Please contact the system administrator.");
+
+    // Use the isolated client: recovery must not write a PKCE verifier into the administrator's session.
+    // The recovery email template opens the existing /auth/recovery-confirm token-hash flow.
+    const { error } = await sendPasswordRecoveryEmail(admin, data.user.email, siteUrl);
+    return error
+      ? fail("Password-reset email could not be sent. Please try again later.")
+      : { status: "success", message: "Password-reset email requested. Ask the user to check their inbox and spam folder." };
+  } catch {
+    return fail("Password-reset email could not be sent. Please try again later.");
+  }
 }
 
 export async function updateUser(previousState: UserAccessActionState = initialUserAccessActionState, formData: FormData): Promise<UserAccessActionState> {

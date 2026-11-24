@@ -10,7 +10,7 @@ function parseArgs(args: string[]): Options {
   if (!organisation) throw new Error("--organisation-id is required; use global explicitly for fixture-compatible rows.");
   if (organisation !== "global" && !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(organisation)) throw new Error("--organisation-id must be a UUID or global.");
   const policy = (option(args, "--conflict-policy") ?? "skip-existing") as ConflictPolicy; if (!(["insert-only", "skip-existing", "update-existing"] as string[]).includes(policy)) throw new Error("Unsupported conflict policy.");
-  return { command, organisationId: organisation === "global" ? null : organisation, output: option(args, "--output") ?? "docs/imports/sales-kpi-history/generated", aliases: option(args, "--aliases") ?? "docs/imports/sales-kpi-history/member-aliases.json", existing: option(args, "--existing"), policy };
+  return { command, organisationId: organisation === "global" ? null : organisation, output: option(args, "--output") ?? "ai-context/imports/sales-kpi-history/generated", aliases: option(args, "--aliases") ?? "ai-context/imports/sales-kpi-history/member-aliases.json", existing: option(args, "--existing"), policy };
 }
 function setOrganisation<T extends { organisation_id: string | null }>(rows: T[], organisationId: string | null) { return rows.map((row) => ({ ...row, organisation_id: organisationId })); }
 
@@ -18,10 +18,10 @@ async function main() {
   const options = parseArgs(process.argv.slice(2));
   const aliases = JSON.parse(await readFile(resolve(options.aliases), "utf8")) as AliasConfig;
   const existing = options.existing ? JSON.parse(await readFile(resolve(options.existing), "utf8")) as ExistingSnapshot : undefined;
-  const workbook = await readWorkbook("docs/Monthly Compare.xlsx", aliases);
+  const workbook = await readWorkbook("ai-context/planning/Monthly Compare.xlsx", aliases);
   const company = setOrganisation(workbook.company, options.organisationId); const members = setOrganisation(workbook.members, options.organisationId);
   const report = validateImport({ company, members, warnings: workbook.warnings, unresolvedMembers: workbook.unresolvedMembers, skippedRows: workbook.skippedRows, existing, policy: options.policy });
-  const summary = { source: basename("docs/Monthly Compare.xlsx"), organisation_id: options.organisationId, policy: options.policy, totals: { companyRows: company.length, memberRows: members.length, validCompanyRows: report.validCompanyRows.length, validMemberRows: report.validMemberRows.length, warnings: report.warnings.length, blockingErrors: report.errors.length, unresolvedMembers: report.unresolvedMembers.length, duplicateRows: report.duplicates.length, skippedRows: report.skippedRows.length }, report };
+  const summary = { source: basename("ai-context/planning/Monthly Compare.xlsx"), organisation_id: options.organisationId, policy: options.policy, totals: { companyRows: company.length, memberRows: members.length, validCompanyRows: report.validCompanyRows.length, validMemberRows: report.validMemberRows.length, warnings: report.warnings.length, blockingErrors: report.errors.length, unresolvedMembers: report.unresolvedMembers.length, duplicateRows: report.duplicates.length, skippedRows: report.skippedRows.length }, report };
   if (options.command === "preview") { console.log(JSON.stringify(summary, null, 2)); return; }
   if (options.command === "validate") { console.log(JSON.stringify(summary, null, 2)); if (report.errors.length) process.exitCode = 1; return; }
   await mkdir(resolve(options.output), { recursive: true });

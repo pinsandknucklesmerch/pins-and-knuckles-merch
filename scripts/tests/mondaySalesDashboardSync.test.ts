@@ -242,6 +242,6 @@ test("the CLI imports under plain Node and keeps the Monday token out of client 
   assert.match(source, /process\.env\.MONDAY_API_TOKEN/);
   assert.doesNotMatch(source, /NEXT_PUBLIC_MONDAY/);
   assert.doesNotMatch(source, /import "server-only"/);
-  const result = await promisify(execFile)(process.execPath, ["--experimental-strip-types", "--input-type=module", "--eval", "await import('./scripts/sync-monday-sales-dashboard.ts')"], { cwd: process.cwd() });
+  const result = await promisify(execFile)(process.execPath, ["--experimental-strip-types", "--experimental-default-type=module", "--input-type=module", "--eval", "await import('./scripts/sync-monday-sales-dashboard.ts')"], { cwd: process.cwd() });
   assert.equal(result.stderr, "");
 });

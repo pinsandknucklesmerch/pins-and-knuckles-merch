@@ -1,0 +1,129 @@
+Current role authority: read ROLES.md at the repository root before any task. Codex must not change its own active role; missing, invalid or ambiguous selection defaults to RESTRICTED. The prompt below is historical evidence, not an instruction to perform work. RESTRICTED follows the restricted maintenance policy; DEVELOPER permits authorised full development under AGENTS.md and engineering standards. Destructive/production operations and infrastructure/deployment work still require explicit authorisation. Roles are procedural instructions, not security boundaries. Future changes remain at the company's own risk and responsibility; the departing developer has no ongoing support obligation. Historical risks remain open until separately resolved.
+
+Historical handover prompt — not current authority
+
+This prompt is retained as a historical record. Read ai-context/RESTRICTED_MAINTENANCE_POLICY.md and AGENTS.md first. The final procedural policy supersedes broader maintenance/access proposals below; this archived prompt grants no permission for provider access or production operations.
+
+# Pins Hub — Complete Remaining Technical Handover
+
+You are assisting a non-technical salesperson taking over basic maintenance of Pins Hub.
+
+Your objective is to complete as much of the remaining technical handover as safely possible, using the existing repository, documentation and available integrations.
+
+## 1. Understand the project
+
+Before doing anything:
+
+- Read `AGENTS.md` and all relevant repository instructions.
+- Read `ai-context/FINAL_HANDOVER_AUDIT.md`.
+- Read `ai-context/TECHNICAL_HANDOVER.md`.
+- Read `ai-context/HUB_SUPPORT_GUIDE.md`.
+- Inspect the current repository and its configuration.
+- Identify the existing GitHub, Supabase, Vercel and Monday integrations.
+
+Do not assume the documentation is current. Compare it against the actual configuration where read-only access is available.
+
+## 2. GitHub access and protection
+
+- Confirm the current GitHub account has repository access.
+- Check repository visibility and branch protection.
+- Identify whether `main` and `stable` are protected.
+- Confirm whether pull requests can be created.
+- Recommend the safest workflow for a non-technical maintainer.
+
+Do not change permissions, branch protection or repository visibility without explicit approval.
+
+## 3. Supabase backups
+
+- Inspect available backup and recovery settings.
+- Confirm whether automated backups or point-in-time recovery are enabled.
+- Determine whether an existing backup can be restored.
+- Identify the safest supported recovery procedure.
+- Document any missing protection.
+
+Do not modify production data, enable paid features or perform a restoration.
+
+## 4. Vercel deployment and rollback
+
+- Confirm access to the correct Vercel project.
+- Inspect production deployment configuration.
+- Identify the current production deployment and available rollback options.
+- Review domain configuration and ownership information.
+- Document the procedure for recovering from a failed deployment.
+
+Do not trigger deployments, rollbacks or configuration changes.
+
+## 5. Authentication and recovery
+
+- Review the recently corrected password-recovery implementation.
+- Confirm that the expected redirect configuration is documented.
+- Inspect available Supabase authentication settings.
+- Identify what is required to verify live password-reset emails.
+
+Do not send recovery emails or modify authentication settings without approval.
+
+## 6. Monday integration
+
+- Identify where Monday API credentials are used.
+- Determine whether integrations depend on Duncan's personal credentials.
+- Identify the safest migration approach to a company-managed credential.
+- Document the required account permissions and migration steps.
+
+Do not expose, rotate or replace credentials. Do not trigger synchronisation jobs.
+
+## 7. Prepare the salesperson's workflow
+
+Ensure the handover documentation explains how to:
+
+1. Open Pins Hub in VS Code.
+2. Start Codex.
+3. Request a small change using plain English.
+4. Review Codex's explanation of the changes.
+5. Create a separate working branch.
+6. Submit a pull request.
+7. Request approval before merging or deploying.
+8. Recognise when a task requires technical support.
+
+Use straightforward language suitable for someone without programming experience.
+
+## 8. Update documentation
+
+Update the existing handover documents with verified findings.
+
+Keep sensitive information out of the public repository, including credentials, private infrastructure details and operational recovery secrets.
+
+If information is sensitive, report it privately rather than committing it.
+
+## Safety restrictions
+
+- Do not change production settings or data.
+- Do not modify permissions without approval.
+- Do not deploy, merge, push or trigger synchronisation jobs.
+- Do not execute database migrations.
+- Do not expose credentials or secrets.
+- Do not make unrelated application changes.
+- Do not run lint, tests, typecheck or build commands.
+- Do not claim a backup or rollback is verified unless its recovery procedure has actually been demonstrated.
+- If an external system cannot be accessed, report it as unverified rather than assuming success.
+- Ask for approval before any action that could affect the live application.
+
+## Final report
+
+Provide a simple handover status report containing:
+
+1. **Completed:** Everything successfully checked or prepared.
+2. **Verified:** Findings supported by actual system access.
+3. **Unverified:** Items that could not be confirmed.
+4. **Manual actions:** Tasks requiring someone to use GitHub, Supabase, Vercel or Monday.
+5. **Risks:** Anything that could prevent safe maintenance.
+6. **Next steps:** A numbered list of remaining actions, with simple instructions.
+
+Finish with one of these conclusions:
+
+- READY
+- READY WITH RESTRICTIONS
+- NOT READY
+
+Explain the decision briefly.
+
+The ultimate goal is to allow the salesperson to perform occasional small updates safely without requiring them to understand the application's architecture or manage production infrastructure independently.

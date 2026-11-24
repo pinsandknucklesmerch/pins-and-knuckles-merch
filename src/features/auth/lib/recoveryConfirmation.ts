@@ -8,11 +8,18 @@ export type RecoveryConfirmationInput = {
 };
 
 export function getSafeAuthNextPath(next: string | null) {
-  if (!next || !next.startsWith("/") || next.startsWith("//")) {
-    return "/auth/update-password";
+  const fallback = "/auth/update-password";
+  if (!next || !next.startsWith("/") || next.startsWith("//") || /[\\\u0000-\u001f\u007f]/.test(next)) {
+    return fallback;
   }
 
-  return next;
+  // URL parsing normalizes some inputs; check the resulting origin before redirecting.
+  const origin = "https://pins-hub.invalid";
+  try {
+    return new URL(next, origin).origin === origin ? next : fallback;
+  } catch {
+    return fallback;
+  }
 }
 
 export function parseRecoveryConfirmationInput(values: {

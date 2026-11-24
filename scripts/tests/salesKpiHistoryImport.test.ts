@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { generateSql, memberKey, parseMonth, parseNumber, parseYear, readWorkbook, resolveMember, validateImport, type CompanyRow, type MemberRow } from "../lib/salesKpiHistoryImport.ts";
 
@@ -18,10 +20,26 @@ test("resolves exact names before aliases and aliases into canonical keys", () =
 });
 
 test("maps the workbook company and member source rows without importing derived rates", async () => {
-  const workbook = await readWorkbook("docs/Monthly Compare.xlsx", { memberYear: 2024, knownMembers: ["Hardus", "Bux", "Bernie", "Catherine", "Johan"], aliases: { CAT: "Catherine" } });
+  const workbook = await readWorkbook("ai-context/planning/Monthly Compare.xlsx", { memberYear: 2024, knownMembers: ["Hardus", "Bux", "Bernie", "Catherine", "Johan"], aliases: { CAT: "Catherine" } });
   assert.equal(workbook.company.length, 59); assert.equal(workbook.members.length, 54);
   assert.deepEqual(workbook.company.find((row) => row.year === 2024 && row.month === 1), { ...company, monthly_profit: 109605, quotes_done: 341, sales_inbox_enquiries: 103, converted: 48 });
   assert.deepEqual(workbook.members.find((row) => row.month === 1 && row.team_member_key === "catherine"), { ...member, team_member_name: "Catherine", sales_inbox_enquiries: 29, converted: 11, profit: 5014 });
+});
+
+test("the local preview command reads the relocated workbook without generating or applying data", () => {
+  const output = execFileSync(process.execPath, [
+    "--experimental-strip-types", "--import", "./scripts/register-test-alias.mjs",
+    "./scripts/import-sales-kpi-history.ts", "preview", "--organisation-id", "global",
+  ], {
+    cwd: fileURLToPath(new URL("../../", import.meta.url)),
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  const summary = JSON.parse(output);
+  assert.equal(summary.source, "Monthly Compare.xlsx");
+  assert.equal(summary.totals.companyRows, 59);
+  assert.equal(summary.totals.memberRows, 54);
+  assert.equal(summary.totals.blockingErrors, 0);
 });
 
 test("detects duplicate and unresolved rows as blocking validation failures", () => {

@@ -6,7 +6,7 @@ import type {
   SalespersonMonthlyMetric,
 } from "../types";
 
-// Normalized from docs/Monthly Compare.xlsx.
+// Normalized from ai-context/planning/Monthly Compare.xlsx.
 // Percentages are stored as percentage points (for example 59.2 means 59.2%).
 // Blank workbook cells remain null; no November or December values are inferred.
 

@@ -4,7 +4,7 @@ import { MondayClient, dateCoverage, normalizeBoard, sampleItem, summarizeMonthl
 import { aggregateYear, discoverMonthlyBoards } from "./lib/monday/monthlyBoardAudit.ts";
 import { auditProfitTracking, type ProfitTrackingAudit } from "./lib/monday/profitTracking.ts";
 
-const output = "docs/imports/monday-sales-history";
+const output = "ai-context/imports/monday-sales-history";
 function option(args: string[], name: string) { const index = args.indexOf(name); return index === -1 ? undefined : args[index + 1]; }
 function year(args: string[]) { const value = Number(option(args, "--year")); if (!Number.isInteger(value) || value < 2020) throw new Error("--year must be a four-digit year."); return value; }
 function boardId(args: string[]) { const id = option(args, "--board-id") ?? process.env.MONDAY_SALES_BOARD_ID ?? process.env.MONDAY_QUOTES_BOARD_ID ?? process.env.MONDAY_ORDERS_BOARD_ID; if (!id) throw new Error("--board-id is required (or set a MONDAY_*_BOARD_ID server-only variable)."); return id; }

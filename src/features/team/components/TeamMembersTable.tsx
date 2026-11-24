@@ -3,22 +3,30 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ActionMenu } from "@/components/ui/ActionMenu";
+import { ActionButton } from "@/components/ui/ActionButton";
+import { Dialog } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { feedback } from "@/components/ui/feedback";
-import { resendInvite } from "../actions/users";
+import { requestUserPasswordReset, resendInvite } from "../actions/users";
 import type { TeamMember } from "../data/teamMembers";
 import { USER_TABLE_COLUMNS } from "../lib/table";
 import { UserEditDialog } from "./UserEditDialog";
 
 const date = (value: string | null) => value ? new Intl.DateTimeFormat("en-ZA", { dateStyle: "medium" }).format(new Date(value)) : "—";
 
-export function TeamMembersTable({ members, currentUserId }: { members: TeamMember[]; currentUserId?: string }) {
+export function TeamMembersTable({ members, currentUserId, canResetPasswords = false, canManagePrivilegedUsers = false }: {
+  members: TeamMember[];
+  currentUserId?: string;
+  canResetPasswords?: boolean;
+  canManagePrivilegedUsers?: boolean;
+}) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [role, setRole] = useState("all");
   const [status, setStatus] = useState("all");
   const [editing, setEditing] = useState<TeamMember | null>(null);
+  const [resetting, setResetting] = useState<TeamMember | null>(null);
   const [pending, startTransition] = useTransition();
   const visible = useMemo(() => members.filter((member) => {
     const matchesQuery = `${member.fullName ?? ""} ${member.email ?? ""}`.toLowerCase().includes(query.toLowerCase());
@@ -30,6 +38,25 @@ export function TeamMembersTable({ members, currentUserId }: { members: TeamMemb
     startTransition(async () => {
       const result = await resendInvite(undefined, data);
       if (result.status === "success") feedback.success(result.message ?? "Invitation resent."); else feedback.error(result.message ?? "Invitation could not be resent.");
+    });
+  }
+
+  function resetPassword() {
+    if (!resetting || pending) return;
+    const data = new FormData();
+    data.set("membership_id", resetting.id);
+    startTransition(async () => {
+      try {
+        const result = await requestUserPasswordReset(data);
+        if (result.status === "success") {
+          feedback.success(result.message ?? "Password-reset email requested.");
+          setResetting(null);
+        } else {
+          feedback.error(result.message ?? "Password-reset email could not be sent. Please try again later.");
+        }
+      } catch {
+        feedback.error("Password-reset email could not be sent. Please try again later.");
+      }
     });
   }
 
@@ -50,6 +77,9 @@ export function TeamMembersTable({ members, currentUserId }: { members: TeamMemb
           <td className="px-4 py-3"><ActionMenu label="Manage" pending={pending} items={[
             { label: "Edit user", onSelect: () => setEditing(member) },
             { label: "Change access", onSelect: () => setEditing(member) },
+            ...(canResetPasswords && member.userId && member.email
+              && (canManagePrivilegedUsers || (!member.isOwner && member.accessLevel !== "developer"))
+              ? [{ label: "Reset Password", onSelect: () => setResetting(member) }] : []),
             ...(!member.isOwner && member.userId !== currentUserId ? [{ label: "View performance", onSelect: () => router.push(`/hub/team/${member.id}`) }] : []),
             ...(member.status === "Pending" ? [{ label: "Resend invite", onSelect: () => resend(member) }] : []),
             ...(!member.isOwner && member.userId !== currentUserId ? [{ label: member.status === "Inactive" ? "Reactivate" : "Deactivate", onSelect: () => setEditing(member) }] : []),
@@ -58,5 +88,12 @@ export function TeamMembersTable({ members, currentUserId }: { members: TeamMemb
       </table>
     </div>
     {editing ? <UserEditDialog key={editing.id} member={editing} onClose={() => setEditing(null)} /> : null}
+    {resetting ? <Dialog open title="Reset Password" className="max-w-md" onClose={() => { if (!pending) setResetting(null); }}
+      description={<>Send a password-reset email for {resetting.fullName || "this user"} ({resetting.email})? It will go to their registered account address so they can choose a new password.</>}>
+      <div className="flex justify-end gap-2">
+        <button type="button" disabled={pending} onClick={() => setResetting(null)} className="h-9 rounded-md border border-input px-3 text-sm hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Cancel</button>
+        <ActionButton disabled={pending} onClick={resetPassword}>{pending ? "Sending…" : "Send reset email"}</ActionButton>
+      </div>
+    </Dialog> : null}
   </>;
 }
